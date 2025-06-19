@@ -119,6 +119,14 @@ if ($_POST) {
         <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
         <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
         <li class="nav-item"><a class="nav-link" href="#horario">Horarios</a></li>
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="carrito.php">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+              0
+            </span>
+          </a>
+        </li>
       </ul>
     </div>
   </div>
@@ -174,7 +182,14 @@ if ($_POST) {
             <h5 class="card-title"><?php echo $registro["nombre"];?></h5>
             <p class="card-text small"><strong><?php echo $registro["ingredientes"];?></strong></p>
             <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"];?></p>
-            <button class="btn btn-agregar mt-auto">Agregar</button>
+            <button class="btn btn-agregar mt-auto" 
+                    data-id="<?php echo $registro['ID']; ?>" 
+                    data-nombre="<?php echo $registro['nombre']; ?>" 
+                    data-precio="<?php echo $registro['precio']; ?>" 
+                    data-img="img/menu/<?php echo $registro['foto']; ?>">
+              Agregar
+            </button>
+
           </div>
         </div>
       </div>
@@ -220,6 +235,32 @@ if ($_POST) {
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+
+<script>
+  function actualizarContador() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    document.getElementById("contador-carrito").textContent = carrito.length;
+  }
+
+  document.querySelectorAll(".btn-agregar").forEach(boton => {
+    boton.addEventListener("click", () => {
+      const item = {
+        id: boton.dataset.id,
+        nombre: boton.dataset.nombre,
+        precio: parseFloat(boton.dataset.precio),
+        img: boton.dataset.img
+      };
+
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      carrito.push(item);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      actualizarContador();
+    });
+  });
+
+  window.onload = actualizarContador;
+</script>
+
 
 </body>
 </html>
