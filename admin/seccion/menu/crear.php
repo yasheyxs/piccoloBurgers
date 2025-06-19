@@ -16,7 +16,7 @@ if($_POST){
     $tmp_foto= $_FILES["foto"]["tmp_name"];
 
     if($tmp_foto!=""){
-      move_uploaded_file($tmp_foto,"../../../images/menu/".$nombre_foto);
+      move_uploaded_file($tmp_foto,"../../../img/menu/".$nombre_foto);
     }
 
     $sentencia->bindParam(":foto", $nombre_foto);

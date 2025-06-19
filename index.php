@@ -46,6 +46,7 @@ if ($_POST) {
   <style>
     body {
       font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.7rem;
     }
     .btn-gold {
       background-color: #fac30c;
@@ -61,6 +62,46 @@ if ($_POST) {
       margin: 0;
       font-size: 1rem;
     }
+
+    .card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .card:hover .card-img-top {
+      transform: scale(1.05);
+    }
+
+    .card .btn-agregar {
+      background-color: #fac30c;
+      color: #000;
+      font-weight: bold;
+      border: none;
+      padding: 8px 20px;
+      border-radius: 20px;
+      margin-top: 10px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      width: 100%;
+    }
+
+    .card .btn-agregar:hover {
+      background-color: #e0ae00;
+      transform: scale(1.05);
+    }
+
+
   </style>
 </head>
 <body>
@@ -85,9 +126,9 @@ if ($_POST) {
 
 <section class="container-fluid p-0">
   <div class="banner-img" style="position:relative; background:url('img/pexels-atomlaborblog-776314.webp') center/cover no-repeat; height:400px;">
-    <div class="banner-text" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; color:#fff;">
+    <div class="banner-text" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; color:#fff; text-shadow: 5px 5px 9px rgba(0,0,0,0.7);">
       <?php foreach($lista_banners as $banner){ ?>
-        <h1><?php echo $banner['titulo'];?></h1>
+        <h1 style="font-size: 5rem;"><?php echo $banner['titulo'];?></h1>
         <p><?php echo $banner['descripcion'];?></p>
         <a href="<?php echo $banner['link'];?>" class="btn btn-gold">Ver Menú</a>
       <?php } ?>
@@ -127,12 +168,13 @@ if ($_POST) {
   <div class="row row-cols-1 row-cols-md-4 g-4">
     <?php foreach($lista_menu as $registro) { ?>
       <div class="col d-flex">
-        <div class="card">
-          <img src="images/menu/<?php echo $registro["foto"];?>" class="card-img-top">
-          <div class="card-body">
+        <div class="card position-relative">
+          <img src="img/menu/<?php echo $registro["foto"];?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
+          <div class="card-body d-flex flex-column">
             <h5 class="card-title"><?php echo $registro["nombre"];?></h5>
             <p class="card-text small"><strong><?php echo $registro["ingredientes"];?></strong></p>
             <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"];?></p>
+            <button class="btn btn-agregar mt-auto">Agregar</button>
           </div>
         </div>
       </div>
@@ -163,18 +205,14 @@ if ($_POST) {
 <div id="horario" class="text-center bg-light p-4">
   <h3 class="mb-4">Horario de atención</h3>
   <div>
-    <p><strong>Lunes a Viernes</strong></p>
-    <p><strong>11:00 a.m. - 10:00 p.m.</strong></p>
+    <p><strong>Martes a Domingo y feriados</strong></p>
+    <p><strong>20:00 hs - 00:30 hs</strong></p>
   </div>
   <div>
-    <p><strong>Sábado</strong></p>
-    <p><strong>12:00 a.m. - 5:00 p.m.</strong></p>
-  </div>
-  <div>
-    <p><strong>Domingo</strong></p>
-    <p><strong>7:00 a.m. - 2:00 p.m.</strong></p>
+    <p><em>Lunes cerrado</em></p>
   </div>
 </div>
+
 
 <footer class="bg-dark text-light text-center py-3">
   <p>&copy; 2025 Piccolo Burgers — Developed by: <strong>Jazmin Abigail Gaido - Mariano Jesús Ceballos - Juan Pablo Medina</strong></p>
