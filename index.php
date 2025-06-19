@@ -1,3 +1,5 @@
+<?php session_start(); ?>
+
 <?php 
 include("admin/bd.php");
 
@@ -128,6 +130,14 @@ if ($_POST) {
           </a>
         </li>
       </ul>
+      <?php if (isset($_SESSION["cliente"])): ?>
+      <span class="text-white ms-3 d-flex align-items-center">
+        👤 <?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>
+      </span>
+      <a href="logout_cliente.php" class="btn btn-gold ms-2">Cerrar sesión</a>
+      <?php else: ?>
+        <a href="login_cliente.php" class="btn btn-outline-light ms-3">Iniciar sesión</a>
+      <?php endif; ?>
     </div>
   </div>
 </nav>
