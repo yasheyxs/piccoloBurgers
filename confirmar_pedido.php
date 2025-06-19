@@ -55,6 +55,35 @@
       <textarea class="form-control" id="nota" name="nota" rows="3"></textarea>
     </div>
 
+    <div class="mb-3">
+    <label for="metodo_pago" class="form-label">Método de pago:</label>
+    <select class="form-control" id="metodo_pago" name="metodo_pago" required>
+        <option value="">Seleccionar</option>
+        <option value="Efectivo">Efectivo</option>
+        <option value="Tarjeta">Tarjeta</option>
+        <option value="MercadoPago">Mercado Pago</option>
+    </select>
+    </div>
+
+    <div class="mb-3">
+    <label for="tipo_entrega" class="form-label">Tipo de entrega:</label>
+    <select class="form-control" id="tipo_entrega" name="tipo_entrega" required onchange="mostrarDireccion(this.value)">
+        <option value="">Seleccionar</option>
+        <option value="Retiro">Retiro en el local</option>
+        <option value="Delivery">Delivery</option>
+    </select>
+    <div class="alert alert-warning" id="aviso-delivery" style="display: none; font-size: 1.2rem;">
+        🚚 El servicio de delivery tiene un costo adicional de entre <strong>$1000</strong> y <strong>$1500</strong>, dependiendo de la zona.
+    </div>
+
+    </div>
+
+    <div class="mb-3" id="grupo-direccion" style="display: none;">
+    <label for="direccion" class="form-label">Dirección (solo delivery):</label>
+    <input type="text" class="form-control" id="direccion" name="direccion">
+    </div>
+
+
     <input type="hidden" name="carrito" id="carrito">
     <button type="submit" class="btn btn-gold w-100">Enviar Pedido</button>
   </form>
@@ -90,6 +119,23 @@ document.getElementById("form-pedido").addEventListener("submit", async function
     form.reset();
   }
 });
+
+function mostrarDireccion(valor) {
+  const grupoDireccion = document.getElementById("grupo-direccion");
+  const aviso = document.getElementById("aviso-delivery");
+
+  if (valor === "Delivery") {
+    grupoDireccion.style.display = "block";
+    aviso.style.display = "block";
+    document.getElementById("direccion").setAttribute("required", "required");
+  } else {
+    grupoDireccion.style.display = "none";
+    aviso.style.display = "none";
+    document.getElementById("direccion").removeAttribute("required");
+  }
+}
+
+
 </script>
 
 </body>

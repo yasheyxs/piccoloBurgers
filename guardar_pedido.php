@@ -11,9 +11,22 @@ $nombre = $_POST["nombre"];
 $telefono = $_POST["telefono"];
 $email = $_POST["email"] ?? null;
 $nota = $_POST["nota"] ?? "";
+$metodo_pago = $_POST["metodo_pago"] ?? "";
+$tipo_entrega = $_POST["tipo_entrega"] ?? "";
+$direccion = $_POST["direccion"] ?? null;
+
 
 if (empty($_POST["carrito"])) {
     echo "<div class='alert alert-warning'>El carrito está vacío.</div>";
+    exit;
+}
+if (!$metodo_pago || !$tipo_entrega) {
+    echo "<div class='alert alert-warning'>Por favor, seleccioná método de pago y tipo de entrega.</div>";
+    exit;
+}
+
+if ($tipo_entrega === "Delivery" && !$direccion) {
+    echo "<div class='alert alert-warning'>Debes ingresar una dirección para el envío.</div>";
     exit;
 }
 
@@ -31,8 +44,9 @@ try {
         $total += $item["precio"];
     }
 
-    $sentencia = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total) VALUES (?, ?, ?, ?, ?)");
-    $sentencia->execute([$nombre, $telefono, $email, $nota, $total]);
+    $sentencia = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    $sentencia->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion]);
+
 
     $pedido_id = $conexion->lastInsertId();
 

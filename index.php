@@ -104,7 +104,7 @@ if ($_POST) {
 
   </style>
 </head>
-<body>
+<body id="top">
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
@@ -259,6 +259,31 @@ if ($_POST) {
   });
 
   window.onload = actualizarContador;
+</script>
+
+<a href="#top" id="scrollTopBtn" class="btn btn-gold" style="
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 999;
+  display: none;
+  font-size: 1.5rem;
+  border-radius: 50%;
+  padding: 12px 16px;
+">
+  <i class="fas fa-arrow-up"></i>
+</a>
+
+<script>
+  // Mostrar u ocultar botón según scroll
+  window.onscroll = function () {
+    const btn = document.getElementById("scrollTopBtn");
+    if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
+      btn.style.display = "block";
+    } else {
+      btn.style.display = "none";
+    }
+  };
 </script>
 
 
