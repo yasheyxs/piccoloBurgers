@@ -80,7 +80,6 @@ if ($usar_puntos && isset($_SESSION["cliente"])) {
     }
 }
 
-
 try {
     // Insertar pedido
     $estado_inicial = "En preparación";
