@@ -74,6 +74,18 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <p><strong>Total:</strong> $<?= number_format($pedido["total"], 2) ?></p>
       <p><strong>Entrega:</strong> <?= htmlspecialchars($pedido["tipo_entrega"]) ?></p>
       <p><strong>Método de pago:</strong> <?= htmlspecialchars($pedido["metodo_pago"]) ?></p>
+      <p><strong>Estado:</strong> 
+            <?php if ($pedido["estado"] === "Cancelado"): ?>
+                <span class="text-danger">Cancelado ❌ — Lamentamos que tu pedido haya sido cancelado. Esperamos servirte mejor la próxima vez</span>
+            <?php elseif ($pedido["estado"] === "Listo"): ?>
+                <span class="text-success">Listo ✅</span>
+            <?php elseif ($pedido["estado"] === "En preparación"): ?>
+                <span class="text-warning">En preparación ⏳</span>
+            <?php else: ?>
+                <?= htmlspecialchars($pedido["estado"]) ?>
+            <?php endif; ?>
+        </p>
+
       <p><strong>Nota:</strong> <?= nl2br(htmlspecialchars($pedido["nota"])) ?></p>
       <strong>Productos:</strong>
       <ul>

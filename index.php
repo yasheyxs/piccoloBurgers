@@ -197,9 +197,10 @@ if ($_POST) {
   <h2 class="text-center">Menú</h2>
 
   <div class="mb-3 text-center">
-    <form method="get" class="d-inline">
+    <form class="d-inline">
       <label for="categoria" class="form-label me-2">Filtrar por categoría:</label>
-      <select name="categoria" id="categoria" class="form-select d-inline w-auto" onchange="this.form.submit()">
+      <select id="categoria" class="form-select d-inline w-auto">
+
         <option value="">Todos</option>
         <?php foreach ($categorias_disponibles as $cat): ?>
           <option value="<?= $cat ?>" <?= ($cat == $categoria_seleccionada) ? 'selected' : '' ?>><?= $cat ?></option>
@@ -208,7 +209,7 @@ if ($_POST) {
     </form>
   </div>
 
-  <div class="row row-cols-1 row-cols-md-4 g-4">
+  <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
     <?php foreach($lista_menu as $registro) { ?>
       <div class="col d-flex">
         <div class="card position-relative">
@@ -319,6 +320,32 @@ if ($_POST) {
       btn.style.display = "none";
     }
   };
+</script>
+
+<script>
+  document.getElementById("categoria").addEventListener("change", function () {
+    const categoria = this.value;
+    fetch("filtrar_menu.php?categoria=" + encodeURIComponent(categoria))
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("contenedor-menu").innerHTML = html;
+        // volver a asignar eventos a botones "Agregar"
+        document.querySelectorAll(".btn-agregar").forEach(boton => {
+          boton.addEventListener("click", () => {
+            const item = {
+              id: boton.dataset.id,
+              nombre: boton.dataset.nombre,
+              precio: parseFloat(boton.dataset.precio),
+              img: boton.dataset.img
+            };
+            let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+            carrito.push(item);
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+            actualizarContador();
+          });
+        });
+      });
+  });
 </script>
 
 
