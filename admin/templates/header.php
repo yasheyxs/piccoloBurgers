@@ -52,6 +52,7 @@ if (MODO_DESARROLLO) {
             <a class="nav-item nav-link" href="<?php echo $url_base;?>seccion/menu/">Menú</a>
             <a class="nav-item nav-link" href="<?php echo $url_base;?>seccion/comentarios/">Comentarios</a>
             <a class="nav-item nav-link" href="<?php echo $url_base;?>seccion/usuarios/">Usuarios</a>
+            <a class="nav-item nav-link" href="<?php echo $url_base;?>panel_cocina.php">Panel de cocina</a>
             <a class="nav-item nav-link" href="<?php echo $url_base;?>cerrar.php">Cerrar sesión</a>
 
 

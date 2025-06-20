@@ -52,28 +52,40 @@ $descuento = 0;
 
 if ($usar_puntos && isset($_SESSION["cliente"])) {
     $valor_por_punto = 20;
+    $minimo_puntos_para_canjear = 50;
+    $redondear_a_multiplo = 100;
+
     $cliente_id = $_SESSION["cliente"]["id"];
 
+    // Obtener puntos actuales
     $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
     $stmt->execute([$cliente_id]);
     $puntos_disponibles = $stmt->fetchColumn();
 
-    $descuento_max = $total * 0.25;
-    $puntos_posibles = floor($descuento_max / $valor_por_punto);
-    $puntos_usados = min($puntos_disponibles, $puntos_posibles);
-    $descuento = $puntos_usados * $valor_por_punto;
+    if ($puntos_disponibles >= $minimo_puntos_para_canjear) {
+        $descuento_max = $total * 0.25;
 
-    $total -= $descuento;
+        // Redondear descuento máximo hacia abajo al múltiplo más cercano
+        $descuento_max_redondeado = floor($descuento_max / $redondear_a_multiplo) * $redondear_a_multiplo;
 
-    // Restar puntos
-    $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos - ? WHERE ID = ?");
-    $stmt->execute([$puntos_usados, $cliente_id]);
+        $puntos_posibles = floor($descuento_max_redondeado / $valor_por_punto);
+        $puntos_usados = min($puntos_disponibles, $puntos_posibles);
+        $descuento = $puntos_usados * $valor_por_punto;
+
+        $total -= $descuento;
+
+        // Restar puntos
+        $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos - ? WHERE ID = ?");
+        $stmt->execute([$puntos_usados, $cliente_id]);
+    }
 }
+
 
 try {
     // Insertar pedido
-    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion]);
+    $estado_inicial = "En preparación";
+    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $estado_inicial]);
     $pedido_id = $conexion->lastInsertId();
 
     // Insertar detalle
