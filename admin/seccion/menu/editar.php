@@ -9,17 +9,22 @@ if($_POST){
     $nombre=(isset($_POST["nombre"]))?$_POST["nombre"]:"";
     $ingredientes=(isset($_POST["ingredientes"]))?$_POST["ingredientes"]:"";
     $precio=(isset($_POST["precio"]))?$_POST["precio"]:"";
+    $categoria = (isset($_POST["categoria"])) ? $_POST["categoria"] : "";
+
 
     $sentencia=$conexion->prepare(" UPDATE tbl_menu SET
-            nombre=:nombre, 
-            ingredientes=:ingredientes,
-            precio=:precio 
-            WHERE id = :id ");
-            $sentencia->bindParam(":nombre",$nombre);
-            $sentencia->bindParam(":ingredientes",$ingredientes);
-            $sentencia->bindParam(":precio",$precio);
-            $sentencia->bindParam(":id",$txtID);
-            $sentencia->execute();
+      nombre=:nombre, 
+      ingredientes=:ingredientes,
+      precio=:precio,
+      categoria=:categoria 
+      WHERE id = :id ");
+    $sentencia->bindParam(":nombre",$nombre);
+    $sentencia->bindParam(":ingredientes",$ingredientes);
+    $sentencia->bindParam(":precio",$precio);
+    $sentencia->bindParam(":categoria",$categoria);
+    $sentencia->bindParam(":id",$txtID);
+    $sentencia->execute();
+
 
     // Proceso de actualización de foto 
     $foto=(isset($_FILES['foto']["name"]))?$_FILES['foto']["name"]:"";
@@ -71,6 +76,8 @@ if(isset($_GET['txtID'])){
      $ingredientes=$registro["ingredientes"];
      $foto=$registro["foto"];
      $precio=$registro["precio"];
+     $categoria=$registro["categoria"];
+
 }
 
 
@@ -117,8 +124,20 @@ include ("../../templates/header.php");
       <label for="precio" class="form-label">Precio:</label>
       <input type="text"
         class="form-control" name="precio" value="<?php echo $precio;?>" id="precio" aria-describedby="helpId" placeholder="Precio">
-      
     </div>
+
+    <div class="mb-3">
+      <label for="categoria" class="form-label">Categoría:</label>
+      <select class="form-select" name="categoria" id="categoria" required>
+        <option value="">Seleccionar...</option>
+        <option value="Hamburguesas" <?= ($categoria == 'Hamburguesas') ? 'selected' : '' ?>>Hamburguesas</option>
+        <option value="Lomitos y Sándwiches" <?= ($categoria == 'Lomitos y Sándwiches') ? 'selected' : '' ?>>Lomitos y Sándwiches</option>
+        <option value="Pizzas" <?= ($categoria == 'Pizzas') ? 'selected' : '' ?>>Pizzas</option>
+        <option value="Bebidas" <?= ($categoria == 'Bebidas') ? 'selected' : '' ?>>Bebidas</option>
+        <option value="Acompañamientos" <?= ($categoria == 'Acompañamientos') ? 'selected' : '' ?>>Acompañamientos</option>
+      </select>
+    </div>
+
 
     <button type="submit" class="btn btn-success">Modificar comida</button>
         <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>

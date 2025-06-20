@@ -29,9 +29,6 @@ $sentencia=$conexion->prepare("SELECT * FROM `tbl_menu`");
 $sentencia->execute();
 $lista_menu= $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
-
-
-
 include ("../../templates/header.php"); ?>
 <br>
 <div class="card">
@@ -49,6 +46,7 @@ include ("../../templates/header.php"); ?>
                     <th scope="col">Ingredientes</th>
                     <th scope="col">Foto</th>
                     <th scope="col">Precio</th>
+                    <th scope="col">Categoría</th>
                     <th scope="col">Acciones</th>
                 </tr>
             </thead>
@@ -62,6 +60,8 @@ include ("../../templates/header.php"); ?>
                         <td><?php echo $registro["ingredientes"];?></td>
                         <td> <img src="../../../images/menu/<?php echo $registro['foto']; ?>" width="50" alt="" srcset="">    </td>
                         <td>$<?php echo $registro["precio"];?></td>
+
+                        <td><?php echo $registro["categoria"]; ?></td>
 
                         <td>   <a name="" id="" class="btn btn-info" href="editar.php?txtID=<?php echo $registro['ID']; ?>" role="button">Editar</a>
                                 <a name="" id="" class="btn btn-danger" href="index.php?txtID=<?php echo $registro['ID']; ?>" role="button">Borrar</a> </td>

@@ -1,14 +1,16 @@
 <?php 
 include("../../bd.php");
+
 if($_POST){
 
     $nombre=(isset($_POST["nombre"]))?$_POST["nombre"]:"";
     $ingredientes=(isset($_POST["ingredientes"]))?$_POST["ingredientes"]:"";
     $precio=(isset($_POST["precio"]))?$_POST["precio"]:"";
+    $categoria=(isset($_POST["categoria"]))?$_POST["categoria"]:"General";
 
     $sentencia=$conexion->prepare("INSERT INTO 
-    `tbl_menu` (`ID`, `nombre`, `ingredientes`,`foto`,`precio`) 
-    VALUES (NULL,:nombre,:ingredientes,:foto,:precio);");
+    tbl_menu (ID, nombre, ingredientes, foto, precio, categoria) 
+    VALUES (NULL, :nombre, :ingredientes, :foto, :precio, :categoria);");
 
     $foto=(isset($_FILES['foto']["name"]))?$_FILES['foto']["name"]:"";
     $fecha_foto= new DateTime();
@@ -23,6 +25,7 @@ if($_POST){
     $sentencia->bindParam(":nombre", $nombre);
     $sentencia->bindParam(":ingredientes",$ingredientes);
     $sentencia->bindParam(":precio",$precio);
+    $sentencia->bindParam(":categoria",$categoria);
 
     $sentencia->execute();
     header("Location:index.php");
@@ -51,23 +54,29 @@ include ("../../templates/header.php"); ?>
     </div>
 
     <div class="mb-3">
+      <label for="categoria" class="form-label">Categoría:</label>
+      <select class="form-control" name="categoria" id="categoria">
+        <option value="Hamburguesas">Hamburguesas</option>
+        <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
+        <option value="Pizzas">Pizzas</option>
+        <option value="Bebidas">Bebidas</option>
+        <option value="Acompañamientos">Acompañamientos</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
       <label for="foto" class="form-label">Foto:</label>
       <input type="file" class="form-control" name="foto" id="foto" placeholder="" aria-describedby="fileHelpId">
     </div>
-
 
     <div class="mb-3">
       <label for="precio" class="form-label">Precio:</label>
       <input type="text"
         class="form-control" name="precio" id="precio" aria-describedby="helpId" placeholder="Precio">
-      
     </div>
 
     <button type="submit" class="btn btn-success">Agregar comida </button>
-        <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>
-
-
-
+    <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>
 
     </form>
 

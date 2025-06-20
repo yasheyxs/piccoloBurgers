@@ -3,6 +3,11 @@
 <?php 
 include("admin/bd.php");
 
+$categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
+
+$categoria_seleccionada = $_GET['categoria'] ?? '';
+$lista_menu = [];
+
 $sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC limit 1 ");
 $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
@@ -11,9 +16,15 @@ $sentencia = $conexion->prepare("SELECT * FROM tbl_testimonios ORDER BY id DESC 
 $sentencia->execute();
 $lista_testimonios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
-$sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
-$sentencia->execute();
-$lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+if ($categoria_seleccionada && in_array($categoria_seleccionada, $categorias_disponibles)) {
+    $sentencia = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
+    $sentencia->execute([$categoria_seleccionada]);
+    $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} else {
+    $sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
+    $sentencia->execute();
+    $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+}
 
 if ($_POST) {
     $nombre = filter_var($_POST["nombre"], FILTER_SANITIZE_STRING);
@@ -184,6 +195,19 @@ if ($_POST) {
 
 <section id="menu" class="container mt-4">
   <h2 class="text-center">Menú</h2>
+
+  <div class="mb-3 text-center">
+    <form method="get" class="d-inline">
+      <label for="categoria" class="form-label me-2">Filtrar por categoría:</label>
+      <select name="categoria" id="categoria" class="form-select d-inline w-auto" onchange="this.form.submit()">
+        <option value="">Todos</option>
+        <?php foreach ($categorias_disponibles as $cat): ?>
+          <option value="<?= $cat ?>" <?= ($cat == $categoria_seleccionada) ? 'selected' : '' ?>><?= $cat ?></option>
+        <?php endforeach; ?>
+      </select>
+    </form>
+  </div>
+
   <div class="row row-cols-1 row-cols-md-4 g-4">
     <?php foreach($lista_menu as $registro) { ?>
       <div class="col d-flex">
@@ -193,6 +217,7 @@ if ($_POST) {
             <h5 class="card-title"><?php echo $registro["nombre"];?></h5>
             <p class="card-text small"><strong><?php echo $registro["ingredientes"];?></strong></p>
             <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"];?></p>
+            <p class="card-text"><small><em><?php echo $registro["categoria"] ?? ''; ?></em></small></p>
             <button class="btn btn-agregar mt-auto" 
                     data-id="<?php echo $registro['ID']; ?>" 
                     data-nombre="<?php echo $registro['nombre']; ?>" 
@@ -200,7 +225,6 @@ if ($_POST) {
                     data-img="img/menu/<?php echo $registro['foto']; ?>">
               Agregar
             </button>
-
           </div>
         </div>
       </div>
