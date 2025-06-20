@@ -79,12 +79,13 @@
     </div>
 
     <div class="mb-3" id="grupo-direccion" style="display: none;">
-    <label for="direccion" class="form-label">Dirección (solo delivery):</label>
+    <label for="direccion" class="form-label">Dirección:</label>
     <input type="text" class="form-control" id="direccion" name="direccion">
     </div>
 
 
     <input type="hidden" name="carrito" id="carrito">
+    <input type="hidden" name="usar_puntos" id="usar_puntos" value="0">
     <button type="submit" class="btn btn-gold w-100">Enviar Pedido</button>
   </form>
 
@@ -92,6 +93,7 @@
 </div>
 
 <script>
+
 document.getElementById("form-pedido").addEventListener("submit", async function(e) {
   e.preventDefault();
   
@@ -105,6 +107,10 @@ document.getElementById("form-pedido").addEventListener("submit", async function
   const formData = new FormData(form);
   formData.set("carrito", JSON.stringify(carrito));
 
+  const usarPuntosCheckbox = localStorage.getItem("usar_puntos_activado") === "1";
+  formData.set("usar_puntos", usarPuntosCheckbox ? "1" : "0");
+
+
   const response = await fetch("guardar_pedido.php", {
     method: "POST",
     body: formData
@@ -113,9 +119,16 @@ document.getElementById("form-pedido").addEventListener("submit", async function
   const resultado = await response.text();
   document.getElementById("mensaje").innerHTML = resultado;
 
+  const contador = document.getElementById("contador-carrito");
+
   if (resultado.includes("Gracias")) {
     localStorage.removeItem("carrito");
-    document.getElementById("contador-carrito").textContent = "0";
+
+    const contador = document.getElementById("contador-carrito");
+    if (contador) {
+      contador.textContent = "0";
+    }
+
     form.reset();
   }
 });

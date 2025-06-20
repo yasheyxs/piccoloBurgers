@@ -68,10 +68,42 @@
 
   <div class="text-end mt-4">
     <h4>Total: $<span id="total">0.00</span></h4>
-    <button class="btn btn-danger me-2" onclick="vaciarCarrito()">Vaciar Carrito</button>
-    <a href="confirmar_pedido.php" class="btn btn-gold">🧾 Finalizar Pedido</a>
-  </div>
 
+    <?php
+      session_start();
+      $descuento_maximo = 0;
+      $puntos_cliente = 0;
+
+      if (isset($_SESSION["cliente"])) {
+        $cliente_id = $_SESSION["cliente"]["id"];
+        $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
+        $stmt->execute([$cliente_id]);
+        $puntos_cliente = $stmt->fetchColumn();
+      }
+    ?>
+
+    <?php if (isset($_SESSION["cliente"])): ?>
+      <div class="form-check mt-3 d-flex justify-content-end align-items-center gap-2">
+        <input class="form-check-input mt-0" type="checkbox" id="usarPuntos" onclick="actualizarTotal()">
+        <label class="form-check-label mb-0" for="usarPuntos">
+          Usar puntos (<?php echo $puntos_cliente; ?> disponibles)
+        </label>
+        <input type="hidden" id="puntosDisponibles" value="<?php echo $puntos_cliente; ?>">
+      </div>
+
+    <?php endif; ?>
+
+
+
+    <button class="btn btn-danger me-2" onclick="vaciarCarrito()">Vaciar Carrito</button>
+    <form id="formPedido" action="confirmar_pedido.php" method="post">
+      <input type="hidden" name="carrito" id="carritoInput">
+      <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
+
+      <button type="submit" class="btn btn-gold">🧾 Finalizar Pedido</button>
+    </form>
+
+  </div>
 </div>
 
 <footer class="bg-dark text-light text-center py-3 mt-5">
@@ -123,12 +155,49 @@ function actualizarContador() {
   }
 }
 
+function actualizarTotal() {
+  const usarPuntos = document.getElementById("usarPuntos")?.checked;
+  localStorage.setItem("usar_puntos_activado", usarPuntos ? "1" : "0");
+
+
+  const items = JSON.parse(localStorage.getItem('carrito')) || [];
+  const totalSpan = document.getElementById("total");
+  let total = items.reduce((acc, item) => acc + item.precio, 0);
+  const puntosDisponibles = parseInt(document.getElementById("puntosDisponibles")?.value || 0);
+
+  let descuento = 0;
+
+  if (usarPuntos && puntosDisponibles > 0) {
+    const valorPorPunto = 20;
+    const maximoDescuento = total * 0.25;
+    const puntosPosibles = Math.floor(maximoDescuento / valorPorPunto);
+    const puntosAUsar = Math.min(puntosDisponibles, puntosPosibles);
+
+    descuento = puntosAUsar * valorPorPunto;
+    document.getElementById("puntos_usados")?.remove();
+    totalSpan.insertAdjacentHTML("afterend", `<div id="puntos_usados" class="text-success">- $${descuento.toFixed(2)} aplicados en puntos</div>`);
+  } else {
+    document.getElementById("puntos_usados")?.remove();
+  }
+
+  totalSpan.textContent = (total - descuento).toFixed(2);
+}
 
 window.onload = () => {
   console.log("Contenido del carrito:", localStorage.getItem('carrito'));
   cargarCarrito();
   actualizarContador();
+  document.getElementById("usarPuntos")?.addEventListener("change", actualizarTotal);
 };
+
+document.getElementById("formPedido").addEventListener("submit", function (e) {
+  const usarPuntosChecked = document.getElementById("usarPuntos")?.checked;
+  document.getElementById("usarPuntosInput").value = usarPuntosChecked ? "1" : "0";
+
+  const carrito = localStorage.getItem("carrito");
+  document.getElementById("carritoInput").value = carrito;
+});
+
 
 </script>
 
