@@ -88,5 +88,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
 </div>
 
+<script>
+  // teléfono tenga solo números
+  document.getElementById("telefono").addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9]/g, "");
+  });
+</script>
+
+
 </body>
 </html>

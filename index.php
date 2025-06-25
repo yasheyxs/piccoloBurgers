@@ -279,20 +279,29 @@ if ($_POST) {
   }
 
   document.querySelectorAll(".btn-agregar").forEach(boton => {
-    boton.addEventListener("click", () => {
-      const item = {
-        id: boton.dataset.id,
-        nombre: boton.dataset.nombre,
-        precio: parseFloat(boton.dataset.precio),
-        img: boton.dataset.img
-      };
+  boton.addEventListener("click", () => {
+    const item = {
+      id: boton.dataset.id,
+      nombre: boton.dataset.nombre,
+      precio: parseFloat(boton.dataset.precio),
+      img: boton.dataset.img
+    };
 
-      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-      carrito.push(item);
-      localStorage.setItem("carrito", JSON.stringify(carrito));
-      actualizarContador();
-    });
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito.push(item);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarContador();
+
+    // Mostrar nombre en el toast
+    document.getElementById("toastProductoNombre").textContent = item.nombre;
+
+    // Mostrar toast
+    const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), { delay: 2500 });
+    toast.show();
+
   });
+});
+
 
   window.onload = actualizarContador;
 </script>
@@ -329,7 +338,6 @@ if ($_POST) {
       .then(response => response.text())
       .then(html => {
         document.getElementById("contenedor-menu").innerHTML = html;
-        // volver a asignar eventos a botones "Agregar"
         document.querySelectorAll(".btn-agregar").forEach(boton => {
           boton.addEventListener("click", () => {
             const item = {
@@ -342,11 +350,31 @@ if ($_POST) {
             carrito.push(item);
             localStorage.setItem("carrito", JSON.stringify(carrito));
             actualizarContador();
+
+            // Mostrar nombre del producto en el modal
+            document.getElementById("nombreProductoAgregado").textContent = item.nombre;
+
+            // Mostrar modal
+            const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
+            modal.show();
           });
         });
       });
+
   });
 </script>
+
+<!-- Toast de producto agregado -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="toastAgregado" class="toast align-items-center text-white bg-success border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <strong id="toastProductoNombre"></strong> fue agregado al carrito.
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
 
 
 </body>

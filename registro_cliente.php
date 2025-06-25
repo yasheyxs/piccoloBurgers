@@ -15,9 +15,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
     } elseif (empty($nombre) || empty($telefono) || empty($password)) {
         $mensaje = "<div class='alert alert-danger'>Por favor, completa todos los campos requeridos.</div>";
-    } elseif (!isset($_POST['terminos'])) {
-        $mensaje = "<div class='alert alert-warning'>Debes aceptar los términos y condiciones.</div>";
-    } else {
+    }
+    {
         try {
             $consulta = $conexion->prepare("SELECT ID FROM tbl_clientes WHERE telefono = ?");
             $consulta->execute([$telefono]);
@@ -103,15 +102,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <input type="password" class="form-control" name="confirmar" required>
     </div>
 
-    <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" name="terminos" id="terminos">
-      <label class="form-check-label" for="terminos">
-        Acepto los términos y condiciones
-      </label>
-    </div>
-
     <button type="submit" class="btn btn-gold w-100">Registrarse</button>
   </form>
 </div>
+
+<script>
+  // Solo números en Teléfono
+  document.querySelector('input[name="telefono"]').addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9]/g, "");
+  });
+
+  // Solo letras en Nombre
+  document.querySelector('input[name="nombre"]').addEventListener("input", function () {
+    this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+  });
+</script>
+
+
 </body>
 </html>

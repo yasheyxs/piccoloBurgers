@@ -96,7 +96,7 @@
 
 document.getElementById("form-pedido").addEventListener("submit", async function(e) {
   e.preventDefault();
-  
+
   const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
   if (carrito.length === 0) {
     alert("Tu carrito está vacío.");
@@ -110,28 +110,66 @@ document.getElementById("form-pedido").addEventListener("submit", async function
   const usarPuntosCheckbox = localStorage.getItem("usar_puntos_activado") === "1";
   formData.set("usar_puntos", usarPuntosCheckbox ? "1" : "0");
 
-
   const response = await fetch("guardar_pedido.php", {
     method: "POST",
     body: formData
   });
 
-  const resultado = await response.text();
-  document.getElementById("mensaje").innerHTML = resultado;
+  const resultado = await response.json();
 
-  const contador = document.getElementById("contador-carrito");
+  if (resultado.exito) {
+    // Construir modal dinámicamente
+    const modalHtml = `
+      <div class="modal fade" id="modalGracias" tabindex="-1" aria-labelledby="modalGraciasLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+              <h5 class="modal-title" id="modalGraciasLabel">¡Gracias por tu pedido!</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body fs-5">
+              <p>🎉 <strong>${resultado.nombre}</strong>, tu pedido está en preparación. 🍔</p>
+              ${parseFloat(resultado.descuento) > 0 ? `
+                <p>Total original: $${resultado.total_original}<br>
+                Descuento por puntos: -$${resultado.descuento}</p>` : ""}
+              <p>Total a pagar: <strong>$${resultado.total}</strong></p>
+              ${resultado.puntos_ganados > 0 ? `<p>🎁 Puntos ganados: <strong>${resultado.puntos_ganados}</strong></p>` : ""}
+            </div>
+            <div class="modal-footer">
+              <a href="index.php" class="btn btn-gold">Volver al inicio</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
 
-  if (resultado.includes("Gracias")) {
-    localStorage.removeItem("carrito");
-
-    const contador = document.getElementById("contador-carrito");
-    if (contador) {
-      contador.textContent = "0";
+    // Insertar modal al body
+    let modalContainer = document.getElementById("modal-container");
+    if (!modalContainer) {
+      modalContainer = document.createElement("div");
+      modalContainer.id = "modal-container";
+      document.body.appendChild(modalContainer);
     }
+    modalContainer.innerHTML = modalHtml;
+
+    // Mostrar modal
+    const modal = new bootstrap.Modal(document.getElementById("modalGracias"));
+    modal.show();
+
+    // Limpiar carrito y contador
+    localStorage.removeItem("carrito");
+    const contador = document.getElementById("contador-carrito");
+    if (contador) contador.textContent = "0";
 
     form.reset();
+    document.getElementById("mensaje").innerHTML = "";
+
+  } else {
+    // Mostrar error en div mensaje
+    document.getElementById("mensaje").innerHTML = `<div class="alert alert-danger">${resultado.mensaje || "Error desconocido"}</div>`;
   }
 });
+
 
 function mostrarDireccion(valor) {
   const grupoDireccion = document.getElementById("grupo-direccion");
@@ -148,8 +186,19 @@ function mostrarDireccion(valor) {
   }
 }
 
+// Validar que solo se escriban números en el campo teléfono
+document.getElementById("telefono").addEventListener("input", function (e) {
+  this.value = this.value.replace(/[^0-9]/g, ""); // elimina todo lo que no sea número
+});
+
+// Validar que solo se escriban letras (y espacios) en el campo nombre
+document.getElementById("nombre").addEventListener("input", function (e) {
+  this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ""); // elimina números y caracteres especiales
+});
 
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

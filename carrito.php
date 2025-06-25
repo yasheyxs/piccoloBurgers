@@ -95,7 +95,7 @@
 
 
 
-    <button class="btn btn-danger me-2" onclick="vaciarCarrito()">Vaciar Carrito</button>
+    <button class="btn btn-danger me-2" onclick="mostrarConfirmacionCancelar()">Cancelar Pedido</button>
     <form id="formPedido" action="confirmar_pedido.php" method="post">
       <input type="hidden" name="carrito" id="carritoInput">
       <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
@@ -187,10 +187,9 @@ function disminuirCantidad(id) {
   }
 }
 
-
 function eliminarProducto(id) {
   let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
-  carrito = carrito.filter(p => p.id !== id); // removemos todas las unidades del producto
+  carrito = carrito.filter(p => p.id.toString() !== id.toString());
   localStorage.setItem('carrito', JSON.stringify(carrito));
   cargarCarrito();
   actualizarContador();
@@ -260,6 +259,46 @@ window.onload = () => {
   document.getElementById("usarPuntos")?.addEventListener("change", actualizarTotal);
 };
 
+function mostrarConfirmacionCancelar() {
+  const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+  const detalleDiv = document.getElementById("detallePedidoModal");
+  if (carrito.length === 0) {
+    detalleDiv.innerHTML = "<p class='text-muted'>El carrito está vacío.</p>";
+  } else {
+    const resumen = carrito.reduce((acc, item) => {
+      if (!acc[item.nombre]) {
+        acc[item.nombre] = { cantidad: 1, precio: item.precio };
+      } else {
+        acc[item.nombre].cantidad += 1;
+        acc[item.nombre].precio += item.precio;
+      }
+      return acc;
+    }, {});
+    detalleDiv.innerHTML = `
+      <ul class="list-group">
+        ${Object.entries(resumen).map(([nombre, datos]) => `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <span>${nombre} (x${datos.cantidad})</span>
+            <span>$${datos.precio.toFixed(2)}</span>
+          </li>
+        `).join("")}
+      </ul>
+    `;
+  }
+
+  const modal = new bootstrap.Modal(document.getElementById("modalCancelarPedido"));
+  modal.show();
+}
+
+function confirmarCancelacion() {
+  localStorage.removeItem("carrito");
+  const modal = bootstrap.Modal.getInstance(document.getElementById("modalCancelarPedido"));
+  modal.hide();
+  cargarCarrito();
+  actualizarContador();
+}
+
+
 document.getElementById("formPedido").addEventListener("submit", function (e) {
   const usarPuntosChecked = document.getElementById("usarPuntos")?.checked;
   document.getElementById("usarPuntosInput").value = usarPuntosChecked ? "1" : "0";
@@ -269,6 +308,28 @@ document.getElementById("formPedido").addEventListener("submit", function (e) {
 });
 
 </script>
+
+<!-- Modal de confirmación para cancelar el pedido -->
+<div class="modal fade" id="modalCancelarPedido" tabindex="-1" aria-labelledby="modalCancelarPedidoLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalCancelarPedidoLabel">¿Cancelar pedido?</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p class="mb-3">Estás por cancelar tu pedido. Este es el detalle actual:</p>
+        <div id="detallePedidoModal" class="mb-3"></div>
+        <div class="text-end">
+          <button class="btn btn-secondary me-2" data-bs-dismiss="modal">Conservar</button>
+          <button class="btn btn-danger" onclick="confirmarCancelacion()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>
