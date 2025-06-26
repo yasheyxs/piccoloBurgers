@@ -15,11 +15,6 @@ $stmt = $conexion->prepare("SELECT nombre, telefono, email, fecha_registro, punt
 $stmt->execute([$cliente_id]);
 $datos = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Obtener historial de pedidos del cliente
-$stmt = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE telefono = ? ORDER BY fecha DESC");
-$stmt->execute([$datos["telefono"]]);
-$pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
 ?>
 
 <!doctype html>
@@ -65,46 +60,75 @@ $pedidos = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <p><strong>Puntos disponibles:</strong> <?= $datos["puntos"] ?> ⭐</p>
   </div>
 
-  <h2 class="mt-5 mb-4 text-center">📜 Historial de Pedidos</h2>
-
-<?php if (count($pedidos) > 0): ?>
-  <?php foreach ($pedidos as $pedido): ?>
-    <div class="card mb-4 shadow p-3">
-      <p><strong>Fecha:</strong> <?= date("d/m/Y H:i", strtotime($pedido["fecha"])) ?></p>
-      <p><strong>Total:</strong> $<?= number_format($pedido["total"], 2) ?></p>
-      <p><strong>Entrega:</strong> <?= htmlspecialchars($pedido["tipo_entrega"]) ?></p>
-      <p><strong>Método de pago:</strong> <?= htmlspecialchars($pedido["metodo_pago"]) ?></p>
-      <p><strong>Estado:</strong> 
-            <?php if ($pedido["estado"] === "Cancelado"): ?>
-                <span class="text-danger">Cancelado ❌ — Lamentamos que tu pedido haya sido cancelado. Esperamos servirte mejor la próxima vez</span>
-            <?php elseif ($pedido["estado"] === "Listo"): ?>
-                <span class="text-success">Listo ✅</span>
-            <?php elseif ($pedido["estado"] === "En preparación"): ?>
-                <span class="text-warning">En preparación ⏳</span>
-            <?php else: ?>
-                <?= htmlspecialchars($pedido["estado"]) ?>
-            <?php endif; ?>
-        </p>
-
-      <p><strong>Nota:</strong> <?= nl2br(htmlspecialchars($pedido["nota"])) ?></p>
-      <strong>Productos:</strong>
-      <ul>
-        <?php
-        $stmt = $conexion->prepare("SELECT nombre, precio, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
-        $stmt->execute([$pedido["ID"]]);
-        $detalles = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        foreach ($detalles as $detalle):
-        ?>
-          <li><?= htmlspecialchars($detalle["nombre"]) ?> - $<?= number_format($detalle["precio"], 2) ?> x <?= $detalle["cantidad"] ?></li>
-        <?php endforeach; ?>
-      </ul>
-    </div>
-  <?php endforeach; ?>
-<?php else: ?>
-  <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
-<?php endif; ?>
-
+  <div id="historial-pedidos">
+    <h2 class="mt-5 mb-4 text-center">📜 Historial de Pedidos</h2>
+  </div>
 </div>
+
+<script>
+  async function actualizarHistorial() {
+    try {
+      const response = await fetch('admin/obtener_pedidos_cliente.php'); // Endpoint que devuelve los pedidos JSON
+      const pedidos = await response.json();
+
+      const contenedor = document.querySelector('.container.mt-5'); // o algún div que contenga el historial
+
+      let htmlPedidos = '';
+
+      if (pedidos.length === 0) {
+        htmlPedidos = `<div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>`;
+      } else {
+        pedidos.forEach(pedido => {
+          let estadoHtml = '';
+          switch(pedido.estado) {
+            case 'Cancelado':
+              estadoHtml = `<span class="text-danger">Cancelado ❌ — Lamentamos que tu pedido haya sido cancelado. Esperamos servirte mejor la próxima vez</span>`;
+              break;
+            case 'Listo':
+              estadoHtml = `<span class="text-success">Listo ✅</span>`;
+              break;
+            case 'En preparación':
+              estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
+              break;
+            default:
+              estadoHtml = pedido.estado;
+          }
+
+          let productosHtml = '<ul>';
+          pedido.detalles.forEach(detalle => {
+            productosHtml += `<li>${detalle.nombre} - $${Number(detalle.precio).toFixed(2)} x ${detalle.cantidad}</li>`;
+          });
+
+          productosHtml += '</ul>';
+
+          htmlPedidos += `
+            <div class="card mb-4 shadow p-3">
+              <p><strong>Fecha:</strong> ${new Date(pedido.fecha).toLocaleString()}</p>
+              <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
+              <p><strong>Entrega:</strong> ${pedido.tipo_entrega}</p>
+              <p><strong>Método de pago:</strong> ${pedido.metodo_pago}</p>
+              <p><strong>Estado:</strong> ${estadoHtml}</p>
+              <p><strong>Nota:</strong> ${pedido.nota.replace(/\n/g, '<br>')}</p>
+              <strong>Productos:</strong>
+              ${productosHtml}
+            </div>
+          `;
+        });
+      }
+
+      document.getElementById('historial-pedidos').innerHTML = htmlPedidos;
+    } catch (e) {
+      console.error('Error al actualizar historial:', e);
+    }
+  }
+
+  // Actualizar cada 10 segundos
+  setInterval(actualizarHistorial, 10000);
+
+  // Ejecutar al cargar
+  document.addEventListener('DOMContentLoaded', actualizarHistorial);
+</script>
+
 
 </body>
 </html>

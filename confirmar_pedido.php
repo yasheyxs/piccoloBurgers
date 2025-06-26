@@ -97,15 +97,43 @@
 document.getElementById("form-pedido").addEventListener("submit", async function(e) {
   e.preventDefault();
 
-  const carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
-  if (carrito.length === 0) {
+  const carritoSinAgrupar = JSON.parse(localStorage.getItem("carrito") || "[]");
+  if (carritoSinAgrupar.length === 0) {
     alert("Tu carrito está vacío.");
     return;
   }
 
+  // Agrupar productos por id
+  const agrupado = {};
+  carritoSinAgrupar.forEach(item => {
+    const key = item.id;
+    if (!agrupado[key]) {
+      agrupado[key] = {
+        id: item.id,
+        nombre: item.nombre,
+        precio: item.precio,
+        cantidad: 1
+      };
+    } else {
+      agrupado[key].cantidad++;
+      agrupado[key].precio += item.precio;
+    }
+  });
+
+  // Convertir a array limpio para enviar
+  const carritoFinal = Object.values(agrupado).map(p => ({
+    id: String(p.id),
+    nombre: p.nombre,
+    precio: Number(p.precio),
+    cantidad: Number(p.cantidad)
+  }));
+
+  // Verificación (opcional)
+  console.log("✅ Carrito final que se enviará:", carritoFinal);
+
   const form = e.target;
   const formData = new FormData(form);
-  formData.set("carrito", JSON.stringify(carrito));
+  formData.set("carrito", JSON.stringify(carritoFinal));
 
   const usarPuntosCheckbox = localStorage.getItem("usar_puntos_activado") === "1";
   formData.set("usar_puntos", usarPuntosCheckbox ? "1" : "0");
@@ -115,7 +143,19 @@ document.getElementById("form-pedido").addEventListener("submit", async function
     body: formData
   });
 
-  const resultado = await response.json();
+  const texto = await response.text();
+  console.log("Respuesta cruda del servidor:", texto);
+  let resultado;
+try {
+  resultado = JSON.parse(texto);
+} catch (error) {
+  console.error("La respuesta no es JSON válido:", texto);
+  document.getElementById("mensaje").innerHTML =
+    '<div class="alert alert-danger">Ocurrió un error al procesar tu pedido. Intentalo de nuevo más tarde.</div>';
+  return;
+}
+
+
 
   if (resultado.exito) {
     // Construir modal dinámicamente
