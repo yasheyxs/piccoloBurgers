@@ -1,8 +1,12 @@
 <?php
+ob_start();
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
 include("admin/bd.php");
 session_start();
 
-// Validaciones (podés devolver JSON también para errores)
+// Validaciones
 function responder_error($mensaje) {
     header('Content-Type: application/json');
     echo json_encode(["exito" => false, "mensaje" => $mensaje]);
@@ -77,14 +81,30 @@ if ($usar_puntos && isset($_SESSION["cliente"])) {
 
 try {
     $estado_inicial = "En preparación";
-    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $estado_inicial]);
+    $cliente_id = $_SESSION["cliente"]["id"] ?? null;
+
+    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, estado, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $estado_inicial, $cliente_id]);
+
     $pedido_id = $conexion->lastInsertId();
 
-    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos_detalle (pedido_id, producto_id, nombre, precio) VALUES (?, ?, ?, ?)");
+    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos_detalle (pedido_id, producto_id, nombre, precio, cantidad) VALUES (?, ?, ?, ?, ?)");
     foreach ($carrito as $item) {
-        $stmt->execute([$pedido_id, $item["id"], $item["nombre"], $item["precio"]]);
+        if (!isset($item["id"], $item["nombre"], $item["precio"], $item["cantidad"])) {
+            responder_error("Producto inválido: " . json_encode($item));
+
+        }
+
+        $stmt->execute([
+            $pedido_id,
+            $item["id"],
+            $item["nombre"],
+            $item["precio"],
+            $item["cantidad"]
+        ]);
     }
+
+
 
     if (isset($_SESSION["cliente"])) {
         $puntos_ganados = floor($total / 1500);
@@ -94,7 +114,8 @@ try {
         $puntos_ganados = 0;
     }
 
-    header('Content-Type: application/json');
+header('Content-Type: application/json');
+ob_end_clean();
     echo json_encode([
         "exito" => true,
         "nombre" => $nombre,
@@ -103,13 +124,17 @@ try {
         "total" => number_format($total, 2),
         "puntos_ganados" => $puntos_ganados,
     ]);
-    exit;
+exit;
+
 
 } catch (Exception $e) {
+    ob_end_clean();
     header('Content-Type: application/json');
     echo json_encode([
         "exito" => false,
         "mensaje" => "Error al procesar el pedido: " . $e->getMessage()
     ]);
+
     exit;
 }
+?>

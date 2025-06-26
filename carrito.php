@@ -123,7 +123,8 @@ function cargarCarrito() {
   items.forEach(item => {
     const key = item.id;
     if (!agrupado[key]) {
-      agrupado[key] = { ...item, cantidad: 1 };
+      agrupado[key] = { id: item.id, nombre: item.nombre, precio: item.precio, img: item.img, cantidad: 1 };
+
     } else {
       agrupado[key].cantidad++;
       agrupado[key].precio += item.precio;
@@ -298,14 +299,52 @@ function confirmarCancelacion() {
   actualizarContador();
 }
 
-
 document.getElementById("formPedido").addEventListener("submit", function (e) {
   const usarPuntosChecked = document.getElementById("usarPuntos")?.checked;
   document.getElementById("usarPuntosInput").value = usarPuntosChecked ? "1" : "0";
 
-  const carrito = localStorage.getItem("carrito");
-  document.getElementById("carritoInput").value = carrito;
+  const items = JSON.parse(localStorage.getItem("carrito")) || [];
+  const agrupado = {};
+
+  items.forEach(item => {
+  const key = item.id;
+  if (!agrupado[key]) {
+    agrupado[key] = {
+      id: item.id,
+      nombre: item.nombre,
+      precio: item.precio,
+      cantidad: 1
+    };
+  } else {
+    agrupado[key].cantidad += 1;
+    agrupado[key].precio += item.precio;
+  }
 });
+
+
+  const carritoFinal = Object.values(agrupado).map(p => ({
+    id: String(p.id),
+    nombre: p.nombre,
+    precio: Number(p.precio),
+    cantidad: Number(p.cantidad)
+  }));
+
+  const hayIncompletos = carritoFinal.some(
+    p => !p.id || !p.nombre || typeof p.precio !== "number" || !p.cantidad
+  );
+
+  if (hayIncompletos) {
+    console.error("⚠️ Hay productos incompletos:", carritoFinal);
+    alert("Error: uno de los productos del carrito no tiene toda la información necesaria.");
+    e.preventDefault();
+    return;
+  }
+
+  console.log("✅ Carrito que se enviará:", carritoFinal);
+  document.getElementById("carritoInput").value = JSON.stringify(carritoFinal);
+});
+
+
 
 </script>
 
