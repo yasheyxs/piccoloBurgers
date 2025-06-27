@@ -17,7 +17,7 @@ if ($categoria && in_array($categoria, $categorias_disponibles)) {
 
 foreach ($lista_menu as $registro): ?>
   <div class="col d-flex">
-    <div class="card position-relative">
+    <div class="card position-relative d-flex flex-column h-100 w-100">
       <img src="img/menu/<?= $registro["foto"] ?>" class="card-img-top" alt="Foto de <?= $registro["nombre"] ?>">
       <div class="card-body d-flex flex-column">
         <h5 class="card-title"><?= $registro["nombre"] ?></h5>
