@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 21, 2025 at 12:17 AM
+-- Generation Time: Jun 26, 2025 at 03:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -62,7 +62,8 @@ CREATE TABLE `tbl_clientes` (
 --
 
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`) VALUES
-(2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 46);
+(2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 190),
+(3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0);
 
 -- --------------------------------------------------------
 
@@ -118,18 +119,17 @@ CREATE TABLE `tbl_pedidos` (
   `metodo_pago` varchar(255) NOT NULL,
   `tipo_entrega` varchar(255) NOT NULL,
   `direccion` varchar(255) DEFAULT NULL,
-  `estado` varchar(20) NOT NULL DEFAULT 'En preparación'
+  `estado` varchar(20) NOT NULL DEFAULT 'En preparación',
+  `cliente_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_pedidos`
 --
 
-INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`) VALUES
-(15, 'Juanita', '123445444141', 'jazmingaidoyxs@gmail.com', '1321312', 10000, '2025-06-20 16:30:59', 'Efectivo', 'Delivery', '233232323 fsfsdf', 'Cancelado'),
-(16, 'Juanita', '123445444141', '', 'No!', 10000, '2025-06-20 16:58:03', 'MercadoPago', 'Retiro', '', 'Cancelado'),
-(17, 'Juanita', '123445444141', '', '!!!', 20000, '2025-06-20 16:58:55', 'Tarjeta', 'Delivery', '233232323 fsfsdf', 'Listo'),
-(18, 'Juanita', '123445444141', '', 'No quiero ketchup', 13000, '2025-06-20 18:38:05', 'Efectivo', 'Delivery', '233232323 fsfsdf', 'Listo');
+INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`) VALUES
+(48, 'Juanita', '123', '', '', 60000, '2025-06-25 21:55:54', 'Tarjeta', 'Retiro', '', 'Cancelado', 2),
+(49, 'Juanita', '123', '', '', 30000, '2025-06-25 22:01:28', 'Efectivo', 'Retiro', '', 'Listo', 2);
 
 -- --------------------------------------------------------
 
@@ -151,9 +151,12 @@ CREATE TABLE `tbl_pedidos_detalle` (
 --
 
 INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `precio`, `cantidad`) VALUES
-(28, 18, 4, 'Fuggazetta', 10000, 1),
-(29, 18, 5, 'Lata de pepsi', 1500, 1),
-(30, 18, 5, 'Lata de pepsi', 1500, 1);
+(46, 48, 4, 'Fuggazetta', 20000, 2),
+(47, 48, 5, 'Lata de pepsi', 6000, 4),
+(48, 48, 6, 'Burga', 34000, 4),
+(49, 49, 4, 'Fuggazetta', 10000, 1),
+(50, 49, 5, 'Lata de pepsi', 3000, 2),
+(51, 49, 6, 'Burga', 17000, 2);
 
 -- --------------------------------------------------------
 
@@ -263,7 +266,7 @@ ALTER TABLE `tbl_banners`
 -- AUTO_INCREMENT for table `tbl_clientes`
 --
 ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbl_comentarios`
@@ -281,13 +284,13 @@ ALTER TABLE `tbl_menu`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=52;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
