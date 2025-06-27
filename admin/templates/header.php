@@ -5,13 +5,13 @@ include_once(dirname(__DIR__, 2) . "/config.php");
 $url_base = "http://localhost/piccoloBurgers/admin/";
 
 if (MODO_DESARROLLO) {
-    $_SESSION["usuario"] = USUARIO_DESARROLLO;
-    $_SESSION["logueado"] = true;
-} else {
-    if (!isset($_SESSION["usuario"])) {
-        header("Location:".$url_base."login.php");
-        exit;
-    }
+    $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
+    $_SESSION["admin_logueado"] = true;
+}
+ else {
+    if (!isset($_SESSION["admin_logueado"])) {
+    header("Location: login.php");
+}
 }
 ?>
 
