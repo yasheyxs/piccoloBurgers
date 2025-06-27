@@ -12,7 +12,7 @@ $sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC limi
 $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
-$sentencia = $conexion->prepare("SELECT * FROM tbl_testimonios ORDER BY id DESC limit 2");
+$sentencia = $conexion->prepare("SELECT * FROM tbl_testimonios ORDER BY id DESC");
 $sentencia->execute();
 $lista_testimonios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
@@ -21,7 +21,7 @@ if ($categoria_seleccionada && in_array($categoria_seleccionada, $categorias_dis
   $sentencia->execute([$categoria_seleccionada]);
   $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 } else {
-  $sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
+  $sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC");
   $sentencia->execute();
   $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 }

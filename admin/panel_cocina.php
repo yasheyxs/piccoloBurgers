@@ -24,11 +24,13 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               <th>ID</th>
               <th>Cliente</th>
               <th>Entrega</th>
+              <th><strong>Dirección</strong></th>
               <th>Productos</th>
               <th>Nota</th>
               <th>Acciones</th>
             </tr>
           </thead>
+
           <tbody>
             <?php foreach ($pedidos as $pedido): ?>
               <?php
@@ -40,6 +42,12 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                 <td><?= $pedido['ID'] ?></td>
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
                 <td><?= htmlspecialchars($pedido['tipo_entrega']) ?></td>
+                <td>
+                  <?= $pedido['tipo_entrega'] === 'Delivery' && !empty($pedido['direccion'])
+                    ? htmlspecialchars($pedido['direccion'])
+                    : '-' ?>
+                </td>
+
                 <td>
                   <ul class="list-unstyled">
                     <?php foreach ($productos as $producto): ?>
@@ -55,6 +63,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               </tr>
             <?php endforeach; ?>
           </tbody>
+
         </table>
       </div>
     <?php endif; ?>
