@@ -32,9 +32,9 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
           <tbody>
             <?php foreach ($pedidos as $pedido): ?>
               <?php
-                $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
-                $stmt_detalle->execute([$pedido['ID']]);
-                $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
+              $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
+              $stmt_detalle->execute([$pedido['ID']]);
+              $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
               ?>
               <tr data-pedido-id="<?= $pedido['ID'] ?>">
                 <td><?= $pedido['ID'] ?></td>

@@ -1,33 +1,32 @@
-<?php 
+<?php
 include("../../bd.php");
 
 
-if(isset($_GET['txtID'])){
+if (isset($_GET['txtID'])) {
 
-    $txtID=(isset($_GET["txtID"]))?$_GET["txtID"]:"";
+    $txtID = (isset($_GET["txtID"])) ? $_GET["txtID"] : "";
 
-    $sentencia=$conexion->prepare("DELETE FROM tbl_comentarios WHERE ID=:id");
+    $sentencia = $conexion->prepare("DELETE FROM tbl_comentarios WHERE ID=:id");
     $sentencia->bindParam(":id", $txtID);
     $sentencia->execute();
-    
-    header("Location:index.php");
 
+    header("Location:index.php");
 }
 
-$sentencia=$conexion->prepare("SELECT * FROM `tbl_comentarios`");
+$sentencia = $conexion->prepare("SELECT * FROM `tbl_comentarios`");
 $sentencia->execute();
-$lista_comentarios= $sentencia->fetchAll(PDO::FETCH_ASSOC);
+$lista_comentarios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 
-include ("../../templates/header.php"); ?>
+include("../../templates/header.php"); ?>
 
-<br/>
+<br />
 <div class="card">
     <div class="card-header">
-        Bandeja de comentarios 
+        Bandeja de comentarios
     </div>
     <div class="card-body">
-    
+
         <div class="table-responsive-sm">
             <table class="table">
                 <thead>
@@ -40,29 +39,29 @@ include ("../../templates/header.php"); ?>
                     </tr>
                 </thead>
                 <tbody>
-                
-                <?php foreach($lista_comentarios as $registro){ ?>
-                <tr class="">
-                        <td ><?php echo $registro["ID"];?></td>
-                        <td><?php echo $registro["nombre"];?></td>
-                        <td><?php echo $registro["correo"];?></td>
-                        <td><?php echo $registro["mensaje"];?></td>
-                        <td> 
-                            <a name="" id="" class="btn btn-danger" 
-                            href="index.php?txtID=<?php echo $registro['ID']; ?>" 
-                            role="button">Borrar</a> 
-                        </td>
-                    </tr>
-                <?php  }?>
+
+                    <?php foreach ($lista_comentarios as $registro) { ?>
+                        <tr class="">
+                            <td><?php echo $registro["ID"]; ?></td>
+                            <td><?php echo $registro["nombre"]; ?></td>
+                            <td><?php echo $registro["correo"]; ?></td>
+                            <td><?php echo $registro["mensaje"]; ?></td>
+                            <td>
+                                <a name="" id="" class="btn btn-danger"
+                                    href="index.php?txtID=<?php echo $registro['ID']; ?>"
+                                    role="button">Borrar</a>
+                            </td>
+                        </tr>
+                    <?php  } ?>
                 </tbody>
             </table>
         </div>
-        
+
 
     </div>
     <div class="card-footer text-muted">
-        
+
     </div>
 </div>
 
-<?php include ("../../templates/footer.php"); ?>
+<?php include("../../templates/footer.php"); ?>

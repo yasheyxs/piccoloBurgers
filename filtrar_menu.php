@@ -6,13 +6,13 @@ $categoria = $_GET['categoria'] ?? '';
 $lista_menu = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-    $stmt = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
-    $stmt->execute([$categoria]);
-    $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
+  $stmt->execute([$categoria]);
+  $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } else {
-    $stmt = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
-    $stmt->execute();
-    $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  $stmt = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
+  $stmt->execute();
+  $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
 foreach ($lista_menu as $registro): ?>
@@ -25,10 +25,10 @@ foreach ($lista_menu as $registro): ?>
         <p class="card-text"><strong>Precio:</strong> $<?= $registro["precio"] ?></p>
         <p class="card-text"><small><em><?= $registro["categoria"] ?? '' ?></em></small></p>
         <button class="btn btn-agregar mt-auto"
-                data-id="<?= $registro['ID'] ?>"
-                data-nombre="<?= $registro['nombre'] ?>"
-                data-precio="<?= $registro['precio'] ?>"
-                data-img="img/menu/<?= $registro['foto'] ?>">
+          data-id="<?= $registro['ID'] ?>"
+          data-nombre="<?= $registro['nombre'] ?>"
+          data-precio="<?= $registro['precio'] ?>"
+          data-img="img/menu/<?= $registro['foto'] ?>">
           Agregar
         </button>
       </div>

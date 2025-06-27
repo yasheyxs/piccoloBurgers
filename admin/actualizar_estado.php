@@ -27,4 +27,3 @@ try {
 } catch (Exception $e) {
     echo json_encode(["success" => false, "message" => "Error al actualizar: " . $e->getMessage()]);
 }
-?>
