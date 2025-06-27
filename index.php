@@ -307,6 +307,11 @@ if ($_POST) {
       z-index: 2;
     }
 
+    .banner-text p {
+      text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
+    }
+
+
     .jumbotron {
       margin-bottom: 3rem;
       padding: 2rem;
@@ -371,7 +376,7 @@ if ($_POST) {
   </nav>
 
   <section class="container-fluid p-0">
-    <div class="banner-img" style="position:relative; background:url('img/pexels-atomlaborblog-776314.webp') center/cover no-repeat; height:400px;">
+    <div class="banner-img" style="position:relative; background:url('img/pexels-valeriya-1199960.jpg') center/cover no-repeat; height:400px;">
       <div class="banner-text" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; color:#fff; text-shadow: 5px 5px 9px rgba(0,0,0,0.7);">
         <?php foreach ($lista_banners as $banner) { ?>
           <h1 style="font-size: 5rem;"><?php echo $banner['titulo']; ?></h1>
