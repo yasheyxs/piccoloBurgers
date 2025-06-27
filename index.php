@@ -54,68 +54,275 @@ if ($_POST) {
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
 
   <style>
-    body {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.7rem;
-    }
-    .btn-gold {
-      background-color: #fac30c;
-      color: #000;
-      font-weight: bold;
-      border: none;
-    }
-    .btn-gold:hover {
-      background-color: #e0ae00;
-      color: #000;
-    }
-    footer p {
-      margin: 0;
-      font-size: 1rem;
-    }
+    :root {
+    --main-gold: #fac30c;
+    --gold-hover: #e0ae00;
+    --dark-bg: #1a1a1a;
+    --gray-bg: #2c2c2c;
+    --text-light: #ffffff;
+    --text-muted: #cccccc;
+    --font-main: 'Inter', sans-serif;
+    --font-title: 'Bebas Neue', sans-serif;
+  }
 
-    .card {
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      overflow: hidden;
-      border-radius: 12px;
-    }
+  body {
+    font-family: var(--font-main);
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    font-size: 1rem;
+    line-height: 1.6;
+  }
 
-    .card:hover {
-      transform: scale(1.03);
-      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-    }
+  h1, h2, h3, .navbar-brand {
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
 
-    .card-img-top {
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
+  h1 {
+    font-size: 4rem;
+  }
 
-    .card:hover .card-img-top {
-      transform: scale(1.05);
-    }
+  h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
 
-    .card .btn-agregar {
-      background-color: #fac30c;
-      color: #000;
-      font-weight: bold;
-      border: none;
-      padding: 8px 20px;
-      border-radius: 20px;
-      margin-top: 10px;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      width: 100%;
-    }
+  h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
 
-    .card .btn-agregar:hover {
-      background-color: #e0ae00;
-      transform: scale(1.05);
-    }
+  /* Navbar */
+  .navbar {
+    background-color: #111;
+  }
+
+  .navbar-brand, .nav-link {
+    font-family: var(--font-main);
+    font-size: 1.2rem;
+  }
+
+  /* Botón dorado */
+  .btn-gold {
+    background-color: var(--main-gold);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    padding: 10px 30px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .btn-gold:hover {
+    background-color: var(--gold-hover);
+    transform: scale(1.05);
+  }
+
+  /* Cards */
+  .card {
+    background-color: var(--gray-bg);
+    border-radius: 16px;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.4);
+  }
+
+  .card-img-top {
+    display: block;
+    max-height: 200px;
+    width: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .card:hover .card-img-top {
+    transform: scale(1.05);
+  }
+
+  .card-title {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    color: var(--text-light);
+  }
+
+  .card-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .card-footer {
+    background-color: transparent;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 1rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    border-left: 4px solid var(--main-gold);
+    padding-left: 12px;
+  }
+
+  .card-footer::before {
+    content: "👤 ";
+  }
+
+.form-control {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  border: 1px solid #444;
+  font-size: 1.2rem;
+  border-radius: 8px;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-control:focus {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  border-color: var(--main-gold);
+  box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+}
+
+/* Estilo oscuro para el select del filtro */
+#categoria {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  border: 1px solid #444;
+  font-size: 1.2rem;
+  border-radius: 8px;
+  padding: 0.375rem 1.75rem 0.375rem 0.75rem; /* Ajuste para flecha */
+  appearance: none; /* Quitar estilo nativo para personalizar */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23fac30c' stroke-width='2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 10px 7px;
+  cursor: pointer;
+}
+
+#categoria option {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+}
 
 
-  </style>
+  /* Botón agregar */
+  .btn-agregar {
+    background-color: var(--main-gold);
+    color: #000;
+    font-weight: bold;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    width: 100%;
+    font-size: 1rem;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+
+  .btn-agregar:hover {
+    background-color: var(--gold-hover);
+    transform: scale(1.05);
+  }
+
+  /* Hero */
+  .hero {
+    background: radial-gradient(circle at top left, #2c2c2c 0%, #1a1a1a 100%);
+    padding: 100px 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .hero h1 {
+    font-family: var(--font-title);
+    font-size: 5rem;
+    color: var(--main-gold);
+    text-shadow: 4px 4px 10px rgba(0,0,0,0.7);
+  }
+
+  .hero p {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 20px auto;
+  }
+
+  /* Horario */
+  #horario p, #horario h3 {
+    color: var(--text-light);
+  }
+
+  /* Footer */
+  footer {
+    background-color: #111;
+    padding: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  /* Banner */
+
+  .banner-img::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 100px;
+    width: 100%;
+    background: linear-gradient(to bottom, rgba(26,26,26,0), #1a1a1a 90%);
+    z-index: 1;
+  }
+
+  .banner-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #fff;
+    text-shadow: 5px 5px 9px rgba(0,0,0,0.7);
+    z-index: 2;
+  }
+
+  .jumbotron {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background: linear-gradient(to bottom, #1a1a1a 0%, #1f1f1f 100%);
+    border-radius: 1rem;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+  }
+
+  /* testimonios */
+  #testimonios {
+    margin-top: 2rem;
+    padding-top: 3rem;
+  }
+
+  /* ScrollTop button */
+  #scrollTopBtn {
+    background-color: var(--main-gold);
+    color: #000;
+    border-radius: 50%;
+    font-size: 1.5rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
+</style>
+
 </head>
 <body id="top">
 
@@ -167,13 +374,13 @@ if ($_POST) {
 </section>
 
 <section class="container mt-4 text-center">
-  <div class="jumbotron bg-dark text-white p-4">
+  <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light);">
     <h2>¡Bienvenidx a Piccolo Burgers!</h2>
     <p>Descubre las verdaderas hamburguesas. Siempre 100% cargadas de sabor.</p>
   </div>
 </section>
 
-<section id="testimonios" class="bg-light py-5">
+<section id="testimonios" class="py-5" style="background: linear-gradient(to bottom, #2c2c2c, #1a1a1a);">
   <div class="container">
     <h2 class="text-center mb-4">Testimonios</h2>
     <div class="row">
@@ -183,7 +390,7 @@ if ($_POST) {
             <div class="card-body">
               <p class="card-text"><?php echo $testimonio["opinion"];?></p>
             </div>
-            <div class="card-footer text-muted">
+            <div class="card-footer">
               <?php echo $testimonio["nombre"]; ?>
             </div>
           </div>
@@ -212,7 +419,8 @@ if ($_POST) {
   <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
     <?php foreach($lista_menu as $registro) { ?>
       <div class="col d-flex">
-        <div class="card position-relative">
+        <div class="card position-relative d-flex flex-column h-100 w-100">
+
           <img src="img/menu/<?php echo $registro["foto"];?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
           <div class="card-body d-flex flex-column">
             <h5 class="card-title"><?php echo $registro["nombre"];?></h5>
@@ -253,7 +461,7 @@ if ($_POST) {
   </form>
 </section>
 
-<div id="horario" class="text-center bg-light p-4">
+<div id="horario" class="text-center p-5" style="background: linear-gradient(to top, #2c2c2c, #1a1a1a);">
   <h3 class="mb-4">Horario de atención</h3>
   <div>
     <p><strong>Martes a Domingo y feriados</strong></p>
