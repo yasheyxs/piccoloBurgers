@@ -19,10 +19,8 @@ if($_POST){
             $lista_usuarios=$sentencia->fetch(PDO::FETCH_LAZY);
             $n_usuario=$lista_usuarios["n_usuario"];
             if($n_usuario==1){
-              
-              $_SESSION["usuario"]=$lista_usuarios["usuario"];
-              $_SESSION["logueado"]=true;
-
+              $_SESSION["admin_usuario"] = $lista_usuarios["usuario"];
+              $_SESSION["admin_logueado"] = true;
               header("Location:index.php");
             }else{
               $mensaje="Usuario o contraseña incorrectos...";
