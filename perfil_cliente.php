@@ -25,6 +25,9 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+
+  
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
   
   <style>
@@ -46,6 +49,25 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
     font-size: 1rem;
     line-height: 1.6;
   }
+
+.navbar-brand {
+  font-family: var(--font-title);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 1.5rem;
+}
+
+.navbar {
+  background-color: #111;
+}
+
+.navbar-brand, .nav-link {
+  font-family: var(--font-main);
+  font-size: 1.2rem;
+}
+
+
+
     .btn-gold {
     background-color: var(--main-gold);
     color: #000;
@@ -161,10 +183,23 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="index.php"><i class="fas fa-user"></i> Volver al inicio</a>
-    <a class="btn btn-gold ms-auto" href="logout_cliente.php">Cerrar Sesión</a>
+    <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPerfil">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarPerfil">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a href="perfil_cliente.php" class="nav-link"><i class="fas fa-user"></i> Mi Perfil</a>
+        </li>
+        <li class="nav-item">
+          <a href="logout_cliente.php" class="btn btn-gold ms-3">Cerrar sesión</a>
+        </li>
+      </ul>
+    </div>
   </div>
 </nav>
+
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center">👤 Información del Cliente</h2>

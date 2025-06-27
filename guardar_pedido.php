@@ -7,7 +7,8 @@ include("admin/bd.php");
 session_start();
 
 // Validaciones
-function responder_error($mensaje) {
+function responder_error($mensaje)
+{
     header('Content-Type: application/json');
     echo json_encode(["exito" => false, "mensaje" => $mensaje]);
     exit;
@@ -92,7 +93,6 @@ try {
     foreach ($carrito as $item) {
         if (!isset($item["id"], $item["nombre"], $item["precio"], $item["cantidad"])) {
             responder_error("Producto inválido: " . json_encode($item));
-
         }
 
         $stmt->execute([
@@ -114,8 +114,8 @@ try {
         $puntos_ganados = 0;
     }
 
-header('Content-Type: application/json');
-ob_end_clean();
+    header('Content-Type: application/json');
+    ob_end_clean();
     echo json_encode([
         "exito" => true,
         "nombre" => $nombre,
@@ -124,9 +124,7 @@ ob_end_clean();
         "total" => number_format($total, 2),
         "puntos_ganados" => $puntos_ganados,
     ]);
-exit;
-
-
+    exit;
 } catch (Exception $e) {
     ob_end_clean();
     header('Content-Type: application/json');
@@ -137,4 +135,3 @@ exit;
 
     exit;
 }
-?>
