@@ -150,6 +150,8 @@
   </div>
 
   <script>
+    // Manejar el envío del formulario
+    // Validar que el carrito no esté vacío y agrupar productos por id
     document.getElementById("form-pedido").addEventListener("submit", async function(e) {
       e.preventDefault();
 
@@ -170,7 +172,7 @@
             precio: item.precio,
             cantidad: 1
           };
-        } else {
+        } else {// Si ya existe, sumar cantidad y precio
           agrupado[key].cantidad++;
           agrupado[key].precio += item.precio;
         }
@@ -184,7 +186,7 @@
         cantidad: Number(p.cantidad)
       }));
 
-      // Verificación (opcional)
+      // Validar que el carrito final no esté vacío
       console.log("✅ Carrito final que se enviará:", carritoFinal);
 
       const form = e.target;
@@ -197,21 +199,19 @@
       const response = await fetch("guardar_pedido.php", {
         method: "POST",
         body: formData
-      });
+      });// Enviar datos del formulario al servidor
 
       const texto = await response.text();
       console.log("Respuesta cruda del servidor:", texto);
       let resultado;
-      try {
+      try {// Intentar parsear la respuesta como JSON
         resultado = JSON.parse(texto);
-      } catch (error) {
+      } catch (error) {// Si falla, mostrar error
         console.error("La respuesta no es JSON válido:", texto);
         document.getElementById("mensaje").innerHTML =
           '<div class="alert alert-danger">Ocurrió un error al procesar tu pedido. Intentalo de nuevo más tarde.</div>';
-        return;
+        return;// salir si no es JSON
       }
-
-
 
       if (resultado.exito) {
         // Construir modal dinámicamente
@@ -266,16 +266,16 @@
       }
     });
 
-
+    // Mostrar/ocultar campo dirección según tipo de entrega
     function mostrarDireccion(valor) {
       const grupoDireccion = document.getElementById("grupo-direccion");
       const aviso = document.getElementById("aviso-delivery");
 
-      if (valor === "Delivery") {
+      if (valor === "Delivery") {// Si es Delivery, mostrar campo dirección y aviso
         grupoDireccion.style.display = "block";
         aviso.style.display = "block";
         document.getElementById("direccion").setAttribute("required", "required");
-      } else {
+      } else {// Si es Retiro, ocultar campo dirección y aviso
         grupoDireccion.style.display = "none";
         aviso.style.display = "none";
         document.getElementById("direccion").removeAttribute("required");
@@ -287,7 +287,7 @@
       this.value = this.value.replace(/[^0-9]/g, ""); // elimina todo lo que no sea número
     });
 
-    // Validar que solo se escriban letras (y espacios) en el campo nombre
+    // Validar que solo se escriban letras y espacios en el campo nombre
     document.getElementById("nombre").addEventListener("input", function(e) {
       this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, ""); // elimina números y caracteres especiales
     });

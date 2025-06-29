@@ -1,36 +1,35 @@
 <?php session_start(); ?>
-
 <?php
 include("admin/bd.php");
 
-$categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
+$categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"]; // Categorías disponibles
 
 $categoria_seleccionada = $_GET['categoria'] ?? '';
 $lista_menu = [];
-
+// Verificar si la categoría seleccionada es válida
 $sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC limit 1 ");
 $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-
+// Obtener testimonios
 $sentencia = $conexion->prepare("SELECT * FROM tbl_testimonios ORDER BY id DESC");
 $sentencia->execute();
 $lista_testimonios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-
+// Filtrar el menú por categoría si se ha seleccionado una
 if ($categoria_seleccionada && in_array($categoria_seleccionada, $categorias_disponibles)) {
   $sentencia = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
   $sentencia->execute([$categoria_seleccionada]);
   $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-} else {
+} else {// Si no se ha seleccionado una categoría o es inválida, mostrar todo el menú
   $sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC");
   $sentencia->execute();
   $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 }
-
+// Procesar el formulario de contacto
 if ($_POST) {
   $nombre = filter_var($_POST["nombre"], FILTER_SANITIZE_STRING);
   $correo = filter_var($_POST["correo"], FILTER_VALIDATE_EMAIL);
   $mensaje = filter_var($_POST["mensaje"], FILTER_SANITIZE_STRING);
-
+  // Validar campos
   if ($nombre && $correo && $mensaje) {
     $sql = "INSERT INTO tbl_comentarios (nombre, correo, mensaje)
                 VALUES (:nombre, :correo, :mensaje)";
@@ -40,7 +39,7 @@ if ($_POST) {
     $resultado->bindParam(':correo', $correo, PDO::PARAM_STR);
     $resultado->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
     $resultado->execute();
-  }
+  }// Si el formulario se envió correctamente, redirigir a la página de inicio
   header("Location:index.php");
 }
 ?>
@@ -202,7 +201,7 @@ if ($_POST) {
       box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
     }
 
-    /* Estilo oscuro para el select del filtro */
+    /*select del filtro */
     #categoria {
       background-color: var(--gray-bg);
       color: var(--text-light);
@@ -311,7 +310,7 @@ if ($_POST) {
       text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
     }
 
-
+  /* jumbotron */
     .jumbotron {
       margin-bottom: 3rem;
       padding: 2rem;
@@ -495,11 +494,12 @@ if ($_POST) {
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
 
   <script>
+    // Actualizar contador de carrito al cargar la página
     function actualizarContador() {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
       document.getElementById("contador-carrito").textContent = carrito.length;
     }
-
+// Agregar evento a los botones de agregar al carrito
     document.querySelectorAll(".btn-agregar").forEach(boton => {
       boton.addEventListener("click", () => {
         const item = {
@@ -507,8 +507,8 @@ if ($_POST) {
           nombre: boton.dataset.nombre,
           precio: parseFloat(boton.dataset.precio),
           img: boton.dataset.img
-        };
-
+        }; // Obtener el carrito del localStorage o inicializarlo si no existe
+        // Agregar el item al carrito
         let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
         carrito.push(item);
         localStorage.setItem("carrito", JSON.stringify(carrito));
@@ -525,7 +525,6 @@ if ($_POST) {
 
       });
     });
-
 
     window.onload = actualizarContador;
   </script>
@@ -544,7 +543,7 @@ if ($_POST) {
   </a>
 
   <script>
-    // Mostrar u ocultar botón según scroll
+    // Mostrar u ocultar botón de flecha según scroll
     window.onscroll = function() {
       const btn = document.getElementById("scrollTopBtn");
       if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
@@ -556,9 +555,10 @@ if ($_POST) {
   </script>
 
   <script>
+    // Filtrar el menú por categoría al cambiar el select
     document.getElementById("categoria").addEventListener("change", function() {
       const categoria = this.value;
-      fetch("filtrar_menu.php?categoria=" + encodeURIComponent(categoria))
+      fetch("filtrar_menu.php?categoria=" + encodeURIComponent(categoria)) // Llamar al script que filtra el menú
         .then(response => response.text())
         .then(html => {
           document.getElementById("contenedor-menu").innerHTML = html;
@@ -569,9 +569,9 @@ if ($_POST) {
                 nombre: boton.dataset.nombre,
                 precio: parseFloat(boton.dataset.precio),
                 img: boton.dataset.img
-              };
-              let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-              carrito.push(item);
+              };// Obtener el carrito del localStorage o inicializarlo si no existe
+              let carrito = JSON.parse(localStorage.getItem("carrito")) || []; // Agregar el item al carrito
+              carrito.push(item);// Guardar el carrito actualizado en el localStorage
               localStorage.setItem("carrito", JSON.stringify(carrito));
               actualizarContador();
 
@@ -588,7 +588,7 @@ if ($_POST) {
     });
   </script>
 
-  <!-- Toast de producto agregado -->
+  <!-- Toast de producto -->
   <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
     <div id="toastAgregado" class="toast align-items-center text-white bg-success border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">

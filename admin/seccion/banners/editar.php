@@ -2,12 +2,14 @@
 include("../../bd.php");
 
 if (isset($_GET['txtID'])) {
+  // Si se envió el ID por GET, buscar el banner
+  // Validar que se reciba el ID necesario
   $txtID = (isset($_GET["txtID"])) ? $_GET["txtID"] : "";
 
   $sentencia = $conexion->prepare("SELECT * FROM `tbl_banners` WHERE ID=:id");
   $sentencia->bindParam(":id", $txtID);
   $sentencia->execute();
-
+// Verificar si se encontró el banner
   $registro = $sentencia->fetch(PDO::FETCH_LAZY);
   $titulo = $registro["titulo"];
   $descripcion = $registro["descripcion"];
@@ -15,16 +17,17 @@ if (isset($_GET['txtID'])) {
 }
 
 if ($_POST) {
-
+// Si se envió el formulario, procesar los datos
   $titulo = (isset($_POST["titulo"])) ? $_POST["titulo"] : "";
   $descripcion = (isset($_POST["descripcion"])) ? $_POST["descripcion"] : "";
   $link = (isset($_POST["link"])) ? $_POST["link"] : "";
   $txtID = (isset($_POST["txtID"])) ? $_POST["txtID"] : "";
-
+// Validar que se reciban los datos necesarios
   $sentencia = $conexion->prepare(" UPDATE `tbl_banners`
              SET titulo=:titulo,  descripcion=:descripcion, link=:link
              WHERE ID=:id");
-
+// Preparar la consulta para actualizar el banner
+  // Usar bindParam para evitar inyecciones SQL
   $sentencia->bindParam(":titulo", $titulo);
   $sentencia->bindParam(":descripcion", $descripcion);
   $sentencia->bindParam(":link", $link);

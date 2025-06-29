@@ -1,35 +1,38 @@
 <?php
+//inicio de sesión y conexión a la base de datos
 session_start();
 include("admin/bd.php");
 
 $mensaje = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") { //revisa si la peticion fue enviada mediante post
+  //se toman los campos del formulario, se eliminan espacios en blanco al inicio y al final. Email es opcional
   $nombre = trim($_POST["nombre"]);
   $telefono = trim($_POST["telefono"]);
   $email = trim($_POST["email"] ?? "");
   $password = $_POST["password"];
   $confirmar = $_POST["confirmar"];
 
+  //verifica que las contraseñas coincidan y que los campos requeridos no estén vacíos
   if ($password !== $confirmar) {
     $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
   } elseif (empty($nombre) || empty($telefono) || empty($password)) {
     $mensaje = "<div class='alert alert-danger'>Por favor, completa todos los campos requeridos.</div>";
   } {
-    try {
+    try { //busca si ya existe un cliente con el mismo teléfono
       $consulta = $conexion->prepare("SELECT ID FROM tbl_clientes WHERE telefono = ?");
       $consulta->execute([$telefono]);
 
-      if ($consulta->rowCount() > 0) {
+      if ($consulta->rowCount() > 0) { //si existe, muestra un mensaje de error
         $mensaje = "<div class='alert alert-warning'>Ya existe una cuenta registrada con ese teléfono.</div>";
-      } else {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
-        $sentencia->execute([$nombre, $telefono, $email, $hash]);
+      } else { //si no existe, inserta el nuevo cliente en la base de datos
+        $hash = password_hash($password, PASSWORD_DEFAULT); //encripta la contraseña
+        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)"); //prepara la sentencia SQL
+        $sentencia->execute([$nombre, $telefono, $email, $hash]); //ejecuta la sentencia
 
         $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora puedes <a href='login_cliente.php'>iniciar sesión</a>.</div>";
       }
-    } catch (Exception $e) {
+    } catch (Exception $e) { //captura cualquier error que ocurra durante la ejecución
       $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
     }
   }

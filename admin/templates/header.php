@@ -4,10 +4,10 @@ include_once(dirname(__DIR__, 2) . "/config.php");
 
 $url_base = "http://localhost/piccoloBurgers/admin/";
 
-if (MODO_DESARROLLO) {
+if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
   $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
   $_SESSION["admin_logueado"] = true;
-} else {
+} else {// Modo producción, verificar autenticación
   if (!isset($_SESSION["admin_logueado"])) {
     header("Location: login.php");
   }

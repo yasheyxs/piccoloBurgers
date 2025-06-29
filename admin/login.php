@@ -18,11 +18,11 @@ if ($_POST) {
   $sentencia->execute();
   $lista_usuarios = $sentencia->fetch(PDO::FETCH_LAZY);
   $n_usuario = $lista_usuarios["n_usuario"];
-  if ($n_usuario == 1) {
+  if ($n_usuario == 1) {// Si se encuentra el usuario, iniciar sesión
     $_SESSION["admin_usuario"] = $lista_usuarios["usuario"];
     $_SESSION["admin_logueado"] = true;
     header("Location:index.php");
-  } else {
+  } else {// Si no se encuentra el usuario, mostrar mensaje de error
     $mensaje = "Usuario o contraseña incorrectos...";
   }
 }

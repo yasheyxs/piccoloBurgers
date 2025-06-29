@@ -4,7 +4,7 @@ include("../admin/templates/header.php");
 
 // Consultar pedidos "En preparación"
 $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En preparación' ORDER BY fecha DESC");
-$sentencia->execute();
+$sentencia->execute();// Obtener todos los pedidos en preparación
 $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -14,9 +14,9 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     <h4 class="mb-0">Panel de Cocina - Pedidos en preparación</h4>
   </div>
   <div class="card-body">
-    <?php if (count($pedidos) === 0): ?>
+    <?php if (count($pedidos) === 0): ?>// Si no hay pedidos en preparación, mostrar mensaje
       <div class="alert alert-info">No hay pedidos en preparación por el momento.</div>
-    <?php else: ?>
+    <?php else: ?>// Si hay pedidos, mostrar la tabla
       <div class="table-responsive">
         <table class="table table-bordered align-middle text-center" id="tabla-pedidos">
           <thead class="table-light">
@@ -37,7 +37,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
               $stmt_detalle->execute([$pedido['ID']]);
               $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
-              ?>
+              ?>// Si no hay productos, mostrar mensaje
               <tr data-pedido-id="<?= $pedido['ID'] ?>">
                 <td><?= $pedido['ID'] ?></td>
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
@@ -71,6 +71,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
+  // Función para actualizar el estado del pedido
   async function actualizarEstado(pedidoId, nuevoEstado, boton) {
     try {
       const formData = new FormData();
@@ -83,7 +84,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       });
       const resultado = await response.json();
 
-      if (resultado.success) {
+      if (resultado.success) {// Si la actualización fue exitosa, mostrar mensaje
         alert(`Pedido #${pedidoId} actualizado a "${nuevoEstado}" correctamente.`);
 
         // Remover la fila del pedido actualizado porque ya no debe verse en "En preparación"
@@ -105,16 +106,17 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     }
   }
 
+  // Asignar evento a los botones de estado
   document.querySelectorAll('.btn-estado').forEach(btn => {
     btn.addEventListener('click', () => {
       const pedidoId = btn.getAttribute('data-id');
       const nuevoEstado = btn.getAttribute('data-estado');
 
-      if (nuevoEstado === 'Cancelado') {
+      if (nuevoEstado === 'Cancelado') {// Si el estado es "Cancelado", preguntar confirmación
         if (!confirm('¿Estás seguro de cancelar este pedido? Esto notificará al cliente.')) return;
       }
 
-      actualizarEstado(pedidoId, nuevoEstado, btn);
+      actualizarEstado(pedidoId, nuevoEstado, btn);// Llamar a la función para actualizar el estado
     });
   });
 

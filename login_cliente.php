@@ -1,20 +1,23 @@
 <?php
+// inicio de sesión y conexión a la base de datos
 session_start();
 include("admin/bd.php");
 
 $mensaje = "";
-
+// Verificar si el cliente ya está autenticado
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
   $telefono = $_POST["telefono"] ?? "";
   $password = $_POST["password"] ?? "";
 
+  // Validar campos
   if (empty($telefono) || empty($password)) {
     $mensaje = "<div class='alert alert-danger'>Completa todos los campos.</div>";
-  } else {
+  } else {// Si los campos están completos, proceder a la autenticación
     $consulta = $conexion->prepare("SELECT * FROM tbl_clientes WHERE telefono = ?");
     $consulta->execute([$telefono]);
     $cliente = $consulta->fetch(PDO::FETCH_ASSOC);
-
+    
+    // Verificar si el cliente existe y si la contraseña es correcta
     if ($cliente && password_verify($password, $cliente["password"])) {
       $_SESSION["cliente"] = [
         "id" => $cliente["ID"],

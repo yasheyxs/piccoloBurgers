@@ -1,12 +1,15 @@
 <?php
+// inicio de sesión y conexión a la base de datos
 include("admin/bd.php");
 session_start();
-
+// Verificar si el cliente ya está autenticado
+// Si no hay sesión de cliente, redirigir al login
 if (!isset($_SESSION["cliente"])) {
     header("Location: login_cliente.php");
-    exit;
+    exit; // Terminar el script para evitar que se muestre el resto de la página
 }
 
+// Obtener el ID del cliente desde la sesión
 $cliente = $_SESSION["cliente"];
 $cliente_id = $cliente["id"];
 
@@ -213,7 +216,7 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   </div>
 
   <h2 class="mt-5 mb-4 text-center">📜 Historial de Pedidos</h2>
-  <div id="historial-pedidos"></div>
+  <div id="historial-pedidos"></div> // aca se carga el historial de pedidos dinamicamente
 
 </div>
 
@@ -227,9 +230,10 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
 
       let htmlPedidos = '';
 
+      // Verificar si hay pedidos
       if (pedidos.length === 0) {
         htmlPedidos = `<div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>`;
-      } else {
+      } else {// Si hay pedidos, construir el HTML
         pedidos.forEach(pedido => {
           let estadoHtml = '';
           switch(pedido.estado) {

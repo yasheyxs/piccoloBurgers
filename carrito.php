@@ -230,6 +230,7 @@ include("admin/bd.php"); ?>
   </footer>
 
   <script>
+    // Actualizar el contador del carrito al cargar la página
     function cargarCarrito() {
       const items = JSON.parse(localStorage.getItem('carrito')) || [];
       const contenedor = document.getElementById("carrito-contenido");
@@ -250,7 +251,7 @@ include("admin/bd.php"); ?>
             cantidad: 1
           };
 
-        } else {
+        } else {// Si ya existe, solo aumentamos la cantidad y sumamos el precio
           agrupado[key].cantidad++;
           agrupado[key].precio += item.precio;
         }
@@ -258,7 +259,7 @@ include("admin/bd.php"); ?>
 
       const productos = Object.values(agrupado);
 
-      if (productos.length === 0) {
+      if (productos.length === 0) {// Si no hay productos, mostrar mensaje
         contenedor.innerHTML = "<p class='text-center'>Tu carrito está vacío.</p>";
         totalSpan.textContent = "0.00";
 
@@ -273,7 +274,7 @@ include("admin/bd.php"); ?>
       }
 
 
-      productos.forEach(item => {
+      productos.forEach(item => {// Mostrar cada producto en el carrito
         total += item.precio;
         contenedor.innerHTML += `
       <div class="col-md-6 col-lg-4 mb-4">
@@ -293,12 +294,12 @@ include("admin/bd.php"); ?>
         </div>
       </div>`;
       });
-
+      
       totalSpan.textContent = total.toFixed(2);
       actualizarTotal(); // Para actualizar puntos y total correctamente
     }
 
-    function aumentarCantidad(id) {
+    function aumentarCantidad(id) {// Aumentar la cantidad de un producto en el carrito
       let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
       // Convertir el id a cadena para asegurar la comparación
       const producto = carrito.find(p => p.id.toString() === id.toString());
@@ -306,17 +307,17 @@ include("admin/bd.php"); ?>
         carrito.push({
           ...producto
         });
-        localStorage.setItem('carrito', JSON.stringify(carrito));
+        localStorage.setItem('carrito', JSON.stringify(carrito)); // agregamos una unidad más
         cargarCarrito();
         actualizarContador();
       }
     }
 
 
-    function disminuirCantidad(id) {
+    function disminuirCantidad(id) {// Disminuir la cantidad de un producto en el carrito
       let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
       const index = carrito.findIndex(p => p.id.toString() === id.toString());
-      if (index !== -1) {
+      if (index !== -1) {// Si el producto existe en el carrito
         carrito.splice(index, 1); // removemos solo una unidad
         localStorage.setItem('carrito', JSON.stringify(carrito));
         cargarCarrito();
@@ -324,29 +325,30 @@ include("admin/bd.php"); ?>
       }
     }
 
-    function eliminarProducto(id) {
-      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    function eliminarProducto(id) {// Eliminar un producto del carrito
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];// Convertir el id a cadena para asegurar la comparación
+      // Filtrar el carrito para eliminar el producto con el id especificado
       carrito = carrito.filter(p => p.id.toString() !== id.toString());
       localStorage.setItem('carrito', JSON.stringify(carrito));
       cargarCarrito();
       actualizarContador();
     }
 
-    function vaciarCarrito() {
+    function vaciarCarrito() {// Vaciar el carrito completamente
       localStorage.removeItem("carrito");
       cargarCarrito();
       actualizarContador();
     }
 
-    function actualizarContador() {
+    function actualizarContador() {// Actualizar el contador de productos en el carrito
       const items = JSON.parse(localStorage.getItem('carrito')) || [];
       const contador = document.getElementById("contador-carrito");
-      if (contador) {
+      if (contador) {// Si el contador existe, actualizamos su valor
         contador.textContent = items.length;
       }
     }
 
-    function actualizarTotal() {
+    function actualizarTotal() {// Actualizar el total del carrito y aplicar puntos si corresponde
       const usarPuntos = document.getElementById("usarPuntos")?.checked;
       localStorage.setItem("usar_puntos_activado", usarPuntos ? "1" : "0");
 
@@ -356,20 +358,19 @@ include("admin/bd.php"); ?>
       const puntosDisponibles = parseInt(document.getElementById("puntosDisponibles")?.value || 0);
 
       let descuento = 0;
-      // Remover avisos anteriores
       document.getElementById("puntos_usados")?.remove();
       document.getElementById("puntos_warning")?.remove();
 
-      if (usarPuntos) {
+      if (usarPuntos) {// Si se selecciona usar puntos, calculamos el descuento
         const valorPorPunto = 20;
         const minimoParaCanjear = 50;
         const maximoDescuento = total * 0.25;
 
-        if (puntosDisponibles < minimoParaCanjear) {
+        if (puntosDisponibles < minimoParaCanjear) {// Si no hay suficientes puntos para canjear
           totalSpan.insertAdjacentHTML("afterend", `<div id="puntos_warning" class="text-danger">⚠️ Necesitás al menos ${minimoParaCanjear} puntos para canjear.</div>`);
-        } else if (total < 1000) {
+        } else if (total < 1000) {// Si el total es menor a $1000, no se puede aplicar descuento
           totalSpan.insertAdjacentHTML("afterend", `<div id="puntos_warning" class="text-danger">⚠️ El total debe ser al menos $1000 para canjear puntos.</div>`);
-        } else {
+        } else {// Si hay suficientes puntos y el total es válido, calculamos el descuento
           const puntosPosibles = Math.floor(maximoDescuento / valorPorPunto);
           const puntosAUsar = Math.min(puntosDisponibles, puntosPosibles);
           descuento = puntosAUsar * valorPorPunto;
@@ -388,7 +389,7 @@ include("admin/bd.php"); ?>
       }
     }
 
-
+    // Cargar el carrito y actualizar el contador al cargar la página
     window.onload = () => {
       console.log("Contenido del carrito:", localStorage.getItem('carrito'));
       cargarCarrito();
@@ -396,19 +397,20 @@ include("admin/bd.php"); ?>
       document.getElementById("usarPuntos")?.addEventListener("change", actualizarTotal);
     };
 
+    // Mostrar confirmación al cancelar el pedido
     function mostrarConfirmacionCancelar() {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
       const detalleDiv = document.getElementById("detallePedidoModal");
-      if (carrito.length === 0) {
+      if (carrito.length === 0) {// Si el carrito está vacío, mostrar mensaje
         detalleDiv.innerHTML = "<p class='text-muted'>El carrito está vacío.</p>";
-      } else {
+      } else {// Si hay productos, mostrar el resumen
         const resumen = carrito.reduce((acc, item) => {
-          if (!acc[item.nombre]) {
+          if (!acc[item.nombre]) {// Si no existe, lo inicializamos
             acc[item.nombre] = {
               cantidad: 1,
               precio: item.precio
             };
-          } else {
+          } else {// Si ya existe, aumentamos la cantidad y sumamos el precio
             acc[item.nombre].cantidad += 1;
             acc[item.nombre].precio += item.precio;
           }
@@ -426,26 +428,26 @@ include("admin/bd.php"); ?>
     `;
       }
 
-      const modal = new bootstrap.Modal(document.getElementById("modalCancelarPedido"));
+      const modal = new bootstrap.Modal(document.getElementById("modalCancelarPedido")); // Crear una nueva instancia del modal
       modal.show();
     }
 
-    function confirmarCancelacion() {
-      localStorage.removeItem("carrito");
-      const modal = bootstrap.Modal.getInstance(document.getElementById("modalCancelarPedido"));
+    function confirmarCancelacion() {// Confirmar la cancelación del pedido
+      localStorage.removeItem("carrito");// Limpiar el carrito
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalCancelarPedido"));// Obtener la instancia del modal
       modal.hide();
       cargarCarrito();
       actualizarContador();
     }
 
-    document.getElementById("formPedido").addEventListener("submit", function(e) {
+    document.getElementById("formPedido").addEventListener("submit", function(e) {// Validar el formulario antes de enviar
       const usarPuntosChecked = document.getElementById("usarPuntos")?.checked;
       document.getElementById("usarPuntosInput").value = usarPuntosChecked ? "1" : "0";
 
       const items = JSON.parse(localStorage.getItem("carrito")) || [];
       const agrupado = {};
 
-      items.forEach(item => {
+      items.forEach(item => {// Agrupar productos por ID para evitar duplicados
         const key = item.id;
         if (!agrupado[key]) {
           agrupado[key] = {
@@ -454,25 +456,25 @@ include("admin/bd.php"); ?>
             precio: item.precio,
             cantidad: 1
           };
-        } else {
+        } else {// Si ya existe, solo aumentamos la cantidad y sumamos el precio
           agrupado[key].cantidad += 1;
           agrupado[key].precio += item.precio;
         }
       });
 
 
-      const carritoFinal = Object.values(agrupado).map(p => ({
+      const carritoFinal = Object.values(agrupado).map(p => ({// Convertimos los datos a un formato adecuado para enviar
         id: String(p.id),
         nombre: p.nombre,
         precio: Number(p.precio),
         cantidad: Number(p.cantidad)
       }));
 
-      const hayIncompletos = carritoFinal.some(
+      const hayIncompletos = carritoFinal.some(// verificar si hay productos incompletos
         p => !p.id || !p.nombre || typeof p.precio !== "number" || !p.cantidad
       );
 
-      if (hayIncompletos) {
+      if (hayIncompletos) {// Si hay productos incompletos, mostramos un mensaje de error
         console.error("⚠️ Hay productos incompletos:", carritoFinal);
         alert("Error: uno de los productos del carrito no tiene toda la información necesaria.");
         e.preventDefault();
@@ -484,7 +486,7 @@ include("admin/bd.php"); ?>
     });
   </script>
 
-  <!-- Modal de confirmación para cancelar el pedido -->
+  <!-- Modal para cancelar el pedido -->
   <div class="modal fade" id="modalCancelarPedido" tabindex="-1" aria-labelledby="modalCancelarPedidoLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content border-0 shadow">

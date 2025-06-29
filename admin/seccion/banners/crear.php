@@ -2,7 +2,8 @@
 include("../../bd.php");
 
 if ($_POST) {
-
+  // Si se envió el formulario, procesar los datos
+  // Validar que se reciban los datos necesarios
   $titulo = (isset($_POST["titulo"])) ? $_POST["titulo"] : "";
   $descripcion = (isset($_POST["descripcion"])) ? $_POST["descripcion"] : "";
   $link = (isset($_POST["link"])) ? $_POST["link"] : "";
@@ -10,6 +11,7 @@ if ($_POST) {
   $sentencia = $conexion->prepare("INSERT INTO `tbl_banners`
              (`ID`, `titulo`, `descripcion`, `link`) 
              VALUES (NULL, :titulo,:descripcion, :link);");
+  // Preparar la consulta para insertar el banner
 
   $sentencia->bindParam(":titulo", $titulo);
   $sentencia->bindParam(":descripcion", $descripcion);

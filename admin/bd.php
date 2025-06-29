@@ -6,7 +6,7 @@ $contrasenia = "";
 try {
     $conexion = new PDO("mysql:host=$servidor;dbname=$baseDatos", $usuario, $contrasenia);
     $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (Exception $error) {
+} catch (Exception $error) {// Capturar errores de conexión
     http_response_code(500);
     header('Content-Type: application/json');
     echo json_encode(["exito" => false, "mensaje" => "Error de conexión a la base de datos"]);
