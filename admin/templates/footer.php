@@ -13,10 +13,11 @@
 </script>
 
 <script>
+
   $(document).ready(function() {
 
-    $('table').DataTable({
-      "pageLength": 3,
+    $('table').DataTable({// Inicializar DataTables
+      "pageLength": 3,// Número de filas por página
       lengthMenu: [
         [3, 10, 25, 50],
         [3, 10, 25, 50]

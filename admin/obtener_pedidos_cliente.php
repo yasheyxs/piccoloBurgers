@@ -4,7 +4,8 @@ session_start();
 
 header("Content-Type: application/json");
 
-if (!isset($_SESSION["cliente"])) {
+if (!isset($_SESSION["cliente"])) {// Verificar si el cliente está autenticado
+    // Si no hay sesión de cliente, redirigir al login
     echo json_encode([]);
     exit;
 }

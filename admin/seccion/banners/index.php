@@ -1,7 +1,7 @@
 <?php
 include("../../bd.php");
 
-if (isset($_GET['txtID'])) {
+if (isset($_GET['txtID'])) {// Si se envió el ID por GET, eliminar el banner
 
     $txtID = (isset($_GET["txtID"])) ? $_GET["txtID"] : "";
 
@@ -12,7 +12,7 @@ if (isset($_GET['txtID'])) {
     header("Location:index.php");
 }
 
-$sentencia = $conexion->prepare("SELECT * FROM `tbl_banners`");
+$sentencia = $conexion->prepare("SELECT * FROM `tbl_banners`"); // Preparar la consulta para obtener todos los banners
 $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
@@ -41,7 +41,7 @@ include("../../templates/header.php");
                 <tbody>
 
 
-                    <?php foreach ($lista_banners as $key => $value) { ?>
+                    <?php foreach ($lista_banners as $key => $value) { ?>// Iterar sobre la lista de banners y mostrar cada uno en una fila de la tabla
                         <tr class="">
                             <td scope="row"><?php echo $value['ID']; ?></td>
                             <td><?php echo $value['titulo']; ?></td>
