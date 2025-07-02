@@ -9,13 +9,14 @@ if ($categoria && in_array($categoria, $categorias_disponibles)) {// Si la categ
   $stmt = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
   $stmt->execute([$categoria]);
   $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} else {// Si categoría es inválida, mostrar los últimos 4 elementos del menú
-  $stmt = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC limit 4");
+} else {// Si categoría es inválida, mostrar todos los elementos del menú
+  $stmt = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC");
   $stmt->execute();
   $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-foreach ($lista_menu as $registro): ?>// Mostrar cada registro del menú
+//mostrar cada registro del menú
+foreach ($lista_menu as $registro): ?>
   <div class="col d-flex">
     <div class="card position-relative d-flex flex-column h-100 w-100">
       <img src="img/menu/<?= $registro["foto"] ?>" class="card-img-top" alt="Foto de <?= $registro["nombre"] ?>">

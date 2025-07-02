@@ -34,7 +34,7 @@ if ($_POST) {
 
     $fecha_foto = new DateTime();
     $nombre_foto = $fecha_foto->getTimestamp() . "_" . $foto;
-    move_uploaded_file($tmp_foto, "../../../images/menu/" . $nombre_foto);
+    move_uploaded_file($tmp_foto, "../../../img/menu/" . $nombre_foto);
 
     $sentencia = $conexion->prepare("SELECT * FROM `tbl_menu` WHERE ID=:id");
     $sentencia->bindParam(":id", $txtID);
@@ -43,8 +43,8 @@ if ($_POST) {
     $registro_foto = $sentencia->fetch(PDO::FETCH_LAZY);
 
     if (isset($registro_foto['foto'])) {
-      if (file_exists("../../../images/menu/" . $registro_foto['foto'])) {
-        unlink("../../../images/menu/" . $registro_foto['foto']);
+      if (file_exists("../../../img/menu/" . $registro_foto['foto'])) {
+        unlink("../../../img/menu/" . $registro_foto['foto']);
       }
     }
 
@@ -112,7 +112,7 @@ include("../../templates/header.php");
       <div class="mb-3">
         <label for="foto" class="form-label">Foto:</label>
         <br />
-        <img width="50" src="../../../images/menu/<?php echo $foto; ?>" />
+        <img width="50" src="../../../img/menu/<?php echo $foto; ?>" />
         <input type="file" class="form-control" name="foto" id="foto" placeholder="" aria-describedby="fileHelpId">
       </div>
 

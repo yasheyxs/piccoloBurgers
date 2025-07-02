@@ -1,4 +1,5 @@
 <?php include("templates/header.php"); ?>
+
 <br />
 <div class="row align-items-md-stretch">
     <div class="col-md-12">
