@@ -340,7 +340,7 @@ if ($_POST) {
   align-items: center;
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 999; /* menor que WhatsApp */
+  z-index: 999;
   transition: transform 0.3s, box-shadow 0.3s;
   text-decoration: none;
 }
@@ -376,6 +376,7 @@ if ($_POST) {
           <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
           <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
           <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="#puntos">Puntos</a></li>
           <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
           <li class="nav-item"><a class="nav-link" href="#horario">Horarios</a></li>
           <li class="nav-item">
@@ -500,6 +501,16 @@ if ($_POST) {
   </div>
 </section>
 
+<section id="puntos" class="container mt-5">
+  <h2 class="text-center mb-4">Sistema de puntos</h2>
+  <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+    <p class="lead text-center" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
+      Cada vez que hacés un pedido registrado, <strong>ganás puntos</strong> que podés canjear por <strong>descuentos exclusivos</strong> en tus próximas compras.  
+      <br><br>
+      Cuanto más pedís, <strong>más ahorrás</strong> 🍔✨
+    </p>
+  </div>
+</section>
 
   <section id="contacto" class="container mt-4">
     <h2>Contacto</h2>
