@@ -285,6 +285,6 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   document.addEventListener('DOMContentLoaded', actualizarHistorial);
 </script>
 
-
+<?php include("componentes/whatsapp_button.php"); ?>
 </body>
 </html>

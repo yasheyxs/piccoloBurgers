@@ -327,12 +327,37 @@ if ($_POST) {
 
     /* ScrollTop button */
     #scrollTopBtn {
-      background-color: var(--main-gold);
-      color: #000;
-      border-radius: 50%;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background-color: var(--main-gold);
+  color: #000;
+  font-size: 1.8rem;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 999; /* menor que WhatsApp */
+  transition: transform 0.3s, box-shadow 0.3s;
+  text-decoration: none;
+}
+
+#scrollTopBtn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+  color: #000;
+  text-decoration: none;
+}
+
+.alert-warning {
+  background-color: #3a2a00;
+  color: #fac30c;
+  border: 1px solid #fac30c;
+}
+
   </style>
 
 </head>
@@ -350,6 +375,7 @@ if ($_POST) {
           <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
           <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
           <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
           <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
           <li class="nav-item"><a class="nav-link" href="#horario">Horarios</a></li>
           <li class="nav-item">
@@ -373,6 +399,17 @@ if ($_POST) {
       </div>
     </div>
   </nav>
+
+  <?php if (!isset($_SESSION["cliente"])): ?>
+  <section class="container mt-3 text-center">
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="font-weight: bold; font-size: 1.2rem;">
+      🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
+      <a href="login_cliente.php" class="btn btn-sm btn-gold ms-3">Iniciar sesión / Registrarse</a>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+  </section>
+<?php endif; ?>
+
 
   <section class="container-fluid p-0">
     <div class="banner-img" style="position:relative; background:url('img/pexels-valeriya-1199960.jpg') center/cover no-repeat; height:400px;">
@@ -453,6 +490,16 @@ if ($_POST) {
       <?php } ?>
     </div>
   </section>
+
+  <section id="nosotros" class="container mt-5">
+  <h2 class="text-center mb-4">Nosotros</h2>
+  <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+    <p class="lead text-center" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">
+      En <strong>Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad. Nuestro compromiso es ofrecerte una experiencia gastronómica inolvidable, con un servicio cálido y un ambiente acogedor. ¡Gracias por elegirnos para compartir momentos deliciosos!
+    </p>
+  </div>
+</section>
+
 
   <section id="contacto" class="container mt-4">
     <h2>Contacto</h2>
@@ -600,7 +647,7 @@ if ($_POST) {
     </div>
   </div>
 
-
+  <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 
 </html>

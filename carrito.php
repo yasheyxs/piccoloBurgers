@@ -79,13 +79,10 @@ include("admin/bd.php"); ?>
     }
 
     .navbar-brand {
-      font-family: var(--font-title);
+      font-family: var(--font-main);
       text-transform: uppercase;
       letter-spacing: 1px;
-      font-size: 1.5rem;
     }
-
-
 
     /* Cards */
     .card {
@@ -508,6 +505,7 @@ include("admin/bd.php"); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 
 </html>

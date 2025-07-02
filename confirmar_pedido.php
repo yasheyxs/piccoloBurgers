@@ -1,7 +1,12 @@
 <?php include("admin/bd.php"); ?>
+<?php
+session_start();
+$cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
+?>
+
+
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8">
   <title>Confirmar Pedido - Piccolo Burgers</title>
@@ -83,7 +88,6 @@
 </head>
 
 <body>
-
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
@@ -97,15 +101,21 @@
     <form id="form-pedido" method="post">
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre completo:</label>
-        <input type="text" class="form-control" id="nombre" name="nombre" required>
+        <input type="text" class="form-control" id="nombre" name="nombre" required
+ value="<?php echo htmlspecialchars($cliente['nombre'] ?? '', ENT_QUOTES); ?>">
+
       </div>
       <div class="mb-3">
         <label for="telefono" class="form-label">Teléfono (obligatorio):</label>
-        <input type="text" class="form-control" id="telefono" name="telefono" required>
+        <input type="text" class="form-control" id="telefono" name="telefono" required
+ value="<?php echo htmlspecialchars($cliente['telefono'] ?? '', ENT_QUOTES); ?>">
+
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email (opcional):</label>
-        <input type="email" class="form-control" id="email" name="email">
+        <input type="email" class="form-control" id="email" name="email"
+ value="<?php echo htmlspecialchars($cliente['email'] ?? '', ENT_QUOTES); ?>">
+
       </div>
       <div class="mb-3">
         <label for="nota" class="form-label">Nota para el pedido:</label>
@@ -295,6 +305,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 
 </html>
