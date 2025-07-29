@@ -362,6 +362,11 @@ if ($_POST) {
   border: 1px solid #fac30c;
 }
 
+.alert-warning .btn-gold:hover {
+  color: #3a2a00 !important;
+}
+
+
   </style>
 
 </head>
