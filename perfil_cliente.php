@@ -18,6 +18,35 @@ $stmt = $conexion->prepare("SELECT nombre, telefono, email, fecha_registro, punt
 $stmt->execute([$cliente_id]);
 $datos = $stmt->fetch(PDO::FETCH_ASSOC);
 
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["actualizar"])) {
+    $nuevo_nombre = trim($_POST["nombre"]);
+    $nuevo_telefono = trim($_POST["telefono"]);
+    $nuevo_email = trim($_POST["email"]);
+
+    // Verificar si el teléfono ya existe en otro cliente
+    $verificar = $conexion->prepare("SELECT COUNT(*) FROM tbl_clientes WHERE telefono = ? AND ID != ?");
+    $verificar->execute([$nuevo_telefono, $cliente_id]);
+    $existe = $verificar->fetchColumn();
+
+    if ($existe > 0) {
+        $mensaje_error = "⚠️ El número de teléfono ya está registrado por otro cliente.";
+    } else {
+        // Actualizar datos
+        $actualizar = $conexion->prepare("UPDATE tbl_clientes SET nombre = ?, telefono = ?, email = ? WHERE ID = ?");
+        $actualizar->execute([$nuevo_nombre, $nuevo_telefono, $nuevo_email, $cliente_id]);
+
+        // Refrescar sesión con nuevos datos si querés
+        $_SESSION["cliente"]["nombre"] = $nuevo_nombre;
+        $_SESSION["cliente"]["telefono"] = $nuevo_telefono;
+        $_SESSION["cliente"]["email"] = $nuevo_email;
+
+        // Recargar la página para mostrar los cambios
+        header("Location: perfil_cliente.php?actualizado=1");
+        exit;
+    }
+}
+
+
 ?>
 
 <!doctype html>
@@ -205,6 +234,17 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   color: var(--text-light);
   border: 1px solid var(--gold-hover);
 }
+
+input.form-control {
+  background-color: #1e1e1e;
+  color: #cccccc;
+  border: 1px solid #444;
+}
+
+input.form-control::placeholder {
+  color: #777;
+}
+
   </style>
 </head>
 <body>
@@ -232,18 +272,64 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
 <div class="container mt-5">
   <h2 class="mb-4 text-center">👤 Información del Cliente</h2>
   <div class="card card-info p-4 mb-5">
+  <p><strong>Nombre:</strong> <?= htmlspecialchars($datos["nombre"]) ?></p>
+  <p><strong>Teléfono:</strong> <?= htmlspecialchars($datos["telefono"]) ?></p>
+  <p><strong>Email:</strong> <?= htmlspecialchars($datos["email"]) ?: "No registrado" ?></p>
+  <p><strong>Fecha de Registro:</strong> <?= date("d/m/Y", strtotime($datos["fecha_registro"])) ?></p>
+  <p><strong>Puntos disponibles:</strong> <?= $datos["puntos"] ?> ⭐</p>
 
-    <p><strong>Nombre:</strong> <?= htmlspecialchars($datos["nombre"]) ?></p>
-    <p><strong>Teléfono:</strong> <?= htmlspecialchars($datos["telefono"]) ?></p>
-    <p><strong>Email:</strong> <?= htmlspecialchars($datos["email"]) ?: "No registrado" ?></p>
-    <p><strong>Fecha de Registro:</strong> <?= date("d/m/Y", strtotime($datos["fecha_registro"])) ?></p>
-    <p><strong>Puntos disponibles:</strong> <?= $datos["puntos"] ?> ⭐</p>
+  <div class="text-end mt-3">
+    <button type="button" class="btn btn-gold" data-bs-toggle="modal" data-bs-target="#modalEditarDatos">
+      Editar mis datos
+    </button>
   </div>
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="modalEditarDatos" tabindex="-1" aria-labelledby="modalEditarDatosLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-light border-0">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalEditarDatosLabel">Editar mis datos</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <form method="POST">
+          <div class="mb-3">
+            <label for="nombre" class="form-label">Nombre</label>
+            <input type="text" name="nombre" id="nombre" class="form-control" value="<?= htmlspecialchars($datos['nombre']) ?>" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="telefono" class="form-label">Teléfono</label>
+            <input type="text" name="telefono" id="telefono" class="form-control" value="<?= htmlspecialchars($datos['telefono']) ?>" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" name="email" id="email" class="form-control" value="<?= htmlspecialchars($datos['email']) ?>">
+          </div>
+
+          <div class="modal-footer">
+            <button type="submit" name="actualizar" class="btn btn-gold">Guardar Cambios</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 
   <h2 class="mt-5 mb-4 text-center">📜 Historial de Pedidos</h2>
   <div id="historial-pedidos"></div>
-
 </div>
+
+<?php if (!empty($mensaje_error)): ?>
+  <div class="alert alert-danger text-center"><?= $mensaje_error ?></div>
+<?php endif; ?>
+
 
 <script>
 
@@ -368,8 +454,6 @@ async function actualizarHistorial() {
     console.error('Error al actualizar historial:', e);
   }
 }
-
-
   // Actualizar cada 10 segundos
   setInterval(actualizarHistorial, 10000);
 
@@ -378,5 +462,35 @@ async function actualizarHistorial() {
 </script>
 
 <?php include("componentes/whatsapp_button.php"); ?>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Toast de confirmación de actualización -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
+  <div id="toastActualizado" class="toast align-items-center text-white bg-success border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        Tus datos fueron actualizados correctamente.
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("actualizado") === "1") {
+    const toastEl = document.getElementById("toastActualizado");
+    const bsToast = new bootstrap.Toast(toastEl, { delay: 3000 });
+    bsToast.show();
+
+    window.history.replaceState({}, document.title, window.location.pathname);
+  }
+});
+
+</script>
+
+
 </body>
 </html>
