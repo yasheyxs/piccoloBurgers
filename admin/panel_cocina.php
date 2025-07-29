@@ -14,9 +14,9 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     <h4 class="mb-0">Panel de Cocina - Pedidos en preparación</h4>
   </div>
   <div class="card-body">
-    <?php if (count($pedidos) === 0): ?>// Si no hay pedidos en preparación, mostrar mensaje
+    <?php if (count($pedidos) === 0): ?>
       <div class="alert alert-info">No hay pedidos en preparación por el momento.</div>
-    <?php else: ?>// Si hay pedidos, mostrar la tabla
+    <?php else: ?>
       <div class="table-responsive">
         <table class="table table-bordered align-middle text-center" id="tabla-pedidos">
           <thead class="table-light">
@@ -37,7 +37,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
               $stmt_detalle->execute([$pedido['ID']]);
               $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
-              ?>// Si no hay productos, mostrar mensaje
+              ?>
               <tr data-pedido-id="<?= $pedido['ID'] ?>">
                 <td><?= $pedido['ID'] ?></td>
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
