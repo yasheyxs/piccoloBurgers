@@ -69,6 +69,31 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   font-size: 1.2rem;
 }
 
+.pedido-resumen {
+  cursor: pointer;
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  font-weight: 600;
+  border-left: 5px solid var(--main-gold);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 12px 16px;
+}
+
+.pedido-resumen:hover {
+  background-color: var(--gold-hover);
+  color: #000;
+  border-left-color: var(--main-gold);
+}
+
+.pedido-resumen.activo {
+  background-color: var(--gold-hover);
+  color: #000;
+  border-left-color: var(--main-gold);
+  box-shadow: 0 0 8px var(--main-gold);
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+
 
 
     .btn-gold {
@@ -216,67 +241,134 @@ $datos = $stmt->fetch(PDO::FETCH_ASSOC);
   </div>
 
   <h2 class="mt-5 mb-4 text-center">📜 Historial de Pedidos</h2>
-  <div id="historial-pedidos"></div> // aca se carga el historial de pedidos dinamicamente
+  <div id="historial-pedidos"></div>
 
 </div>
 
 <script>
-  async function actualizarHistorial() {
-    try {
-      const response = await fetch('admin/obtener_pedidos_cliente.php'); // Endpoint que devuelve los pedidos JSON
-      const pedidos = await response.json();
 
-      const contenedor = document.querySelector('.container.mt-5'); // o algún div que contenga el historial
+async function actualizarHistorial() {
+  try {
+    const response = await fetch('admin/obtener_pedidos_cliente.php');
+    const pedidos = await response.json();
 
-      let htmlPedidos = '';
+    let htmlPedidos = '';
 
-      // Verificar si hay pedidos
-      if (pedidos.length === 0) {
-        htmlPedidos = `<div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>`;
-      } else {// Si hay pedidos, construir el HTML
-        pedidos.forEach(pedido => {
-          let estadoHtml = '';
-          switch(pedido.estado) {
-            case 'Cancelado':
-              estadoHtml = `<span class="text-danger">Cancelado ❌ — Lamentamos que tu pedido haya sido cancelado. Esperamos servirte mejor la próxima vez</span>`;
-              break;
-            case 'Listo':
-              estadoHtml = `<span class="text-success">Listo ✅</span>`;
-              break;
-            case 'En preparación':
-              estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
-              break;
-            default:
-              estadoHtml = pedido.estado;
-          }
+    if (pedidos.length === 0) {
+      htmlPedidos = `<div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>`;
+    } else {
+      pedidos.forEach((pedido, index) => {
+        let estadoHtml = '';
+        switch (pedido.estado) {
+          case 'Cancelado':
+            estadoHtml = `<span class="text-danger">Cancelado ❌ -  Esperamos poder servirte mejor en el futuro. </span>`;
+            break;
+          case 'Listo':
+            estadoHtml = `<span class="text-success">Listo ✅</span>`;
+            break;
+          case 'En preparación':
+            estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
+            break;
+          default:
+            estadoHtml = pedido.estado;
+        }
 
-          let productosHtml = '<ul>';
-          pedido.detalles.forEach(detalle => {
-            productosHtml += `<li>${detalle.nombre} - $${Number(detalle.precio).toFixed(2)} x ${detalle.cantidad}</li>`;
-          });
+        htmlPedidos += `
+          <div class="pedido-resumen p-3 mb-2 rounded shadow-sm"
+               data-index="${index}">
+            <i class="fas fa-receipt me-2"></i>
+            <span><strong>Fecha:</strong> ${new Date(pedido.fecha).toLocaleString()}</span>
+            &mdash;
+            <span><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</span>
+          </div>
 
-          productosHtml += '</ul>';
-
-          htmlPedidos += `
-            <div class="card mb-4 shadow p-3">
-              <p><strong>Fecha:</strong> ${new Date(pedido.fecha).toLocaleString()}</p>
-              <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
+          <div class="pedido-detalle mb-4" id="detalle-${index}" style="display:none;">
+            <div class="card shadow p-3" style="background-color: var(--gray-bg);">
               <p><strong>Entrega:</strong> ${pedido.tipo_entrega}</p>
               <p><strong>Método de pago:</strong> ${pedido.metodo_pago}</p>
               <p><strong>Estado:</strong> ${estadoHtml}</p>
-              <p><strong>Nota:</strong> ${pedido.nota.replace(/\n/g, '<br>')}</p>
+              <p><strong>Nota:</strong> ${pedido.nota ? pedido.nota.replace(/\n/g, '<br>') : 'Sin nota'}</p>
               <strong>Productos:</strong>
-              ${productosHtml}
+              <div class="row mt-2">
+        `;
+
+        pedido.detalles.forEach(detalle => {
+          htmlPedidos += `
+            <div class="col-md-6 col-lg-4 mb-3">
+              <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                  <h5 class="card-title">${detalle.nombre}</h5>
+                  <p class="card-text mb-1"><strong>Precio unitario:</strong> $${Number(detalle.precio).toFixed(2)}</p>
+                  <p class="card-text mb-1"><strong>Cantidad:</strong> ${detalle.cantidad}</p>
+                  <p class="card-text"><strong>Subtotal:</strong> $${(detalle.precio * detalle.cantidad).toFixed(2)}</p>
+                </div>
+              </div>
             </div>
           `;
         });
-      }
 
-      document.getElementById('historial-pedidos').innerHTML = htmlPedidos;
-    } catch (e) {
-      console.error('Error al actualizar historial:', e);
+        htmlPedidos += `
+              </div>
+            </div>
+          </div>
+        `;
+      });
     }
+
+    document.getElementById('historial-pedidos').innerHTML = htmlPedidos;
+
+    // Restaurar estado abierto guardado en localStorage
+    const abiertos = JSON.parse(localStorage.getItem('pedidosAbiertos') || '[]');
+
+    // Evento click toggle detalle
+    document.querySelectorAll('.pedido-resumen').forEach(elem => {
+  const idx = elem.getAttribute('data-index');
+  const detalle = document.getElementById('detalle-' + idx);
+
+  // Restaurar visual abierto
+  if (abiertos.includes(idx)) {
+    detalle.style.display = 'block';
+    elem.classList.add('activo');
   }
+
+  elem.addEventListener('click', () => {
+    if (detalle.style.display === 'none') {
+      // Cerrar todos los detalles y quitar clase activo de todos
+      document.querySelectorAll('.pedido-detalle').forEach(d => d.style.display = 'none');
+      document.querySelectorAll('.pedido-resumen').forEach(e => e.classList.remove('activo'));
+      abiertos.length = 0; // limpiar el array de abiertos
+
+      // Abrir el detalle clickeado y marcarlo activo
+      detalle.style.display = 'block';
+      elem.classList.add('activo');
+
+      // Guardar solo este abierto
+      abiertos.push(idx);
+
+      // Scroll suave para centrar el detalle en pantalla
+      detalle.scrollIntoView({behavior: 'smooth', block: 'center'});
+
+    } else {
+      // Cerrar el detalle si ya estaba abierto
+      detalle.style.display = 'none';
+      elem.classList.remove('activo');
+
+      // Quitar de abiertos
+      const pos = abiertos.indexOf(idx);
+      if (pos > -1) {
+        abiertos.splice(pos, 1);
+      }
+    }
+    localStorage.setItem('pedidosAbiertos', JSON.stringify(abiertos));
+  });
+});
+
+
+  } catch (e) {
+    console.error('Error al actualizar historial:', e);
+  }
+}
+
 
   // Actualizar cada 10 segundos
   setInterval(actualizarHistorial, 10000);
