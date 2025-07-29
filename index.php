@@ -455,17 +455,19 @@ if ($_POST) {
     <h2 class="text-center">Menú</h2>
 
     <div class="mb-3 text-center">
-      <form class="d-inline">
-        <label for="categoria" class="form-label me-2">Filtrar por categoría:</label>
-        <select id="categoria" class="form-select d-inline w-auto">
+  <form class="d-inline">
+    <label for="categoria" class="form-label me-2">Filtrar por categoría:</label>
+    <select id="categoria" class="form-select d-inline w-auto me-3">
+      <option value="">Todos</option>
+      <?php foreach ($categorias_disponibles as $cat): ?>
+        <option value="<?= $cat ?>" <?= ($cat == $categoria_seleccionada) ? 'selected' : '' ?>><?= $cat ?></option>
+      <?php endforeach; ?>
+    </select>
 
-          <option value="">Todos</option>
-          <?php foreach ($categorias_disponibles as $cat): ?>
-            <option value="<?= $cat ?>" <?= ($cat == $categoria_seleccionada) ? 'selected' : '' ?>><?= $cat ?></option>
-          <?php endforeach; ?>
-        </select>
-      </form>
-    </div>
+    <input type="text" id="buscador-menu" class="form-control d-inline w-auto" style="max-width: 300px;" placeholder="Buscar por nombre...">
+  </form>
+</div>
+
 
     <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
       <?php foreach ($lista_menu as $registro) { ?>
@@ -659,6 +661,45 @@ if ($_POST) {
   </div>
 
   <?php include("componentes/whatsapp_button.php"); ?>
+
+  <script>
+  const buscadorInput = document.getElementById("buscador-menu");
+  const categoriaSelect = document.getElementById("categoria");
+
+  function filtrarMenu() {
+    const texto = buscadorInput.value.toLowerCase();
+    const categoria = categoriaSelect.value;
+
+    fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById("contenedor-menu").innerHTML = html;
+
+        document.querySelectorAll(".btn-agregar").forEach(boton => {
+          boton.addEventListener("click", () => {
+            const item = {
+              id: boton.dataset.id,
+              nombre: boton.dataset.nombre,
+              precio: parseFloat(boton.dataset.precio),
+              img: boton.dataset.img
+            };
+            let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+            carrito.push(item);
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+            actualizarContador();
+
+            document.getElementById("toastProductoNombre").textContent = item.nombre;
+            const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), { delay: 2500 });
+            toast.show();
+          });
+        });
+      });
+  }
+
+  categoriaSelect.addEventListener("change", filtrarMenu);
+  buscadorInput.addEventListener("input", filtrarMenu);
+</script>
+
 </body>
 
 </html>
