@@ -59,6 +59,10 @@ if ($_POST) {
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
 
+  <!-- AOS CSS -->
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+
+
   <style>
     :root {
       --main-gold: #fac30c;
@@ -403,7 +407,7 @@ if ($_POST) {
 
   <?php if (!isset($_SESSION["cliente"])): ?>
   <section class="container mt-3 text-center">
-    <div class="alert alert-warning alert-dismissible fade show" role="alert" style="font-weight: bold; font-size: 1.2rem;">
+    <div class="alert alert-warning alert-dismissible fade show" role="alert" data-aos-up="fade-up" data-aos="fade-up" style="font-weight: bold; font-size: 1.2rem;">
       🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
       <a href="login_cliente.php" class="btn btn-sm btn-gold ms-3">Iniciar sesión / Registrarse</a>
       <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
@@ -425,7 +429,7 @@ if ($_POST) {
   </section>
 
   <section class="container mt-4 text-center">
-    <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light);">
+    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light);">
       <h2>¡Bienvenidx a Piccolo Burgers!</h2>
       <p>Descubre las verdaderas hamburguesas. Siempre 100% cargadas de sabor.</p>
     </div>
@@ -436,7 +440,7 @@ if ($_POST) {
       <h2 class="text-center mb-4">Testimonios</h2>
       <div class="row">
         <?php foreach ($lista_testimonios as $testimonio) { ?>
-          <div class="col-md-6 d-flex">
+          <div class="col-md-6 d-flex" data-aos-up="fade-up" data-aos="fade-up">
             <div class="card mb-4 w-100">
               <div class="card-body">
                 <p class="card-text"><?php echo $testimonio["opinion"]; ?></p>
@@ -471,7 +475,7 @@ if ($_POST) {
 
     <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
       <?php foreach ($lista_menu as $registro) { ?>
-        <div class="col d-flex">
+        <div class="col d-flex" data-aos-up="fade-up" data-aos="fade-up">
           <div class="card position-relative d-flex flex-column h-100 w-100">
 
             <img src="img/menu/<?php echo $registro["foto"]; ?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
@@ -496,7 +500,7 @@ if ($_POST) {
 
   <section id="nosotros" class="container mt-5">
   <h2 class="text-center mb-4">Nosotros</h2>
-  <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+  <div class="jumbotron p-4"  data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
     <p class="lead text-center" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">
       En <strong>Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad. Nuestro compromiso es ofrecerte una experiencia gastronómica inolvidable, con un servicio cálido y un ambiente acogedor. ¡Gracias por elegirnos para compartir momentos deliciosos!
     </p>
@@ -505,7 +509,7 @@ if ($_POST) {
 
 <section id="puntos" class="container mt-5">
   <h2 class="text-center mb-4">Sistema de puntos</h2>
-  <div class="jumbotron p-4" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+  <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
     <p class="lead text-center" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
       Cada vez que hacés un pedido registrado, <strong>ganás puntos</strong> que podés canjear por <strong>descuentos exclusivos</strong> en tus próximas compras.  
       <br><br>
@@ -514,7 +518,7 @@ if ($_POST) {
   </div>
 </section>
 
-  <section id="contacto" class="container mt-4">
+  <section id="contacto" class="container mt-4" data-aos-up="fade-up" data-aos="fade-up">
     <h2>Contacto</h2>
     <p>Estamos acá para servirte.</p>
     <form action="?" method="post">
@@ -534,7 +538,7 @@ if ($_POST) {
     </form>
   </section>
 
-  <div id="horario" class="text-center p-5" style="background: linear-gradient(to top, #2c2c2c, #1a1a1a);">
+  <div id="horario" class="text-center p-5" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to top, #2c2c2c, #1a1a1a);">
     <h3 class="mb-4">Horario de atención</h3>
     <div>
       <p><strong>Martes a Domingo y feriados</strong></p>
@@ -698,6 +702,38 @@ if ($_POST) {
 
   categoriaSelect.addEventListener("change", filtrarMenu);
   buscadorInput.addEventListener("input", filtrarMenu);
+
+  let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+  const scrollingDown = currentScroll > lastScroll;
+  lastScroll = currentScroll <= 0 ? 0 : currentScroll; // Evitar negativos
+
+  // Para cada elemento que tenga data-aos-up y data-aos-down
+  document.querySelectorAll('[data-aos-up][data-aos-down]').forEach(el => {
+    if(scrollingDown){
+      // Scroll hacia abajo: usar animación data-aos-up
+      el.setAttribute('data-aos', el.getAttribute('data-aos-up'));
+    } else {
+      // Scroll hacia arriba: usar animación data-aos-down
+      el.setAttribute('data-aos', el.getAttribute('data-aos-down'));
+    }
+  });
+
+  AOS.refresh(); // refrescar animaciones
+});
+
+</script>
+
+<!-- AOS JS -->
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+AOS.init({
+  once: false,
+  duration: 800,
+});
+
 </script>
 
 </body>
