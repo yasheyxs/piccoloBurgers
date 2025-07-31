@@ -152,6 +152,7 @@ if ($_POST) {
     .card-img-top {
       display: block;
       max-height: 200px;
+      height: 200px;
       width: 100%;
       object-fit: cover;
       transition: transform 0.3s ease;
