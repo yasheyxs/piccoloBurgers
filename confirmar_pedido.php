@@ -13,6 +13,8 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
 
   <style>
@@ -225,29 +227,55 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
 
       if (resultado.exito) {
         // Construir modal dinámicamente
-        const modalHtml = `
-      <div class="modal fade" id="modalGracias" tabindex="-1" aria-labelledby="modalGraciasLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content border-0 shadow">
-            <div class="modal-header bg-success text-white">
-              <h5 class="modal-title" id="modalGraciasLabel">¡Gracias por tu pedido!</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-            </div>
-            <div class="modal-body fs-5">
-              <p>🎉 <strong>${resultado.nombre}</strong>, tu pedido está en preparación. 🍔</p>
-              ${parseFloat(resultado.descuento) > 0 ? `
-                <p>Total original: $${resultado.total_original}<br>
-                Descuento por puntos: -$${resultado.descuento}</p>` : ""}
-              <p>Total a pagar: <strong>$${resultado.total}</strong></p>
-              ${resultado.puntos_ganados > 0 ? `<p>🎁 Puntos ganados: <strong>${resultado.puntos_ganados}</strong></p>` : ""}
-            </div>
-            <div class="modal-footer">
-              <a href="index.php" class="btn btn-gold">Volver al inicio</a>
-            </div>
-          </div>
+        let mensajePago = "";
+if (formData.get("metodo_pago") === "MercadoPago") {
+  const esDelivery = formData.get("tipo_entrega") === "Delivery";
+  mensajePago = `
+  <div class="p-4 mt-4 rounded" style="background-color: var(--gray-bg); border: 1px solid rgba(255, 255, 255, 0.1);">
+    <h5 class="mb-3" style="font-size: 1.6rem; color: var(--main-gold);">
+      📲 Pagá por Mercado Pago
+    </h5>
+    <p class="mb-2" style="font-size: 1.1rem;"><strong>Alias:</strong> piccolovdr</p>
+    <p class="mb-2" style="font-size: 1.1rem;"><strong>Nombre del titular:</strong> Mario Alberto Gaido</p>
+    <p class="mb-2" style="font-size: 1.1rem;">
+      Enviá el comprobante por WhatsApp a:
+      <a href="https://wa.me/5493573438947" target="_blank" style="color: var(--main-gold); text-decoration: underline;">+54 9 3573 438947</a>
+    </p>
+    ${esDelivery ? `
+      <p class="mt-3" style="color: var(--main-gold); font-size: 1.05rem;">
+        💸 El costo del delivery varía entre <strong>$1000</strong> y <strong>$1500</strong> según la zona.
+        Envianos un mensaje para confirmar el monto.
+      </p>
+    ` : ""}
+  </div>
+`;
+}
+
+const modalHtml = `
+  <div class="modal fade" id="modalGracias" tabindex="-1" aria-labelledby="modalGraciasLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="modalGraciasLabel">¡Gracias por tu pedido!</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body fs-5">
+          <p>🎉 <strong>${resultado.nombre}</strong>, tu pedido está en preparación. 🍔</p>
+          ${parseFloat(resultado.descuento) > 0 ? `
+            <p>Total original: $${resultado.total_original}<br>
+            Descuento por puntos: -$${resultado.descuento}</p>` : ""}
+          <p>Total a pagar: <strong>$${resultado.total}</strong></p>
+          ${resultado.puntos_ganados > 0 ? `<p>🎁 Puntos ganados: <strong>${resultado.puntos_ganados}</strong></p>` : ""}
+          ${mensajePago}
+        </div>
+        <div class="modal-footer">
+          <a href="index.php" class="btn btn-gold">Volver al inicio</a>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
+
 
         // Insertar modal al body
         let modalContainer = document.getElementById("modal-container");
