@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 02, 2025 at 07:36 AM
+-- Generation Time: Aug 02, 2025 at 07:40 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -178,31 +178,6 @@ CREATE TABLE `tbl_pedidos` (
   `cliente_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tbl_pedidos`
---
-
-INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`) VALUES
-(48, 'Juanita', '123', '', '', 60000, '2025-06-25 21:55:54', 'Tarjeta', 'Retiro', '', 'Cancelado', 2),
-(49, 'Juanita', '123', '', '', 30000, '2025-06-25 22:01:28', 'Efectivo', 'Retiro', '', 'Listo', 2),
-(50, 'Juanita', '123', '', 'No quiero coca', 1200, '2025-06-26 13:44:51', 'MercadoPago', 'Delivery', '233232323 fsfsdf', 'Listo', 2),
-(51, 'Juanita', '123445444141', '', '', 26500, '2025-06-26 13:46:24', 'Efectivo', 'Retiro', '', 'Cancelado', 2),
-(52, 'Juanita', '123', '', '', 18500, '2025-06-26 14:40:12', 'Efectivo', 'Delivery', '233232323 fsfsdf', 'Listo', 2),
-(53, 'Juanita', '123445444141', 'jazmingaidoyxs@gmail.com', 'asdasd', 8500, '2025-06-26 14:41:48', 'MercadoPago', 'Retiro', '', 'Listo', 2),
-(54, 'Juanita', '123', '', 'Sin ketchup!!', 30000, '2025-06-27 04:51:30', 'Efectivo', 'Delivery', '233232323 fsfsdf', 'Cancelado', 2),
-(55, 'Juanita', '123', '', 'No quiero aguacate en mi hamburguesa de palta', 7420, '2025-06-27 04:56:26', 'Efectivo', 'Delivery', 'Av. San martin 123', 'Listo', 2),
-(56, 'Juana', '123', '', '', 23000, '2025-06-27 16:33:33', 'Efectivo', 'Retiro', '', 'Cancelado', 2),
-(57, 'juanita', '123', '', '', 10000, '2025-06-30 17:53:56', 'MercadoPago', 'Delivery', '233232323 fsfsdf', 'Cancelado', 2),
-(58, 'Yass', '123', '', '', 10600, '2025-07-29 16:12:22', 'Efectivo', 'Retiro', '', 'Listo', 4),
-(59, 'Yass', '123', '', '', 19400, '2025-07-29 16:12:49', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4),
-(60, 'Yass', '123', '', '', 21000, '2025-07-29 16:23:18', 'Efectivo', 'Retiro', '', 'Cancelado', 4),
-(61, 'Yass', '123', '', '', 14000, '2025-07-31 04:09:25', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', NULL),
-(62, 'Yass', '123', '', '', 3800, '2025-07-31 04:13:54', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', NULL),
-(63, 'Yass', '123', '', '', 3800, '2025-07-31 04:16:03', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', NULL),
-(64, 'Yass', '123', '', '', 26000, '2025-07-31 04:18:36', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', NULL),
-(65, 'Yass', '123', '', '', 10500, '2025-08-01 01:29:49', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', NULL),
-(66, 'Yass', '123', '', '', 22500, '2025-08-01 01:31:09', 'MercadoPago', 'Delivery', 'Zona 123', 'En preparación', 4);
-
 -- --------------------------------------------------------
 
 --
@@ -217,25 +192,6 @@ CREATE TABLE `tbl_pedidos_detalle` (
   `precio` decimal(10,0) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_pedidos_detalle`
---
-
-INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `precio`, `cantidad`) VALUES
-(65, 58, 24, 'Lomoburger', 9100, 1),
-(66, 58, 28, 'Pepsi', 1500, 1),
-(67, 59, 18, 'Fritas con cheddar y bacon', 8500, 1),
-(68, 59, 23, 'Lomo Piccolo', 10900, 1),
-(69, 60, 20, 'Tequeños x6', 8000, 1),
-(70, 60, 25, 'Fuggazetta', 13000, 1),
-(71, 61, 27, 'Pepperoni', 14000, 1),
-(72, 62, 29, 'Coca-cola', 3800, 1),
-(73, 63, 29, 'Coca-cola', 3800, 1),
-(74, 64, 26, 'Napolitana', 26000, 2),
-(75, 65, 33, 'BBQ', 10500, 1),
-(76, 66, 32, 'Monstruosa', 12000, 1),
-(77, 66, 33, 'BBQ', 10500, 1);
 
 -- --------------------------------------------------------
 
