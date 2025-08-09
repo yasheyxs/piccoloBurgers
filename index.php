@@ -461,22 +461,25 @@ if ($_POST) {
     </div>
   </section>
 
-  <section id="menu" class="container mt-4">
-    <h2 class="text-center">Menú</h2>
+  <section id="menu" class="container my-5">
+  <h2 class="text-center mb-4">Nuestro Menú</h2>
 
-    <div class="mb-3 text-center">
-  <form class="d-inline">
-    <label for="categoria" class="form-label me-2">Filtrar por categoría:</label>
-    <select id="categoria" class="form-select d-inline w-auto me-3">
-      <option value="">Todos</option>
-      <?php foreach ($categorias_disponibles as $cat): ?>
-        <option value="<?= $cat ?>" <?= ($cat == $categoria_seleccionada) ? 'selected' : '' ?>><?= $cat ?></option>
-      <?php endforeach; ?>
-    </select>
-
-    <input type="text" id="buscador-menu" class="form-control d-inline w-auto" style="max-width: 300px;" placeholder="Buscar por nombre...">
-  </form>
-</div>
+  <!-- Controles de filtrado -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
+    </div>
+    <div class="col-md-6">
+      <select id="categoria" class="form-select">
+        <option value="">Todas las categorías</option>
+        <option value="Acompañamientos">Acompañamientos</option>
+        <option value="Hamburguesas">Hamburguesas</option>
+        <option value="Bebidas">Bebidas</option>
+        <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
+        <option value="Pizzas">Pizzas</option>
+      </select>
+    </div>
+  </div>
 
 
     <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
@@ -631,29 +634,30 @@ if ($_POST) {
       fetch("filtrar_menu.php?categoria=" + encodeURIComponent(categoria)) // Llamar al script que filtra el menú
         .then(response => response.text())
         .then(html => {
-          document.getElementById("contenedor-menu").innerHTML = html;
-          document.querySelectorAll(".btn-agregar").forEach(boton => {
-            boton.addEventListener("click", () => {
-              const item = {
+    document.getElementById("contenedor-menu").innerHTML = html;
+
+    // Volver a activar AOS
+    AOS.refresh();
+
+    document.querySelectorAll(".btn-agregar").forEach(boton => {
+        boton.addEventListener("click", () => {
+            const item = {
                 id: boton.dataset.id,
                 nombre: boton.dataset.nombre,
                 precio: parseFloat(boton.dataset.precio),
                 img: boton.dataset.img
-              };// Obtener el carrito del localStorage o inicializarlo si no existe
-              let carrito = JSON.parse(localStorage.getItem("carrito")) || []; // Agregar el item al carrito
-              carrito.push(item);// Guardar el carrito actualizado en el localStorage
-              localStorage.setItem("carrito", JSON.stringify(carrito));
-              actualizarContador();
+            };
+            let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+            carrito.push(item);
+            localStorage.setItem("carrito", JSON.stringify(carrito));
+            actualizarContador();
 
-              // Mostrar nombre del producto en el modal
-              document.getElementById("nombreProductoAgregado").textContent = item.nombre;
-
-              // Mostrar modal
-              const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
-              modal.show();
-            });
-          });
+            document.getElementById("nombreProductoAgregado").textContent = item.nombre;
+            const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
+            modal.show();
         });
+    });
+});
 
     });
   </script>
@@ -672,75 +676,148 @@ if ($_POST) {
 
   <?php include("componentes/whatsapp_button.php"); ?>
 
-  <script>
-  const buscadorInput = document.getElementById("buscador-menu");
-  const categoriaSelect = document.getElementById("categoria");
-
-  function filtrarMenu() {
-    const texto = buscadorInput.value.toLowerCase();
-    const categoria = categoriaSelect.value;
-
-    fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
-      .then(response => response.text())
-      .then(html => {
-        document.getElementById("contenedor-menu").innerHTML = html;
-
-        document.querySelectorAll(".btn-agregar").forEach(boton => {
-          boton.addEventListener("click", () => {
-            const item = {
-              id: boton.dataset.id,
-              nombre: boton.dataset.nombre,
-              precio: parseFloat(boton.dataset.precio),
-              img: boton.dataset.img
-            };
-            let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-            carrito.push(item);
-            localStorage.setItem("carrito", JSON.stringify(carrito));
-            actualizarContador();
-
-            document.getElementById("toastProductoNombre").textContent = item.nombre;
-            const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), { delay: 2500 });
-            toast.show();
-          });
-        });
-      });
-  }
-
-  categoriaSelect.addEventListener("change", filtrarMenu);
-  buscadorInput.addEventListener("input", filtrarMenu);
-
-  let lastScroll = 0;
-
-window.addEventListener('scroll', () => {
-  const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-  const scrollingDown = currentScroll > lastScroll;
-  lastScroll = currentScroll <= 0 ? 0 : currentScroll; // Evitar negativos
-
-  // Para cada elemento que tenga data-aos-up y data-aos-down
-  document.querySelectorAll('[data-aos-up][data-aos-down]').forEach(el => {
-    if(scrollingDown){
-      // Scroll hacia abajo: usar animación data-aos-up
-      el.setAttribute('data-aos', el.getAttribute('data-aos-up'));
-    } else {
-      // Scroll hacia arriba: usar animación data-aos-down
-      el.setAttribute('data-aos', el.getAttribute('data-aos-down'));
-    }
-  });
-
-  AOS.refresh(); // refrescar animaciones
-});
-
-</script>
-
 <!-- AOS JS -->
 <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
 <script>
-AOS.init({
-  once: false,
-  duration: 800,
-});
-
+  AOS.init({ once: false, duration: 800 });
 </script>
+
+<script>
+  const buscadorInput = document.getElementById("buscador-menu");
+  const categoriaSelect = document.getElementById("categoria");
+  const contenedor = document.getElementById("contenedor-menu");
+
+  function actualizarContador() {
+    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    const contador = document.getElementById("contador-carrito");
+    if (contador) contador.textContent = carrito.length;
+  }
+
+  function onAddClick(e) {
+    const boton = e.currentTarget;
+    const item = {
+      id: boton.dataset.id,
+      nombre: boton.dataset.nombre,
+      precio: parseFloat(boton.dataset.precio),
+      img: boton.dataset.img
+    };
+    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+    carrito.push(item);
+    localStorage.setItem("carrito", JSON.stringify(carrito));
+    actualizarContador();
+
+    // toast
+    const toastNombre = document.getElementById("toastProductoNombre");
+    if (toastNombre) toastNombre.textContent = item.nombre;
+    const toastEl = document.getElementById("toastAgregado");
+    if (toastEl) {
+      const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
+      toast.show();
+    }
+  }
+
+  function reattachAddButtons() {
+    document.querySelectorAll(".btn-agregar").forEach(b => {
+      b.removeEventListener('click', onAddClick); // evitar duplicados
+      b.addEventListener('click', onAddClick);
+    });
+  }
+
+  // Debounce simple
+  function debounce(fn, wait = 200) {
+    let t;
+    return (...args) => {
+      clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
+
+  function filtrarMenu() {
+    const texto = buscadorInput.value.trim();
+    const categoria = categoriaSelect.value;
+    fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
+      .then(resp => resp.text())
+      .then(html => {
+        contenedor.innerHTML = html;
+        reattachAddButtons();
+        // refrescar AOS solo si existe
+        if (window.AOS && typeof AOS.refresh === "function") {
+          AOS.refresh();
+        }
+      })
+      .catch(err => {
+        console.error("Error al filtrar menú:", err);
+      });
+  }
+
+  // Listeners
+  categoriaSelect.addEventListener("change", filtrarMenu);
+  buscadorInput.addEventListener("input", debounce(filtrarMenu, 250));
+
+  // Al cargar la página
+  window.addEventListener('load', () => {
+    actualizarContador();
+    // Hace una carga por AJAX para garantizar mismo orden/atributos que filtrar_menu.php
+    filtrarMenu();
+  });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const contenedorMenu = document.getElementById("contenedor-menu");
+    const buscador = document.getElementById("buscador-menu");
+    const selectorCategoria = document.getElementById("categoria");
+
+    // Función para cargar productos desde filtrar_menu.php
+    function cargarProductos(categoria = "", busqueda = "") {
+        fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(busqueda)}`)
+            .then(response => response.text())
+            .then(html => {
+                contenedorMenu.innerHTML = html;
+
+                // Refrescar animaciones AOS
+                AOS.refresh();
+
+                // Volver a enlazar botones de agregar al carrito
+                document.querySelectorAll(".btn-agregar").forEach(boton => {
+                    boton.addEventListener("click", () => {
+                        const item = {
+                            id: boton.dataset.id,
+                            nombre: boton.dataset.nombre,
+                            precio: parseFloat(boton.dataset.precio),
+                            img: boton.dataset.img
+                        };
+
+                        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+                        carrito.push(item);
+                        localStorage.setItem("carrito", JSON.stringify(carrito));
+
+                        actualizarContador();
+
+                        // Mostrar popup de agregado
+                        document.getElementById("nombreProductoAgregado").textContent = item.nombre;
+                        const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
+                        modal.show();
+                    });
+                });
+            })
+            .catch(error => console.error("Error al cargar productos:", error));
+    }
+
+    // Carga inicial
+    cargarProductos();
+
+    // Filtrar por categoría
+    selectorCategoria.addEventListener("change", () => {
+        cargarProductos(selectorCategoria.value, buscador.value);
+    });
+
+    // Filtrar por buscador
+    buscador.addEventListener("input", () => {
+        cargarProductos(selectorCategoria.value, buscador.value);
+    });
+});
+</script>
+
 
 </body>
 
