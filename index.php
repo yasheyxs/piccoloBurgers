@@ -864,14 +864,14 @@ btnMostrarMas.addEventListener("click", () => {
   fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(busqueda)}&offset=${offset}&limit=${limit}`)
     .then(response => response.text())
     .then(html => {
-  if (html.includes("sin-resultados") || html.includes("ultima-carga")) {
-    btnMostrarMas.style.opacity = "0";
-    btnMostrarMas.style.pointerEvents = "none";
-    setTimeout(() => {
-      btnMostrarMas.style.display = "none";
-    }, 300);
-    return;
-  }
+  if (html.includes("ultima-carga")) {
+  btnMostrarMas.style.opacity = "0";
+  btnMostrarMas.style.pointerEvents = "none";
+  setTimeout(() => {
+    btnMostrarMas.style.display = "none";
+  }, 300);
+}
+
 
   if (html.trim()) {
     document.getElementById("contenedor-menu").insertAdjacentHTML("beforeend", html);

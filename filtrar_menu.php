@@ -59,10 +59,11 @@ $stmt = $conexion->prepare($sql);
 $stmt->execute($parametros);
 $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Si ya se han mostrado todos los productos posibles
+// Si ya se han cargado todos los productos posibles en esta carga
 if (($offset + count($lista_menu)) >= $totalItems) {
     echo '<div id="ultima-carga" style="display:none;"></div>';
 }
+
 
 // Mostrar mensaje si no hay resultados
 if (count($lista_menu) < $limit) {
