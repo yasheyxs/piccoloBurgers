@@ -20,9 +20,12 @@ if ($categoria_seleccionada && in_array($categoria_seleccionada, $categorias_dis
   $sentencia->execute([$categoria_seleccionada]);
   $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 } else {// Si no se ha seleccionado una categoría o es inválida, mostrar todo el menú
-  $sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC");
-  $sentencia->execute();
-  $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+  $limite = $_GET['limite'] ?? 8; // Mostrar los primeros 8 por defecto
+$sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC LIMIT ?");
+$sentencia->bindParam(1, $limite, PDO::PARAM_INT);
+$sentencia->execute();
+$lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
 }
 // Procesar el formulario de contacto
 if ($_POST) {
@@ -367,6 +370,11 @@ if ($_POST) {
   color: #3a2a00 !important;
 }
 
+#btn-mostrar-mas {
+  display: block;
+  margin: 20px auto;
+  text-align: center;
+}
 
   </style>
 
@@ -483,28 +491,35 @@ if ($_POST) {
 
 
     <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
-      <?php foreach ($lista_menu as $registro) { ?>
-        <div class="col d-flex" data-aos-up="fade-up" data-aos="fade-up">
-          <div class="card position-relative d-flex flex-column h-100 w-100">
-
-            <img src="img/menu/<?php echo $registro["foto"]; ?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title"><?php echo $registro["nombre"]; ?></h5>
-              <p class="card-text small"><strong><?php echo $registro["ingredientes"]; ?></strong></p>
-              <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"]; ?></p>
-              <p class="card-text"><small><em><?php echo $registro["categoria"] ?? ''; ?></em></small></p>
-              <button class="btn btn-agregar mt-auto"
-                data-id="<?php echo $registro['ID']; ?>"
-                data-nombre="<?php echo $registro['nombre']; ?>"
-                data-precio="<?php echo $registro['precio']; ?>"
-                data-img="img/menu/<?php echo $registro['foto']; ?>">
-                Agregar
-              </button>
-            </div>
-          </div>
+  <?php foreach ($lista_menu as $registro) { ?>
+    <div class="col d-flex" data-aos-up="fade-up" data-aos="fade-up">
+      <div class="card position-relative d-flex flex-column h-100 w-100">
+        <img src="img/menu/<?php echo $registro["foto"]; ?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title"><?php echo $registro["nombre"]; ?></h5>
+          <p class="card-text small"><strong><?php echo $registro["ingredientes"]; ?></strong></p>
+          <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"]; ?></p>
+          <p class="card-text"><small><em><?php echo $registro["categoria"] ?? ''; ?></em></small></p>
+          <button class="btn btn-agregar mt-auto"
+            data-id="<?php echo $registro['ID']; ?>"
+            data-nombre="<?php echo $registro['nombre']; ?>"
+            data-precio="<?php echo $registro['precio']; ?>"
+            data-img="img/menu/<?php echo $registro['foto']; ?>">
+            Agregar
+          </button>
         </div>
-      <?php } ?>
+      </div>
     </div>
+  <?php } ?>
+</div>
+<div class="text-center mt-4" data-aos="fade-in" data-aos-duration="500">
+  <button id="btn-mostrar-mas" class="btn-gold">Mostrar más</button>
+</div>
+
+
+
+</section>
+
   </section>
 
   <section id="nosotros" class="container mt-5">
@@ -735,6 +750,13 @@ if ($_POST) {
   function filtrarMenu() {
     const texto = buscadorInput.value.trim();
     const categoria = categoriaSelect.value;
+
+offset = 0;
+btnMostrarMas.style.display = "block";
+btnMostrarMas.style.opacity = "1";
+btnMostrarMas.style.pointerEvents = "auto";
+
+
     fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
       .then(resp => resp.text())
       .then(html => {
@@ -808,15 +830,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Filtrar por categoría
     selectorCategoria.addEventListener("change", () => {
-        cargarProductos(selectorCategoria.value, buscador.value);
-    });
+  // Restaurar botón
+offset = 0;
+btnMostrarMas.style.display = "block";
+btnMostrarMas.style.opacity = "1";
+btnMostrarMas.style.pointerEvents = "auto";
+
+  cargarProductos(selectorCategoria.value, buscador.value);
+});
+
 
     // Filtrar por buscador
     buscador.addEventListener("input", () => {
-        cargarProductos(selectorCategoria.value, buscador.value);
+        
+        offset = 0;
+btnMostrarMas.style.display = "block";
+btnMostrarMas.style.opacity = "1";
+btnMostrarMas.style.pointerEvents = "auto";
+cargarProductos(selectorCategoria.value, buscador.value);
+
     });
 });
 </script>
+<script>
+let offset = 0;
+const limit = 8;
+const btnMostrarMas = document.getElementById("btn-mostrar-mas");
+
+btnMostrarMas.addEventListener("click", () => {
+  const categoria = document.getElementById("categoria").value;
+  const busqueda = document.getElementById("buscador-menu").value;
+
+  fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(busqueda)}&offset=${offset}&limit=${limit}`)
+    .then(response => response.text())
+    .then(html => {
+  if (html.includes("sin-resultados") || html.includes("ultima-carga")) {
+    btnMostrarMas.style.opacity = "0";
+    btnMostrarMas.style.pointerEvents = "none";
+    setTimeout(() => {
+      btnMostrarMas.style.display = "none";
+    }, 300);
+    return;
+  }
+
+  if (html.trim()) {
+    document.getElementById("contenedor-menu").insertAdjacentHTML("beforeend", html);
+    offset += limit;
+    AOS.refresh();
+  }
+})
+
+    .catch(error => {
+      console.error("Error al cargar más productos:", error);
+    });
+});
+
+</script>
+
 
 
 </body>
