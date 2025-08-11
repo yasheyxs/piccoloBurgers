@@ -752,9 +752,14 @@ if ($_POST) {
     const categoria = categoriaSelect.value;
 
 offset = 0;
-btnMostrarMas.style.display = "block";
-btnMostrarMas.style.opacity = "1";
-btnMostrarMas.style.pointerEvents = "auto";
+if (buscadorInput.value.trim().length > 0) {
+  btnMostrarMas.style.display = "none";
+} else {
+  btnMostrarMas.style.display = "block";
+  btnMostrarMas.style.opacity = "1";
+  btnMostrarMas.style.pointerEvents = "auto";
+}
+
 
 
     fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
@@ -838,8 +843,6 @@ btnMostrarMas.style.pointerEvents = "auto";
 
   cargarProductos(selectorCategoria.value, buscador.value);
 });
-
-
     // Filtrar por buscador
     buscador.addEventListener("input", () => {
         
@@ -865,7 +868,6 @@ btnMostrarMas.addEventListener("click", () => {
     .then(response => response.text())
     .then(html => {
   if (html.includes("ultima-carga")) {
-  btnMostrarMas.style.opacity = "0";
   btnMostrarMas.style.pointerEvents = "none";
   setTimeout(() => {
     btnMostrarMas.style.display = "none";
@@ -885,10 +887,21 @@ btnMostrarMas.addEventListener("click", () => {
     });
 });
 
+buscadorInput.addEventListener('input', () => {
+  const q = input.value.trim();
+  offset = 0;
+  grid.innerHTML = '';
+
+  if (q.length > 0) {
+    btnMostrarMas.style.display = 'none';
+  } else {
+    btnMostrarMas.style.display = 'block';
+  }
+
+  buscar(q);
+});
+
+
 </script>
-
-
-
 </body>
-
 </html>
