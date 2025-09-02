@@ -53,7 +53,7 @@ if ($_POST) {
 <head>
   <title>Piccolo Burgers</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -95,6 +95,14 @@ if ($_POST) {
       letter-spacing: 1px;
     }
 
+    .table-responsive {
+      margin-top: 1rem;
+    }
+
+table {
+      width: 100%;
+      word-wrap: break-word;
+    }
     h1 {
       font-size: 4rem;
     }
@@ -107,6 +115,11 @@ if ($_POST) {
     h3 {
       font-size: 2rem;
       margin-bottom: 1rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
     }
 
     /* Navbar */
@@ -232,6 +245,11 @@ if ($_POST) {
     #categoria option {
       background-color: var(--gray-bg);
       color: var(--text-light);
+    }
+
+    .btn {
+      border-radius: 8px;
+      padding: 10px 16px;
     }
 
 
@@ -747,35 +765,35 @@ if ($_POST) {
     };
   }
 
-  function filtrarMenu() {
-    const texto = buscadorInput.value.trim();
-    const categoria = categoriaSelect.value;
+function filtrarMenu() {
+  const texto = buscadorInput.value.trim();
+  const categoria = categoriaSelect.value;
 
-offset = 0;
-if (buscadorInput.value.trim().length > 0) {
-  btnMostrarMas.style.display = "none";
-} else {
-  btnMostrarMas.style.display = "block";
-  btnMostrarMas.style.opacity = "1";
-  btnMostrarMas.style.pointerEvents = "auto";
+  offset = 0;
+  if (buscadorInput.value.trim().length > 0) {
+    btnMostrarMas.style.display = "none";
+  } else {
+    btnMostrarMas.style.display = "block";
+    btnMostrarMas.style.opacity = "1";
+    btnMostrarMas.style.pointerEvents = "auto";
+  }
+
+  fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
+    .then(resp => resp.text())
+    .then(html => {
+      contenedor.innerHTML = html;
+
+      reattachAddButtons();
+
+      if (window.AOS && typeof AOS.refresh === "function") {
+        AOS.refresh();
+      }
+    })
+    .catch(err => {
+      console.error("Error al filtrar menú:", err);
+    });
 }
 
-
-
-    fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
-      .then(resp => resp.text())
-      .then(html => {
-        contenedor.innerHTML = html;
-        reattachAddButtons();
-        // refrescar AOS solo si existe
-        if (window.AOS && typeof AOS.refresh === "function") {
-          AOS.refresh();
-        }
-      })
-      .catch(err => {
-        console.error("Error al filtrar menú:", err);
-      });
-  }
 
   // Listeners
   categoriaSelect.addEventListener("change", filtrarMenu);
@@ -820,10 +838,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
                         actualizarContador();
 
-                        // Mostrar popup de agregado
-                        document.getElementById("nombreProductoAgregado").textContent = item.nombre;
-                        const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
-                        modal.show();
+                        // Mostrar toast
+document.getElementById("toastProductoNombre").textContent = item.nombre;
+const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), {
+  delay: 2500
+});
+toast.show();
+
                     });
                 });
             })
@@ -876,10 +897,12 @@ btnMostrarMas.addEventListener("click", () => {
 
 
   if (html.trim()) {
-    document.getElementById("contenedor-menu").insertAdjacentHTML("beforeend", html);
-    offset += limit;
-    AOS.refresh();
-  }
+  document.getElementById("contenedor-menu").insertAdjacentHTML("beforeend", html);
+  offset += limit;
+  AOS.refresh();
+  reattachAddButtons();
+}
+
 })
 
     .catch(error => {
