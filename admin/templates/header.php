@@ -58,6 +58,7 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/ventas/">Ventas</a></li>
         <li class="nav-item"><a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php">Cerrar sesión</a></li>
       </ul>
     </div>
