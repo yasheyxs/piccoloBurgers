@@ -203,6 +203,10 @@ table {
       content: "👤 ";
     }
 
+    #contenedor-menu .card {
+  min-height: 250px;
+}
+
     .form-control {
       background-color: var(--gray-bg);
       color: var(--text-light);
@@ -509,7 +513,8 @@ table {
   </div>
 
 
-    <div id="contenedor-menu" class="row row-cols-1 row-cols-md-4 g-4">
+    <div id="contenedor-menu" class="row row-cols-2 row-cols-md-4 g-4">
+
   <?php foreach ($lista_menu as $registro) { ?>
     <div class="col d-flex" data-aos-up="fade-up" data-aos="fade-up">
       <div class="card position-relative d-flex flex-column h-100 w-100">
@@ -534,8 +539,6 @@ table {
 <div class="text-center mt-4" data-aos="fade-in" data-aos-duration="500">
   <button id="btn-mostrar-mas" class="btn-gold">Mostrar más</button>
 </div>
-
-
 
 </section>
 
