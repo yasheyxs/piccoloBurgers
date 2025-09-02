@@ -55,11 +55,14 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/banners/">Banners</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>clientes.php">Clientes</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/ventas/">Ventas</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/compras/">Compras</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
         <li class="nav-item"><a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php">Cerrar sesión</a></li>
       </ul>
     </div>
