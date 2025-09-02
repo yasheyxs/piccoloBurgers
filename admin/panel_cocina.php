@@ -4,9 +4,46 @@ include("../admin/templates/header.php");
 
 // Consultar pedidos "En preparación"
 $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En preparación' ORDER BY fecha DESC");
-$sentencia->execute();// Obtener todos los pedidos en preparación
+$sentencia->execute();
 $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 ?>
+
+<style>
+  @media (max-width: 576px) {
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+      width: 100% !important;
+    }
+
+    .dataTables_wrapper .dataTables_paginate {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .dataTables_length label {
+      font-weight: 500;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+  }
+
+  @media (min-width: 576px) {
+    .dataTables_length label {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+</style>
 
 <br>
 <div class="card">
@@ -18,19 +55,18 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       <div class="alert alert-info">No hay pedidos en preparación por el momento.</div>
     <?php else: ?>
       <div class="table-responsive">
-        <table class="table table-bordered align-middle text-center" id="tabla-pedidos">
+        <table class="table table-bordered table-hover table-sm align-middle text-center w-100" id="tabla-pedidos">
           <thead class="table-light">
             <tr>
               <th>ID</th>
               <th>Cliente</th>
               <th>Entrega</th>
-              <th><strong>Dirección</strong></th>
+              <th>Dirección</th>
               <th>Productos</th>
               <th>Nota</th>
               <th>Acciones</th>
             </tr>
           </thead>
-
           <tbody>
             <?php foreach ($pedidos as $pedido): ?>
               <?php
@@ -47,9 +83,8 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                     ? htmlspecialchars($pedido['direccion'])
                     : '-' ?>
                 </td>
-
                 <td>
-                  <ul class="list-unstyled">
+                  <ul class="list-unstyled mb-0">
                     <?php foreach ($productos as $producto): ?>
                       <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
                     <?php endforeach; ?>
@@ -57,20 +92,60 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                 </td>
                 <td><?= htmlspecialchars($pedido['nota']) ?: '-' ?></td>
                 <td>
-                  <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
-                  <button class="btn btn-danger btn-sm btn-estado" data-estado="Cancelado" data-id="<?= $pedido['ID'] ?>">Cancelar</button>
+                  <div class="d-flex flex-wrap justify-content-center gap-1">
+                    <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
+                    <button class="btn btn-danger btn-sm btn-estado" data-estado="Cancelado" data-id="<?= $pedido['ID'] ?>">Cancelar</button>
+                  </div>
                 </td>
               </tr>
             <?php endforeach; ?>
           </tbody>
-
         </table>
       </div>
     <?php endif; ?>
   </div>
 </div>
 
+<!-- DataTables JS -->
+<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script>
+  $(document).ready(function () {
+    if ($.fn.DataTable.isDataTable('#tabla-pedidos')) {
+      $('#tabla-pedidos').DataTable().clear().destroy();
+    }
+
+    $('#tabla-pedidos').DataTable({
+      paging: true,
+      searching: true,
+      info: false,
+      lengthChange: true,
+      responsive: true,
+      fixedHeader: true,
+      language: {
+        decimal: "",
+        emptyTable: "No hay datos disponibles en la tabla",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Mostrando 0 a 0 de 0 registros",
+        infoFiltered: "(filtrado de _MAX_ registros totales)",
+        lengthMenu: "Mostrar registros: _MENU_",
+        loadingRecords: "Cargando...",
+        processing: "Procesando...",
+        search: "Buscar:",
+        zeroRecords: "No se encontraron registros coincidentes",
+        paginate: {
+          first: "Primero",
+          last: "Último",
+          next: "Siguiente",
+          previous: "Anterior"
+        },
+        aria: {
+          sortAscending: ": activar para ordenar la columna ascendente",
+          sortDescending: ": activar para ordenar la columna descendente"
+        }
+      }
+    });
+  });
+
   // Función para actualizar el estado del pedido
   async function actualizarEstado(pedidoId, nuevoEstado, boton) {
     try {
@@ -84,14 +159,11 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       });
       const resultado = await response.json();
 
-      if (resultado.success) {// Si la actualización fue exitosa, mostrar mensaje
+      if (resultado.success) {
         alert(`Pedido #${pedidoId} actualizado a "${nuevoEstado}" correctamente.`);
-
-        // Remover la fila del pedido actualizado porque ya no debe verse en "En preparación"
         const fila = boton.closest('tr');
         fila.remove();
 
-        // Si la tabla quedó vacía, mostrar mensaje
         const tbody = document.querySelector('#tabla-pedidos tbody');
         if (tbody.children.length === 0) {
           const contenedor = document.querySelector('.card-body');
@@ -112,11 +184,11 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       const pedidoId = btn.getAttribute('data-id');
       const nuevoEstado = btn.getAttribute('data-estado');
 
-      if (nuevoEstado === 'Cancelado') {// Si el estado es "Cancelado", preguntar confirmación
+      if (nuevoEstado === 'Cancelado') {
         if (!confirm('¿Estás seguro de cancelar este pedido? Esto notificará al cliente.')) return;
       }
 
-      actualizarEstado(pedidoId, nuevoEstado, btn);// Llamar a la función para actualizar el estado
+      actualizarEstado(pedidoId, nuevoEstado, btn);
     });
   });
 

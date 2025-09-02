@@ -13,23 +13,24 @@
 </script>
 
 <script>
-
-  $(document).ready(function() {
-
-    $('table').DataTable({// Inicializar DataTables
-      "pageLength": 3,// Número de filas por página
-      lengthMenu: [
-        [3, 10, 25, 50],
-        [3, 10, 25, 50]
-      ],
-      "language": {
-        "url": "https://cdn.datatables.net/plug-ins/1.13.2/i18n/es-MX.json"
+  $(document).ready(function () {
+    $('table').each(function () {
+      if (!$.fn.DataTable.isDataTable(this)) {
+        $(this).DataTable({
+          pageLength: 3,
+          lengthMenu: [
+            [3, 10, 25, 50],
+            [3, 10, 25, 50]
+          ],
+          language: {
+            url: "https://cdn.datatables.net/plug-ins/1.13.2/i18n/es-MX.json"
+          }
+        });
       }
     });
-
-
   });
 </script>
+
 
 </body>
 

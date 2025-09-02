@@ -2,7 +2,9 @@
 session_start();
 include_once(dirname(__DIR__, 2) . "/config.php");
 
-$url_base = "http://localhost/piccoloBurgers/admin/";
+$host = $_SERVER['HTTP_HOST'];
+$url_base = "http://$host/piccoloBurgers/admin/";
+
 
 if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
   $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
@@ -41,21 +43,27 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
   <header>
     <!-- place navbar here -->
 
-    <nav class="navbar navbar-expand navbar-light bg-light">
-      <div class="nav navbar-nav">
-        <a class="nav-item nav-link active" href="<?php echo $url_base; ?>index.php" aria-current="page">Administrador <span class="visually-hidden">(current)</span></a>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="<?php echo $url_base; ?>index.php">Administrador</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarAdmin" aria-controls="navbarAdmin" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>seccion/banners/">Banners</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a>
-        <a class="nav-item nav-link" href="<?php echo $url_base; ?>cerrar.php">Cerrar sesión</a>
+    <div class="collapse navbar-collapse" id="navbarAdmin">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/banners/">Banners</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
+        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
+        <li class="nav-item"><a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php">Cerrar sesión</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
 
-
-      </div>
-    </nav>
 
   </header>
   <main>
