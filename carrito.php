@@ -7,6 +7,8 @@ include("admin/bd.php"); ?>
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Carrito - Piccolo Burgers</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -274,15 +276,17 @@ include("admin/bd.php"); ?>
       productos.forEach(item => {// Mostrar cada producto en el carrito
         total += item.precio;
         contenedor.innerHTML += `
-      <div class="col-md-6 col-lg-4 mb-4">
+      <div class="col-12 col-md-6 col-lg-4 mb-4">
+
         <div class="card h-100">
-          <img src="${item.img}" class="card-img-top" alt="${item.nombre}">
-          <div class="card-body d-flex flex-column">
+          <img src="${item.img}" class="card-img-top img-fluid" alt="${item.nombre}">
+          <div class="card-body d-flex flex-column p-3">
             <h5 class="card-title">${item.nombre}</h5>
             <p class="card-text mb-1"><strong>Precio unitario:</strong> $${(item.precio / item.cantidad).toFixed(2)}</p>
             <p class="card-text mb-1"><strong>Cantidad:</strong> ${item.cantidad}</p>
             <p class="card-text"><strong>Subtotal:</strong> $${item.precio.toFixed(2)}</p>
-            <div class="mt-auto d-flex gap-2">
+            <div class="mt-auto d-flex flex-wrap gap-2">
+
               <button class="btn btn-secondary" onclick="disminuirCantidad(${item.id})">-</button>
               <button class="btn btn-secondary" onclick="aumentarCantidad(${item.id})">+</button>
               <button class="btn btn-danger" onclick="eliminarProducto(${item.id})">Eliminar</button>
