@@ -26,26 +26,32 @@ if ($_POST) {
 
   // Insertar detalles
   foreach ($materias as $item) {
-    $materia_id = $item["materia_id"];
-    $cantidad = $item["cantidad"];
-    $precio = $item["precio"];
+    $materia_id = $item["materia_id"] ?? null;
+    $cantidad = $item["cantidad"] ?? null;
+    $precio = $item["precio"] ?? null;
 
-    $sentencia = $conexion->prepare("INSERT INTO tbl_compras_detalle 
-      (compra_id, materia_prima_id, cantidad, precio_unitario) 
-      VALUES (:compra_id, :materia_id, :cantidad, :precio)");
+    if (
+      $materia_id &&
+      is_numeric($cantidad) && $cantidad > 0 &&
+      is_numeric($precio) && $precio > 0
+    ) {
+      $sentencia = $conexion->prepare("INSERT INTO tbl_compras_detalle 
+        (compra_id, materia_prima_id, cantidad, precio_unitario) 
+        VALUES (:compra_id, :materia_id, :cantidad, :precio)");
 
-    $sentencia->bindParam(":compra_id", $compra_id);
-    $sentencia->bindParam(":materia_id", $materia_id);
-    $sentencia->bindParam(":cantidad", $cantidad);
-    $sentencia->bindParam(":precio", $precio);
-    $sentencia->execute();
+      $sentencia->bindParam(":compra_id", $compra_id);
+      $sentencia->bindParam(":materia_id", $materia_id);
+      $sentencia->bindParam(":cantidad", $cantidad);
+      $sentencia->bindParam(":precio", $precio);
+      $sentencia->execute();
 
-    // Actualizar stock
-    $sentencia = $conexion->prepare("UPDATE tbl_materias_primas 
-      SET cantidad = cantidad + :cantidad WHERE ID = :materia_id");
-    $sentencia->bindParam(":cantidad", $cantidad);
-    $sentencia->bindParam(":materia_id", $materia_id);
-    $sentencia->execute();
+      // Actualizar stock
+      $sentencia = $conexion->prepare("UPDATE tbl_materias_primas 
+        SET cantidad = cantidad + :cantidad WHERE ID = :materia_id");
+      $sentencia->bindParam(":cantidad", $cantidad);
+      $sentencia->bindParam(":materia_id", $materia_id);
+      $sentencia->execute();
+    }
   }
 
   header("Location:index.php");
@@ -91,6 +97,7 @@ include("../../templates/header.php");
 
 <script>
   const materias = <?= json_encode($lista_materias) ?>;
+  let materiaIndex = 0;
 
   function agregarMateria() {
     const container = document.getElementById("materias-container");
@@ -100,16 +107,16 @@ include("../../templates/header.php");
 
     div.innerHTML = `
       <div class="col-md-5">
-        <select class="form-select" name="materias[][materia_id]" required>
+        <select class="form-select" name="materias[${materiaIndex}][materia_id]" required>
           <option value="">Seleccionar materia prima</option>
           ${materias.map(m => `<option value="${m.ID}">${m.nombre}</option>`).join("")}
         </select>
       </div>
       <div class="col-md-3">
-        <input type="number" step="0.01" class="form-control" name="materias[][cantidad]" placeholder="Cantidad" required>
+        <input type="number" step="0.01" min="0.01" class="form-control" name="materias[${materiaIndex}][cantidad]" placeholder="Cantidad" required>
       </div>
       <div class="col-md-3">
-        <input type="number" step="0.01" class="form-control" name="materias[][precio]" placeholder="Precio unitario" required>
+        <input type="number" step="0.01" min="0.01" class="form-control" name="materias[${materiaIndex}][precio]" placeholder="Precio unitario" required>
       </div>
       <div class="col-md-1 d-flex align-items-center">
         <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.row').remove()">✕</button>
@@ -117,6 +124,7 @@ include("../../templates/header.php");
     `;
 
     container.appendChild(div);
+    materiaIndex++;
   }
 </script>
 
