@@ -413,6 +413,7 @@ table {
           <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
           <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
           <li class="nav-item"><a class="nav-link" href="#puntos">Puntos</a></li>
+          <li class="nav-item"><a class="nav-link" href="#ubicacion">Ubicación</a></li>
           <li class="nav-item"><a class="nav-link" href="#contacto">Contacto</a></li>
           <li class="nav-item"><a class="nav-link" href="#horario">Horarios</a></li>
           <li class="nav-item">
@@ -557,6 +558,20 @@ table {
       <br><br>
       Cuanto más pedís, <strong>más ahorrás</strong> 🍔✨
     </p>
+  </div>
+</section>
+
+<section id="ubicacion" class="container-fluid p-5 text-center" style="background: linear-gradient(to top, #1a1a1a, #111);">
+  <h2 class="mb-4" data-aos="fade-up">Nuestra Ubicación</h2>
+  <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Encontranos fácilmente en nuestro local 🍔✨</p>
+  <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-delay="200">
+    <div class="shadow-lg" style="width: 350px; height: 350px; border-radius: 15px; overflow: hidden;">
+      <iframe
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.107065015397!2d-63.53723899007664!3d-31.548676202549203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94332a4ac325a7ad%3A0x91ff9ca646897a8f!2s25%20de%20Mayo%201295%2C%20X5963%20Villa%20del%20Rosario%2C%20C%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1756841415057!5m2!1ses-419!2sar"
+        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade">
+      </iframe>
+    </div>
   </div>
 </section>
 
