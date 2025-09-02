@@ -180,7 +180,8 @@ include("admin/bd.php"); ?>
 
   <div class="container mt-5">
     <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
-    <div id="carrito-contenido" class="row"></div>
+    <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
+
 
     <div class="text-end mt-4">
       <h4>Total: $<span id="total">0.00</span></h4>
@@ -276,24 +277,23 @@ include("admin/bd.php"); ?>
       productos.forEach(item => {// Mostrar cada producto en el carrito
         total += item.precio;
         contenedor.innerHTML += `
-      <div class="col-12 col-md-6 col-lg-4 mb-4">
-
-        <div class="card h-100">
-          <img src="${item.img}" class="card-img-top img-fluid" alt="${item.nombre}">
-          <div class="card-body d-flex flex-column p-3">
-            <h5 class="card-title">${item.nombre}</h5>
-            <p class="card-text mb-1"><strong>Precio unitario:</strong> $${(item.precio / item.cantidad).toFixed(2)}</p>
-            <p class="card-text mb-1"><strong>Cantidad:</strong> ${item.cantidad}</p>
-            <p class="card-text"><strong>Subtotal:</strong> $${item.precio.toFixed(2)}</p>
-            <div class="mt-auto d-flex flex-wrap gap-2">
-
-              <button class="btn btn-secondary" onclick="disminuirCantidad(${item.id})">-</button>
-              <button class="btn btn-secondary" onclick="aumentarCantidad(${item.id})">+</button>
-              <button class="btn btn-danger" onclick="eliminarProducto(${item.id})">Eliminar</button>
-            </div>
-          </div>
+  <div class="col d-flex" data-aos="fade-up">
+    <div class="card position-relative d-flex flex-column h-100 w-100">
+      <img src="${item.img}" class="card-img-top" alt="Foto de ${item.nombre}">
+      <div class="card-body d-flex flex-column">
+        <h5 class="card-title">${item.nombre}</h5>
+        <p class="card-text mb-1"><strong>Precio unitario:</strong> $${(item.precio / item.cantidad).toFixed(2)}</p>
+        <p class="card-text mb-1"><strong>Cantidad:</strong> ${item.cantidad}</p>
+        <p class="card-text"><strong>Subtotal:</strong> $${item.precio.toFixed(2)}</p>
+        <div class="mt-auto d-flex flex-wrap gap-2">
+          <button class="btn btn-secondary" onclick="disminuirCantidad(${item.id})">-</button>
+          <button class="btn btn-secondary" onclick="aumentarCantidad(${item.id})">+</button>
+          <button class="btn btn-danger" onclick="eliminarProducto(${item.id})">Eliminar</button>
         </div>
-      </div>`;
+      </div>
+    </div>
+  </div>`;
+
       });
       
       totalSpan.textContent = total.toFixed(2);
