@@ -3,7 +3,9 @@ include("../../bd.php");
 
 // Manejo de fechas
 $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+$fecha_fin_input = $_GET['fecha_fin'] ?? date('Y-m-d');
+$fecha_fin = $fecha_fin_input . ' 23:59:59';
+
 
 // Total de ventas
 $stmt = $conexion->prepare("SELECT SUM(pd.precio * pd.cantidad) AS total_ventas
@@ -17,8 +19,8 @@ $total_ventas = $stmt->fetch(PDO::FETCH_ASSOC)['total_ventas'] ?? 0;
 
 // Cantidad de pedidos
 $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
-    FROM tbl_pedidos
-    WHERE fecha BETWEEN :inicio AND :fin");
+    FROM tbl_pedidos p
+    WHERE p.fecha BETWEEN :inicio AND :fin");
 $stmt->bindParam(':inicio', $fecha_inicio);
 $stmt->bindParam(':fin', $fecha_fin);
 $stmt->execute();
@@ -31,8 +33,7 @@ JOIN tbl_pedidos p ON pd.pedido_id = p.ID
 WHERE p.fecha BETWEEN :inicio AND :fin
 GROUP BY pd.nombre
 ORDER BY total_vendido DESC
-LIMIT 1
-");
+LIMIT 1");
 $stmt->bindParam(':inicio', $fecha_inicio);
 $stmt->bindParam(':fin', $fecha_fin);
 $stmt->execute();
@@ -95,7 +96,8 @@ include("../../templates/header.php");
     </div>
     <div class="col-12 col-md-auto">
       <label class="form-label">Hasta:</label>
-      <input type="date" class="form-control" name="fecha_fin" value="<?= $fecha_fin ?>">
+      <input type="date" class="form-control" name="fecha_fin" value="<?= $fecha_fin_input ?>">
+
     </div>
     <div class="col-12 col-md-auto d-flex align-items-end flex-wrap gap-2">
       <button type="submit" class="btn btn-primary"><i class="fa-solid fa-filter"></i> Filtrar</button>
