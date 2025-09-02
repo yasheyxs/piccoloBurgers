@@ -63,6 +63,27 @@ $stmt->bindParam(':anio', $anio_actual);
 $stmt->execute();
 $ventas_mensuales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Métodos de pago
+$stmt = $conexion->prepare("SELECT metodo_pago, COUNT(*) AS total
+    FROM tbl_pedidos p
+    WHERE p.fecha BETWEEN :inicio AND :fin
+    GROUP BY metodo_pago");
+$stmt->bindParam(':inicio', $fecha_inicio);
+$stmt->bindParam(':fin', $fecha_fin);
+$stmt->execute();
+$metodos_pago = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Tipos de entrega
+$stmt = $conexion->prepare("SELECT tipo_entrega, COUNT(*) AS total
+    FROM tbl_pedidos p
+    WHERE p.fecha BETWEEN :inicio AND :fin
+    GROUP BY tipo_entrega");
+$stmt->bindParam(':inicio', $fecha_inicio);
+$stmt->bindParam(':fin', $fecha_fin);
+$stmt->execute();
+$tipos_entrega = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
 // Datos para Chart.js
 $productos_labels = json_encode(array_column($productos_grafico, 'nombre'));
 $productos_data = json_encode(array_column($productos_grafico, 'total_vendido'));
@@ -138,6 +159,40 @@ include("../../templates/header.php");
       </div>
     </div>
   </div>
+  <div class="row mb-4 g-3">
+  <div class="col-md-6 col-12">
+    <div class="card shadow border-0 h-100">
+      <div class="card-body text-center">
+        <i class="fa-solid fa-credit-card fa-2x text-primary mb-2"></i>
+        <h5 class="card-title">Métodos de Pago</h5>
+        <?php if (!empty($metodos_pago)): ?>
+          <?php foreach ($metodos_pago as $m): ?>
+            <p class="mb-1"><strong><?= ucfirst($m['metodo_pago']) ?>:</strong> <?= $m['total'] ?></p>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">Sin registros</p>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6 col-12">
+    <div class="card shadow border-0 h-100">
+      <div class="card-body text-center">
+        <i class="fa-solid fa-truck fa-2x text-danger mb-2"></i>
+        <h5 class="card-title">Tipos de Entrega</h5>
+        <?php if (!empty($tipos_entrega)): ?>
+          <?php foreach ($tipos_entrega as $t): ?>
+            <p class="mb-1"><strong><?= ucfirst($t['tipo_entrega']) ?>:</strong> <?= $t['total'] ?></p>
+          <?php endforeach; ?>
+        <?php else: ?>
+          <p class="text-muted">Sin registros</p>
+        <?php endif; ?>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <!-- Gráficos -->
   <div class="row g-4">
