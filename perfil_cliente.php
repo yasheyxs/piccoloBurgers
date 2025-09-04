@@ -354,6 +354,10 @@ async function actualizarHistorial() {
           case 'En preparación':
             estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
             break;
+            case 'En camino':
+  estadoHtml = `<span class="text-info">En camino 🚚</span>`;
+  break;
+
           default:
             estadoHtml = pedido.estado;
         }
