@@ -71,7 +71,6 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
   </ul>
 </li>
 
-
         <!-- Dropdown Transacciones -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="transaccionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
