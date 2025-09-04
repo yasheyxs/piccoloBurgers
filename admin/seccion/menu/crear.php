@@ -2,36 +2,53 @@
 include("../../bd.php");
 
 if ($_POST) {
+  $nombre = trim($_POST["nombre"] ?? "");
+  $ingredientes = trim($_POST["ingredientes"] ?? "");
+  $precio = $_POST["precio"] ?? "";
+  $categoria = $_POST["categoria"] ?? "General";
 
-  $nombre = (isset($_POST["nombre"])) ? $_POST["nombre"] : "";
-  $ingredientes = (isset($_POST["ingredientes"])) ? $_POST["ingredientes"] : "";
-  $precio = (isset($_POST["precio"])) ? $_POST["precio"] : "";
-  $categoria = (isset($_POST["categoria"])) ? $_POST["categoria"] : "General";
+  $foto = $_FILES['foto']['name'] ?? "";
+  $tmp_foto = $_FILES['foto']['tmp_name'] ?? "";
 
-  $sentencia = $conexion->prepare("INSERT INTO 
-    tbl_menu (ID, nombre, ingredientes, foto, precio, categoria) 
-    VALUES (NULL, :nombre, :ingredientes, :foto, :precio, :categoria);");
+  // Validaciones básicas
+  if ($nombre === "" || $ingredientes === "" || !is_numeric($precio) || $precio < 0) {
+    echo "<script>alert('Datos inválidos. Verifica los campos.');</script>";
+  } else {
+    try {
+      $nombre_foto = "";
+      if ($tmp_foto && $foto) {
+        $fecha_foto = new DateTime();
+        $nombre_foto = $fecha_foto->getTimestamp() . "_" . basename($foto);
 
-  $foto = (isset($_FILES['foto']["name"])) ? $_FILES['foto']["name"] : "";
-  $fecha_foto = new DateTime();
-  $nombre_foto = $fecha_foto->getTimestamp() . "_" . $foto;
-  $tmp_foto = $_FILES["foto"]["tmp_name"];
+        $destino = "../../../img/menu/" . $nombre_foto;
+        if (!move_uploaded_file($tmp_foto, $destino)) {
+          throw new Exception("No se pudo guardar la imagen.");
+        }
+      }
 
-  if ($tmp_foto != "") {
-    move_uploaded_file($tmp_foto, "../../../img/menu/" . $nombre_foto);
+      $sentencia = $conexion->prepare("INSERT INTO 
+        tbl_menu (ID, nombre, ingredientes, foto, precio, categoria) 
+        VALUES (NULL, :nombre, :ingredientes, :foto, :precio, :categoria)");
+
+      $sentencia->bindParam(":nombre", $nombre);
+      $sentencia->bindParam(":ingredientes", $ingredientes);
+      $sentencia->bindParam(":foto", $nombre_foto);
+      $sentencia->bindParam(":precio", $precio);
+      $sentencia->bindParam(":categoria", $categoria);
+      $sentencia->execute();
+
+      header("Location:index.php");
+      exit;
+    } catch (Exception $e) {
+      error_log("Error al agregar comida: " . $e->getMessage());
+      echo "<script>alert('Error al registrar el menú. Intenta nuevamente.');</script>";
+    }
   }
-
-  $sentencia->bindParam(":foto", $nombre_foto);
-  $sentencia->bindParam(":nombre", $nombre);
-  $sentencia->bindParam(":ingredientes", $ingredientes);
-  $sentencia->bindParam(":precio", $precio);
-  $sentencia->bindParam(":categoria", $categoria);
-
-  $sentencia->execute();
-  header("Location:index.php");
 }
 
-include("../../templates/header.php"); ?>
+include("../../templates/header.php");
+?>
+
 <br />
 <div class="card">
   <div class="card-header">
@@ -43,14 +60,12 @@ include("../../templates/header.php"); ?>
 
       <div class="mb-3">
         <label for="nombre" class="form-label">Nombre:</label>
-        <input type="text"
-          class="form-control" name="nombre" id="nombre" aria-describedby="helpId" placeholder="Nombre:">
+        <input type="text" class="form-control" name="nombre" id="nombre" placeholder="Ej: Pizza Napolitana" required>
       </div>
 
       <div class="mb-3">
         <label for="ingredientes" class="form-label">Ingredientes (separados por comas):</label>
-        <input type="text"
-          class="form-control" name="ingredientes" id="ingredientes" aria-describedby="helpId" placeholder="Ingredientes">
+        <input type="text" class="form-control" name="ingredientes" id="ingredientes" placeholder="Ej: Tomate, Mozzarella, Albahaca" required>
       </div>
 
       <div class="mb-3">
@@ -66,24 +81,21 @@ include("../../templates/header.php"); ?>
 
       <div class="mb-3">
         <label for="foto" class="form-label">Foto:</label>
-        <input type="file" class="form-control" name="foto" id="foto" placeholder="" aria-describedby="fileHelpId">
+        <input type="file" class="form-control" name="foto" id="foto" accept="image/*">
       </div>
 
       <div class="mb-3">
         <label for="precio" class="form-label">Precio:</label>
-        <input type="text"
-          class="form-control" name="precio" id="precio" aria-describedby="helpId" placeholder="Precio">
+        <input type="number" step="0.01" min="0" class="form-control" name="precio" id="precio" placeholder="Ej: 1500.00" required>
       </div>
 
-      <button type="submit" class="btn btn-success">Agregar comida </button>
-      <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>
+      <button type="submit" class="btn btn-success">Agregar comida</button>
+      <a class="btn btn-primary" href="index.php" role="button">Cancelar</a>
 
     </form>
 
   </div>
-  <div class="card-footer text-muted">
-
-  </div>
+  <div class="card-footer text-muted"></div>
 </div>
 
 <?php include("../../templates/footer.php"); ?>

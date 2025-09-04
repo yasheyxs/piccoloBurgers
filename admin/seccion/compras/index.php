@@ -1,81 +1,118 @@
 <?php
 include("../../bd.php");
 
-// Eliminar compra
-if (isset($_GET['txtID'])) {
-  $txtID = $_GET["txtID"] ?? "";
+// Eliminar compra con validación y manejo de errores
+if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
+  $txtID = intval($_GET["txtID"]);
 
-  $sentencia = $conexion->prepare("DELETE FROM tbl_compras_detalle WHERE compra_id = :id");
-  $sentencia->bindParam(":id", $txtID);
-  $sentencia->execute();
+  try {
+    $conexion->beginTransaction();
 
-  $sentencia = $conexion->prepare("DELETE FROM tbl_compras WHERE ID = :id");
-  $sentencia->bindParam(":id", $txtID);
-  $sentencia->execute();
+    $sentencia = $conexion->prepare("DELETE FROM tbl_compras_detalle WHERE compra_id = :id");
+    $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
+    $sentencia->execute();
 
-  header("Location:index.php");
+    $sentencia = $conexion->prepare("DELETE FROM tbl_compras WHERE ID = :id");
+    $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
+    $sentencia->execute();
+
+    $conexion->commit();
+    header("Location:index.php");
+    exit;
+  } catch (Exception $e) {
+    $conexion->rollBack();
+    error_log("Error al eliminar compra: " . $e->getMessage());
+    echo "<script>alert('Error al eliminar la compra. Intenta nuevamente.');</script>";
+  }
 }
 
 // Obtener compras con proveedor y total
-$sentencia = $conexion->prepare("
-  SELECT c.ID, c.fecha, p.nombre AS proveedor, p.telefono,
-    (SELECT SUM(cd.cantidad * cd.precio_unitario)
-     FROM tbl_compras_detalle cd
-     WHERE cd.compra_id = c.ID) AS total
-  FROM tbl_compras c
-  JOIN tbl_proveedores p ON c.proveedor_id = p.ID
-  ORDER BY c.fecha DESC
-");
-$sentencia->execute();
-$lista_compras = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+try {
+  $sentencia = $conexion->prepare("
+    SELECT c.ID, c.fecha, p.nombre AS proveedor, p.telefono,
+      (SELECT SUM(cd.cantidad * cd.precio_unitario)
+       FROM tbl_compras_detalle cd
+       WHERE cd.compra_id = c.ID) AS total
+    FROM tbl_compras c
+    JOIN tbl_proveedores p ON c.proveedor_id = p.ID
+    ORDER BY c.fecha DESC
+  ");
+  $sentencia->execute();
+  $lista_compras = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Error al obtener lista de compras: " . $e->getMessage());
+  $lista_compras = [];
+}
 
 // Métricas: gasto mensual y anual
-$sentencia = $conexion->prepare("
-  SELECT SUM(cd.cantidad * cd.precio_unitario) AS total_mes
-  FROM tbl_compras c
-  JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
-  WHERE MONTH(c.fecha) = MONTH(CURRENT_DATE()) AND YEAR(c.fecha) = YEAR(CURRENT_DATE())
-");
-$sentencia->execute();
-$total_mes = $sentencia->fetchColumn();
+try {
+  $sentencia = $conexion->prepare("
+    SELECT SUM(cd.cantidad * cd.precio_unitario) AS total_mes
+    FROM tbl_compras c
+    JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
+    WHERE MONTH(c.fecha) = MONTH(CURRENT_DATE()) AND YEAR(c.fecha) = YEAR(CURRENT_DATE())
+  ");
+  $sentencia->execute();
+  $total_mes = $sentencia->fetchColumn() ?: 0;
+} catch (Exception $e) {
+  error_log("Error al calcular gasto mensual: " . $e->getMessage());
+  $total_mes = 0;
+}
 
-$sentencia = $conexion->prepare("
-  SELECT SUM(cd.cantidad * cd.precio_unitario) AS total_anio
-  FROM tbl_compras c
-  JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
-  WHERE YEAR(c.fecha) = YEAR(CURRENT_DATE())
-");
-$sentencia->execute();
-$total_anio = $sentencia->fetchColumn();
+try {
+  $sentencia = $conexion->prepare("
+    SELECT SUM(cd.cantidad * cd.precio_unitario) AS total_anio
+    FROM tbl_compras c
+    JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
+    WHERE YEAR(c.fecha) = YEAR(CURRENT_DATE())
+  ");
+  $sentencia->execute();
+  $total_anio = $sentencia->fetchColumn() ?: 0;
+} catch (Exception $e) {
+  error_log("Error al calcular gasto anual: " . $e->getMessage());
+  $total_anio = 0;
+}
 
 // Proveedores más solicitados
-$sentencia = $conexion->prepare("
-  SELECT p.nombre AS proveedor, SUM(cd.cantidad * cd.precio_unitario) AS total
-  FROM tbl_compras c
-  JOIN tbl_proveedores p ON c.proveedor_id = p.ID
-  JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
-  GROUP BY p.nombre
-  ORDER BY total DESC
-  LIMIT 5
-");
-$sentencia->execute();
-$proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-$labels_prov = json_encode(array_column($proveedores, 'proveedor'));
-$totales_prov = json_encode(array_map('floatval', array_column($proveedores, 'total')));
+try {
+  $sentencia = $conexion->prepare("
+    SELECT p.nombre AS proveedor, SUM(cd.cantidad * cd.precio_unitario) AS total
+    FROM tbl_compras c
+    JOIN tbl_proveedores p ON c.proveedor_id = p.ID
+    JOIN tbl_compras_detalle cd ON c.ID = cd.compra_id
+    GROUP BY p.nombre
+    ORDER BY total DESC
+    LIMIT 5
+  ");
+  $sentencia->execute();
+  $proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+  $labels_prov = json_encode(array_column($proveedores, 'proveedor'));
+  $totales_prov = json_encode(array_map('floatval', array_column($proveedores, 'total')));
+} catch (Exception $e) {
+  error_log("Error al obtener proveedores: " . $e->getMessage());
+  $labels_prov = json_encode([]);
+  $totales_prov = json_encode([]);
+}
 
 // Materias primas más compradas
-$sentencia = $conexion->prepare("
-  SELECT mp.nombre AS materia_prima, SUM(cd.cantidad) AS total_cantidad
-  FROM tbl_compras_detalle cd
-  JOIN tbl_materias_primas mp ON cd.materia_prima_id = mp.ID
-  GROUP BY mp.nombre
-  ORDER BY total_cantidad DESC
-  LIMIT 5
-");
-$sentencia->execute();
-$materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-$labels_mat = json_encode(array_column($materias, 'materia_prima'));
-$cantidades_mat = json_encode(array_map('intval', array_column($materias, 'total_cantidad')));
+try {
+  $sentencia = $conexion->prepare("
+    SELECT mp.nombre AS materia_prima, SUM(cd.cantidad) AS total_cantidad
+    FROM tbl_compras_detalle cd
+    JOIN tbl_materias_primas mp ON cd.materia_prima_id = mp.ID
+    GROUP BY mp.nombre
+    ORDER BY total_cantidad DESC
+    LIMIT 5
+  ");
+  $sentencia->execute();
+  $materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+  $labels_mat = json_encode(array_column($materias, 'materia_prima'));
+  $cantidades_mat = json_encode(array_map('intval', array_column($materias, 'total_cantidad')));
+} catch (Exception $e) {
+  error_log("Error al obtener materias primas: " . $e->getMessage());
+  $labels_mat = json_encode([]);
+  $cantidades_mat = json_encode([]);
+}
 
 include("../../templates/header.php");
 ?>
@@ -101,10 +138,10 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_compras as $compra) { ?>
             <tr>
-              <td><?= $compra["ID"] ?></td>
-              <td><?= $compra["fecha"] ?></td>
-              <td><?= $compra["proveedor"] ?></td>
-              <td><?= $compra["telefono"] ?></td>
+              <td><?= htmlspecialchars($compra["ID"]) ?></td>
+              <td><?= htmlspecialchars($compra["fecha"]) ?></td>
+              <td><?= htmlspecialchars($compra["proveedor"]) ?></td>
+              <td><?= htmlspecialchars($compra["telefono"]) ?></td>
               <td>$<?= number_format($compra["total"], 2) ?></td>
               <td>
                 <a class="btn btn-info btn-sm" href="detalle.php?txtID=<?= $compra['ID'] ?>">Ver detalles</a>
