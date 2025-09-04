@@ -3,22 +3,28 @@ session_start();
 if ($_POST) {
   include("bd.php");
 
-  $usuario = $_POST["usuario"] ?? "";
+  $usuario  = trim($_POST["usuario"] ?? "");
   $password = $_POST["password"] ?? "";
 
-  // Buscar usuario por nombre
   $sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios WHERE usuario = :usuario");
   $sentencia->bindParam(":usuario", $usuario);
   $sentencia->execute();
   $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
 
   if ($usuarioEncontrado) {
-    if (md5($password) === $usuarioEncontrado["password"]) {
+    $hashAlmacenado = $usuarioEncontrado["password"];
 
+    // Verificar si el hash es moderno (password_hash) o legacy (md5)
+    $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+
+    $valido = $esHashModerno
+      ? password_verify($password, $hashAlmacenado)
+      : md5($password) === $hashAlmacenado;
+
+    if ($valido) {
       $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
       $_SESSION["admin_logueado"] = true;
-      $_SESSION["rol"] = $usuarioEncontrado["rol"]; // Guardar el rol
-
+      $_SESSION["rol"] = $usuarioEncontrado["rol"];
       header("Location:index.php");
       exit();
     }
@@ -33,9 +39,8 @@ if ($_POST) {
 <html lang="es">
 
 <head>
-  <title>Login</title>
+  <title>Login Administrador</title>
   <link rel="icon" type="image/png" href="../img/favicon.png" />
-
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -74,6 +79,10 @@ if ($_POST) {
                   <button type="submit" class="btn btn-primary">Entrar</button>
                 </div>
               </form>
+
+              <div class="mt-3 text-center">
+                <a href="password/recuperar_password_usuario.php?tipo=usuario" class="text-primary">¿Olvidaste tu contraseña?</a>
+              </div>
             </div>
           </div>
 
