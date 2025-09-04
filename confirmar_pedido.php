@@ -4,7 +4,6 @@ session_start();
 $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
 ?>
 
-
 <!doctype html>
 <html lang="es">
 <head>
@@ -41,6 +40,17 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
     .form-control {
       font-size: 1.2rem;
     }
+
+    select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
 
     .btn-gold {
       background-color: var(--main-gold);
