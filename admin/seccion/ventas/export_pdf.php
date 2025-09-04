@@ -104,7 +104,9 @@ $productos_chart_url = "https://quickchart.io/chart?c=" . urlencode(json_encode(
     "options" => ["plugins" => ["legend" => ["position" => "bottom"]]]
 ]));
 
-$meses = array_map(fn($v) => 'Mes '.$v['mes'], $ventas_mensuales);
+$mes_nombres = [1=>"Enero",2=>"Febrero",3=>"Marzo",4=>"Abril",5=>"Mayo",6=>"Junio",7=>"Julio",8=>"Agosto",9=>"Septiembre",10=>"Octubre",11=>"Noviembre",12=>"Diciembre"];
+$meses = array_map(fn($v) => $mes_nombres[(int)$v['mes']], $ventas_mensuales);
+
 $ventas_data = array_column($ventas_mensuales, 'total_ventas');
 $ventas_chart_url = "https://quickchart.io/chart?c=" . urlencode(json_encode([
     "type" => "bar",
@@ -144,19 +146,23 @@ td { padding: 6px; text-align: left; }
 <h2>Desde '.htmlspecialchars($fecha_inicio).' hasta '.htmlspecialchars($fecha_fin_input).'</h2>
 
 <div class="metrics">
-  <div class="metric">
+  <div class="metric" style="width:48%;">
     <h3>Total Ventas</h3>
     <p>$'.number_format($total_ventas,2).'</p>
   </div>
-  <div class="metric">
+  <div class="metric" style="width:48%;">
     <h3>Total Pedidos</h3>
     <p>'.$total_pedidos.'</p>
   </div>
-  <div class="metric">
+</div>
+
+<div class="metrics">
+  <div class="metric" style="width:100%;">
     <h3>Producto más vendido</h3>
     <p>'.htmlspecialchars($producto_mas_vendido['nombre'] ?? 'N/A').' ('.htmlspecialchars($producto_mas_vendido['total_vendido'] ?? 0).')</p>
   </div>
 </div>
+
 
 <div class="metrics">
   <div class="metric" style="width:45%;">
