@@ -1,38 +1,42 @@
 <?php
-//inicio de sesión y conexión a la base de datos
 session_start();
 include("admin/bd.php");
 
 $mensaje = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") { //revisa si la peticion fue enviada mediante post
-  //se toman los campos del formulario, se eliminan espacios en blanco al inicio y al final. Email es opcional
+// Validación de fuerza de contraseña
+function validarFuerza($pass) {
+  return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $pass);
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $nombre = trim($_POST["nombre"]);
   $telefono = trim($_POST["telefono"]);
   $email = trim($_POST["email"] ?? "");
   $password = $_POST["password"];
   $confirmar = $_POST["confirmar"];
 
-  //verifica que las contraseñas coincidan y que los campos requeridos no estén vacíos
   if ($password !== $confirmar) {
     $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
   } elseif (empty($nombre) || empty($telefono) || empty($password)) {
     $mensaje = "<div class='alert alert-danger'>Por favor, completa todos los campos requeridos.</div>";
-  } {
-    try { //busca si ya existe un cliente con el mismo teléfono
+  } elseif (!validarFuerza($password)) {
+    $mensaje = "<div class='alert alert-danger'>La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.</div>";
+  } else {
+    try {
       $consulta = $conexion->prepare("SELECT ID FROM tbl_clientes WHERE telefono = ?");
       $consulta->execute([$telefono]);
 
-      if ($consulta->rowCount() > 0) { //si existe, muestra un mensaje de error
+      if ($consulta->rowCount() > 0) {
         $mensaje = "<div class='alert alert-warning'>Ya existe una cuenta registrada con ese teléfono.</div>";
-      } else { //si no existe, inserta el nuevo cliente en la base de datos
-        $hash = password_hash($password, PASSWORD_DEFAULT); //encripta la contraseña
-        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)"); //prepara la sentencia SQL
-        $sentencia->execute([$nombre, $telefono, $email, $hash]); //ejecuta la sentencia
+      } else {
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
+        $sentencia->execute([$nombre, $telefono, $email, $hash]);
 
         $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora puedes <a href='login_cliente.php'>iniciar sesión</a>.</div>";
       }
-    } catch (Exception $e) { //captura cualquier error que ocurra durante la ejecución
+    } catch (Exception $e) {
       $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
     }
   }
@@ -143,7 +147,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //revisa si la peticion fue enviada 
 
       <div class="mb-3">
         <label for="password" class="form-label">Contraseña:</label>
-        <input type="password" class="form-control" name="password" required>
+        <input type="password" class="form-control" name="password" id="password" required>
+        <small class="form-text text-muted">
+          La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
+        </small>
       </div>
 
       <div class="mb-3">
@@ -156,18 +163,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") { //revisa si la peticion fue enviada 
   </div>
 
   <script>
-    // Solo números en Teléfono
-    document.querySelector('input[name="telefono"]').addEventListener("input", function() {
+    document.querySelector('input[name="telefono"]').addEventListener("input", function () {
       this.value = this.value.replace(/[^0-9]/g, "");
     });
 
-    // Solo letras en Nombre
-    document.querySelector('input[name="nombre"]').addEventListener("input", function() {
+    document.querySelector('input[name="nombre"]').addEventListener("input", function () {
       this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
+    });
+
+    // Validación de fuerza en tiempo real
+    document.getElementById("password")?.addEventListener("input", function () {
+      const val = this.value;
+      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+      this.setCustomValidity(regex.test(val) ? "" : "La contraseña no cumple con los requisitos.");
     });
   </script>
 
-
 </body>
-
 </html>

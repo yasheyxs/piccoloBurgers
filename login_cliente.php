@@ -1,38 +1,47 @@
 <?php
-// inicio de sesión y conexión a la base de datos
 session_start();
 include("admin/bd.php");
 
 $mensaje = "";
-// Verificar si el cliente ya está autenticado
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $telefono = $_POST["telefono"] ?? "";
+  $telefono = trim($_POST["telefono"] ?? "");
   $password = $_POST["password"] ?? "";
 
-  // Validar campos
   if (empty($telefono) || empty($password)) {
     $mensaje = "<div class='alert alert-danger'>Completa todos los campos.</div>";
-  } else {// Si los campos están completos, proceder a la autenticación
+  } else {
     $consulta = $conexion->prepare("SELECT * FROM tbl_clientes WHERE telefono = ?");
     $consulta->execute([$telefono]);
     $cliente = $consulta->fetch(PDO::FETCH_ASSOC);
-    
-    // Verificar si el cliente existe y si la contraseña es correcta
-    if ($cliente && password_verify($password, $cliente["password"])) {
-      $_SESSION["cliente"] = [
-        "id" => $cliente["ID"],
-        "nombre" => $cliente["nombre"],
-        "telefono" => $cliente["telefono"],
-        "email" => $cliente["email"]
-      ];
-      $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
-      $mensaje .= "<script>setTimeout(() => window.location.href = 'index.php', 1500);</script>";
+
+    if ($cliente) {
+      $hashAlmacenado = $cliente["password"];
+      $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+
+      $valido = $esHashModerno
+        ? password_verify($password, $hashAlmacenado)
+        : md5($password) === $hashAlmacenado;
+
+      if ($valido) {
+        $_SESSION["cliente"] = [
+          "id" => $cliente["ID"],
+          "nombre" => $cliente["nombre"],
+          "telefono" => $cliente["telefono"],
+          "email" => $cliente["email"]
+        ];
+        $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
+        $mensaje .= "<script>setTimeout(() => window.location.href = 'index.php', 1500);</script>";
+      } else {
+        $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";
+      }
     } else {
       $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";
     }
   }
 }
 ?>
+
 
 <!doctype html>
 <html lang="es">
@@ -130,7 +139,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     </form>
 
     <div class="mt-3 text-center">
-      ¿No tenés cuenta? <a href="registro_cliente.php">Registrate acá</a>
+      ¿No tenés cuenta? <a href="registro_cliente.php" class="text-warning">Registrate acá</a>
+    </div>
+
+    <div class="mt-2 text-center">
+      <a href="admin/password/recuperar_password_cliente.php?tipo=cliente" class="text-warning">¿Olvidaste tu contraseña?</a>
     </div>
 
     <div class="mt-4 text-center">
@@ -139,13 +152,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   </div>
 
   <script>
-    // teléfono tenga solo números
-    document.getElementById("telefono").addEventListener("input", function() {
+    document.getElementById("telefono").addEventListener("input", function () {
       this.value = this.value.replace(/[^0-9]/g, "");
     });
   </script>
 
-
 </body>
-
 </html>
