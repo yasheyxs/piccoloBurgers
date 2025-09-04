@@ -49,6 +49,28 @@ if ($_POST) {
 include("../../templates/header.php");
 ?>
 
+<!-- Estilo para flecha en el dropdown -->
+<style>
+  .custom-select-wrapper {
+    position: relative;
+  }
+
+  .custom-select-arrow {
+    padding-right: 2.5rem;
+  }
+
+  .custom-select-wrapper::after {
+    content: "▾";
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1rem;
+    color: #6c757d;
+  }
+</style>
+
 <br />
 <div class="card">
   <div class="card-header">
@@ -70,13 +92,15 @@ include("../../templates/header.php");
 
       <div class="mb-3">
         <label for="categoria" class="form-label">Categoría:</label>
-        <select class="form-control" name="categoria" id="categoria">
-          <option value="Hamburguesas">Hamburguesas</option>
-          <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
-          <option value="Pizzas">Pizzas</option>
-          <option value="Bebidas">Bebidas</option>
-          <option value="Acompañamientos">Acompañamientos</option>
-        </select>
+        <div class="custom-select-wrapper">
+          <select class="form-control custom-select-arrow" name="categoria" id="categoria">
+            <option value="Hamburguesas">Hamburguesas</option>
+            <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
+            <option value="Pizzas">Pizzas</option>
+            <option value="Bebidas">Bebidas</option>
+            <option value="Acompañamientos">Acompañamientos</option>
+          </select>
+        </div>
       </div>
 
       <div class="mb-3">
