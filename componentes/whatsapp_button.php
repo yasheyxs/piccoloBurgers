@@ -24,7 +24,8 @@ $whatsappMensaje = urlencode("¡Hola! Me gustaría hacer un pedido 🍔✨");
   justify-content: center;
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   z-index: 1000;
-  transition: transform 0.3s, box-shadow 0.3s;
+  opacity: 0.6; 
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
   text-decoration: none;
 }
 
@@ -32,6 +33,7 @@ $whatsappMensaje = urlencode("¡Hola! Me gustaría hacer un pedido 🍔✨");
   transform: scale(1.1);
   box-shadow: 0 6px 16px rgba(0,0,0,0.4);
   color: white;
+  opacity: 1; 
   text-decoration: none;
 }
 </style>

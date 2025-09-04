@@ -724,7 +724,8 @@ table {
       </div>
     </div>
   </div>
-
+  
+  <?php include("componentes/carrito_button.php"); ?>
   <?php include("componentes/whatsapp_button.php"); ?>
 
 <!-- AOS JS -->
