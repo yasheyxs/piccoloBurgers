@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Aug 02, 2025 at 07:40 AM
+-- Generation Time: Sep 04, 2025 at 12:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -54,7 +54,7 @@ CREATE TABLE `tbl_clientes` (
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
-  `puntos` int(11) NOT NULL
+  `puntos` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -64,7 +64,7 @@ CREATE TABLE `tbl_clientes` (
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`) VALUES
 (2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25),
 (3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0),
-(4, 'Yass', '123', '', '$2y$10$8Xdt5f5TSd91nY6auzztgOr3IFIvlMmn5YjA9d53KwMmYD1mRDYPa', '2025-07-29 19:11:37', 48);
+(4, 'Yass', '123', '', '$2y$10$8Xdt5f5TSd91nY6auzztgOr3IFIvlMmn5YjA9d53KwMmYD1mRDYPa', '2025-07-29 19:11:37', 66);
 
 -- --------------------------------------------------------
 
@@ -78,6 +78,116 @@ CREATE TABLE `tbl_comentarios` (
   `correo` varchar(255) NOT NULL,
   `mensaje` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_compras`
+--
+
+CREATE TABLE `tbl_compras` (
+  `ID` int(11) NOT NULL,
+  `fecha` date NOT NULL,
+  `proveedor_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_compras`
+--
+
+INSERT INTO `tbl_compras` (`ID`, `fecha`, `proveedor_id`) VALUES
+(4, '2025-09-03', 17),
+(5, '2025-09-03', 18),
+(6, '2025-09-03', 24),
+(7, '2025-09-03', 20),
+(8, '2025-09-03', 20),
+(9, '2025-09-04', 20);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_compras_detalle`
+--
+
+CREATE TABLE `tbl_compras_detalle` (
+  `ID` int(11) NOT NULL,
+  `compra_id` int(11) NOT NULL,
+  `materia_prima_id` int(11) NOT NULL,
+  `cantidad` decimal(10,0) NOT NULL,
+  `precio_unitario` decimal(10,0) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_compras_detalle`
+--
+
+INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `cantidad`, `precio_unitario`) VALUES
+(1, 4, 24, 2, 4000),
+(2, 5, 9, 2, 8000),
+(3, 5, 17, 3, 1234),
+(4, 6, 1, 2, 4000),
+(5, 6, 2, 3, 1200),
+(6, 6, 4, 6, 2000),
+(7, 7, 10, 10, 1000),
+(8, 8, 11, 10, 1000),
+(9, 9, 12, 1, 4999),
+(10, 9, 13, 2, 4999),
+(11, 9, 10, 3, 4999);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_materias_primas`
+--
+
+CREATE TABLE `tbl_materias_primas` (
+  `ID` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `unidad_medida` varchar(50) NOT NULL,
+  `cantidad` decimal(10,2) NOT NULL,
+  `proveedor_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_materias_primas`
+--
+
+INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, `proveedor_id`) VALUES
+(1, 'Tomate', 'kg', 2.00, 20),
+(2, 'Lechuga', 'kg', 5.00, 0),
+(3, 'Morrón', 'kg', 0.00, 1),
+(4, 'Cebolla', 'kg', 6.00, 1),
+(5, 'Carne molida de cerdo', 'kg', 0.00, 21),
+(6, 'Carne molida de vaca', 'kg', 0.00, 21),
+(7, 'Carne de lomo', 'kg', 0.00, 1),
+(8, 'Pan de lomo', 'bolsa', 0.00, 1),
+(9, 'Pan de hamburguesa', 'bolsa', 2.00, 1),
+(10, 'Mayonesa', 'litro', 13.00, 19),
+(11, 'Mostaza', 'litro', 10.00, 1),
+(12, 'Ketchup', 'litro', 1.00, 1),
+(13, 'Salsa BBQ', 'litro', 2.00, 1),
+(14, 'Queso Tybo', 'kg', 0.00, 1),
+(15, 'Queso Cheddar', 'kg', 0.00, 1),
+(16, 'Queso Cheddar Litro', 'litro', 0.00, 1),
+(17, 'Jamón cocido', 'kg', 3.00, 1),
+(18, 'Huevo', 'maple', 0.00, 1),
+(19, 'Panceta', 'kg', 0.00, 1),
+(20, 'Salsa Piccolo', 'litro', 0.00, 1),
+(21, 'Pepinillos', 'unidad', 0.00, 1),
+(22, 'Bondiola', 'kg', 0.00, 1),
+(23, 'Cebolla morada', 'kg', 0.00, 1),
+(24, 'Milanesa Vegetariana', 'unidad', 2.00, 1),
+(25, 'Milanesa de pollo', 'kg', 0.00, 1),
+(26, 'Milanesa de carne', 'kg', 0.00, 1),
+(27, 'Prepizza', 'unidad', 0.00, 1),
+(28, 'Aceituna', 'tarro', 0.00, 1),
+(29, 'Muzzarella', 'kg', 0.00, 1),
+(30, 'Aceite de ajo', 'litro', 0.00, 1),
+(31, 'Aceite de girasol', 'litro', 0.00, 1),
+(32, 'Salsa para pizza', 'litro', 0.00, 1),
+(33, 'Anchoas', 'lata', 0.00, 1),
+(34, 'Pepperoni', 'kg', 0.00, 1),
+(35, 'Discos de empanada', 'unidad', 0.00, 1);
 
 -- --------------------------------------------------------
 
@@ -178,6 +288,18 @@ CREATE TABLE `tbl_pedidos` (
   `cliente_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `tbl_pedidos`
+--
+
+INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`) VALUES
+(67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4),
+(68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4),
+(69, 'Yass', '123', '', '', 16600, '2025-09-01 22:33:41', 'Efectivo', 'Retiro', '', 'Cancelado', 4),
+(70, 'Yass', '123', '', 'Todo sin aderezo', 66500, '2025-09-02 04:40:37', 'Efectivo', 'Retiro', '', 'Listo', NULL),
+(71, 'Juana', '123', '', '', 21200, '2025-09-03 19:14:42', 'Efectivo', 'Retiro', '', 'Listo', NULL),
+(72, 'Yass', '123', '', '', 1500, '2025-09-03 19:18:38', 'Efectivo', 'Retiro', '', 'En preparación', 4);
+
 -- --------------------------------------------------------
 
 --
@@ -192,6 +314,51 @@ CREATE TABLE `tbl_pedidos_detalle` (
   `precio` decimal(10,0) NOT NULL,
   `cantidad` int(11) NOT NULL DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_pedidos_detalle`
+--
+
+INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `precio`, `cantidad`) VALUES
+(78, 67, 67, 'Sprite', 4500, 1),
+(79, 68, 65, 'Agua Saborizada', 4500, 1),
+(80, 69, 19, 'Aros de cebolla', 5600, 1),
+(81, 69, 57, 'Sándwich de suprema', 11000, 1),
+(82, 70, 20, 'Tequeños x6', 8000, 1),
+(83, 70, 26, 'Napolitana', 13000, 1),
+(84, 70, 33, 'BBQ', 21000, 2),
+(85, 70, 47, 'Empanada de jamón y queso x1', 4500, 3),
+(86, 70, 55, 'Lomo de pollo', 20000, 2),
+(87, 71, 17, 'Fritas', 7200, 1),
+(88, 71, 39, 'Empanadas árabes x6', 14000, 2),
+(89, 72, 47, 'Empanada de jamón y queso x1', 1500, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tbl_proveedores`
+--
+
+CREATE TABLE `tbl_proveedores` (
+  `ID` int(11) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `telefono` varchar(50) NOT NULL,
+  `email` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_proveedores`
+--
+
+INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
+(17, 'Distribuidora redolfi s.r.l', '+54 3574 4970244', 'distribuidoraredolfi@gmail.com'),
+(18, 'Distribuidora lozano', '+54 3573 500740', 'distribuidoralozano@gmail.com'),
+(19, 'Distribuidora \"C\"', '+54 3573 451618', 'distribuidoracladera@gmail.com'),
+(20, 'Vironi Super V.D.R', '+54 3573 692673', 'supermercadovironi@gmail.com'),
+(21, 'La Nueva', '+54 3573 451913', 'zampettijuanpablo@gmail.com'),
+(22, 'Pastas via krupp', '+54 3573 514709', 'pastasviakrupp@gmail.com'),
+(23, 'Arrodimez', '+54 3574 401891', 'gomezarrodillense@gmail.com'),
+(24, 'Andrada', 'Desconocido', '');
 
 -- --------------------------------------------------------
 
@@ -259,6 +426,24 @@ ALTER TABLE `tbl_comentarios`
   ADD PRIMARY KEY (`ID`);
 
 --
+-- Indexes for table `tbl_compras`
+--
+ALTER TABLE `tbl_compras`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `tbl_compras_detalle`
+--
+ALTER TABLE `tbl_compras_detalle`
+  ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `tbl_materias_primas`
+--
+ALTER TABLE `tbl_materias_primas`
+  ADD PRIMARY KEY (`ID`);
+
+--
 -- Indexes for table `tbl_menu`
 --
 ALTER TABLE `tbl_menu`
@@ -277,6 +462,12 @@ ALTER TABLE `tbl_pedidos_detalle`
   ADD PRIMARY KEY (`ID`),
   ADD KEY `pedido_id` (`pedido_id`),
   ADD KEY `producto_id` (`producto_id`);
+
+--
+-- Indexes for table `tbl_proveedores`
+--
+ALTER TABLE `tbl_proveedores`
+  ADD PRIMARY KEY (`ID`);
 
 --
 -- Indexes for table `tbl_testimonios`
@@ -313,6 +504,24 @@ ALTER TABLE `tbl_comentarios`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT for table `tbl_compras`
+--
+ALTER TABLE `tbl_compras`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT for table `tbl_compras_detalle`
+--
+ALTER TABLE `tbl_compras_detalle`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+
+--
+-- AUTO_INCREMENT for table `tbl_materias_primas`
+--
+ALTER TABLE `tbl_materias_primas`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+
+--
 -- AUTO_INCREMENT for table `tbl_menu`
 --
 ALTER TABLE `tbl_menu`
@@ -322,13 +531,19 @@ ALTER TABLE `tbl_menu`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=67;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=78;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=90;
+
+--
+-- AUTO_INCREMENT for table `tbl_proveedores`
+--
+ALTER TABLE `tbl_proveedores`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
