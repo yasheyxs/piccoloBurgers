@@ -24,6 +24,7 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
   <!-- Required meta tags -->
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <!-- Bootstrap CSS v5.2.1 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet"
@@ -57,13 +58,50 @@ if (MODO_DESARROLLO) {// Modo desarrollo, no se requiere autenticación
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>clientes.php">Clientes</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
         <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/ventas/">Ventas</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/compras/">Compras</a></li>
-        <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
-        <li class="nav-item"><a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php">Cerrar sesión</a></li>
+
+        <!-- Dropdown Gestión de personas -->
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle" href="#" id="personasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Gestión de personas
+  </a>
+  <ul class="dropdown-menu" aria-labelledby="personasDropdown">
+    <li><a class="dropdown-item" href="<?php echo $url_base; ?>clientes.php">Clientes</a></li>
+    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
+  </ul>
+</li>
+
+
+        <!-- Dropdown Transacciones -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="transaccionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Transacciones
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="transaccionesDropdown">
+            <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/ventas/">Ventas</a></li>
+            <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/compras/">Compras</a></li>
+          </ul>
+        </li>
+
+        <!-- Dropdown Paneles -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="panelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Paneles
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="panelDropdown">
+            <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
+            <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
+          </ul>
+        </li>
+      </ul>
+
+      <!-- Ícono cerrar sesión -->
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php" title="Cerrar sesión">
+            <i class="fa-solid fa-right-from-bracket fa-lg"></i>
+          </a>
+        </li>
       </ul>
     </div>
   </div>

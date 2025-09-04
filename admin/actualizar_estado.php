@@ -13,7 +13,7 @@ if (!$pedido_id || !$nuevo_estado) {// Validar que se reciban los datos necesari
 }
 
 $pedido_id = intval($pedido_id);
-$estados_validos = ["En preparación", "Listo", "Cancelado"];
+$estados_validos = ["En preparación", "Listo", "En camino", "Entregado", "Cancelado"];
 if (!in_array($nuevo_estado, $estados_validos)) {// Validar que el estado sea válido
     echo json_encode(["success" => false, "message" => "Estado inválido."]);
     exit;
