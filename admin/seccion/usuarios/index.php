@@ -1,16 +1,46 @@
 <?php
 include("../../bd.php");
+session_start();
 
-if (isset($_GET["txtID"])) {
-    $txtID = $_GET["txtID"] ?? "";
-    $sentencia = $conexion->prepare("DELETE FROM tbl_usuarios WHERE ID=:id");
-    $sentencia->bindParam(":id", $txtID);
-    $sentencia->execute();
-
-    header("Location:index.php");
+// Solo admin puede acceder
+if (!isset($_SESSION["rol"]) || $_SESSION["rol"] !== "admin") {
+    header("Location: ../../login.php");
+    exit();
 }
 
-$sentencia = $conexion->prepare("SELECT * FROM `tbl_usuarios`");
+// Eliminar usuario si se pasa txtID
+if (isset($_GET["txtID"])) {
+    $txtID = intval($_GET["txtID"]);
+
+    // Verificar si el usuario a eliminar es admin
+    $stmt = $conexion->prepare("SELECT rol FROM tbl_usuarios WHERE ID = :id");
+    $stmt->bindParam(":id", $txtID);
+    $stmt->execute();
+    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($usuario && $usuario["rol"] === "admin") {
+        // Contar admins
+        $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
+        $stmt->execute();
+        $totalAdmins = $stmt->fetchColumn();
+
+        if ($totalAdmins <= 1) {
+            echo "<script>alert('No se puede eliminar el último administrador'); window.location.href='index.php';</script>";
+            exit();
+        }
+    }
+
+    // Ejecutar eliminación
+    $stmt = $conexion->prepare("DELETE FROM tbl_usuarios WHERE ID = :id");
+    $stmt->bindParam(":id", $txtID);
+    $stmt->execute();
+
+    header("Location:index.php");
+    exit();
+}
+
+// Obtener lista de usuarios
+$sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios");
 $sentencia->execute();
 $lista_usuarios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
@@ -66,8 +96,8 @@ include("../../templates/header.php");
           <tr>
             <th>ID</th>
             <th>Usuario</th>
-            <th>Contraseña</th>
             <th>Correo</th>
+            <th>Rol</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -76,11 +106,32 @@ include("../../templates/header.php");
             <tr>
               <td><?php echo $registro["ID"]; ?></td>
               <td><?php echo $registro["usuario"]; ?></td>
-              <td>*****</td>
               <td><?php echo $registro["correo"]; ?></td>
+              <td><?php echo ucfirst($registro["rol"]); ?></td>
               <td>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro["ID"]; ?>">Borrar</a>
-              </td>
+  <?php
+    $mostrarBoton = true;
+
+    if ($registro["rol"] === "admin") {
+      // Contar admins
+      $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
+      $stmt->execute();
+      $totalAdmins = $stmt->fetchColumn();
+
+      // Si es el último admin, no mostrar botón
+      if ($totalAdmins <= 1) {
+        $mostrarBoton = false;
+      }
+    }
+
+    if ($mostrarBoton) {
+  ?>
+    <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro["ID"]; ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">Borrar</a>
+  <?php } else { ?>
+    <span class="text-muted">Protegido</span>
+  <?php } ?>
+</td>
+
             </tr>
           <?php } ?>
         </tbody>
@@ -90,8 +141,6 @@ include("../../templates/header.php");
   <div class="card-footer text-muted"></div>
 </div>
 
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script>
   $(document).ready(function () {
     if ($.fn.DataTable.isDataTable('#tablaUsuarios')) {

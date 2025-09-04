@@ -12,3 +12,12 @@ try {
     echo json_encode(["exito" => false, "mensaje" => "Error de conexión a la base de datos"]);
     exit;
 }
+
+function verificarRol($rolPermitido) {
+    session_start();
+    if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== $rolPermitido) {
+        header("Location: ../login.php");
+        exit();
+    }
+}
+

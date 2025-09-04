@@ -4,26 +4,30 @@ if ($_POST) {
   include("bd.php");
 
   $usuario = $_POST["usuario"] ?? "";
-  $password = md5($_POST["password"] ?? "");
+  $password = $_POST["password"] ?? "";
 
-  $sentencia = $conexion->prepare("SELECT *, count(*) as n_usuario
-            FROM tbl_usuarios
-            WHERE usuario=:usuario
-            AND password=:password");
+  // Buscar usuario por nombre
+  $sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios WHERE usuario = :usuario");
   $sentencia->bindParam(":usuario", $usuario);
-  $sentencia->bindParam(":password", $password);
   $sentencia->execute();
-  $lista_usuarios = $sentencia->fetch(PDO::FETCH_LAZY);
-  $n_usuario = $lista_usuarios["n_usuario"];
-  if ($n_usuario == 1) {
-    $_SESSION["admin_usuario"] = $lista_usuarios["usuario"];
-    $_SESSION["admin_logueado"] = true;
-    header("Location:index.php");
-  } else {
-    $mensaje = "Usuario o contraseña incorrectos...";
+  $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
+
+  if ($usuarioEncontrado) {
+    if (md5($password) === $usuarioEncontrado["password"]) {
+
+      $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
+      $_SESSION["admin_logueado"] = true;
+      $_SESSION["rol"] = $usuarioEncontrado["rol"]; // Guardar el rol
+
+      header("Location:index.php");
+      exit();
+    }
   }
+
+  $mensaje = "Usuario o contraseña incorrectos...";
 }
 ?>
+
 
 <!doctype html>
 <html lang="es">
