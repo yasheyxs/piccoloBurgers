@@ -90,44 +90,45 @@ include("../../templates/header.php");
     </div>
   </div>
 
-  <?php if (count($insumos) === 0): ?>
-    <div class="alert alert-warning">Este menú no tiene insumos asignados.</div>
-  <?php else: ?>
-    <div class="table-responsive">
-      <table id="tablaInsumos" class="table table-bordered table-hover table-sm align-middle">
-        <thead class="table-light">
-          <tr>
-            <th>Materia Prima</th>
-            <th>Unidad</th>
-            <th>Cantidad por unidad</th>
-            <th>Stock Actual</th>
-            <th>Estado</th>
-            <th title="Eliminar insumo">🗑️</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($insumos as $insumo): ?>
-            <?php
-              $id = $insumo['ID'];
-              $requerido = $insumo['requerido'] ?? '';
-              $estado = ($requerido > 0 && $insumo['stock_actual'] < $requerido) ? 'estado-low' : 'estado-ok';
-              $estado_texto = ($estado === 'estado-low') ? '❌ Bajo' : '✅ OK';
-            ?>
-            <tr>
-              <td><?= $insumo['nombre'] ?></td>
-              <td><?= $insumo['unidad_medida'] ?></td>
-              <td><input type="number" step="0.01" min="0" name="cantidad[<?= $id ?>]" value="<?= $requerido ?>" class="form-control form-control-sm"></td>
-              <td><?= number_format($insumo['stock_actual'], 2) ?></td>
-              <td class="<?= $estado ?>"><?= $estado_texto ?></td>
-              <td class="text-center">
-                <button type="submit" name="eliminar[]" value="<?= $id ?>" class="btn btn-outline-danger btn-sm btn-delete" title="Eliminar insumo">✖</button>
-              </td>
-            </tr>
-          <?php endforeach; ?>
-        </tbody>
-      </table>
-    </div>
-  <?php endif; ?>
+ <?php if (count($insumos) === 0): ?>
+  <div class="alert alert-warning">Este menú no tiene insumos asignados.</div>
+<?php endif; ?>
+
+<div class="table-responsive">
+  <table id="tablaInsumos" class="table table-bordered table-hover table-sm align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>Materia Prima</th>
+        <th>Unidad</th>
+        <th>Cantidad por unidad</th>
+        <th>Stock Actual</th>
+        <th>Estado</th>
+        <th title="Eliminar insumo">🗑️</th>
+      </tr>
+    </thead>
+    <tbody>
+      <?php foreach ($insumos as $insumo): ?>
+        <?php
+          $id = $insumo['ID'];
+          $requerido = $insumo['requerido'] ?? '';
+          $estado = ($requerido > 0 && $insumo['stock_actual'] < $requerido) ? 'estado-low' : 'estado-ok';
+          $estado_texto = ($estado === 'estado-low') ? '❌ Bajo' : '✅ OK';
+        ?>
+        <tr>
+          <td><?= $insumo['nombre'] ?></td>
+          <td><?= $insumo['unidad_medida'] ?></td>
+          <td><input type="number" step="0.01" min="0" name="cantidad[<?= $id ?>]" value="<?= $requerido ?>" class="form-control form-control-sm"></td>
+          <td><?= number_format($insumo['stock_actual'], 2) ?></td>
+          <td class="<?= $estado ?>"><?= $estado_texto ?></td>
+          <td class="text-center">
+            <button type="submit" name="eliminar[]" value="<?= $id ?>" class="btn btn-outline-danger btn-sm btn-delete" title="Eliminar insumo">✖</button>
+          </td>
+        </tr>
+      <?php endforeach; ?>
+    </tbody>
+  </table>
+</div>
+
 
   <button type="submit" class="btn btn-success mt-3">Guardar cambios</button>
 </form>
@@ -176,22 +177,38 @@ include("../../templates/header.php");
     });
   });
 
-  function agregarFila(mp) {
-    const existe = document.querySelector(`input[name="cantidad[${mp.ID}]"]`);
-    if (existe) return;
+function agregarFila(mp) {
+  const existe = document.querySelector(`input[name="cantidad[${mp.ID}]"]`);
+  if (existe) return;
 
-    const fila = document.createElement('tr');
-    fila.innerHTML = `
-      <td>${mp.nombre}</td>
-      <td>${mp.unidad_medida}</td>
-      <td><input type="number" step="0.01" min="0" name="cantidad[${mp.ID}]" class="form-control form-control-sm"></td>
-      <td>${parseFloat(mp.cantidad).toFixed(2)}</td>
-      <td class="text-muted">Nuevo</td>
-      <td class="text-center">—</td>
-    `;
-    tabla.appendChild(fila);
-       document.getElementById('inputBuscar').value = '';
-    document.getElementById('sugerencias').innerHTML = '';
+  const table = $('#tablaInsumos').DataTable();
+
+  const fila = table.row.add([
+    mp.nombre,
+    mp.unidad_medida,
+    `<input type="number" step="0.01" min="0" name="cantidad[${mp.ID}]" class="form-control form-control-sm">`,
+    parseFloat(mp.cantidad).toFixed(2),
+    `<span class="text-muted">Nuevo</span>`,
+    `<span class="text-center">—</span>`
+  ]).draw().node();
+
+  $(fila).addClass('table-warning');
+
+  // Ocultar sugerencias y buscador
+  document.getElementById('inputBuscar').value = '';
+  document.getElementById('sugerencias').innerHTML = '';
+  document.getElementById('buscadorInsumo').style.display = 'none';
+
+  // Eliminar alerta si existe
+  const alerta = document.querySelector('.alert-warning');
+  if (alerta) alerta.remove();
+}
+
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
     document.getElementById('buscadorInsumo').style.display = 'none';
+    document.getElementById('sugerencias').innerHTML = '';
   }
+});
+
 </script>
