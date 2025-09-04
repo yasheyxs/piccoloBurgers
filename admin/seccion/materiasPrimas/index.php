@@ -3,99 +3,134 @@ include("../../bd.php");
 
 if (isset($_GET['txtID'])) {
     $txtID = $_GET["txtID"] ?? "";
-
-    // Eliminar registro
     $sentencia = $conexion->prepare("DELETE FROM tbl_materias_primas WHERE ID=:id");
     $sentencia->bindParam(":id", $txtID);
     $sentencia->execute();
-
     header("Location:index.php");
 }
 
-// Obtener listado de materias primas
-$sentencia = $conexion->prepare("SELECT mp.*, p.nombre AS proveedor 
-  FROM tbl_materias_primas mp 
-  LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID");
+if (isset($_GET['criticos'])) {
+    $sentencia = $conexion->prepare("
+        SELECT mp.*, p.nombre AS proveedor 
+        FROM tbl_materias_primas mp 
+        LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
+        WHERE mp.cantidad <= IFNULL(mp.stock_minimo, 1)
+    ");
+} else {
+    $sentencia = $conexion->prepare("
+        SELECT mp.*, p.nombre AS proveedor 
+        FROM tbl_materias_primas mp 
+        LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
+    ");
+}
 $sentencia->execute();
 $lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 include("../../templates/header.php");
 ?>
 
+<style>
+  .stock-bajo {
+    background-color: #fff3cd !important;
+    color: #856404;
+    font-weight: bold;
+  }
+
+  .stock-cero {
+    background-color: #f8d7da !important;
+    color: #721c24;
+    font-weight: bold;
+  }
+
+  .stock-ok {
+    background-color: #d4edda !important;
+    color: #155724;
+  }
+
+  .table td, .table th {
+    vertical-align: middle;
+  }
+
+  .btn-group-filtros {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 576px) {
+    .btn-group-filtros {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+</style>
+
 <br>
 <div class="card">
-  <div class="card-header">
-    <a class="btn btn-primary" href="crear.php" role="button">Agregar materia prima</a>
+  <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <a class="btn btn-primary" href="crear.php">Agregar materia prima</a>
+    <form method="GET" class="btn-group-filtros">
+      <button type="submit" name="criticos" value="1" class="btn btn-warning">Ver insumos críticos</button>
+      <?php if (isset($_GET['criticos'])): ?>
+        <a href="index.php" class="btn btn-secondary">Mostrar todos</a>
+      <?php endif; ?>
+    </form>
   </div>
+
   <div class="card-body">
     <div class="table-responsive">
-      <table id="tablaMaterias" class="table table-bordered table-hover table-sm align-middle w-100">
+      <table id="tablaMaterias" class="table table-bordered table-hover table-sm w-100">
         <thead class="table-light">
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Unidad de medida</th>
+            <th>Unidad</th>
             <th>Cantidad</th>
             <th>Proveedor</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($lista_materias as $registro) { ?>
-            <tr>
-              <td><?php echo $registro["ID"]; ?></td>
-              <td><?php echo $registro["nombre"]; ?></td>
-              <td><?php echo $registro["unidad_medida"]; ?></td>
-              <td><?php echo $registro["cantidad"]; ?></td>
-              <td><?php echo $registro["proveedor"] ?: '—'; ?></td>
+          <?php foreach ($lista_materias as $registro): ?>
+            <?php
+              $cantidad = floatval($registro["cantidad"]);
+              $stock_minimo = floatval($registro["stock_minimo"] ?? 1);
+              $clase = ($cantidad == 0) ? 'stock-cero' : (($cantidad <= $stock_minimo) ? 'stock-bajo' : 'stock-ok');
+            ?>
+            <tr class="<?= $clase ?>">
+              <td><?= $registro["ID"] ?></td>
+              <td><?= $registro["nombre"] ?></td>
+              <td><?= $registro["unidad_medida"] ?></td>
+              <td><?= number_format($cantidad, 2) ?></td>
+              <td><?= $registro["proveedor"] ?: '—' ?></td>
               <td>
-                <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo $registro['ID']; ?>">Editar</a>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro['ID']; ?>" onclick="return confirm('¿Eliminar esta materia prima?')">Borrar</a>
+                <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= $registro['ID'] ?>">Editar</a>
+                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?= $registro['ID'] ?>" onclick="return confirm('¿Eliminar esta materia prima?')">Borrar</a>
               </td>
             </tr>
-          <?php } ?>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </div>
   </div>
-  <div class="card-footer text-muted"></div>
 </div>
 
-<!-- DataTables JS -->
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script>
   $(document).ready(function () {
-    if ($.fn.DataTable.isDataTable('#tablaMaterias')) {
-      $('#tablaMaterias').DataTable().clear().destroy();
-    }
-
     $('#tablaMaterias').DataTable({
       paging: true,
       searching: true,
       info: false,
-      lengthChange: true,
       responsive: true,
       fixedHeader: true,
       language: {
-        decimal: "",
-        emptyTable: "No hay datos disponibles en la tabla",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-        infoEmpty: "Mostrando 0 a 0 de 0 registros",
-        infoFiltered: "(filtrado de _MAX_ registros totales)",
-        lengthMenu: "Mostrar registros: _MENU_",
-        loadingRecords: "Cargando...",
-        processing: "Procesando...",
+        emptyTable: "No hay materias primas registradas",
         search: "Buscar:",
-        zeroRecords: "No se encontraron registros coincidentes",
         paginate: {
           first: "Primero",
           last: "Último",
           next: "Siguiente",
           previous: "Anterior"
-        },
-        aria: {
-          sortAscending: ": activar para ordenar la columna ascendente",
-          sortDescending: ": activar para ordenar la columna descendente"
         }
       }
     });

@@ -70,7 +70,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     <div class="alert alert-info">No hay pedidos en camino por el momento.</div>
   <?php else: ?>
     <?php foreach ($pedidos as $pedido): ?>
-      <?php
+      http://localhost/phpmyadmin/index.php?route=/database/structure&db=piccolodb<?php
       $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
       $stmt_detalle->execute([$pedido['ID']]);
       $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
