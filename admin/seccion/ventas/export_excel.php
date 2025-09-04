@@ -7,9 +7,18 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 
-// Fechas
+// Validación de fechas
+function validarFecha($fecha) {
+  return preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha);
+}
+
 $fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
+$fecha_fin_input = $_GET['fecha_fin'] ?? date('Y-m-d');
+
+if (!validarFecha($fecha_inicio)) $fecha_inicio = date('Y-m-01');
+if (!validarFecha($fecha_fin_input)) $fecha_fin_input = date('Y-m-d');
+
+$fecha_fin = $fecha_fin_input . ' 23:59:59';
 
 // Total de ventas
 $stmt = $conexion->prepare("SELECT SUM(pd.precio * pd.cantidad) AS total_ventas
@@ -55,12 +64,32 @@ $stmt->bindParam(':fin', $fecha_fin);
 $stmt->execute();
 $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+// Métodos de pago
+$stmt = $conexion->prepare("SELECT metodo_pago, COUNT(*) AS total
+    FROM tbl_pedidos
+    WHERE fecha BETWEEN :inicio AND :fin
+    GROUP BY metodo_pago");
+$stmt->bindParam(':inicio', $fecha_inicio);
+$stmt->bindParam(':fin', $fecha_fin);
+$stmt->execute();
+$metodos_pago = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Tipos de entrega
+$stmt = $conexion->prepare("SELECT tipo_entrega, COUNT(*) AS total
+    FROM tbl_pedidos
+    WHERE fecha BETWEEN :inicio AND :fin
+    GROUP BY tipo_entrega");
+$stmt->bindParam(':inicio', $fecha_inicio);
+$stmt->bindParam(':fin', $fecha_fin);
+$stmt->execute();
+$tipos_entrega = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 // Crear spreadsheet
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 
 // Título
-$sheet->setCellValue('A1', "Reporte de Ventas desde $fecha_inicio hasta $fecha_fin");
+$sheet->setCellValue('A1', "Reporte de Ventas desde $fecha_inicio hasta $fecha_fin_input");
 $sheet->mergeCells('A1:B1');
 $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
 $sheet->getRowDimension(1)->setRowHeight(30);
@@ -100,9 +129,47 @@ foreach($productos as $producto){
     $row++;
 }
 
-// Generar archivo
+// Métodos de pago
+$row += 2;
+$sheet->setCellValue("A$row", "Métodos de Pago");
+$sheet->getStyle("A$row")->getFont()->setBold(true)->setSize(14);
+$row++;
+
+$sheet->setCellValue("A$row", "Método");
+$sheet->setCellValue("B$row", "Cantidad");
+$sheet->getStyle("A$row:B$row")->getFont()->setBold(true);
+$sheet->getStyle("A$row:B$row")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('AED6F1');
+$row++;
+
+foreach($metodos_pago as $m){
+    $sheet->setCellValue("A$row", ucfirst($m['metodo_pago']));
+    $sheet->setCellValue("B$row", $m['total']);
+    $sheet->getStyle("A$row:B$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+    $row++;
+}
+
+// Tipos de entrega
+$row += 2;
+$sheet->setCellValue("A$row", "Tipos de Entrega");
+$sheet->getStyle("A$row")->getFont()->setBold(true)->setSize(14);
+$row++;
+
+$sheet->setCellValue("A$row", "Tipo");
+$sheet->setCellValue("B$row", "Cantidad");
+$sheet->getStyle("A$row:B$row")->getFont()->setBold(true);
+$sheet->getStyle("A$row:B$row")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F9E79F');
+$row++;
+
+foreach($tipos_entrega as $t){
+    $sheet->setCellValue("A$row", ucfirst($t['tipo_entrega']));
+    $sheet->setCellValue("B$row", $t['total']);
+    $sheet->getStyle("A$row:B$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+    $row++;
+}
+
+// Exportar archivo
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="reporte.xlsx"');
+header('Content-Disposition: attachment;filename="reporte_ventas.xlsx"');
 header('Cache-Control: max-age=0');
 
 $writer = new Xlsx($spreadsheet);

@@ -1,25 +1,66 @@
 <?php
 include("../../bd.php");
 
+// Inicializar variables
+$mensaje = "";
+$tipoMensaje = "";
+
+// Manejo de eliminación con validación y try/catch
 if (isset($_GET['txtID'])) {
     $txtID = $_GET["txtID"] ?? "";
 
-    // Eliminar registro de proveedor
-    $sentencia = $conexion->prepare("DELETE FROM tbl_proveedores WHERE ID=:id");
-    $sentencia->bindParam(":id", $txtID);
-    $sentencia->execute();
+    if (!is_numeric($txtID) || intval($txtID) <= 0) {
+        $mensaje = "ID inválido para eliminar proveedor.";
+        $tipoMensaje = "danger";
+    } else {
+        try {
+            // Verificar existencia antes de eliminar
+            $verificar = $conexion->prepare("SELECT COUNT(*) FROM tbl_proveedores WHERE ID = :id");
+            $verificar->bindParam(":id", $txtID, PDO::PARAM_INT);
+            $verificar->execute();
+            $existe = $verificar->fetchColumn();
 
-    header("Location:index.php");
+            if ($existe > 0) {
+                $sentencia = $conexion->prepare("DELETE FROM tbl_proveedores WHERE ID = :id");
+                $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
+                $sentencia->execute();
+
+                $mensaje = "Proveedor eliminado correctamente.";
+                $tipoMensaje = "success";
+            } else {
+                $mensaje = "El proveedor no existe o ya fue eliminado.";
+                $tipoMensaje = "warning";
+            }
+        } catch (PDOException $e) {
+            $mensaje = "Error al eliminar proveedor: " . htmlspecialchars($e->getMessage());
+            $tipoMensaje = "danger";
+        }
+    }
 }
 
-$sentencia = $conexion->prepare("SELECT * FROM tbl_proveedores");
-$sentencia->execute();
-$lista_proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+// Obtener lista de proveedores con manejo de errores
+try {
+    $sentencia = $conexion->prepare("SELECT * FROM tbl_proveedores");
+    $sentencia->execute();
+    $lista_proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $lista_proveedores = [];
+    $mensaje = "Error al cargar proveedores: " . htmlspecialchars($e->getMessage());
+    $tipoMensaje = "danger";
+}
 
 include("../../templates/header.php");
 ?>
 
 <br>
+
+<?php if ($mensaje): ?>
+  <div class="alert alert-<?php echo $tipoMensaje; ?> alert-dismissible fade show" role="alert">
+    <?php echo $mensaje; ?>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+  </div>
+<?php endif; ?>
+
 <div class="card">
   <div class="card-header">
     <a class="btn btn-primary" href="crear.php" role="button">Agregar proveedor</a>
@@ -37,18 +78,24 @@ include("../../templates/header.php");
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($lista_proveedores as $registro) { ?>
+          <?php if (!empty($lista_proveedores)) : ?>
+            <?php foreach ($lista_proveedores as $registro) { ?>
+              <tr>
+                <td><?php echo htmlspecialchars($registro["ID"]); ?></td>
+                <td><?php echo htmlspecialchars($registro["nombre"]); ?></td>
+                <td><?php echo htmlspecialchars($registro["telefono"]); ?></td>
+                <td><?php echo $registro["email"] ? htmlspecialchars($registro["email"]) : '—'; ?></td>
+                <td>
+                  <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo urlencode($registro['ID']); ?>">Editar</a>
+                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo urlencode($registro['ID']); ?>" onclick="return confirm('¿Estás seguro de eliminar este proveedor?')">Borrar</a>
+                </td>
+              </tr>
+            <?php } ?>
+          <?php else : ?>
             <tr>
-              <td><?php echo $registro["ID"]; ?></td>
-              <td><?php echo $registro["nombre"]; ?></td>
-              <td><?php echo $registro["telefono"]; ?></td>
-              <td><?php echo $registro["email"] ?: '—'; ?></td>
-              <td>
-                <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo $registro['ID']; ?>">Editar</a>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro['ID']; ?>" onclick="return confirm('¿Estás seguro de eliminar este proveedor?')">Borrar</a>
-              </td>
+              <td colspan="5" class="text-center">No se encontraron proveedores.</td>
             </tr>
-          <?php } ?>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>
