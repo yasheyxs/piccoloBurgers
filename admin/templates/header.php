@@ -58,7 +58,6 @@ $rol = $_SESSION["rol"] ?? "";
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
 
-              <!-- Gestión de personas -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="personasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Gestión de personas
@@ -69,7 +68,6 @@ $rol = $_SESSION["rol"] ?? "";
                 </ul>
               </li>
 
-              <!-- Transacciones -->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="transaccionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                   Transacciones
@@ -82,28 +80,25 @@ $rol = $_SESSION["rol"] ?? "";
             <?php } ?>
 
             <?php if (in_array($rol, ["admin", "empleado", "delivery"])) { ?>
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" href="#" id="panelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-      Paneles
-    </a>
-    <ul class="dropdown-menu" aria-labelledby="panelDropdown">
-      <?php if ($rol === "admin" || $rol === "empleado") { ?>
-        <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
-      <?php } ?>
-      <?php if ($rol === "admin" || $rol === "delivery") { ?>
-        <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
-      <?php } ?>
-    </ul>
-  </li>
-<?php } ?>
-
-
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="panelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Paneles
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="panelDropdown">
+                  <?php if ($rol === "admin" || $rol === "empleado") { ?>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
+                  <?php } ?>
+                  <?php if ($rol === "admin" || $rol === "delivery") { ?>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
+                  <?php } ?>
+                </ul>
+              </li>
+            <?php } ?>
           </ul>
 
-          <!-- Cerrar sesión -->
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link text-danger" href="<?php echo $url_base; ?>cerrar.php" title="Cerrar sesión">
+              <a class="nav-link text-danger" href="#" data-bs-toggle="modal" data-bs-target="#modalCerrarSesion" title="Cerrar sesión">
                 <i class="fa-solid fa-right-from-bracket fa-lg"></i>
               </a>
             </li>
@@ -115,3 +110,27 @@ $rol = $_SESSION["rol"] ?? "";
 
   <main>
     <section class="container">
+
+<!-- Modal de confirmación de cierre de sesión -->
+<div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-danger">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="modalCerrarSesionLabel">¿Cerrar sesión?</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que querés cerrar sesión? Esta acción te desconectará del panel de administración.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Quedarse</button>
+        <a href="<?php echo $url_base; ?>cerrar.php" class="btn btn-danger">Salir</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS para que el modal funcione -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
