@@ -1,30 +1,46 @@
 <?php
 include("../../bd.php");
 
-if (isset($_GET['txtID'])) {
-    $txtID = $_GET["txtID"] ?? "";
-    $sentencia = $conexion->prepare("DELETE FROM tbl_materias_primas WHERE ID=:id");
-    $sentencia->bindParam(":id", $txtID);
+// Eliminar materia prima con validación y manejo de errores
+if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
+  $txtID = intval($_GET["txtID"]);
+
+  try {
+    $sentencia = $conexion->prepare("DELETE FROM tbl_materias_primas WHERE ID = :id");
+    $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
     $sentencia->execute();
     header("Location:index.php");
+    exit;
+  } catch (Exception $e) {
+    error_log("Error al eliminar materia prima: " . $e->getMessage());
+    echo "<script>alert('Error al eliminar la materia prima. Intenta nuevamente.');</script>";
+  }
 }
 
-if (isset($_GET['criticos'])) {
+// Obtener lista de materias primas
+try {
+  if (isset($_GET['criticos'])) {
     $sentencia = $conexion->prepare("
-        SELECT mp.*, p.nombre AS proveedor 
-        FROM tbl_materias_primas mp 
-        LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
-        WHERE mp.cantidad <= IFNULL(mp.stock_minimo, 1)
+      SELECT mp.ID, mp.nombre, mp.unidad_medida, mp.cantidad, mp.stock_minimo, p.nombre AS proveedor 
+      FROM tbl_materias_primas mp 
+      LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
+      WHERE mp.cantidad <= IFNULL(mp.stock_minimo, 1)
     ");
-} else {
+  } else {
     $sentencia = $conexion->prepare("
-        SELECT mp.*, p.nombre AS proveedor 
-        FROM tbl_materias_primas mp 
-        LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
+      SELECT mp.ID, mp.nombre, mp.unidad_medida, mp.cantidad, mp.stock_minimo, p.nombre AS proveedor 
+      FROM tbl_materias_primas mp 
+      LEFT JOIN tbl_proveedores p ON mp.proveedor_id = p.ID
     ");
+  }
+
+  $sentencia->execute();
+  $lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Error al obtener materias primas: " . $e->getMessage());
+  $lista_materias = [];
+  echo "<script>alert('Error al cargar la lista de materias primas.');</script>";
 }
-$sentencia->execute();
-$lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 include("../../templates/header.php");
 ?>
@@ -90,24 +106,36 @@ include("../../templates/header.php");
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($lista_materias as $registro): ?>
-            <?php
-              $cantidad = floatval($registro["cantidad"]);
-              $stock_minimo = floatval($registro["stock_minimo"] ?? 1);
-              $clase = ($cantidad == 0) ? 'stock-cero' : (($cantidad <= $stock_minimo) ? 'stock-bajo' : 'stock-ok');
-            ?>
-            <tr class="<?= $clase ?>">
-              <td><?= $registro["ID"] ?></td>
-              <td><?= $registro["nombre"] ?></td>
-              <td><?= $registro["unidad_medida"] ?></td>
-              <td><?= number_format($cantidad, 2) ?></td>
-              <td><?= $registro["proveedor"] ?: '—' ?></td>
-              <td>
-                <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= $registro['ID'] ?>">Editar</a>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?= $registro['ID'] ?>" onclick="return confirm('¿Eliminar esta materia prima?')">Borrar</a>
-              </td>
-            </tr>
-          <?php endforeach; ?>
+          <?php if (count($lista_materias) > 0): ?>
+            <?php foreach ($lista_materias as $registro): ?>
+              <?php
+                $cantidad = floatval($registro["cantidad"]);
+                $stock_minimo = floatval($registro["stock_minimo"] ?? 1);
+                $clase = ($cantidad == 0) ? 'stock-cero' : (($cantidad <= $stock_minimo) ? 'stock-bajo' : 'stock-ok');
+              ?>
+              <tr class="<?= $clase ?>">
+                <td><?= htmlspecialchars($registro["ID"]) ?></td>
+                <td><?= htmlspecialchars($registro["nombre"]) ?></td>
+                <td><?= htmlspecialchars($registro["unidad_medida"]) ?></td>
+                <td><?= number_format($cantidad, 2) ?></td>
+                <td><?= htmlspecialchars($registro["proveedor"] ?? '—') ?></td>
+                <td>
+                  <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= $registro['ID'] ?>">Editar</a>
+                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?= $registro['ID'] ?>" onclick="return confirm('¿Eliminar esta materia prima?')">Borrar</a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
+  <tr>
+    <td class="text-center text-muted">—</td>
+    <td class="text-center text-muted">—</td>
+    <td class="text-center text-muted">—</td>
+    <td class="text-center text-muted">—</td>
+    <td class="text-center text-muted">—</td>
+    <td class="text-center text-muted">No se encontraron materias primas.</td>
+  </tr>
+<?php endif; ?>
+
         </tbody>
       </table>
     </div>

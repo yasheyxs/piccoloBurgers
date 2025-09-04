@@ -1,60 +1,86 @@
 <?php
 include("../../bd.php");
 
-// Obtener proveedores
-$sentencia = $conexion->prepare("SELECT ID, nombre, telefono FROM tbl_proveedores");
-$sentencia->execute();
-$lista_proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+// Inicializar listas
+$lista_proveedores = [];
+$lista_materias = [];
 
-// Obtener materias primas
-$sentencia = $conexion->prepare("SELECT ID, nombre FROM tbl_materias_primas");
-$sentencia->execute();
-$lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+try {
+  // Obtener proveedores
+  $sentencia = $conexion->prepare("SELECT ID, nombre, telefono FROM tbl_proveedores");
+  $sentencia->execute();
+  $lista_proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Error al obtener proveedores: " . $e->getMessage());
+}
+
+try {
+  // Obtener materias primas
+  $sentencia = $conexion->prepare("SELECT ID, nombre FROM tbl_materias_primas");
+  $sentencia->execute();
+  $lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  error_log("Error al obtener materias primas: " . $e->getMessage());
+}
 
 if ($_POST) {
   $fecha = $_POST["fecha"] ?? date("Y-m-d");
   $proveedor_id = $_POST["proveedor_id"] ?? null;
   $materias = $_POST["materias"] ?? [];
 
-  // Insertar compra
-  $sentencia = $conexion->prepare("INSERT INTO tbl_compras (fecha, proveedor_id) VALUES (:fecha, :proveedor_id)");
-  $sentencia->bindParam(":fecha", $fecha);
-  $sentencia->bindParam(":proveedor_id", $proveedor_id);
-  $sentencia->execute();
+  if (!$proveedor_id || !is_numeric($proveedor_id)) {
+    echo "<script>alert('Proveedor inválido.');</script>";
+  } else {
+    try {
+      $conexion->beginTransaction();
 
-  $compra_id = $conexion->lastInsertId();
-
-  // Insertar detalles
-  foreach ($materias as $item) {
-    $materia_id = $item["materia_id"] ?? null;
-    $cantidad = $item["cantidad"] ?? null;
-    $precio = $item["precio"] ?? null;
-
-    if (
-      $materia_id &&
-      is_numeric($cantidad) && $cantidad > 0 &&
-      is_numeric($precio) && $precio > 0
-    ) {
-      $sentencia = $conexion->prepare("INSERT INTO tbl_compras_detalle 
-        (compra_id, materia_prima_id, cantidad, precio_unitario) 
-        VALUES (:compra_id, :materia_id, :cantidad, :precio)");
-
-      $sentencia->bindParam(":compra_id", $compra_id);
-      $sentencia->bindParam(":materia_id", $materia_id);
-      $sentencia->bindParam(":cantidad", $cantidad);
-      $sentencia->bindParam(":precio", $precio);
+      // Insertar compra
+      $sentencia = $conexion->prepare("INSERT INTO tbl_compras (fecha, proveedor_id) VALUES (:fecha, :proveedor_id)");
+      $sentencia->bindParam(":fecha", $fecha);
+      $sentencia->bindParam(":proveedor_id", $proveedor_id, PDO::PARAM_INT);
       $sentencia->execute();
 
-      // Actualizar stock
-      $sentencia = $conexion->prepare("UPDATE tbl_materias_primas 
-        SET cantidad = cantidad + :cantidad WHERE ID = :materia_id");
-      $sentencia->bindParam(":cantidad", $cantidad);
-      $sentencia->bindParam(":materia_id", $materia_id);
-      $sentencia->execute();
+      $compra_id = $conexion->lastInsertId();
+
+      // Insertar detalles
+      foreach ($materias as $item) {
+        $materia_id = $item["materia_id"] ?? null;
+        $cantidad = $item["cantidad"] ?? null;
+        $precio = $item["precio"] ?? null;
+
+        if (
+          $materia_id && is_numeric($materia_id) &&
+          is_numeric($cantidad) && $cantidad > 0 &&
+          is_numeric($precio) && $precio > 0
+        ) {
+          $sentencia = $conexion->prepare("INSERT INTO tbl_compras_detalle 
+            (compra_id, materia_prima_id, cantidad, precio_unitario) 
+            VALUES (:compra_id, :materia_id, :cantidad, :precio)");
+
+          $sentencia->bindParam(":compra_id", $compra_id, PDO::PARAM_INT);
+          $sentencia->bindParam(":materia_id", $materia_id, PDO::PARAM_INT);
+          $sentencia->bindParam(":cantidad", $cantidad);
+          $sentencia->bindParam(":precio", $precio);
+          $sentencia->execute();
+
+          // Actualizar stock
+          $sentencia = $conexion->prepare("UPDATE tbl_materias_primas 
+            SET cantidad = cantidad + :cantidad WHERE ID = :materia_id");
+          $sentencia->bindParam(":cantidad", $cantidad);
+          $sentencia->bindParam(":materia_id", $materia_id, PDO::PARAM_INT);
+          $sentencia->execute();
+        }
+      }
+
+      $conexion->commit();
+      header("Location:index.php");
+      exit;
+    } catch (Exception $e) {
+      $conexion->rollBack();
+      error_log("Error al registrar compra: " . $e->getMessage());
+      echo "<script>alert('Error al registrar la compra. Intenta nuevamente.');</script>";
     }
   }
-
-  header("Location:index.php");
 }
 
 include("../../templates/header.php");
@@ -68,7 +94,7 @@ include("../../templates/header.php");
 
       <div class="mb-3">
         <label for="fecha" class="form-label">Fecha de compra:</label>
-        <input type="date" class="form-control" name="fecha" id="fecha" value="<?= date("Y-m-d") ?>" required>
+        <input type="date" class="form-control" name="fecha" id="fecha" value="<?= htmlspecialchars(date("Y-m-d")) ?>" required>
       </div>
 
       <div class="mb-3">
@@ -76,8 +102,8 @@ include("../../templates/header.php");
         <select class="form-select" name="proveedor_id" id="proveedor_id" required>
           <option value="">Seleccionar proveedor</option>
           <?php foreach ($lista_proveedores as $proveedor) { ?>
-            <option value="<?= $proveedor['ID'] ?>">
-              <?= $proveedor['nombre'] ?> (<?= $proveedor['telefono'] ?>)
+            <option value="<?= htmlspecialchars($proveedor['ID']) ?>">
+              <?= htmlspecialchars($proveedor['nombre']) ?> (<?= htmlspecialchars($proveedor['telefono']) ?>)
             </option>
           <?php } ?>
         </select>
