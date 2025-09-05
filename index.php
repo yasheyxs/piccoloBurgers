@@ -732,7 +732,5 @@ if ($_POST) {
   <?php include("componentes/whatsapp_button.php"); ?>
   <?php include("componentes/scroll_button.php"); ?>
 
-
 </body>
-
 </html>

@@ -44,62 +44,48 @@ if (isset($intencion_categoria[$busqueda])) {
 
 $excluir_lata = ($busqueda === "botella");
 
-$sqlTotal = "SELECT COUNT(*) FROM tbl_menu WHERE 1=1";
-$paramsTotal = [];
-
-if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $sqlTotal .= " AND categoria = ?";
-  $paramsTotal[] = $categoria;
-}
-
-if ($busqueda !== '') {
-  $sqlTotal .= " AND (LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
-  $paramsTotal[] = "%$busqueda%";
-  $paramsTotal[] = "%$busqueda%";
-  $paramsTotal[] = "%$busqueda%";
-}
-
-if ($extra !== '') {
-  $sqlTotal .= " OR LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?";
-  $paramsTotal[] = "%$extra%";
-  $paramsTotal[] = "%$extra%";
-}
-
-if ($excluir_lata) {
-  $sqlTotal .= " AND LOWER(ingredientes) NOT LIKE ?";
-  $paramsTotal[] = "%lata%";
-}
-
-$stmTotal = $conexion->prepare($sqlTotal);
-$stmTotal->execute($paramsTotal);
-$totalItems = $stmTotal->fetchColumn();
-
-$sql = "SELECT * FROM tbl_menu WHERE 1=1";
+// Construir condiciones
+$condiciones = ["visible_en_menu = 1"];
 $parametros = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $sql .= " AND categoria = ?";
+  $condiciones[] = "categoria = ?";
   $parametros[] = $categoria;
 }
 
+$busquedaCondiciones = [];
 if ($busqueda !== '') {
-  $sql .= " AND (LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
+  $busquedaCondiciones[] = "(LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
   $parametros[] = "%$busqueda%";
   $parametros[] = "%$busqueda%";
   $parametros[] = "%$busqueda%";
 }
 
 if ($extra !== '') {
-  $sql .= " OR LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?";
+  $busquedaCondiciones[] = "(LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?)";
   $parametros[] = "%$extra%";
   $parametros[] = "%$extra%";
+}
+
+if (!empty($busquedaCondiciones)) {
+  $condiciones[] = "(" . implode(" OR ", $busquedaCondiciones) . ")";
 }
 
 if ($excluir_lata) {
-  $sql .= " AND LOWER(ingredientes) NOT LIKE ?";
+  $condiciones[] = "LOWER(ingredientes) NOT LIKE ?";
   $parametros[] = "%lata%";
 }
 
+// Consulta total
+$sqlTotal = "SELECT COUNT(DISTINCT ID) FROM tbl_menu WHERE " . implode(" AND ", $condiciones);
+$stmTotal = $conexion->prepare($sqlTotal);
+$stmTotal->execute($parametros);
+$totalItems = $stmTotal->fetchColumn();
+
+// Consulta principal
+$sql = "SELECT DISTINCT * FROM tbl_menu WHERE " . implode(" AND ", $condiciones);
+
+// Ordenamiento
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
   $sql .= " ORDER BY ID DESC";
 } else {
