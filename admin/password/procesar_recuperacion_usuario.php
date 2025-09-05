@@ -7,7 +7,7 @@ $correo = trim($_POST["correo"] ?? "");
 
 echo '<div class="container mt-5"><div class="row justify-content-center"><div class="col-md-6">';
 
-if (empty($correo)) {
+if (empty($correo) || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
   echo "<div class='alert alert-danger text-center'>Por favor, ingresá un correo válido.</div>";
   echo "<div class='mt-3 text-center'><a href='recuperar_password_usuario.php' class='btn btn-secondary'>Volver</a></div>";
   include(__DIR__ . "/../templates/footer.php");
@@ -36,18 +36,17 @@ if ($usuario) {
   echo "
     <div class='alert alert-success text-center'>
       Si el correo está registrado, se ha generado un enlace de recuperación.<br><br>
-      <a href='$link' class='btn btn-success'>Haga clic aquí</a>
+      <a href='$link' class='btn btn-success'>Hacé clic aquí</a>
     </div>
   ";
 } else {
   echo "
-    <div class='alert alert-success text-center'>
-      Si el correo está registrado, se ha generado un enlace de recuperación.
+    <div class='alert alert-warning text-center'>
+      No encontramos ese correo en nuestra base.<br><br>
+      <a href='recuperar_password_usuario.php' class='btn btn-secondary'>Volver al formulario</a>
     </div>
   ";
 }
 
-echo "<div class='mt-3 text-center'><a href='recuperar_password_usuario.php' class='text-primary'>Volver al formulario</a></div>";
 echo '</div></div></div>';
-
 include(__DIR__ . "/../templates/footer.php");

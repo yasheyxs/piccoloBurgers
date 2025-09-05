@@ -1,5 +1,22 @@
 <?php
 include("../bd.php");
+
+function validarTelefono($codigo, $numero)
+{
+  $codigo = preg_replace('/[^\d]/', '', $codigo);
+  $numero = preg_replace('/[^\d]/', '', $numero);
+  $telefono = '+' . $codigo . $numero;
+
+  $longitudes = [
+    '54' => [10], '598' => [8, 9], '55' => [10, 11], '56' => [9],
+    '595' => [9], '591' => [8], '51' => [9], '1' => [10], '34' => [9]
+  ];
+
+  if (!isset($longitudes[$codigo])) return false;
+  if (!in_array(strlen($numero), $longitudes[$codigo])) return false;
+
+  return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
+}
 ?>
 
 <!doctype html>
@@ -11,7 +28,6 @@ include("../bd.php");
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" href="../../img/favicon.png" type="image/x-icon" />
-
   <style>
     :root {
       --main-gold: #fac30c;
@@ -66,17 +82,18 @@ include("../bd.php");
     <div class="col-md-8">
 
 <?php
-$telefono = trim($_POST["telefono"] ?? "");
+$codigo = trim($_POST["codigo_pais"] ?? "");
+$numero = trim($_POST["telefono"] ?? "");
+$telefonoCompleto = validarTelefono($codigo, $numero);
 
-if (empty($telefono)) {
-  echo "<div class='alert alert-danger'>Por favor, ingresá tu número de teléfono.</div>";
-  echo "<div class='mt-3'><a href='../../recuperar_password_cliente.php' class='btn btn-gold'>Volver</a></div>";
+if (empty($telefonoCompleto)) {
+  echo "<div class='alert alert-danger'>Por favor, ingresá un número válido.</div>";
+  echo "<div class='mt-3'><a href='../../recuperar_password_cliente.php' class='btn-gold'>Volver</a></div>";
   exit();
 }
 
-// Buscar cliente por teléfono
 $stmt = $conexion->prepare("SELECT * FROM tbl_clientes WHERE telefono = :telefono");
-$stmt->bindParam(":telefono", $telefono);
+$stmt->bindParam(":telefono", $telefonoCompleto);
 $stmt->execute();
 $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -87,7 +104,7 @@ if ($cliente) {
   $stmt = $conexion->prepare("UPDATE tbl_clientes SET reset_token = :token, token_expira = :expira WHERE telefono = :telefono");
   $stmt->bindParam(":token", $token);
   $stmt->bindParam(":expira", $expira);
-  $stmt->bindParam(":telefono", $telefono);
+  $stmt->bindParam(":telefono", $telefonoCompleto);
   $stmt->execute();
 
   $host = $_SERVER['HTTP_HOST'];
@@ -96,13 +113,14 @@ if ($cliente) {
   echo "
     <div class='alert alert-success'>
       Si el teléfono está registrado, se ha generado un enlace de recuperación.<br>
-      <a href='$link' class='btn-gold'>Haga clic aquí</a>
+      <a href='$link' class='btn-gold'>Hacé clic aquí</a>
     </div>
   ";
 } else {
   echo "
-    <div class='alert alert-success'>
-      Si el teléfono está registrado, se ha generado un enlace de recuperación.
+    <div class='alert alert-warning'>
+      No encontramos ese número en nuestra base.<br>
+      <a href='../../login_cliente.php' class='btn-gold'>Volver al login</a>
     </div>
   ";
 }

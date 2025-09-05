@@ -773,7 +773,7 @@ if ($_POST) {
           <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
             <i></i> Quedarme
           </button>
-          <a href="logout.php" class="btn btn-danger px-4">
+          <a href="./logout_cliente.php" class="btn btn-danger px-4">
             <i class="fas fa-door-open me-1"></i> Cerrar Sesión
           </a>
         </div>
