@@ -148,34 +148,76 @@ include("admin/bd.php"); ?>
       color: var(--text-light);
       border-color: rgba(255, 255, 255, 0.1);
     }
+
+    .nav-link i.fas.fa-user-circle,
+  .nav-link i.fas.fa-sign-out-alt {
+    font-size: 1.35rem;
+    vertical-align: middle;
+  }
   </style>
 </head>
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCarrito">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarCarrito">
-        <ul class="navbar-nav ms-auto align-items-center">
-          <li class="nav-item me-3">
-            <a class="nav-link position-relative" href="carrito.php">
-              <i class="fas fa-shopping-cart"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-                0
-              </span>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#testimonios">Testimonio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
+
+        <!-- Dropdown compacto -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+            Más
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
+            <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
+            <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+            <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
+          </ul>
+        </li>
+
+        <!-- Carrito -->
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="carrito.php">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+              0
+            </span>
+          </a>
+        </li>
+
+        <!-- Sesión -->
+        <?php if (isset($_SESSION["cliente"])): ?>
+          <li class="nav-item">
+            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <i class="fas fa-user-circle"></i>
             </a>
           </li>
           <li class="nav-item">
-            <a class="btn btn-gold" href="index.php"><i class="fas fa-chevron-left"></i> Volver</a>
+  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
+    <i class="fas fa-sign-out-alt"></i>
+  </a>
+</li>
+
+        <?php else: ?>
+          <li class="nav-item">
+            <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
           </li>
-        </ul>
-      </div>
+        <?php endif; ?>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
 
 
   <div class="container mt-5">
@@ -509,6 +551,30 @@ include("admin/bd.php"); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <!-- Modal de cierre de sesión -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-0 shadow-lg">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold" id="logoutModalLabel">
+          <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-top-0">
+        <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+          <i></i> Quedarme
+        </button>
+        <a href="logout.php" class="btn btn-danger px-4">
+          <i class="fas fa-door-open me-1"></i> Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
   <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 

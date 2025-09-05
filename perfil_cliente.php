@@ -120,10 +120,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["actualizar"])) {
   box-shadow: 0 0 8px var(--main-gold);
   transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
-
-
-
-
     .btn-gold {
     background-color: var(--main-gold);
     color: #000;
@@ -244,29 +240,75 @@ input.form-control::placeholder {
   color: #777;
 }
 
+.nav-link i.fas.fa-user-circle,
+  .nav-link i.fas.fa-sign-out-alt {
+    font-size: 1.35rem;
+    vertical-align: middle;
+  }
+
   </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
   <div class="container">
-    <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarPerfil">
+    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarPerfil">
+
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
-        <li class="nav-item">
-          <a href="perfil_cliente.php" class="nav-link"><i class="fas fa-user"></i> Mi Perfil</a>
+        <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#testimonios">Testimonio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
+
+        <!-- Dropdown compacto -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+            Más
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
+            <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
+            <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+            <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
+          </ul>
         </li>
+
+        <!-- Carrito -->
         <li class="nav-item">
-          <a href="logout_cliente.php" class="btn btn-gold ms-3">Cerrar sesión</a>
+          <a class="nav-link position-relative" href="carrito.php">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+              0
+            </span>
+          </a>
         </li>
+
+        <!-- Sesión -->
+        <?php if (isset($_SESSION["cliente"])): ?>
+          <li class="nav-item">
+            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <i class="fas fa-user-circle"></i>
+            </a>
+          </li>
+          <li class="nav-item">
+  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
+    <i class="fas fa-sign-out-alt"></i>
+  </a>
+</li>
+
+        <?php else: ?>
+          <li class="nav-item">
+            <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
+          </li>
+        <?php endif; ?>
       </ul>
     </div>
   </div>
 </nav>
-
 
 <div class="container mt-5">
   <h2 class="mb-4 text-center">👤 Información del Cliente</h2>
@@ -492,8 +534,35 @@ async function actualizarHistorial() {
   }
 });
 
+
+
 </script>
 
+<!-- Modal de cierre de sesión -->
+<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content bg-dark text-white border-0 shadow-lg">
+      <div class="modal-header border-bottom-0">
+        <h5 class="modal-title fw-bold" id="logoutModalLabel">
+          <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
+      </div>
+      <div class="modal-footer justify-content-center border-top-0">
+        <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+          <i></i> Quedarme
+        </button>
+        <a href="logout.php" class="btn btn-danger px-4">
+          <i class="fas fa-door-open me-1"></i> Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 
+<?php include("componentes/carrito_button.php"); ?>
 </body>
 </html>

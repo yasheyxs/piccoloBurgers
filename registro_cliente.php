@@ -143,17 +143,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       transform: scale(1.05);
     }
   </style>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> PICCOLO BURGERS</a>
     </div>
   </nav>
 
   <div class="container mt-5">
     <h2 class="text-center mb-4">Registro de Cliente</h2>
+
+    <div class="d-flex justify-content-end mb-3">
+      <a href="login_cliente.php" class="btn btn-gold" style="border-radius: 30px; padding: 8px 20px;">
+        ← Volver
+      </a>
+    </div>
 
     <?= $mensaje ?>
 
@@ -179,11 +188,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           </select>
           <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
         </div>
-        <small class="form-text text-muted">Ingresá tu número sin el 0 ni el +. Ejemplo: 3511234567</small>
+        
       </div>
-
-
-
 
       <div class="mb-3">
         <label for="email" class="form-label">Email (opcional):</label>
@@ -205,6 +211,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
       <button type="submit" class="btn btn-gold w-100">Registrarse</button>
     </form>
+
+
   </div>
 
   <script>
