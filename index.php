@@ -2,50 +2,35 @@
 <?php
 include("admin/bd.php");
 
-$categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"]; // Categorías disponibles
-
-$categoria_seleccionada = $_GET['categoria'] ?? '';
-$lista_menu = [];
-// Verificar si la categoría seleccionada es válida
-$sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC limit 1 ");
+// Obtener banners
+$sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC LIMIT 1");
 $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
 // Obtener testimonios
 $sentencia = $conexion->prepare("SELECT * FROM tbl_testimonios ORDER BY id DESC");
 $sentencia->execute();
 $lista_testimonios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-// Filtrar el menú por categoría si se ha seleccionado una
-if ($categoria_seleccionada && in_array($categoria_seleccionada, $categorias_disponibles)) {
-  $sentencia = $conexion->prepare("SELECT * FROM tbl_menu WHERE categoria = ? ORDER BY id DESC");
-  $sentencia->execute([$categoria_seleccionada]);
-  $lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-} else {// Si no se ha seleccionado una categoría o es inválida, mostrar todo el menú
-  $limite = $_GET['limite'] ?? 8; // Mostrar los primeros 8 por defecto
-$sentencia = $conexion->prepare("SELECT * FROM tbl_menu ORDER BY id DESC LIMIT ?");
-$sentencia->bindParam(1, $limite, PDO::PARAM_INT);
-$sentencia->execute();
-$lista_menu = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
-}
 // Procesar el formulario de contacto
 if ($_POST) {
   $nombre = filter_var($_POST["nombre"], FILTER_SANITIZE_STRING);
   $correo = filter_var($_POST["correo"], FILTER_VALIDATE_EMAIL);
   $mensaje = filter_var($_POST["mensaje"], FILTER_SANITIZE_STRING);
-  // Validar campos
-  if ($nombre && $correo && $mensaje) {
-    $sql = "INSERT INTO tbl_comentarios (nombre, correo, mensaje)
-                VALUES (:nombre, :correo, :mensaje)";
 
+  if ($nombre && $correo && $mensaje) {
+    $sql = "INSERT INTO tbl_comentarios (nombre, correo, mensaje) VALUES (:nombre, :correo, :mensaje)";
     $resultado = $conexion->prepare($sql);
     $resultado->bindParam(':nombre', $nombre, PDO::PARAM_STR);
     $resultado->bindParam(':correo', $correo, PDO::PARAM_STR);
     $resultado->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
     $resultado->execute();
-  }// Si el formulario se envió correctamente, redirigir a la página de inicio
+  }
+
   header("Location:index.php");
 }
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -63,7 +48,7 @@ if ($_POST) {
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
 
   <!-- AOS CSS -->
-<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 
 
   <style>
@@ -99,10 +84,11 @@ if ($_POST) {
       margin-top: 1rem;
     }
 
-table {
+    table {
       width: 100%;
       word-wrap: break-word;
     }
+
     h1 {
       font-size: 4rem;
     }
@@ -204,8 +190,8 @@ table {
     }
 
     #contenedor-menu .card {
-  min-height: 250px;
-}
+      min-height: 250px;
+    }
 
     .form-control {
       background-color: var(--gray-bg);
@@ -340,7 +326,7 @@ table {
       text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
     }
 
-  /* jumbotron */
+    /* jumbotron */
     .jumbotron {
       margin-bottom: 3rem;
       padding: 2rem;
@@ -357,47 +343,46 @@ table {
 
     /* ScrollTop button */
     #scrollTopBtn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  background-color: var(--main-gold);
-  color: #000;
-  font-size: 1.8rem;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 999;
-  transition: transform 0.3s, box-shadow 0.3s;
-  text-decoration: none;
-}
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background-color: var(--main-gold);
+      color: #000;
+      font-size: 1.8rem;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      transition: transform 0.3s, box-shadow 0.3s;
+      text-decoration: none;
+    }
 
-#scrollTopBtn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
-  color: #000;
-  text-decoration: none;
-}
+    #scrollTopBtn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+      color: #000;
+      text-decoration: none;
+    }
 
-.alert-warning {
-  background-color: #3a2a00;
-  color: #fac30c;
-  border: 1px solid #fac30c;
-}
+    .alert-warning {
+      background-color: #3a2a00;
+      color: #fac30c;
+      border: 1px solid #fac30c;
+    }
 
-.alert-warning .btn-gold:hover {
-  color: #3a2a00 !important;
-}
+    .alert-warning .btn-gold:hover {
+      color: #3a2a00 !important;
+    }
 
-#btn-mostrar-mas {
-  display: block;
-  margin: 20px auto;
-  text-align: center;
-}
-
+    #btn-mostrar-mas {
+      display: block;
+      margin: 20px auto;
+      text-align: center;
+    }
   </style>
 
 </head>
@@ -443,14 +428,14 @@ table {
   </nav>
 
   <?php if (!isset($_SESSION["cliente"])): ?>
-  <section class="container mt-3 text-center">
-    <div class="alert alert-warning alert-dismissible fade show" role="alert" data-aos-up="fade-up" data-aos="fade-up" style="font-weight: bold; font-size: 1.2rem;">
-      🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
-      <a href="login_cliente.php" class="btn btn-sm btn-gold ms-3">Iniciar sesión / Registrarse</a>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-    </div>
-  </section>
-<?php endif; ?>
+    <section class="container mt-3 text-center">
+      <div class="alert alert-warning alert-dismissible fade show" role="alert" data-aos-up="fade-up" data-aos="fade-up" style="font-weight: bold; font-size: 1.2rem;">
+        🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
+        <a href="login_cliente.php" class="btn btn-sm btn-gold ms-3">Iniciar sesión / Registrarse</a>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    </section>
+  <?php endif; ?>
 
 
   <section class="container-fluid p-0">
@@ -493,90 +478,68 @@ table {
   </section>
 
   <section id="menu" class="container my-5">
-  <h2 class="text-center mb-4">Nuestro Menú</h2>
+    <h2 class="text-center mb-4">Nuestro Menú</h2>
 
-  <!-- Controles de filtrado -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
-    </div>
-    <div class="col-md-6">
-      <select id="categoria" class="form-select">
-        <option value="">Todas las categorías</option>
-        <option value="Acompañamientos">Acompañamientos</option>
-        <option value="Hamburguesas">Hamburguesas</option>
-        <option value="Bebidas">Bebidas</option>
-        <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
-        <option value="Pizzas">Pizzas</option>
-      </select>
-    </div>
-  </div>
-
-
-    <div id="contenedor-menu" class="row row-cols-2 row-cols-md-4 g-4">
-
-  <?php foreach ($lista_menu as $registro) { ?>
-    <div class="col d-flex" data-aos-up="fade-up" data-aos="fade-up">
-      <div class="card position-relative d-flex flex-column h-100 w-100">
-        <img src="img/menu/<?php echo $registro["foto"]; ?>" class="card-img-top" alt="Foto de <?php echo $registro["nombre"]; ?>">
-        <div class="card-body d-flex flex-column">
-          <h5 class="card-title"><?php echo $registro["nombre"]; ?></h5>
-          <p class="card-text small"><strong><?php echo $registro["ingredientes"]; ?></strong></p>
-          <p class="card-text"><strong>Precio:</strong> $<?php echo $registro["precio"]; ?></p>
-          <p class="card-text"><small><em><?php echo $registro["categoria"] ?? ''; ?></em></small></p>
-          <button class="btn btn-agregar mt-auto"
-            data-id="<?php echo $registro['ID']; ?>"
-            data-nombre="<?php echo $registro['nombre']; ?>"
-            data-precio="<?php echo $registro['precio']; ?>"
-            data-img="img/menu/<?php echo $registro['foto']; ?>">
-            Agregar
-          </button>
-        </div>
+    <!-- Controles de filtrado -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
+      </div>
+      <div class="col-md-6">
+        <select id="categoria" class="form-select">
+          <option value="">Todas las categorías</option>
+          <option value="Acompañamientos">Acompañamientos</option>
+          <option value="Hamburguesas">Hamburguesas</option>
+          <option value="Bebidas">Bebidas</option>
+          <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
+          <option value="Pizzas">Pizzas</option>
+        </select>
       </div>
     </div>
-  <?php } ?>
-</div>
-<div class="text-center mt-4" data-aos="fade-in" data-aos-duration="500">
-  <button id="btn-mostrar-mas" class="btn-gold">Mostrar más</button>
-</div>
 
-</section>
+    <!-- Contenedor de tarjetas -->
+    <div id="contenedor-menu" class="row row-cols-2 row-cols-md-4 g-4">
+      <!-- Las tarjetas se insertan dinámicamente -->
+    </div>
 
+    <!-- Contenedor del botón "Mostrar más" -->
+    <div id="contenedor-boton-mas" class="text-center mt-4"></div>
   </section>
 
+
   <section id="nosotros" class="container mt-5">
-  <h2 class="text-center mb-4">Nosotros</h2>
-  <div class="jumbotron p-4"  data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
-    <p class="lead text-center" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">
-      En <strong>Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad. Nuestro compromiso es ofrecerte una experiencia gastronómica inolvidable, con un servicio cálido y un ambiente acogedor. ¡Gracias por elegirnos para compartir momentos deliciosos!
-    </p>
-  </div>
-</section>
-
-<section id="puntos" class="container mt-5">
-  <h2 class="text-center mb-4">Sistema de puntos</h2>
-  <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
-    <p class="lead text-center" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
-      Cada vez que hacés un pedido registrado, <strong>ganás puntos</strong> que podés canjear por <strong>descuentos exclusivos</strong> en tus próximas compras.  
-      <br><br>
-      Cuanto más pedís, <strong>más ahorrás</strong> 🍔✨
-    </p>
-  </div>
-</section>
-
-<section id="ubicacion" class="container-fluid p-5 text-center" style="background: linear-gradient(to top, #1a1a1a, #111);">
-  <h2 class="mb-4" data-aos="fade-up">Nuestra Ubicación</h2>
-  <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Encontranos fácilmente en nuestro local 🍔✨</p>
-  <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-delay="200">
-    <div class="shadow-lg" style="width: 350px; height: 350px; border-radius: 15px; overflow: hidden;">
-      <iframe
-        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.107065015397!2d-63.53723899007664!3d-31.548676202549203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94332a4ac325a7ad%3A0x91ff9ca646897a8f!2s25%20de%20Mayo%201295%2C%20X5963%20Villa%20del%20Rosario%2C%20C%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1756841415057!5m2!1ses-419!2sar"
-        width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
-      </iframe>
+    <h2 class="text-center mb-4">Nosotros</h2>
+    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+      <p class="lead text-center" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">
+        En <strong>Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad. Nuestro compromiso es ofrecerte una experiencia gastronómica inolvidable, con un servicio cálido y un ambiente acogedor. ¡Gracias por elegirnos para compartir momentos deliciosos!
+      </p>
     </div>
-  </div>
-</section>
+  </section>
+
+  <section id="puntos" class="container mt-5">
+    <h2 class="text-center mb-4">Sistema de puntos</h2>
+    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
+      <p class="lead text-center" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
+        Cada vez que hacés un pedido registrado, <strong>ganás puntos</strong> que podés canjear por <strong>descuentos exclusivos</strong> en tus próximas compras.
+        <br><br>
+        Cuanto más pedís, <strong>más ahorrás</strong> 🍔✨
+      </p>
+    </div>
+  </section>
+
+  <section id="ubicacion" class="container-fluid p-5 text-center" style="background: linear-gradient(to top, #1a1a1a, #111);">
+    <h2 class="mb-4" data-aos="fade-up">Nuestra Ubicación</h2>
+    <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Encontranos fácilmente en nuestro local 🍔✨</p>
+    <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-delay="200">
+      <div class="shadow-lg" style="width: 350px; height: 350px; border-radius: 15px; overflow: hidden;">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.107065015397!2d-63.53723899007664!3d-31.548676202549203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94332a4ac325a7ad%3A0x91ff9ca646897a8f!2s25%20de%20Mayo%201295%2C%20X5963%20Villa%20del%20Rosario%2C%20C%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1756841415057!5m2!1ses-419!2sar"
+          width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+      </div>
+    </div>
+  </section>
 
   <section id="contacto" class="container mt-4" data-aos-up="fade-up" data-aos="fade-up">
     <h2>Contacto</h2>
@@ -616,334 +579,160 @@ table {
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({
+      once: false,
+      duration: 800
+    });
+  </script>
 
   <script>
-    // Actualizar contador de carrito al cargar la página
+    const buscadorInput = document.getElementById("buscador-menu");
+    const categoriaSelect = document.getElementById("categoria");
+    const contenedor = document.getElementById("contenedor-menu");
+    const contenedorBotonMas = document.getElementById("contenedor-boton-mas");
+
+    let offset = 0;
+    const limit = 8;
+    let btnMostrarMas = null;
+
     function actualizarContador() {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-      document.getElementById("contador-carrito").textContent = carrito.length;
+      const contador = document.getElementById("contador-carrito");
+      if (contador) contador.textContent = carrito.length;
     }
-// Agregar evento a los botones de agregar al carrito
-    document.querySelectorAll(".btn-agregar").forEach(boton => {
-      boton.addEventListener("click", () => {
-        const item = {
-          id: boton.dataset.id,
-          nombre: boton.dataset.nombre,
-          precio: parseFloat(boton.dataset.precio),
-          img: boton.dataset.img
-        }; // Obtener el carrito del localStorage o inicializarlo si no existe
-        // Agregar el item al carrito
-        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-        carrito.push(item);
-        localStorage.setItem("carrito", JSON.stringify(carrito));
-        actualizarContador();
 
-        // Mostrar nombre en el toast
-        document.getElementById("toastProductoNombre").textContent = item.nombre;
+    function onAddClick(e) {
+      const boton = e.currentTarget;
+      const item = {
+        id: boton.dataset.id,
+        nombre: boton.dataset.nombre,
+        precio: parseFloat(boton.dataset.precio),
+        img: boton.dataset.img
+      };
+      let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      carrito.push(item);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
+      actualizarContador();
 
-        // Mostrar toast
-        const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), {
+      const toastNombre = document.getElementById("toastProductoNombre");
+      if (toastNombre) toastNombre.textContent = item.nombre;
+
+      const toastEl = document.getElementById("toastAgregado");
+      if (toastEl) {
+        const toast = new bootstrap.Toast(toastEl, {
           delay: 2500
         });
         toast.show();
-
-      });
-    });
-
-    window.onload = actualizarContador;
-  </script>
-
-  <a href="#top" id="scrollTopBtn" class="btn btn-gold" style="
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 999;
-  display: none;
-  font-size: 1.5rem;
-  border-radius: 50%;
-  padding: 12px 16px;
-">
-    <i class="fas fa-arrow-up"></i>
-  </a>
-
-  <script>
-    // Mostrar u ocultar botón de flecha según scroll
-    window.onscroll = function() {
-      const btn = document.getElementById("scrollTopBtn");
-      if (document.body.scrollTop > 200 || document.documentElement.scrollTop > 200) {
-        btn.style.display = "block";
-      } else {
-        btn.style.display = "none";
       }
-    };
-  </script>
 
-  <script>
-    // Filtrar el menú por categoría al cambiar el select
-    document.getElementById("categoria").addEventListener("change", function() {
-      const categoria = this.value;
-      fetch("filtrar_menu.php?categoria=" + encodeURIComponent(categoria)) // Llamar al script que filtra el menú
+    }
+
+    function reattachAddButtons() {
+      document.querySelectorAll(".btn-agregar").forEach(b => {
+        b.removeEventListener('click', onAddClick);
+        b.addEventListener('click', onAddClick);
+      });
+    }
+
+    function debounce(fn, wait = 200) {
+      let t;
+      return (...args) => {
+        clearTimeout(t);
+        t = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    function filtrarMenu(reset = true) {
+      const texto = buscadorInput.value.trim();
+      const categoria = categoriaSelect.value;
+
+      if (reset) {
+        offset = 0;
+        contenedor.innerHTML = "";
+        contenedorBotonMas.innerHTML = "";
+      }
+
+      fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
+        .then(resp => resp.text())
+        .then(html => {
+          const temp = document.createElement("div");
+          temp.innerHTML = html;
+
+          const tarjetas = temp.querySelectorAll(".col");
+          tarjetas.forEach(t => contenedor.appendChild(t));
+
+          const boton = temp.querySelector("#btn-mostrar-mas");
+          if (boton) {
+            contenedorBotonMas.innerHTML = "";
+            contenedorBotonMas.appendChild(boton);
+            boton.addEventListener("click", cargarMasProductos);
+          }
+
+          reattachAddButtons();
+          AOS.refresh();
+        })
+        .catch(err => {
+          console.error("Error al filtrar menú:", err);
+        });
+    }
+
+    function cargarMasProductos() {
+      const categoria = categoriaSelect.value;
+      const texto = buscadorInput.value.trim();
+
+      fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
         .then(response => response.text())
         .then(html => {
-    document.getElementById("contenedor-menu").innerHTML = html;
+          const temp = document.createElement("div");
+          temp.innerHTML = html;
 
-    // Volver a activar AOS
-    AOS.refresh();
+          const tarjetas = temp.querySelectorAll(".col");
+          tarjetas.forEach(t => contenedor.appendChild(t));
 
-    document.querySelectorAll(".btn-agregar").forEach(boton => {
-        boton.addEventListener("click", () => {
-            const item = {
-                id: boton.dataset.id,
-                nombre: boton.dataset.nombre,
-                precio: parseFloat(boton.dataset.precio),
-                img: boton.dataset.img
-            };
-            let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-            carrito.push(item);
-            localStorage.setItem("carrito", JSON.stringify(carrito));
-            actualizarContador();
+          const boton = temp.querySelector("#btn-mostrar-mas");
+          contenedorBotonMas.innerHTML = "";
+          if (boton) {
+            contenedorBotonMas.appendChild(boton);
+            boton.addEventListener("click", cargarMasProductos);
+          }
 
-            document.getElementById("nombreProductoAgregado").textContent = item.nombre;
-            const modal = new bootstrap.Modal(document.getElementById("popupAgregado"));
-            modal.show();
+          offset += limit;
+          reattachAddButtons();
+          AOS.refresh();
+        })
+        .catch(error => {
+          console.error("Error al cargar más productos:", error);
         });
-    });
-});
+    }
 
+    buscadorInput.addEventListener("input", debounce(() => filtrarMenu(true), 300));
+    categoriaSelect.addEventListener("change", () => filtrarMenu(true));
+
+    window.addEventListener("DOMContentLoaded", () => {
+      actualizarContador();
+      filtrarMenu(true);
     });
   </script>
 
-  <!-- Toast de producto -->
-  <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1100">
-    <div id="toastAgregado" class="toast align-items-center text-white bg-success border-0 shadow" role="alert" aria-live="assertive" aria-atomic="true">
+  <!-- Toast fijo en el DOM -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
+    <div id="toastAgregado" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
       <div class="d-flex">
         <div class="toast-body">
-          <strong id="toastProductoNombre"></strong> fue agregado al carrito.
+          Producto <span id="toastProductoNombre"></span> agregado al carrito.
         </div>
         <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
       </div>
     </div>
   </div>
-  
+
   <?php include("componentes/carrito_button.php"); ?>
   <?php include("componentes/whatsapp_button.php"); ?>
-
-<!-- AOS JS -->
-<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
-<script>
-  AOS.init({ once: false, duration: 800 });
-</script>
-
-<script>
-  const buscadorInput = document.getElementById("buscador-menu");
-  const categoriaSelect = document.getElementById("categoria");
-  const contenedor = document.getElementById("contenedor-menu");
-
-  function actualizarContador() {
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    const contador = document.getElementById("contador-carrito");
-    if (contador) contador.textContent = carrito.length;
-  }
-
-  function onAddClick(e) {
-    const boton = e.currentTarget;
-    const item = {
-      id: boton.dataset.id,
-      nombre: boton.dataset.nombre,
-      precio: parseFloat(boton.dataset.precio),
-      img: boton.dataset.img
-    };
-    let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    carrito.push(item);
-    localStorage.setItem("carrito", JSON.stringify(carrito));
-    actualizarContador();
-
-    // toast
-    const toastNombre = document.getElementById("toastProductoNombre");
-    if (toastNombre) toastNombre.textContent = item.nombre;
-    const toastEl = document.getElementById("toastAgregado");
-    if (toastEl) {
-      const toast = new bootstrap.Toast(toastEl, { delay: 2500 });
-      toast.show();
-    }
-  }
-
-  function reattachAddButtons() {
-    document.querySelectorAll(".btn-agregar").forEach(b => {
-      b.removeEventListener('click', onAddClick); // evitar duplicados
-      b.addEventListener('click', onAddClick);
-    });
-  }
-
-  // Debounce simple
-  function debounce(fn, wait = 200) {
-    let t;
-    return (...args) => {
-      clearTimeout(t);
-      t = setTimeout(() => fn(...args), wait);
-    };
-  }
-
-function filtrarMenu() {
-  const texto = buscadorInput.value.trim();
-  const categoria = categoriaSelect.value;
-
-  offset = 0;
-  if (buscadorInput.value.trim().length > 0) {
-    btnMostrarMas.style.display = "none";
-  } else {
-    btnMostrarMas.style.display = "block";
-    btnMostrarMas.style.opacity = "1";
-    btnMostrarMas.style.pointerEvents = "auto";
-  }
-
-  fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}`)
-    .then(resp => resp.text())
-    .then(html => {
-      contenedor.innerHTML = html;
-
-      reattachAddButtons();
-
-      if (window.AOS && typeof AOS.refresh === "function") {
-        AOS.refresh();
-      }
-    })
-    .catch(err => {
-      console.error("Error al filtrar menú:", err);
-    });
-}
+  <?php include("componentes/scroll_button.php"); ?>
 
 
-  // Listeners
-  categoriaSelect.addEventListener("change", filtrarMenu);
-  buscadorInput.addEventListener("input", debounce(filtrarMenu, 250));
-
-  // Al cargar la página
-  window.addEventListener('load', () => {
-    actualizarContador();
-    // Hace una carga por AJAX para garantizar mismo orden/atributos que filtrar_menu.php
-    filtrarMenu();
-  });
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const contenedorMenu = document.getElementById("contenedor-menu");
-    const buscador = document.getElementById("buscador-menu");
-    const selectorCategoria = document.getElementById("categoria");
-
-    // Función para cargar productos desde filtrar_menu.php
-    function cargarProductos(categoria = "", busqueda = "") {
-        fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(busqueda)}`)
-            .then(response => response.text())
-            .then(html => {
-                contenedorMenu.innerHTML = html;
-
-                // Refrescar animaciones AOS
-                AOS.refresh();
-
-                // Volver a enlazar botones de agregar al carrito
-                document.querySelectorAll(".btn-agregar").forEach(boton => {
-                    boton.addEventListener("click", () => {
-                        const item = {
-                            id: boton.dataset.id,
-                            nombre: boton.dataset.nombre,
-                            precio: parseFloat(boton.dataset.precio),
-                            img: boton.dataset.img
-                        };
-
-                        let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-                        carrito.push(item);
-                        localStorage.setItem("carrito", JSON.stringify(carrito));
-
-                        actualizarContador();
-
-                        // Mostrar toast
-document.getElementById("toastProductoNombre").textContent = item.nombre;
-const toast = new bootstrap.Toast(document.getElementById("toastAgregado"), {
-  delay: 2500
-});
-toast.show();
-
-                    });
-                });
-            })
-            .catch(error => console.error("Error al cargar productos:", error));
-    }
-
-    // Carga inicial
-    cargarProductos();
-
-    // Filtrar por categoría
-    selectorCategoria.addEventListener("change", () => {
-  // Restaurar botón
-offset = 0;
-btnMostrarMas.style.display = "block";
-btnMostrarMas.style.opacity = "1";
-btnMostrarMas.style.pointerEvents = "auto";
-
-  cargarProductos(selectorCategoria.value, buscador.value);
-});
-    // Filtrar por buscador
-    buscador.addEventListener("input", () => {
-        
-        offset = 0;
-btnMostrarMas.style.display = "block";
-btnMostrarMas.style.opacity = "1";
-btnMostrarMas.style.pointerEvents = "auto";
-cargarProductos(selectorCategoria.value, buscador.value);
-
-    });
-});
-</script>
-<script>
-let offset = 0;
-const limit = 8;
-const btnMostrarMas = document.getElementById("btn-mostrar-mas");
-
-btnMostrarMas.addEventListener("click", () => {
-  const categoria = document.getElementById("categoria").value;
-  const busqueda = document.getElementById("buscador-menu").value;
-
-  fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(busqueda)}&offset=${offset}&limit=${limit}`)
-    .then(response => response.text())
-    .then(html => {
-  if (html.includes("ultima-carga")) {
-  btnMostrarMas.style.pointerEvents = "none";
-  setTimeout(() => {
-    btnMostrarMas.style.display = "none";
-  }, 300);
-}
-
-
-  if (html.trim()) {
-  document.getElementById("contenedor-menu").insertAdjacentHTML("beforeend", html);
-  offset += limit;
-  AOS.refresh();
-  reattachAddButtons();
-}
-
-})
-
-    .catch(error => {
-      console.error("Error al cargar más productos:", error);
-    });
-});
-
-buscadorInput.addEventListener('input', () => {
-  const q = input.value.trim();
-  offset = 0;
-  grid.innerHTML = '';
-
-  if (q.length > 0) {
-    btnMostrarMas.style.display = 'none';
-  } else {
-    btnMostrarMas.style.display = 'block';
-  }
-
-  buscar(q);
-});
-
-
-</script>
 </body>
+
 </html>
