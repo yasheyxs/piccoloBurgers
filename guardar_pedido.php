@@ -93,10 +93,11 @@ foreach ($carrito as $item) {
     foreach ($insumos as $insumo) {
         $consumo = $insumo['requerido'] * $cantidadVendida;
         if ($insumo['stock_actual'] < $consumo) {
-            responder_error("Stock insuficiente de " . $insumo['nombre']);
+            responder_error("Ups... hubo un inconveniente al procesar tu pedido. Por favor, revisá tu carrito o intentá nuevamente en unos minutos.");
         }
     }
 }
+
 
 try {
     $estado_inicial = "En preparación";
