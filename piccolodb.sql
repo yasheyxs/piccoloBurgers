@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 04, 2025 at 08:37 AM
+-- Generation Time: Sep 05, 2025 at 06:27 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -54,17 +54,21 @@ CREATE TABLE `tbl_clientes` (
   `email` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
-  `puntos` int(11) DEFAULT NULL
+  `puntos` int(11) DEFAULT 0,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_clientes`
 --
 
-INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`) VALUES
-(2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25),
-(3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0),
-(4, 'Yass', '123', '', '$2y$10$8Xdt5f5TSd91nY6auzztgOr3IFIvlMmn5YjA9d53KwMmYD1mRDYPa', '2025-07-29 19:11:37', 159);
+INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`, `reset_token`, `token_expira`) VALUES
+(2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
+(3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
+(4, 'Yass', '123', '', '$2y$10$ymoDnjJqsUC7idNrtSc6huvuuZLymLrYJT0fkAFqLV4OVli3vVHry', '2025-07-29 19:11:37', 159, NULL, NULL),
+(5, 'Morrón', '543573451913', '', '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
+(6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -78,6 +82,20 @@ CREATE TABLE `tbl_comentarios` (
   `correo` varchar(255) NOT NULL,
   `mensaje` varchar(255) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_comentarios`
+--
+
+INSERT INTO `tbl_comentarios` (`ID`, `nombre`, `correo`, `mensaje`) VALUES
+(4, 'Feedback', 'Feedback@gmail.com', 'Feedback'),
+(5, 'Feedback', 'Feedback@gmail.com', 'feedback'),
+(6, 'Feedback', 'Feedback@gmail.com', 'feedback'),
+(7, 'Feedback', 'delivery@gmail.com', 'feedback'),
+(8, 'Feedback', 'Feedback@gmail.com', 'feedback'),
+(9, 'Feedback', 'Feedback@gmail.com', 'feedback'),
+(10, 'Feedback', 'Feedback@gmail.com', 'feed'),
+(11, 'Feedback', 'Feedback@gmail.com', 'feed');
 
 -- --------------------------------------------------------
 
@@ -161,31 +179,31 @@ CREATE TABLE `tbl_materias_primas` (
 --
 
 INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, `proveedor_id`, `unidades_por_pack`, `stock_minimo`) VALUES
-(1, 'Tomate', 'kg', 3.50, 20, 1, NULL),
-(2, 'Lechuga', 'kg', 3.51, 0, 1, NULL),
+(1, 'Tomate', 'kg', 3.44, 20, 1, NULL),
+(2, 'Lechuga', 'kg', 3.45, 0, 1, NULL),
 (3, 'Morrón', 'kg', 2.08, 24, 1, NULL),
 (4, 'Cebolla', 'kg', 2.86, 1, 1, NULL),
-(5, 'Carne molida de cerdo', 'kg', 3.04, 21, 1, NULL),
-(6, 'Carne molida de vaca', 'kg', 1.64, 21, 1, NULL),
+(5, 'Carne molida de cerdo', 'kg', 2.98, 21, 1, NULL),
+(6, 'Carne molida de vaca', 'kg', 1.54, 21, 1, NULL),
 (7, 'Carne de lomo', 'kg', 2.06, 1, 1, NULL),
 (8, 'Pan de lomo', 'unidad', 36.00, 0, 1, NULL),
-(9, 'Pan de hamburguesa', 'unidad', 43.00, 0, 1, NULL),
+(9, 'Pan de hamburguesa', 'unidad', 41.00, 0, 1, NULL),
 (10, 'Mayonesa', 'litro', 4.39, 19, 1, NULL),
-(11, 'Mostaza', 'litro', 2.77, 1, 1, NULL),
-(12, 'Ketchup', 'litro', 3.67, 1, 1, NULL),
+(11, 'Mostaza', 'litro', 2.75, 1, 1, NULL),
+(12, 'Ketchup', 'litro', 3.65, 1, 1, NULL),
 (13, 'Salsa BBQ', 'litro', 1.06, 1, 1, NULL),
-(14, 'Queso Tybo', 'kg', 1.28, 1, 1, NULL),
+(14, 'Queso Tybo', 'kg', 1.18, 1, 1, NULL),
 (15, 'Queso Cheddar', 'kg', 2.21, 1, 1, NULL),
 (16, 'Queso Cheddar Litro', 'litro', 2.23, 1, 1, NULL),
 (17, 'Jamón cocido', 'kg', 3.51, 1, 1, NULL),
 (18, 'Huevo', 'unidad', 35.00, 0, 1, NULL),
 (19, 'Panceta', 'kg', 1.85, 1, 1, NULL),
 (20, 'Salsa Piccolo', 'litro', 1.73, 1, 1, NULL),
-(21, 'Pepinillos', 'kg', 2.10, 0, 1, NULL),
+(21, 'Pepinillos', 'kg', 2.08, 0, 1, NULL),
 (22, 'Bondiola', 'kg', 4.30, 1, 1, NULL),
 (23, 'Cebolla morada', 'kg', 2.19, 1, 1, NULL),
 (24, 'Milanesa Vegetariana', 'unidad', 38.00, 1, 1, NULL),
-(25, 'Milanesa de pollo', 'kg', 1.04, 1, 1, NULL),
+(25, 'Milanesa de pollo', 'kg', 0.88, 1, 1, NULL),
 (26, 'Milanesa de carne', 'kg', 1.66, 1, 1, NULL),
 (27, 'Prepizza', 'unidad', 35.00, 1, 1, NULL),
 (28, 'Aceituna', 'tarro', 4.19, 1, 1, NULL),
@@ -214,7 +232,7 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (117, 'Milanesa de carne', 'unidad', 33.00, 1, 1, 5.00),
 (118, 'Suprema de pollo', 'unidad', 45.00, 1, 1, 5.00),
 (119, 'Nugget de pollo', 'unidad', 33.00, 1, 1, 10.00),
-(120, 'Papas fritas', 'kg', 7.00, 17, 1, NULL),
+(120, 'Papas fritas', 'kg', 6.70, 17, 1, NULL),
 (121, 'Aros de cebolla', 'kg', 7.00, 17, 1, NULL);
 
 -- --------------------------------------------------------
@@ -229,71 +247,72 @@ CREATE TABLE `tbl_menu` (
   `ingredientes` varchar(255) NOT NULL,
   `foto` varchar(255) NOT NULL,
   `precio` varchar(255) NOT NULL,
-  `categoria` varchar(30) NOT NULL DEFAULT 'General'
+  `categoria` varchar(30) NOT NULL DEFAULT 'General',
+  `visible_en_menu` tinyint(1) DEFAULT 1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_menu`
 --
 
-INSERT INTO `tbl_menu` (`ID`, `nombre`, `ingredientes`, `foto`, `precio`, `categoria`) VALUES
-(12, 'Jamón y queso', 'Carne, jamón, queso y mayonesa', '1754019339_5.png', '9000', 'Hamburguesas'),
-(13, 'Clásica', 'Carne, queso tybo, tomate, lechuga, mostaza y ketchup', '1754019355_1.png', '8900', 'Hamburguesas'),
-(14, 'Completa', 'Carne, queso tybo, tomate, lechuga, pepinillos y mayonesa', '1754019362_2.png', '9000', 'Hamburguesas'),
-(15, 'Vegetariana', 'Milanesa veggie, queso tybo, tomate, lechuga, pepinillos y mayonesa', '1754019377_3.png', '9000', 'Hamburguesas'),
-(16, 'Cheese', 'Carne, queso cheddar, mostaza y ketchup', '1754019388_4.png', '8300', 'Hamburguesas'),
-(17, 'Fritas', 'Papas fritas', '1754020670_13.png', '7200', 'Acompañamientos'),
-(18, 'Fritas con cheddar y bacon', 'Papas fritas con cheddar y panceta ahumada', '1754020695_14.png', '8500', 'Acompañamientos'),
-(19, 'Aros de cebolla', 'Aros de cebolla x8 unidades', '1754020686_12.png', '5600', 'Acompañamientos'),
-(20, 'Tequeños x6', 'Aperitivo venezolano consistente en palitos de queso envueltos en una masa de harina de trigo, fritos. x6 unidades', '1754111154_Clásica.png', '8000', 'Acompañamientos'),
-(21, 'Tequeños x12', 'Aperitivo venezolano consistente en palitos de queso envueltos en una masa de harina de trigo, fritos. x12 unidades', '1754111146_Clásica.png', '10000', 'Acompañamientos'),
-(22, 'Super lomo', 'Carne, jamón, queso tybo, huevo, tomate, lechuga y mayonesa', '1754109263_20.png', '11000', 'Lomitos y Sándwiches'),
-(23, 'Lomo Piccolo', 'Triple carne, queso tybo, 2 huevos fritos, panceta ahumada, cebolla caramelizada, morrones confitados y salsa Piccolo', '1754109280_21.png', '13000', 'Lomitos y Sándwiches'),
-(24, 'Lomoburger', 'Carne, jamón, queso tybo, huevo, tomate, lechuga y mayonesa. Lo delicioso del lomo, en pan de hamburguesa.', '1754109304_19.png', '10000', 'Lomitos y Sándwiches'),
-(25, 'Fuggazetta', 'Muzza y cebolla caramelizada', '1754109317_29.png', '13000', 'Pizzas'),
-(26, 'Napolitana', 'Muzza, tomate fresco, aceite de ajo', '1754109327_28.png', '13000', 'Pizzas'),
-(27, 'Pepperoni', 'Muzza y pepperoni', '1754109355_26.png', '14000', 'Pizzas'),
-(28, 'Pepsi', 'Lata de pepsi', '1754112409_34.png', '1500', 'Bebidas'),
-(29, 'Coca-cola', 'Coca-cola 1,5lts', '1754112420_44.png', '3800', 'Bebidas'),
-(30, 'Sweet Onion', 'Carne, queso tybo, cebolla caramelizada y mayonesa', '1754019494_6.png', '9500', 'Hamburguesas'),
-(31, 'Morrón', 'Carne, queso tybo, morrón confitado y mayonesa', '1754019527_7.png', '9500', 'Hamburguesas'),
-(32, 'Monstruosa', 'Triple carne, queso cheddar, panceta ahumada y salsa piccolo', '1754019605_10.png', '12000', 'Hamburguesas'),
-(33, 'BBQ', 'Doble carne, queso cheddar, panceta ahumada y salsa BBQ', '1754019638_8.png', '10500', 'Hamburguesas'),
-(34, 'Gran Piccolo', 'Doble carne, queso cheddar, panceta ahumada, huevo frito, cebolla caramelizada, morrones confitados y salsa piccolo', '1754019684_9.png', '11000', 'Hamburguesas'),
-(35, 'Chicken', 'Medallón de pollo, queso tybo, tomate, lechuga, pepinillos, cebolla y mayonesa', '1754020099_Clásica.png', '9500', 'Hamburguesas'),
-(36, 'Pizza Anchoas', 'Muzza y anchoas', '1754109472_32.png', '14500', 'Pizzas'),
-(37, 'Roque', 'Muzza, roquefort', '1754109502_31.png', '13000', 'Pizzas'),
-(38, 'Empanada árabe x1', 'Empanada árabe', '1754109584_15.png', '1500', 'Acompañamientos'),
-(39, 'Empanadas árabes x6', 'Media docena de empanadas árabes', '1754109614_15.png', '7000', 'Acompañamientos'),
-(40, 'Empanadas árabes x12', 'Docena de empanadas árabes', '1754109637_15.png', '11000', 'Acompañamientos'),
-(41, 'Empanada dulce x1', 'Empanada dulce', '1754109663_17.png', '1500', 'Acompañamientos'),
-(42, 'Empanadas dulces x6', 'Media docena de empanadas dulces', '1754109694_17.png', '7000', 'Acompañamientos'),
-(43, 'Empanadas dulces x12', 'Docena de empanadas dulces', '1754109734_17.png', '11000', 'Acompañamientos'),
-(44, 'Empanada salada x1', 'Empanada salada', '1754109761_16.png', '1500', 'Acompañamientos'),
-(45, 'Empanadas saladas x6', 'Media docena de empanadas saladas', '1754109790_16.png', '7000', 'Acompañamientos'),
-(46, 'Empanadas saladas x12', 'Docena de empanadas saladas', '1754109818_16.png', '11000', 'Acompañamientos'),
-(47, 'Empanada de jamón y queso x1', 'Empanada dulce', '1754109860_18.png', '1500', 'Acompañamientos'),
-(48, 'Empanadas de jamón y queso x6', 'Media docena de empanadas de jamón y queso', '1754109898_18.png', '7000', 'Acompañamientos'),
-(49, 'Empanadas de jamón y queso x12', 'Docena de empanadas de jamón y queso', '1754109926_18.png', '11000', 'Acompañamientos'),
-(50, 'Especial', 'Muzza, jamón cocido', '1754110143_27.png', '13000', 'Pizzas'),
-(51, 'Lomo de bondiola', 'Bondiola desmenuzada, queso tybo, panceta ahumada, huevo revuelto, cebolla morada, morrones confitados y mayonesa', '1754110631_22.png', '13000', 'Lomitos y Sándwiches'),
-(52, 'Pizza Piccolo', 'Muzza, panceta ahumada, huevos fritos, cebolla caramelizada, morrones confitados, salsa piccolo', '1754110697_30.png', '16400', 'Pizzas'),
-(53, 'Nuggets x6', 'Nuggets de pollo x6', '1754110767_24.png', '6200', 'Acompañamientos'),
-(54, 'Nuggets x12', 'Nuggets de pollo x12', '1754110789_24.png', '6500', 'Acompañamientos'),
-(55, 'Lomo de pollo', 'Pollo, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110831_25.png', '10000', 'Lomitos y Sándwiches'),
-(56, 'Sándwich de milanesa', 'Milanesa, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110872_23.png', '11000', 'Lomitos y Sándwiches'),
-(57, 'Sándwich de suprema', 'Suprema, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110909_23.png', '11000', 'Lomitos y Sándwiches'),
-(58, 'Paso de los Toros', 'Lata de Paso de los Toros', '1754112454_35.png', '1500', 'Bebidas'),
-(59, '7up', 'Lata de 7up', '1754112494_36.png', '1500', 'Bebidas'),
-(60, 'Mirinda', 'Lata de Mirinda', '1754112517_37.png', '1500', 'Bebidas'),
-(61, 'Lata de Cerveza', 'Lata de cerveza Brahma o Quilmes por disponibilidad o elección', '1754112561_38.png', '4500', 'Bebidas'),
-(62, 'Stella', 'Lata de Stella', '1754112587_39.png', '4500', 'Bebidas'),
-(63, 'Porrón de Cerveza', 'Porrón Brahma o Quilmes por disponibilidad o elección', '1754112636_40.png', '6000', 'Bebidas'),
-(64, 'Porrón Stella', 'Porrón Stella', '1754112658_41.png', '6500', 'Bebidas'),
-(65, 'Agua Saborizada', 'Agua saborizada de 1 litro. Sabor por disponibilidad o elección', '1754112697_42.png', '4500', 'Bebidas'),
-(66, 'Agua Saborizada', 'Agua saborizada de 500ml. Sabor por disponibilidad o elección', '1754112720_43.png', '1500', 'Bebidas'),
-(67, 'Sprite', 'Sprite de 1,5lts', '1754112745_45.png', '4500', 'Bebidas'),
-(68, 'Fanta', 'Fanta 1,5lts', '1754112763_46.png', '4500', 'Bebidas');
+INSERT INTO `tbl_menu` (`ID`, `nombre`, `ingredientes`, `foto`, `precio`, `categoria`, `visible_en_menu`) VALUES
+(12, 'Jamón y queso', 'Carne, jamón, queso y mayonesa', '1754019339_5.png', '9000', 'Hamburguesas', 1),
+(13, 'Clásica', 'Carne, queso tybo, tomate, lechuga, mostaza y ketchup', '1754019355_1.png', '8900', 'Hamburguesas', 1),
+(14, 'Completa', 'Carne, queso tybo, tomate, lechuga, pepinillos y mayonesa', '1754019362_2.png', '9000', 'Hamburguesas', 1),
+(15, 'Vegetariana', 'Milanesa veggie, queso tybo, tomate, lechuga, pepinillos y mayonesa', '1754019377_3.png', '9000', 'Hamburguesas', 1),
+(16, 'Cheese', 'Carne, queso cheddar, mostaza y ketchup', '1754019388_4.png', '8300', 'Hamburguesas', 1),
+(17, 'Fritas', 'Papas fritas', '1754020670_13.png', '7200', 'Acompañamientos', 1),
+(18, 'Fritas con cheddar y bacon', 'Papas fritas con cheddar y panceta ahumada', '1754020695_14.png', '8500', 'Acompañamientos', 1),
+(19, 'Aros de cebolla', 'Aros de cebolla x8 unidades', '1754020686_12.png', '5600', 'Acompañamientos', 1),
+(20, 'Tequeños x6', 'Aperitivo venezolano consistente en palitos de queso envueltos en una masa de harina de trigo, fritos. x6 unidades', '1754111154_Clásica.png', '8000', 'Acompañamientos', 1),
+(21, 'Tequeños x12', 'Aperitivo venezolano consistente en palitos de queso envueltos en una masa de harina de trigo, fritos. x12 unidades', '1754111146_Clásica.png', '10000', 'Acompañamientos', 1),
+(22, 'Super lomo', 'Carne, jamón, queso tybo, huevo, tomate, lechuga y mayonesa', '1754109263_20.png', '11000', 'Lomitos y Sándwiches', 1),
+(23, 'Lomo Piccolo', 'Triple carne, queso tybo, 2 huevos fritos, panceta ahumada, cebolla caramelizada, morrones confitados y salsa Piccolo', '1754109280_21.png', '13000', 'Lomitos y Sándwiches', 1),
+(24, 'Lomoburger', 'Carne, jamón, queso tybo, huevo, tomate, lechuga y mayonesa. Lo delicioso del lomo, en pan de hamburguesa.', '1754109304_19.png', '10000', 'Lomitos y Sándwiches', 1),
+(25, 'Fuggazetta', 'Muzza y cebolla caramelizada', '1754109317_29.png', '13000', 'Pizzas', 1),
+(26, 'Napolitana', 'Muzza, tomate fresco, aceite de ajo', '1754109327_28.png', '13000', 'Pizzas', 1),
+(27, 'Pepperoni', 'Muzza y pepperoni', '1754109355_26.png', '14000', 'Pizzas', 1),
+(28, 'Pepsi', 'Lata de pepsi', '1754112409_34.png', '1500', 'Bebidas', 1),
+(29, 'Coca-cola', 'Coca-cola 1,5lts', '1754112420_44.png', '3800', 'Bebidas', 1),
+(30, 'Sweet Onion', 'Carne, queso tybo, cebolla caramelizada y mayonesa', '1754019494_6.png', '9500', 'Hamburguesas', 1),
+(31, 'Morrón', 'Carne, queso tybo, morrón confitado y mayonesa', '1754019527_7.png', '9500', 'Hamburguesas', 1),
+(32, 'Monstruosa', 'Triple carne, queso cheddar, panceta ahumada y salsa piccolo', '1754019605_10.png', '12000', 'Hamburguesas', 1),
+(33, 'BBQ', 'Doble carne, queso cheddar, panceta ahumada y salsa BBQ', '1754019638_8.png', '10500', 'Hamburguesas', 1),
+(34, 'Gran Piccolo', 'Doble carne, queso cheddar, panceta ahumada, huevo frito, cebolla caramelizada, morrones confitados y salsa piccolo', '1754019684_9.png', '11000', 'Hamburguesas', 1),
+(35, 'Chicken', 'Medallón de pollo, queso tybo, tomate, lechuga, pepinillos, cebolla y mayonesa', '1754020099_Clásica.png', '9500', 'Hamburguesas', 1),
+(36, 'Pizza Anchoas', 'Muzza y anchoas', '1754109472_32.png', '14500', 'Pizzas', 1),
+(37, 'Roque', 'Muzza, roquefort', '1754109502_31.png', '13000', 'Pizzas', 1),
+(38, 'Empanada árabe x1', 'Empanada árabe', '1754109584_15.png', '1500', 'Acompañamientos', 1),
+(39, 'Empanadas árabes x6', 'Media docena de empanadas árabes', '1754109614_15.png', '7000', 'Acompañamientos', 1),
+(40, 'Empanadas árabes x12', 'Docena de empanadas árabes', '1754109637_15.png', '11000', 'Acompañamientos', 1),
+(41, 'Empanada dulce x1', 'Empanada dulce', '1754109663_17.png', '1500', 'Acompañamientos', 1),
+(42, 'Empanadas dulces x6', 'Media docena de empanadas dulces', '1754109694_17.png', '7000', 'Acompañamientos', 1),
+(43, 'Empanadas dulces x12', 'Docena de empanadas dulces', '1754109734_17.png', '11000', 'Acompañamientos', 1),
+(44, 'Empanada salada x1', 'Empanada salada', '1754109761_16.png', '1500', 'Acompañamientos', 1),
+(45, 'Empanadas saladas x6', 'Media docena de empanadas saladas', '1754109790_16.png', '7000', 'Acompañamientos', 1),
+(46, 'Empanadas saladas x12', 'Docena de empanadas saladas', '1754109818_16.png', '11000', 'Acompañamientos', 1),
+(47, 'Empanada de jamón y queso x1', 'Empanada dulce', '1754109860_18.png', '1500', 'Acompañamientos', 1),
+(48, 'Empanadas de jamón y queso x6', 'Media docena de empanadas de jamón y queso', '1754109898_18.png', '7000', 'Acompañamientos', 1),
+(49, 'Empanadas de jamón y queso x12', 'Docena de empanadas de jamón y queso', '1754109926_18.png', '11000', 'Acompañamientos', 1),
+(50, 'Especial', 'Muzza, jamón cocido', '1754110143_27.png', '13000', 'Pizzas', 1),
+(51, 'Lomo de bondiola', 'Bondiola desmenuzada, queso tybo, panceta ahumada, huevo revuelto, cebolla morada, morrones confitados y mayonesa', '1754110631_22.png', '13000', 'Lomitos y Sándwiches', 1),
+(52, 'Pizza Piccolo', 'Muzza, panceta ahumada, huevos fritos, cebolla caramelizada, morrones confitados, salsa piccolo', '1754110697_30.png', '16400', 'Pizzas', 1),
+(53, 'Nuggets x6', 'Nuggets de pollo x6', '1754110767_24.png', '6200', 'Acompañamientos', 1),
+(54, 'Nuggets x12', 'Nuggets de pollo x12', '1754110789_24.png', '6500', 'Acompañamientos', 1),
+(55, 'Lomo de pollo', 'Pollo, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110831_25.png', '10000', 'Lomitos y Sándwiches', 1),
+(56, 'Sándwich de milanesa', 'Milanesa, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110872_23.png', '11000', 'Lomitos y Sándwiches', 1),
+(57, 'Sándwich de suprema', 'Suprema, jamón cocido, queso tybo, huevo, tomate, lechuga y mayonesa', '1754110909_23.png', '11000', 'Lomitos y Sándwiches', 1),
+(58, 'Paso de los Toros', 'Lata de Paso de los Toros', '1754112454_35.png', '1500', 'Bebidas', 1),
+(59, '7up', 'Lata de 7up', '1754112494_36.png', '1500', 'Bebidas', 1),
+(60, 'Mirinda', 'Lata de Mirinda', '1754112517_37.png', '1500', 'Bebidas', 1),
+(61, 'Lata de Cerveza', 'Lata de cerveza Brahma o Quilmes por disponibilidad o elección', '1754112561_38.png', '4500', 'Bebidas', 1),
+(62, 'Stella', 'Lata de Stella', '1754112587_39.png', '4500', 'Bebidas', 1),
+(63, 'Porrón de Cerveza', 'Porrón Brahma o Quilmes por disponibilidad o elección', '1754112636_40.png', '6000', 'Bebidas', 1),
+(64, 'Porrón Stella', 'Porrón Stella', '1754112658_41.png', '6500', 'Bebidas', 1),
+(65, 'Agua Saborizada', 'Agua saborizada de 1 litro. Sabor por disponibilidad o elección', '1754112697_42.png', '4500', 'Bebidas', 1),
+(66, 'Agua Saborizada', 'Agua saborizada de 500ml. Sabor por disponibilidad o elección', '1754112720_43.png', '1500', 'Bebidas', 1),
+(67, 'Sprite', 'Sprite de 1,5lts', '1754112745_45.png', '4500', 'Bebidas', 1),
+(68, 'Fanta', 'Fanta 1,5lts', '1754112763_46.png', '4500', 'Bebidas', 1);
 
 -- --------------------------------------------------------
 
@@ -330,7 +349,6 @@ INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `ca
 (17, 14, 9, 1.0000),
 (18, 14, 5, 0.0600),
 (19, 14, 6, 0.1000),
-(20, 14, 14, 0.0500),
 (21, 14, 1, 0.0300),
 (22, 14, 2, 0.0300),
 (23, 14, 21, 0.0200),
@@ -546,7 +564,6 @@ INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `ca
 (252, 51, 120, 0.1500),
 (253, 52, 27, 1.0000),
 (254, 52, 32, 0.0800),
-(255, 27, 27, 1.0000),
 (256, 50, 27, 1.0000),
 (258, 55, 120, 0.1500),
 (259, 44, 35, 1.0000),
@@ -604,7 +621,11 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'En camino', 4),
 (88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4),
 (89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4),
-(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'En preparación', 4);
+(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'En preparación', 4),
+(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'En camino', 5),
+(92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5),
+(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'En preparación', 5),
+(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5);
 
 -- --------------------------------------------------------
 
@@ -657,7 +678,24 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (106, 87, 54, 'Nuggets x12', 6500, 1),
 (107, 88, 66, 'Agua Saborizada', 1500, 1),
 (108, 89, 12, 'Jamón y queso', 9000, 1),
-(109, 90, 12, 'Jamón y queso', 9000, 1);
+(109, 90, 12, 'Jamón y queso', 9000, 1),
+(110, 91, 17, 'Fritas', 7200, 1),
+(111, 91, 19, 'Aros de cebolla', 5600, 1),
+(112, 91, 38, 'Empanada árabe x1', 1500, 1),
+(113, 91, 39, 'Empanadas árabes x6', 7000, 1),
+(114, 91, 40, 'Empanadas árabes x12', 22000, 2),
+(115, 91, 45, 'Empanadas saladas x6', 7000, 1),
+(116, 91, 67, 'Sprite', 4500, 1),
+(117, 92, 13, 'Clásica', 8900, 1),
+(118, 92, 35, 'Chicken', 9500, 1),
+(119, 93, 16, 'Cheese', 8300, 1),
+(120, 93, 35, 'Chicken', 28500, 3),
+(121, 94, 23, 'Lomo Piccolo', 13000, 1),
+(122, 94, 24, 'Lomoburger', 10000, 1),
+(123, 94, 51, 'Lomo de bondiola', 13000, 1),
+(124, 94, 55, 'Lomo de pollo', 10000, 1),
+(125, 94, 56, 'Sándwich de milanesa', 11000, 1),
+(126, 94, 57, 'Sándwich de suprema', 11000, 1);
 
 -- --------------------------------------------------------
 
@@ -704,9 +742,9 @@ CREATE TABLE `tbl_testimonios` (
 
 INSERT INTO `tbl_testimonios` (`ID`, `opinion`, `nombre`) VALUES
 (1, 'Este es un testimonio de prueba', 'Juanita'),
-(2, '⭐⭐⭐⭐⭐ Me encantó!', 'Soy un comensal'),
 (3, 'Este es el tercer testimonio de prueba!', 'La developer'),
-(4, 'ultimo testimoniooo', 'la developer');
+(4, 'ultimo testimoniooo', 'la developer'),
+(5, '⭐⭐⭐⭐⭐ me encantó todo!', 'Un opinante');
 
 -- --------------------------------------------------------
 
@@ -718,15 +756,19 @@ CREATE TABLE `tbl_usuarios` (
   `ID` int(11) NOT NULL,
   `usuario` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `correo` varchar(255) NOT NULL
+  `correo` varchar(255) NOT NULL,
+  `rol` enum('admin','empleado','delivery') NOT NULL DEFAULT 'empleado',
+  `reset_token` varchar(255) DEFAULT NULL,
+  `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_usuarios`
 --
 
-INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`) VALUES
-(3, 'Jazmin Gaido', '1f72b11d211305eaa302167bd4e7ee1d', 'jazmingaidoyxs@gmail.com');
+INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
+(3, 'Jazmin Gaido', '$2y$10$tFXh5i9maQp3somQfBMKD.igABc.OS8nxQfGVY.HZFZh0BuP4Neo.', 'jazmingaidoyxs@gmail.com', 'admin', NULL, NULL),
+(4, 'Delivery', '202cb962ac59075b964b07152d234b70', 'delivery@gmail.com', 'delivery', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -849,19 +891,19 @@ ALTER TABLE `tbl_usuarios`
 -- AUTO_INCREMENT for table `tbl_banners`
 --
 ALTER TABLE `tbl_banners`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbl_clientes`
 --
 ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `tbl_comentarios`
 --
 ALTER TABLE `tbl_comentarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `tbl_compras`
@@ -897,13 +939,13 @@ ALTER TABLE `tbl_menu_materias_primas`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=91;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
@@ -915,13 +957,13 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_testimonios`
 --
 ALTER TABLE `tbl_testimonios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_usuarios`
 --
 ALTER TABLE `tbl_usuarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Constraints for dumped tables
