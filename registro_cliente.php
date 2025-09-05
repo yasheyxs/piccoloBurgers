@@ -4,19 +4,12 @@ include("admin/bd.php");
 
 $mensaje = "";
 
-// Validación de fuerza de contraseña
-function validarFuerza($pass)
-{
-  return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $pass);
-}
-
 function validarTelefono($codigo, $numero)
 {
   $codigo = preg_replace('/[^\d]/', '', $codigo);
   $numero = preg_replace('/[^\d]/', '', $numero);
   $telefono = '+' . $codigo . $numero;
 
-  // Longitudes esperadas por país
   $longitudes = [
     '54' => [10],       // Argentina
     '598' => [8, 9],    // Uruguay
@@ -35,59 +28,57 @@ function validarTelefono($codigo, $numero)
   return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
 }
 
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $nombre = trim($_POST["nombre"]);
-  $codigo = trim($_POST["codigo_pais"]);
-  $numero = trim($_POST["telefono"]);
-  $email = trim($_POST["email"] ?? "");
-  $password = $_POST["password"];
-  $confirmar = $_POST["confirmar"];
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+  $codigo = trim($_POST["codigo_pais"] ?? "");
+  $numero = trim($_POST["telefono"] ?? "");
+  $password = $_POST["password"] ?? "";
 
   $telefonoCompleto = validarTelefono($codigo, $numero);
 
-  if ($password !== $confirmar) {
-    $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
-  } elseif (empty($nombre) || empty($codigo) || empty($numero) || empty($password)) {
-    $mensaje = "<div class='alert alert-danger'>Por favor, completá todos los campos requeridos.</div>";
-  } elseif (!validarFuerza($password)) {
-    $mensaje = "<div class='alert alert-danger'>La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.</div>";
-  } elseif (!$telefonoCompleto) {
-    $mensaje = "<div class='alert alert-danger'>El número ingresado no parece válido. Verificá que esté completo y sin espacios.</div>";
+  if (empty($telefonoCompleto) || empty($password)) {
+    $mensaje = "<div class='alert alert-danger'>Completa todos los campos correctamente.</div>";
   } else {
-    try {
-      $consulta = $conexion->prepare("SELECT ID FROM tbl_clientes WHERE telefono = ?");
-      $consulta->execute([$telefonoCompleto]);
+    $consulta = $conexion->prepare("SELECT * FROM tbl_clientes WHERE telefono = ?");
+    $consulta->execute([$telefonoCompleto]);
+    $cliente = $consulta->fetch(PDO::FETCH_ASSOC);
 
-      if ($consulta->rowCount() > 0) {
-        $mensaje = "<div class='alert alert-warning'>Ya existe una cuenta registrada con ese teléfono.</div>";
+    if ($cliente) {
+      $hashAlmacenado = $cliente["password"];
+      $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+
+      $valido = $esHashModerno
+        ? password_verify($password, $hashAlmacenado)
+        : md5($password) === $hashAlmacenado;
+
+      if ($valido) {
+        $_SESSION["cliente"] = [
+          "id" => $cliente["ID"],
+          "nombre" => $cliente["nombre"],
+          "telefono" => $cliente["telefono"],
+          "email" => $cliente["email"]
+        ];
+        $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
+        $mensaje .= "<script>setTimeout(() => window.location.href = 'index.php', 1500);</script>";
       } else {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
-        $sentencia->execute([$nombre, $telefonoCompleto, $email, $hash]);
-
-        $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora podés <a href='login_cliente.php'>iniciar sesión</a>.</div>";
+        $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";
       }
-    } catch (Exception $e) {
-      $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
+    } else {
+      $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";
     }
   }
 }
 ?>
 
-
 <!doctype html>
 <html lang="es">
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Registro Cliente - Piccolo Burgers</title>
+  <title>Login Cliente - Piccolo Burgers</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
-
   <style>
     :root {
       --main-gold: #fac30c;
@@ -95,7 +86,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       --dark-bg: #1a1a1a;
       --gray-bg: #2c2c2c;
       --text-light: #ffffff;
-      --text-muted: #cccccc;
+      --text-muted: #b0b0b0;
       --font-main: 'Inter', sans-serif;
       --font-title: 'Bebas Neue', sans-serif;
     }
@@ -109,10 +100,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     .form-control {
-      font-size: 1.2rem;
       background-color: var(--gray-bg);
       color: var(--text-light);
       border: 1px solid #444;
+      font-size: 1.2rem;
       border-radius: 8px;
     }
 
@@ -142,103 +133,72 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       background-color: var(--gold-hover);
       transform: scale(1.05);
     }
+
+    .form-text {
+      color: var(--text-muted);
+    }
   </style>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <nav class="navbar navbar-dark bg-dark">
     <div class="container">
       <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> PICCOLO BURGERS</a>
     </div>
   </nav>
 
   <div class="container mt-5">
-    <h2 class="text-center mb-4">Registro de Cliente</h2>
-
-    <div class="d-flex justify-content-end mb-3">
-      <a href="login_cliente.php" class="btn btn-gold" style="border-radius: 30px; padding: 8px 20px;">
-        ← Volver
-      </a>
-    </div>
-
-    <?= $mensaje ?>
-
+    <h2 class="mb-4 text-center">Iniciar sesión</h2>
     <form method="post">
-      <div class="mb-3">
-        <label for="nombre" class="form-label">Nombre completo:</label>
-        <input type="text" class="form-control" name="nombre" required>
+      <label for="telefono" class="form-label">Teléfono:</label>
+      <div class="d-flex gap-2">
+        <select name="codigo_pais" class="form-control" style="max-width: 140px;" required id="codigo_pais">
+          <option value="54" selected>🇦🇷 +54</option>
+          <option value="598">🇺🇾 +598</option>
+          <option value="55">🇧🇷 +55</option>
+          <option value="56">🇨🇱 +56</option>
+          <option value="595">🇵🇾 +595</option>
+          <option value="591">🇧🇴 +591</option>
+          <option value="51">🇵🇪 +51</option>
+          <option value="1">🇺🇸 +1</option>
+          <option value="34">🇪🇸 +34</option>
+        </select>
+        <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
       </div>
+      <small class="form-text text-muted">Ingresá solo números, sin espacios ni guiones.</small>
 
-      <div class="mb-3">
-        <label for="telefono" class="form-label">Teléfono:</label>
-        <div class="d-flex gap-2">
-          <select name="codigo_pais" class="form-control" style="max-width: 140px;" required id="codigo_pais">
-            <option value="54" selected>🇦🇷 +54</option>
-            <option value="598">🇺🇾 +598</option>
-            <option value="55">🇧🇷 +55</option>
-            <option value="56">🇨🇱 +56</option>
-            <option value="595">🇵🇾 +595</option>
-            <option value="591">🇧🇴 +591</option>
-            <option value="51">🇵🇪 +51</option>
-            <option value="1">🇺🇸 +1</option>
-            <option value="34">🇪🇸 +34</option>
-          </select>
-          <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
-        </div>
-        
-      </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Email (opcional):</label>
-        <input type="email" class="form-control" name="email">
-      </div>
-
-      <div class="mb-3">
+      <div class="mb-3 mt-3">
         <label for="password" class="form-label">Contraseña:</label>
         <input type="password" class="form-control" name="password" id="password" required>
       </div>
 
-      <div class="mb-3">
-        <label for="confirmar" class="form-label">Confirmar contraseña:</label>
-        <input type="password" class="form-control" name="confirmar" required>
-      </div>
-
-      <button type="submit" class="btn btn-gold w-100">Registrarse</button>
+      <button type="submit" class="btn btn-gold w-100">Iniciar sesión</button>
     </form>
 
+    <div class="mt-3 text-center">
+      ¿No tenés cuenta? <a href="registro_cliente.php" class="text-warning">Registrate acá</a>
+    </div>
 
+    <div class="mt-2 text-center">
+      <a href="admin/password/recuperar_password_cliente.php?tipo=cliente" class="text-warning">¿Olvidaste tu contraseña?</a>
+    </div>
+
+    <div class="mt-4 text-center">
+      <?= $mensaje ?>
+    </div>
+
+    <div class="mt-4 text-center">
+      <a href="index.php" class="text-secondary small text-decoration-none" style="opacity: 0.85;">
+        <i class="fas fa-arrow-left me-1"></i> Volver al inicio
+      </a>
+    </div>
   </div>
 
   <script>
-    document.querySelector('input[name="telefono"]').addEventListener("input", function() {
-      this.value = this.value.replace(/[^\d]/g, "");
-    });
-
-    document.querySelector('input[name="nombre"]').addEventListener("input", function() {
-      this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
-    });
-
-    document.getElementById("password")?.addEventListener("input", function() {
-      const val = this.value;
-      const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-      this.setCustomValidity(regex.test(val) ? "" : "La contraseña no cumple con los requisitos.");
-    });
-  </script>
-
-  <script>
     const longitudes = {
-      '54': 10, // Argentina
-      '598': 9,
-      '55': 11,
-      '56': 9,
-      '595': 9,
-      '591': 8,
-      '51': 9,
-      '1': 10,
-      '34': 9
+      '54': 10, '598': 9, '55': 11, '56': 9, '595': 9,
+      '591': 8, '51': 9, '1': 10, '34': 9
     };
 
     const selectPais = document.getElementById('codigo_pais');
@@ -250,14 +210,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       inputTel.maxLength = max;
     }
 
-    inputTel.addEventListener("input", function() {
+    inputTel.addEventListener("input", function () {
       this.value = this.value.replace(/[^\d]/g, "");
     });
 
     selectPais.addEventListener("change", actualizarMaxLength);
     document.addEventListener("DOMContentLoaded", actualizarMaxLength);
   </script>
-
 </body>
-
 </html>
