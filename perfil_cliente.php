@@ -79,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["actualizar"])) {
     color: var(--text-light);
     font-size: 1rem;
     line-height: 1.6;
+    padding-top: 70px;
   }
 
 .navbar-brand {
@@ -250,7 +251,8 @@ input.form-control::placeholder {
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+
   <div class="container">
     <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -555,7 +557,7 @@ async function actualizarHistorial() {
         <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
           <i></i> Quedarme
         </button>
-        <a href="logout.php" class="btn btn-danger px-4">
+        <a href="./logout_cliente.php" class="btn btn-danger px-4">
           <i class="fas fa-door-open me-1"></i> Cerrar Sesión
         </a>
       </div>
