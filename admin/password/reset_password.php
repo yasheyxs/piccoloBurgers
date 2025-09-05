@@ -36,7 +36,7 @@ if (!in_array($tipo, ["usuario", "cliente"])) {
           <a href="recuperar_password_<?= htmlspecialchars($tipo) ?>.php" class="btn btn-warning">Volver a recuperar contraseña</a>
         </div>
       <?php else: ?>
-        <h4 class="mb-4 text-center">Restablecer contraseña</h4>
+        <h4 class="mb-4 text-center">Restablecer contraseña de cliente</h4>
 
         <form action="actualizar_password.php" method="post">
           <input type="hidden" name="token" value="<?= htmlspecialchars($token) ?>">
