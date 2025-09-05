@@ -11,7 +11,7 @@ $url_base = "http://$host/piccoloBurgers/admin/";
 if (MODO_DESARROLLO) {
   $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
   $_SESSION["admin_logueado"] = true;
-  $_SESSION["rol"] = "admin"; // Asignar rol por defecto en desarrollo
+  $_SESSION["rol"] = "admin";
 } else {
   if (!isset($_SESSION["admin_logueado"])) {
     header("Location: login.php");
@@ -24,7 +24,6 @@ $rol = $_SESSION["rol"] ?? "";
 
 <!doctype html>
 <html lang="es">
-
 <head>
   <title>Administrador del sitio web</title>
   <meta charset="utf-8">
@@ -32,10 +31,14 @@ $rol = $_SESSION["rol"] ?? "";
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
   <link rel="icon" type="image/png" href="<?php echo $url_base; ?>../img/favicon.png" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
-  <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+
+  <style>
+    .dropdown-menu {
+      z-index: 1050;
+    }
+  </style>
 </head>
 
 <body>
@@ -130,7 +133,14 @@ $rol = $_SESSION["rol"] ?? "";
   </div>
 </div>
 
-<!-- Bootstrap JS para que el modal funcione -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownElements.forEach(function (dropdownToggleEl) {
+      new bootstrap.Dropdown(dropdownToggleEl);
+    });
+  });
+</script>
+
 </body>
 </html>
