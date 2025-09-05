@@ -4,79 +4,123 @@ include("admin/bd.php");
 $categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
 
 $categoria = $_GET['categoria'] ?? '';
-$busqueda = trim($_GET['busqueda'] ?? '');
+$busqueda = strtolower(trim($_GET['busqueda'] ?? ''));
 $offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8; // 8 por carga
+$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8;
 
-// ----------- Contar total de ítems -----------
+$intencion_categoria = [
+  "gaseosa" => "Bebidas",
+  "refresco" => "Bebidas",
+  "lata" => "Bebidas",
+  "botella" => "Bebidas",
+  "hamburguesa" => "Hamburguesas",
+  "papas" => "Acompañamientos",
+  "papas fritas" => "Acompañamientos"
+];
+
+$busqueda_equivalente = [
+  "cheddar" => "fritas con cheddar",
+  "panceta" => "fritas con panceta",
+  "latas" => "lata",
+  "papas" => "fritas"
+];
+
+// Detectar equivalencias semánticas
+$extra = '';
+if (isset($busqueda_equivalente[$busqueda])) {
+  $extra = strtolower($busqueda_equivalente[$busqueda]);
+}
+
+// Detectar intención de categoría
+if (in_array(ucfirst($busqueda), $categorias_disponibles)) {
+  $categoria = ucfirst($busqueda);
+  $busqueda = '';
+}
+
+if (isset($intencion_categoria[$busqueda])) {
+  $categoria = $intencion_categoria[$busqueda];
+  $busqueda = '';
+}
+
+$excluir_lata = ($busqueda === "botella");
+
 $sqlTotal = "SELECT COUNT(*) FROM tbl_menu WHERE 1=1";
 $paramsTotal = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-    $sqlTotal .= " AND categoria = ?";
-    $paramsTotal[] = $categoria;
+  $sqlTotal .= " AND categoria = ?";
+  $paramsTotal[] = $categoria;
 }
 
 if ($busqueda !== '') {
-    $sqlTotal .= " AND nombre LIKE ?";
-    $paramsTotal[] = "%$busqueda%";
+  $sqlTotal .= " AND (LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
+  $paramsTotal[] = "%$busqueda%";
+  $paramsTotal[] = "%$busqueda%";
+  $paramsTotal[] = "%$busqueda%";
+}
+
+if ($extra !== '') {
+  $sqlTotal .= " OR LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?";
+  $paramsTotal[] = "%$extra%";
+  $paramsTotal[] = "%$extra%";
+}
+
+if ($excluir_lata) {
+  $sqlTotal .= " AND LOWER(ingredientes) NOT LIKE ?";
+  $paramsTotal[] = "%lata%";
 }
 
 $stmTotal = $conexion->prepare($sqlTotal);
 $stmTotal->execute($paramsTotal);
 $totalItems = $stmTotal->fetchColumn();
 
-// ----------- Construir query principal -----------
 $sql = "SELECT * FROM tbl_menu WHERE 1=1";
 $parametros = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-    $sql .= " AND categoria = ?";
-    $parametros[] = $categoria;
+  $sql .= " AND categoria = ?";
+  $parametros[] = $categoria;
 }
 
 if ($busqueda !== '') {
-    $sql .= " AND nombre LIKE ?";
-    $parametros[] = "%$busqueda%";
+  $sql .= " AND (LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
+  $parametros[] = "%$busqueda%";
+  $parametros[] = "%$busqueda%";
+  $parametros[] = "%$busqueda%";
 }
 
-// Orden
+if ($extra !== '') {
+  $sql .= " OR LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?";
+  $parametros[] = "%$extra%";
+  $parametros[] = "%$extra%";
+}
+
+if ($excluir_lata) {
+  $sql .= " AND LOWER(ingredientes) NOT LIKE ?";
+  $parametros[] = "%lata%";
+}
+
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-    $sql .= " ORDER BY ID DESC";
+  $sql .= " ORDER BY ID DESC";
 } else {
-    $case = "CASE";
-    foreach ($categorias_disponibles as $i => $cat) {
-        $case .= " WHEN categoria = " . $conexion->quote($cat) . " THEN " . ($i + 1);
-    }
-    $case .= " ELSE " . (count($categorias_disponibles) + 1) . " END";
-    $sql .= " ORDER BY $case, nombre ASC";
+  $case = "CASE";
+  foreach ($categorias_disponibles as $i => $cat) {
+    $case .= " WHEN categoria = " . $conexion->quote($cat) . " THEN " . ($i + 1);
+  }
+  $case .= " ELSE " . (count($categorias_disponibles) + 1) . " END";
+  $sql .= " ORDER BY $case, nombre ASC";
 }
 
-// Límite y desplazamiento
 $sql .= " LIMIT $limit OFFSET $offset";
 
 $stmt = $conexion->prepare($sql);
 $stmt->execute($parametros);
 $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
+?>
 
-// Si ya se han cargado todos los productos posibles en esta carga
-if (($offset + count($lista_menu)) >= $totalItems) {
-  echo '<div id="ultima-carga" style="display:none;"></div>';
-}
-
-
-// Mostrar mensaje si no hay resultados
-if (count($lista_menu) < $limit) {
-    echo '<div id="ultima-carga" style="display:none;"></div>';
-}
-
-
-// Render HTML parcial
-foreach ($lista_menu as $registro): ?>
-  <div class="col d-flex"
-       data-aos-up="fade-up"
-       data-aos-down="fade-down"
-       data-aos="fade-up">
+<!-- Tarjetas: se insertan en #contenedor-menu -->
+<?php foreach ($lista_menu as $registro): ?>
+  <div class="col d-flex" data-aos="fade-up">
     <div class="card position-relative d-flex flex-column h-100 w-100">
       <img src="img/menu/<?= htmlspecialchars($registro["foto"]) ?>" class="card-img-top" alt="Foto de <?= htmlspecialchars($registro["nombre"]) ?>">
       <div class="card-body d-flex flex-column">
@@ -95,3 +139,10 @@ foreach ($lista_menu as $registro): ?>
     </div>
   </div>
 <?php endforeach; ?>
+
+<!-- Botón se insertará en #contenedor-boton-mas por el JS -->
+<?php if (($offset + count($lista_menu)) < $totalItems): ?>
+  <div id="btn-mostrar-mas-wrapper">
+    <button id="btn-mostrar-mas" class="btn btn-gold">Mostrar más</button>
+  </div>
+<?php endif; ?>
