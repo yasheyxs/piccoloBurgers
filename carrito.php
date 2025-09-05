@@ -34,6 +34,7 @@ include("admin/bd.php"); ?>
       color: var(--text-light);
       font-size: 1rem;
       line-height: 1.6;
+      padding-top: 70px;
     }
 
     /* Botón dorado */
@@ -150,86 +151,136 @@ include("admin/bd.php"); ?>
     }
 
     .nav-link i.fas.fa-user-circle,
-  .nav-link i.fas.fa-sign-out-alt {
-    font-size: 1.35rem;
-    vertical-align: middle;
-  }
+    .nav-link i.fas.fa-sign-out-alt {
+      font-size: 1.35rem;
+      vertical-align: middle;
+    }
+
+    .btn-add-more {
+      background-color: var(--main-gold);
+      color: #000;
+      font-size: 2rem;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-add-more {
+      background-color: var(--main-gold);
+      color: #000;
+      font-size: 2rem;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .btn-add-more:hover {
+      background-color: var(--gold-hover);
+      transform: scale(1.1);
+      color: #000;
+    }
+
+    .btn-right {
+      justify-content: end;
+    }
+
+    .btn-center {
+      justify-content: center;
+    }
   </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#testimonios">Testimonio</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <!-- Dropdown compacto -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
-            Más
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
-            <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
-            <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
-            <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
-          </ul>
-        </li>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#testimonios">Testimonio</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
 
-        <!-- Carrito -->
-        <li class="nav-item">
-          <a class="nav-link position-relative" href="carrito.php">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-              0
-            </span>
-          </a>
-        </li>
+          <!-- Dropdown compacto -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+              Más
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
+              <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
+              <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+              <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
+            </ul>
+          </li>
 
-        <!-- Sesión -->
-        <?php if (isset($_SESSION["cliente"])): ?>
+          <!-- Carrito -->
           <li class="nav-item">
-            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
-              <i class="fas fa-user-circle"></i>
+            <a class="nav-link position-relative" href="carrito.php">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+                0
+              </span>
             </a>
           </li>
-          <li class="nav-item">
-  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
-    <i class="fas fa-sign-out-alt"></i>
-  </a>
-</li>
 
-        <?php else: ?>
-          <li class="nav-item">
-            <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
-          </li>
-        <?php endif; ?>
-      </ul>
+          <!-- Sesión -->
+          <?php if (isset($_SESSION["cliente"])): ?>
+            <li class="nav-item">
+              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+                <i class="fas fa-user-circle"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
+            </li>
+
+          <?php else: ?>
+            <li class="nav-item">
+              <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
+            </li>
+          <?php endif; ?>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
 
   <div class="container mt-5">
     <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
     <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
+    <div id="btnAgregarMas" class="mt-4"></div>
 
+
+    <div class="d-flex justify-content-center mt-4">
+      <a href="./index.php#menu" class="btn btn-add-more" title="Volver al menú">
+        <i class="fas fa-plus"></i>
+      </a>
+    </div>
 
     <div class="text-end mt-4">
       <h4>Total: $<span id="total">0.00</span></h4>
-
       <?php
-
       $descuento_maximo = 0;
       $puntos_cliente = 0;
 
@@ -251,9 +302,6 @@ include("admin/bd.php"); ?>
         </div>
 
       <?php endif; ?>
-
-
-
       <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
         <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
           <input type="hidden" name="carrito" id="carritoInput">
@@ -262,8 +310,6 @@ include("admin/bd.php"); ?>
         </form>
         <button class="btn btn-outline-danger-rounded" id="btnCancelar" onclick="mostrarConfirmacionCancelar()">Cancelar Pedido</button>
       </div>
-
-
     </div>
   </div>
 
@@ -293,7 +339,7 @@ include("admin/bd.php"); ?>
             cantidad: 1
           };
 
-        } else {// Si ya existe, solo aumentamos la cantidad y sumamos el precio
+        } else { // Si ya existe, solo aumentamos la cantidad y sumamos el precio
           agrupado[key].cantidad++;
           agrupado[key].precio += item.precio;
         }
@@ -301,7 +347,7 @@ include("admin/bd.php"); ?>
 
       const productos = Object.values(agrupado);
 
-      if (productos.length === 0) {// Si no hay productos, mostrar mensaje
+      if (productos.length === 0) { // Si no hay productos, mostrar mensaje
         contenedor.innerHTML = "<p class='text-center'>Tu carrito está vacío.</p>";
         totalSpan.textContent = "0.00";
 
@@ -316,7 +362,7 @@ include("admin/bd.php"); ?>
       }
 
 
-      productos.forEach(item => {// Mostrar cada producto en el carrito
+      productos.forEach(item => { // Mostrar cada producto en el carrito
         total += item.precio;
         contenedor.innerHTML += `
   <div class="col d-flex" data-aos="fade-up">
@@ -337,12 +383,12 @@ include("admin/bd.php"); ?>
   </div>`;
 
       });
-      
+
       totalSpan.textContent = total.toFixed(2);
       actualizarTotal(); // Para actualizar puntos y total correctamente
     }
 
-    function aumentarCantidad(id) {// Aumentar la cantidad de un producto en el carrito
+    function aumentarCantidad(id) { // Aumentar la cantidad de un producto en el carrito
       let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
       // Convertir el id a cadena para asegurar la comparación
       const producto = carrito.find(p => p.id.toString() === id.toString());
@@ -357,10 +403,10 @@ include("admin/bd.php"); ?>
     }
 
 
-    function disminuirCantidad(id) {// Disminuir la cantidad de un producto en el carrito
+    function disminuirCantidad(id) { // Disminuir la cantidad de un producto en el carrito
       let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
       const index = carrito.findIndex(p => p.id.toString() === id.toString());
-      if (index !== -1) {// Si el producto existe en el carrito
+      if (index !== -1) { // Si el producto existe en el carrito
         carrito.splice(index, 1); // removemos solo una unidad
         localStorage.setItem('carrito', JSON.stringify(carrito));
         cargarCarrito();
@@ -368,8 +414,8 @@ include("admin/bd.php"); ?>
       }
     }
 
-    function eliminarProducto(id) {// Eliminar un producto del carrito
-      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];// Convertir el id a cadena para asegurar la comparación
+    function eliminarProducto(id) { // Eliminar un producto del carrito
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || []; // Convertir el id a cadena para asegurar la comparación
       // Filtrar el carrito para eliminar el producto con el id especificado
       carrito = carrito.filter(p => p.id.toString() !== id.toString());
       localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -377,21 +423,21 @@ include("admin/bd.php"); ?>
       actualizarContador();
     }
 
-    function vaciarCarrito() {// Vaciar el carrito completamente
+    function vaciarCarrito() { // Vaciar el carrito completamente
       localStorage.removeItem("carrito");
       cargarCarrito();
       actualizarContador();
     }
 
-    function actualizarContador() {// Actualizar el contador de productos en el carrito
+    function actualizarContador() { // Actualizar el contador de productos en el carrito
       const items = JSON.parse(localStorage.getItem('carrito')) || [];
       const contador = document.getElementById("contador-carrito");
-      if (contador) {// Si el contador existe, actualizamos su valor
+      if (contador) { // Si el contador existe, actualizamos su valor
         contador.textContent = items.length;
       }
     }
 
-    function actualizarTotal() {// Actualizar el total del carrito y aplicar puntos si corresponde
+    function actualizarTotal() { // Actualizar el total del carrito y aplicar puntos si corresponde
       const usarPuntos = document.getElementById("usarPuntos")?.checked;
       localStorage.setItem("usar_puntos_activado", usarPuntos ? "1" : "0");
 
@@ -404,16 +450,16 @@ include("admin/bd.php"); ?>
       document.getElementById("puntos_usados")?.remove();
       document.getElementById("puntos_warning")?.remove();
 
-      if (usarPuntos) {// Si se selecciona usar puntos, calculamos el descuento
+      if (usarPuntos) { // Si se selecciona usar puntos, calculamos el descuento
         const valorPorPunto = 20;
         const minimoParaCanjear = 50;
         const maximoDescuento = total * 0.25;
 
-        if (puntosDisponibles < minimoParaCanjear) {// Si no hay suficientes puntos para canjear
+        if (puntosDisponibles < minimoParaCanjear) { // Si no hay suficientes puntos para canjear
           totalSpan.insertAdjacentHTML("afterend", `<div id="puntos_warning" class="text-danger">⚠️ Necesitás al menos ${minimoParaCanjear} puntos para canjear.</div>`);
-        } else if (total < 1000) {// Si el total es menor a $1000, no se puede aplicar descuento
+        } else if (total < 1000) { // Si el total es menor a $1000, no se puede aplicar descuento
           totalSpan.insertAdjacentHTML("afterend", `<div id="puntos_warning" class="text-danger">⚠️ El total debe ser al menos $1000 para canjear puntos.</div>`);
-        } else {// Si hay suficientes puntos y el total es válido, calculamos el descuento
+        } else { // Si hay suficientes puntos y el total es válido, calculamos el descuento
           const puntosPosibles = Math.floor(maximoDescuento / valorPorPunto);
           const puntosAUsar = Math.min(puntosDisponibles, puntosPosibles);
           descuento = puntosAUsar * valorPorPunto;
@@ -444,16 +490,16 @@ include("admin/bd.php"); ?>
     function mostrarConfirmacionCancelar() {
       const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
       const detalleDiv = document.getElementById("detallePedidoModal");
-      if (carrito.length === 0) {// Si el carrito está vacío, mostrar mensaje
+      if (carrito.length === 0) { // Si el carrito está vacío, mostrar mensaje
         detalleDiv.innerHTML = "<p class='text-muted'>El carrito está vacío.</p>";
-      } else {// Si hay productos, mostrar el resumen
+      } else { // Si hay productos, mostrar el resumen
         const resumen = carrito.reduce((acc, item) => {
-          if (!acc[item.nombre]) {// Si no existe, lo inicializamos
+          if (!acc[item.nombre]) { // Si no existe, lo inicializamos
             acc[item.nombre] = {
               cantidad: 1,
               precio: item.precio
             };
-          } else {// Si ya existe, aumentamos la cantidad y sumamos el precio
+          } else { // Si ya existe, aumentamos la cantidad y sumamos el precio
             acc[item.nombre].cantidad += 1;
             acc[item.nombre].precio += item.precio;
           }
@@ -475,22 +521,22 @@ include("admin/bd.php"); ?>
       modal.show();
     }
 
-    function confirmarCancelacion() {// Confirmar la cancelación del pedido
-      localStorage.removeItem("carrito");// Limpiar el carrito
-      const modal = bootstrap.Modal.getInstance(document.getElementById("modalCancelarPedido"));// Obtener la instancia del modal
+    function confirmarCancelacion() { // Confirmar la cancelación del pedido
+      localStorage.removeItem("carrito"); // Limpiar el carrito
+      const modal = bootstrap.Modal.getInstance(document.getElementById("modalCancelarPedido")); // Obtener la instancia del modal
       modal.hide();
       cargarCarrito();
       actualizarContador();
     }
 
-    document.getElementById("formPedido").addEventListener("submit", function(e) {// Validar el formulario antes de enviar
+    document.getElementById("formPedido").addEventListener("submit", function(e) { // Validar el formulario antes de enviar
       const usarPuntosChecked = document.getElementById("usarPuntos")?.checked;
       document.getElementById("usarPuntosInput").value = usarPuntosChecked ? "1" : "0";
 
       const items = JSON.parse(localStorage.getItem("carrito")) || [];
       const agrupado = {};
 
-      items.forEach(item => {// Agrupar productos por ID para evitar duplicados
+      items.forEach(item => { // Agrupar productos por ID para evitar duplicados
         const key = item.id;
         if (!agrupado[key]) {
           agrupado[key] = {
@@ -499,25 +545,25 @@ include("admin/bd.php"); ?>
             precio: item.precio,
             cantidad: 1
           };
-        } else {// Si ya existe, solo aumentamos la cantidad y sumamos el precio
+        } else { // Si ya existe, solo aumentamos la cantidad y sumamos el precio
           agrupado[key].cantidad += 1;
           agrupado[key].precio += item.precio;
         }
       });
 
 
-      const carritoFinal = Object.values(agrupado).map(p => ({// Convertimos los datos a un formato adecuado para enviar
+      const carritoFinal = Object.values(agrupado).map(p => ({ // Convertimos los datos a un formato adecuado para enviar
         id: String(p.id),
         nombre: p.nombre,
         precio: Number(p.precio),
         cantidad: Number(p.cantidad)
       }));
 
-      const hayIncompletos = carritoFinal.some(// verificar si hay productos incompletos
+      const hayIncompletos = carritoFinal.some( // verificar si hay productos incompletos
         p => !p.id || !p.nombre || typeof p.precio !== "number" || !p.cantidad
       );
 
-      if (hayIncompletos) {// Si hay productos incompletos, mostramos un mensaje de error
+      if (hayIncompletos) { // Si hay productos incompletos, mostramos un mensaje de error
         console.error("⚠️ Hay productos incompletos:", carritoFinal);
         alert("Error: uno de los productos del carrito no tiene toda la información necesaria.");
         e.preventDefault();
@@ -552,29 +598,29 @@ include("admin/bd.php"); ?>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- Modal de cierre de sesión -->
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-0 shadow-lg">
-      <div class="modal-header border-bottom-0">
-        <h5 class="modal-title fw-bold" id="logoutModalLabel">
-          <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
-      </div>
-      <div class="modal-footer justify-content-center border-top-0">
-        <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
-          <i></i> Quedarme
-        </button>
-        <a href="logout.php" class="btn btn-danger px-4">
-          <i class="fas fa-door-open me-1"></i> Cerrar Sesión
-        </a>
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-0 shadow-lg">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold" id="logoutModalLabel">
+            <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0">
+          <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+            <i></i> Quedarme
+          </button>
+          <a href="./logout_cliente.php" class="btn btn-danger px-4">
+            <i class="fas fa-door-open me-1"></i> Cerrar Sesión
+          </a>
+        </div>
       </div>
     </div>
   </div>
-</div>
   <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 

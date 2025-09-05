@@ -151,13 +151,21 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="mt-4 text-center">
       <?= $mensaje ?>
     </div>
+
+    <div class="mt-4 text-center">
+      <a href="index.php" class="text-secondary small text-decoration-none" style="opacity: 0.85;">
+        <i class="fas fa-arrow-left me-1"></i> Volver al inicio
+      </a>
+    </div>
+
   </div>
 
   <script>
-    document.getElementById("telefono").addEventListener("input", function () {
+    document.getElementById("telefono").addEventListener("input", function() {
       this.value = this.value.replace(/[^0-9]/g, "");
     });
   </script>
 
 </body>
+
 </html>

@@ -1,25 +1,10 @@
 <?php
 include("../../bd.php");
 
-// Eliminar menú con validación y manejo de errores
 if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
   $txtID = intval($_GET["txtID"]);
 
   try {
-    // Obtener foto
-    $sentencia = $conexion->prepare("SELECT foto FROM tbl_menu WHERE ID = :id");
-    $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
-    $sentencia->execute();
-    $registro_foto = $sentencia->fetch(PDO::FETCH_ASSOC);
-
-    if ($registro_foto && !empty($registro_foto['foto'])) {
-      $ruta_foto = "../../../images/menu/" . $registro_foto['foto'];
-      if (file_exists($ruta_foto)) {
-        unlink($ruta_foto);
-      }
-    }
-
-    // Eliminar registro
     $sentencia = $conexion->prepare("DELETE FROM tbl_menu WHERE ID = :id");
     $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
     $sentencia->execute();
@@ -50,6 +35,11 @@ try {
 include("../../templates/header.php");
 ?>
 
+<!-- Estilos de DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.0/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.dataTables.min.css">
+
 <br>
 <div class="card">
   <div class="card-header">
@@ -63,7 +53,6 @@ include("../../templates/header.php");
             <th>ID</th>
             <th>Nombre</th>
             <th>Ingredientes</th>
-            <th>Foto</th>
             <th>Precio</th>
             <th>Categoría</th>
             <th>Insumos</th>
@@ -77,13 +66,6 @@ include("../../templates/header.php");
                 <td><?= htmlspecialchars($registro["ID"]) ?></td>
                 <td><?= htmlspecialchars($registro["nombre"]) ?></td>
                 <td><?= htmlspecialchars($registro["ingredientes"]) ?></td>
-                <td>
-                  <?php if (!empty($registro['foto']) && file_exists("../../../images/menu/" . $registro['foto'])): ?>
-                    <img src="../../../images/menu/<?= htmlspecialchars($registro['foto']) ?>" width="50" alt="Foto">
-                  <?php else: ?>
-                    <span class="text-muted">Sin foto</span>
-                  <?php endif; ?>
-                </td>
                 <td>$<?= number_format($registro["precio"], 0) ?></td>
                 <td><?= htmlspecialchars($registro["categoria"]) ?></td>
                 <td>
@@ -102,7 +84,7 @@ include("../../templates/header.php");
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="8" class="text-center text-muted">No hay registros de menú disponibles.</td>
+              <td colspan="7" class="text-center text-muted">No hay registros de menú disponibles.</td>
             </tr>
           <?php endif; ?>
         </tbody>
@@ -111,18 +93,27 @@ include("../../templates/header.php");
   </div>
 </div>
 
+<!-- ✅ Scripts de DataTables -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+
 <script>
   $(document).ready(function () {
     $('#tablaMenu').DataTable({
       paging: true,
       searching: true,
-      info: false,
+      info: true,
       responsive: true,
       fixedHeader: true,
+      lengthMenu: [10, 25, 50, 100],
       language: {
         emptyTable: "No hay registros de menú",
         search: "Buscar:",
+        lengthMenu: "Mostrar _MENU_ registros por página",
+        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+        infoEmpty: "Sin registros disponibles",
         paginate: {
           first: "Primero",
           last: "Último",

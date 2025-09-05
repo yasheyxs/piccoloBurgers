@@ -25,10 +25,17 @@ if ($_POST) {
     $resultado->bindParam(':correo', $correo, PDO::PARAM_STR);
     $resultado->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
     $resultado->execute();
+
+    $_SESSION['toast'] = "¡Gracias por tu comentario!";
+  } else {
+    $_SESSION['toast'] = "Hubo un error al enviar el formulario.";
   }
 
-  header("Location:index.php");
+  header("Location: index.php#contacto");
+  exit;
 }
+
+
 ?>
 
 <!doctype html>
@@ -68,6 +75,7 @@ if ($_POST) {
       color: var(--text-light);
       font-size: 1rem;
       line-height: 1.6;
+      padding-top: 70px;
     }
 
     h1,
@@ -77,15 +85,6 @@ if ($_POST) {
       font-family: var(--font-title);
       text-transform: uppercase;
       letter-spacing: 1px;
-    }
-
-    .table-responsive {
-      margin-top: 1rem;
-    }
-
-    table {
-      width: 100%;
-      word-wrap: break-word;
     }
 
     h1 {
@@ -107,7 +106,15 @@ if ($_POST) {
       height: auto;
     }
 
-    /* Navbar */
+    .table-responsive {
+      margin-top: 1rem;
+    }
+
+    table {
+      width: 100%;
+      word-wrap: break-word;
+    }
+
     .navbar {
       background-color: #111;
     }
@@ -118,24 +125,56 @@ if ($_POST) {
       font-size: 1.2rem;
     }
 
-    /* Botón dorado */
-    .btn-gold {
+    .btn,
+    .form-control,
+    #categoria {
+      font-size: 1.2rem;
+      border-radius: 8px;
+      background-color: var(--gray-bg);
+      color: var(--text-light);
+      border: 1px solid #444;
+    }
+
+    .form-control::placeholder,
+    #categoria option {
+      color: var(--text-muted);
+    }
+
+    .form-control:focus {
+      border-color: var(--main-gold);
+      box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+    }
+
+    #categoria {
+      padding: 0.375rem 1.75rem 0.375rem 0.75rem;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23fac30c' stroke-width='2'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 10px 7px;
+      cursor: pointer;
+    }
+
+    .btn-gold,
+    .btn-agregar {
       background-color: var(--main-gold);
       color: #000;
+      color: #3a2a00 !important;
       font-weight: bold;
       border: none;
       border-radius: 30px;
-      padding: 10px 30px;
-      transition: all 0.3s ease;
       font-size: 1rem;
+      transition: background-color 0.3s ease, transform 0.3s ease;
     }
 
-    .btn-gold:hover {
+    .btn-gold:hover,
+    .btn-agregar:hover {
       background-color: var(--gold-hover);
       transform: scale(1.05);
     }
 
-    /* Cards */
     .card {
       background-color: var(--gray-bg);
       border-radius: 16px;
@@ -152,9 +191,8 @@ if ($_POST) {
 
     .card-img-top {
       display: block;
-      max-height: 200px;
-      height: 200px;
       width: 100%;
+      height: 200px;
       object-fit: cover;
       transition: transform 0.3s ease;
     }
@@ -192,75 +230,6 @@ if ($_POST) {
       min-height: 250px;
     }
 
-    .form-control {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-      border: 1px solid #444;
-      font-size: 1.2rem;
-      border-radius: 8px;
-    }
-
-    .form-control::placeholder {
-      color: var(--text-muted);
-    }
-
-    .form-control:focus {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-      border-color: var(--main-gold);
-      box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
-    }
-
-    /*select del filtro */
-    #categoria {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-      border: 1px solid #444;
-      font-size: 1.2rem;
-      border-radius: 8px;
-      padding: 0.375rem 1.75rem 0.375rem 0.75rem;
-      /* Ajuste para flecha */
-      appearance: none;
-      /* Quitar estilo nativo para personalizar */
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23fac30c' stroke-width='2'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 10px 7px;
-      cursor: pointer;
-    }
-
-    #categoria option {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-    }
-
-    .btn {
-      border-radius: 8px;
-      padding: 10px 16px;
-    }
-
-
-    /* Botón agregar */
-    .btn-agregar {
-      background-color: var(--main-gold);
-      color: #000;
-      font-weight: bold;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 30px;
-      width: 100%;
-      font-size: 1rem;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-
-    .btn-agregar:hover {
-      background-color: var(--gold-hover);
-      transform: scale(1.05);
-    }
-
-    /* Hero */
     .hero {
       background: radial-gradient(circle at top left, #2c2c2c 0%, #1a1a1a 100%);
       padding: 100px 20px;
@@ -282,13 +251,11 @@ if ($_POST) {
       margin: 20px auto;
     }
 
-    /* Horario */
     #horario p,
     #horario h3 {
       color: var(--text-light);
     }
 
-    /* Footer */
     footer {
       background-color: #111;
       padding: 20px;
@@ -296,8 +263,6 @@ if ($_POST) {
       font-size: 0.9rem;
       color: var(--text-muted);
     }
-
-    /* Banner */
 
     .banner-img::after {
       content: "";
@@ -325,7 +290,6 @@ if ($_POST) {
       text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
     }
 
-    /* jumbotron */
     .jumbotron {
       margin-bottom: 3rem;
       padding: 2rem;
@@ -334,13 +298,11 @@ if ($_POST) {
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
     }
 
-    /* testimonios */
     #testimonios {
       margin-top: 2rem;
       padding-top: 3rem;
     }
 
-    /* ScrollTop button */
     #scrollTopBtn {
       position: fixed;
       bottom: 30px;
@@ -369,8 +331,8 @@ if ($_POST) {
 
     .alert-warning {
       background-color: #3a2a00;
-      color: #fac30c;
-      border: 1px solid #fac30c;
+      color: var(--main-gold);
+      border: 1px solid var(--main-gold);
     }
 
     .alert-warning .btn-gold:hover {
@@ -384,81 +346,98 @@ if ($_POST) {
     }
 
     .nav-link i.fas.fa-user-circle,
-  .nav-link i.fas.fa-sign-out-alt {
-    font-size: 1.35rem;
-    vertical-align: middle;
-  }
+    .nav-link i.fas.fa-sign-out-alt {
+      font-size: 1.35rem;
+      vertical-align: middle;
+    }
+
+    .no-resize {
+      resize: none;
+    }
+
+    .form-control:focus {
+      background-color: #2c2c2c;
+      color: #fff;
+      border-color: #ffc107;
+      box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+    }
   </style>
+
 
 </head>
 
 <body id="top">
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
 
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
-        <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
-        <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
+    <div class="container">
+      <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-        <!-- Dropdown compacto -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
-            Más
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="#puntos">Puntos</a></li>
-            <li><a class="dropdown-item" href="#ubicacion">Ubicación</a></li>
-            <li><a class="dropdown-item" href="#contacto">Contacto</a></li>
-            <li><a class="dropdown-item" href="#horario">Horarios</a></li>
-          </ul>
-        </li>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
+          <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
 
-        <!-- Carrito -->
-        <li class="nav-item">
-          <a class="nav-link position-relative" href="carrito.php">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-              0
-            </span>
-          </a>
-        </li>
+          <!-- Dropdown compacto -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+              Más
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="#puntos">Puntos</a></li>
+              <li><a class="dropdown-item" href="#ubicacion">Ubicación</a></li>
+              <li><a class="dropdown-item" href="#contacto">Contacto</a></li>
+              <li><a class="dropdown-item" href="#horario">Horarios</a></li>
+            </ul>
+          </li>
 
-        <!-- Sesión -->
-        <?php if (isset($_SESSION["cliente"])): ?>
+          <!-- Carrito -->
           <li class="nav-item">
-            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
-              <i class="fas fa-user-circle"></i>
+            <a class="nav-link position-relative" href="carrito.php">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+                0
+              </span>
             </a>
           </li>
-          <li class="nav-item">
-  <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
-    <i class="fas fa-sign-out-alt"></i>
-  </a>
-</li>
 
-        <?php else: ?>
-          <li class="nav-item">
-            <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
-          </li>
-        <?php endif; ?>
-      </ul>
+          <!-- Sesión -->
+          <?php if (isset($_SESSION["cliente"])): ?>
+            <li class="nav-item">
+              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+                <i class="fas fa-user-circle"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
+            </li>
+
+          <?php else: ?>
+            <li class="nav-item">
+              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+                <i></i> Iniciar sesión / Registrarse
+              </a>
+            </li>
+          <?php endif; ?>
+        </ul>
+      </div>
     </div>
-  </div>
-</nav>
+  </nav>
 
   <?php if (!isset($_SESSION["cliente"])): ?>
     <section class="container mt-3 text-center">
       <div class="alert alert-warning alert-dismissible fade show" role="alert" data-aos-up="fade-up" data-aos="fade-up" style="font-weight: bold; font-size: 1.2rem;">
         🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
-        <a href="login_cliente.php" class="btn btn-sm btn-gold ms-3">Iniciar sesión / Registrarse</a>
+        <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-3 btn-sm">
+          <i></i> Iniciar sesión / Registrarse
+        </a>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
       </div>
     </section>
@@ -571,7 +550,14 @@ if ($_POST) {
   <section id="contacto" class="container mt-4" data-aos-up="fade-up" data-aos="fade-up">
     <h2>Contacto</h2>
     <p>Estamos acá para servirte.</p>
-    <form action="?" method="post">
+    <?php if (isset($_SESSION['mensaje'])): ?>
+      <div class="alert alert-warning text-center mt-3">
+        <?php echo $_SESSION['mensaje'];
+        unset($_SESSION['mensaje']); ?>
+      </div>
+    <?php endif; ?>
+
+    <form action="?" method="post" id="formContacto">
       <div class="mb-3">
         <label for="name">Nombre:</label>
         <input type="text" class="form-control" name="nombre" placeholder="Escribe tu nombre..." required>
@@ -582,7 +568,7 @@ if ($_POST) {
       </div>
       <div class="mb-3">
         <label for="message">Mensaje:</label>
-        <textarea id="message" class="form-control" name="mensaje" rows="6"></textarea>
+        <textarea id="message" class="form-control no-resize" name="mensaje" rows="6" required></textarea>
       </div>
       <input type="submit" class="btn btn-gold" value="Enviar mensaje">
     </form>
@@ -741,6 +727,17 @@ if ($_POST) {
       actualizarContador();
       filtrarMenu(true);
     });
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const toastEl = document.getElementById('toastContacto');
+      if (toastEl) {
+        const toast = new bootstrap.Toast(toastEl, {
+          autohide: true,
+          delay: 2500
+        });
+        toast.show();
+      }
+    });
   </script>
 
   <!-- Toast fijo en el DOM -->
@@ -759,29 +756,43 @@ if ($_POST) {
   <?php include("componentes/whatsapp_button.php"); ?>
   <?php include("componentes/scroll_button.php"); ?>
 
-<!-- Modal de cierre de sesión -->
-<div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content bg-dark text-white border-0 shadow-lg">
-      <div class="modal-header border-bottom-0">
-        <h5 class="modal-title fw-bold" id="logoutModalLabel">
-          <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-center">
-        <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
-      </div>
-      <div class="modal-footer justify-content-center border-top-0">
-        <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
-          <i></i> Quedarme
-        </button>
-        <a href="logout.php" class="btn btn-danger px-4">
-          <i class="fas fa-door-open me-1"></i> Cerrar Sesión
-        </a>
+  <!-- Modal de cierre de sesión -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-0 shadow-lg">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold" id="logoutModalLabel">
+            <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body text-center">
+          <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0">
+          <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+            <i></i> Quedarme
+          </button>
+          <a href="logout.php" class="btn btn-danger px-4">
+            <i class="fas fa-door-open me-1"></i> Cerrar Sesión
+          </a>
+        </div>
       </div>
     </div>
   </div>
-</div>
+  <?php if (isset($_SESSION['toast'])): ?>
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
+      <div id="toastContacto" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+          <div class="toast-body">
+            <?php echo $_SESSION['toast'];
+            unset($_SESSION['toast']); ?>
+          </div>
+          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+      </div>
+    </div>
+
+  <?php endif; ?>
 </body>
 </html>
