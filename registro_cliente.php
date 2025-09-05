@@ -199,9 +199,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       <div class="mb-3">
         <label for="password" class="form-label">Contraseña:</label>
         <input type="password" class="form-control" name="password" id="password" required>
-        <small class="form-text text-muted">
-          La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.
-        </small>
       </div>
 
       <div class="mb-3">
