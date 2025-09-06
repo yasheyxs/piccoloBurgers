@@ -103,7 +103,7 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> PICCOLO BURGERS</a>
       <a class="btn btn-gold ms-auto" href="carrito.php"><i class="fas fa-chevron-left"></i> Volver</a>
     </div>
   </nav>
@@ -311,7 +311,20 @@ const modalHtml = `
 
       } else {
         // Mostrar error en div mensaje
-        document.getElementById("mensaje").innerHTML = `<div class="alert alert-danger">${resultado.mensaje || "Error desconocido"}</div>`;
+document.getElementById("mensaje").innerHTML = `
+  <div id="mensaje-error" class="alert alert-danger">
+    ${resultado.mensaje || "Error desconocido"}
+  </div>
+`;
+if (resultado.scroll) {
+  setTimeout(() => {
+    const errorDiv = document.getElementById("mensaje-error");
+    if (errorDiv) {
+      errorDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, 100);
+}
+
       }
     });
 
@@ -344,6 +357,21 @@ const modalHtml = `
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
+  <script>fetch("ruta-del-endpoint", { method: "POST", body: datos })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.exito) {
+      const errorDiv = document.getElementById("mensaje-error");
+      errorDiv.innerText = data.mensaje;
+      errorDiv.style.display = "block";
+      if (data.scroll) {
+        setTimeout(() => {
+          errorDiv.scrollIntoView({ behavior: "smooth", block: "center" });
+        }, 100);
+      }
+    }
+  });
+</script>
   <?php include("componentes/whatsapp_button.php"); ?>
 </body>
 
