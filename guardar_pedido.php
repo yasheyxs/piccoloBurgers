@@ -8,7 +8,11 @@ session_start();
 
 function responder_error($mensaje) {
     header('Content-Type: application/json');
-    echo json_encode(["exito" => false, "mensaje" => $mensaje]);
+    echo json_encode([
+        "exito" => false,
+        "mensaje" => $mensaje,
+        "scroll" => true // Indicador para el frontend de que debe hacer scroll
+    ]);
     exit;
 }
 
@@ -97,7 +101,6 @@ foreach ($carrito as $item) {
         }
     }
 }
-
 
 try {
     $estado_inicial = "En preparación";
