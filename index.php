@@ -150,7 +150,6 @@ if ($_POST) {
 <?php endif; ?>
 
 
-
   <section id="inicio" class="container-fluid p-0">
   <div class="banner-img" style="position:relative; background:url('img/BannerBG.jpg') center/cover no-repeat; height:100vh;">
     <div class="banner-text">
@@ -608,10 +607,6 @@ if ($_POST) {
     </div>
   </div>
 
-  <?php include("componentes/carrito_button.php"); ?>
-  <?php include("componentes/whatsapp_button.php"); ?>
-  <?php include("componentes/scroll_button.php"); ?>
-
   <!-- Modal de cierre de sesión -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -653,6 +648,10 @@ if ($_POST) {
   </div>
   <?php unset($_SESSION['toast']); ?>
 <?php endif; ?>
+
+<?php include("componentes/carrito_button.php"); ?>
+  <?php include("componentes/whatsapp_button.php"); ?>
+  <?php include("componentes/scroll_button.php"); ?>
 
 </body>
 </html>

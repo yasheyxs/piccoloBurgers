@@ -422,7 +422,7 @@
   border-radius: 1.2rem;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
   max-width: 350px;
-  z-index: 1050;
+  z-index: 9999;
   padding: 1.5rem;
   color: #fff;
   animation: slideIn 0.8s ease-out forwards;

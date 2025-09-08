@@ -261,22 +261,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   }
   
 }
-
   </style>
-
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
 </head>
-
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="./index.php"><i class="fas fa-utensils"></i> PICCOLO BURGERS</a>
-    </div>
-  </nav>
-
-  
-
   <div class="register-container">
     <!-- Imagen a la izquierda -->
     <div class="register-image"></div>
@@ -329,7 +317,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <button type="submit" class="btn-gold mt-3">Registrarse</button>
 
         <div class="extra-links">
-          ¿Ya tenés cuenta? <a href="login_cliente.php">Iniciar sesión</a><br><br>
+          ¿Ya tenés cuenta? <a href="./login_cliente.php">Iniciar sesión</a><br><br>
           <a href="index.php" class="btn btn-outline-light">← Volver a la página principal</a>
         </div>
       </form>
