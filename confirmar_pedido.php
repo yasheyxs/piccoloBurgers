@@ -29,27 +29,99 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
       --font-title: 'Bebas Neue', sans-serif;
     }
 
+    /* Estilo global */
+    html,
+    body {
+      height: 100%;
+      /* Asegura que el body ocupe toda la altura */
+      margin: 0;
+      padding: 0;
+      font-family: var(--font-main);
+      color: var(--text-light);
+      background: url('img/HamLoginCliente.jpg') no-repeat center center fixed;
+      background-size: cover;
+      background-attachment: fixed;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
     body {
       font-family: var(--font-main);
       background-color: var(--dark-bg);
       color: var(--text-light);
       font-size: 1rem;
       line-height: 1.6;
+
+    }
+
+    /* Navbar fija */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      --bs-bg-opacity: 0.1;
+      padding: 0.5rem 1rem;
+    }
+
+    /* Contenedor con efecto Glass */
+    .container {
+      background: rgba(44, 44, 44, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 3rem 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      max-width: 600px;
+      margin: 0 auto;
+      flex-grow: 1;
+      margin-top: 100px;
+    }
+
+    .navbar>.container,
+    .navbar>.container-fluid,
+    .navbar>.container-lg,
+    .navbar>.container-md,
+    .navbar>.container-sm,
+    .navbar>.container-xl,
+    .navbar>.container-xxl {
+      display: flex;
+      flex-wrap: inherit;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 1rem;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      color: var(--main-gold);
+      text-align: center;
     }
 
     .form-control {
+      background-color: var(--gray-bg);
+      color: var(--text-light);
+      border: 1px solid #444;
       font-size: 1.2rem;
+      border-radius: 8px;
+    }
+
+    .form-control:focus {
+      background-color: var(--gray-bg);
+      color: var(--text-light);
+      border-color: var(--main-gold);
+      box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
     }
 
     select.form-control {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  background-size: 1rem;
-  padding-right: 2.5rem;
-  cursor: pointer;
-}
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 1rem center;
+      background-size: 1rem;
+      padding-right: 2.5rem;
+      cursor: pointer;
+    }
 
 
     .btn-gold {
@@ -68,6 +140,20 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
       transform: scale(1.05);
     }
 
+    /* Contenedor con efecto glass */
+    .container {
+      background: rgba(44, 44, 44, 0.7);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 3rem 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      max-width: 600px;
+      margin: 0 auto;
+      flex-grow: 1;
+      /* Garantiza que este contenido crezca */
+    }
+
     .modal-content {
       background-color: var(--gray-bg);
       color: var(--text-light);
@@ -80,22 +166,60 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
     }
 
     .form-control {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
+      background-color: #1e1e1e;
+      color: #fff;
       border: 1px solid #444;
-      font-size: 1.2rem;
-      border-radius: 8px;
+      border-radius: 0.75rem;
+      font-size: 1.1rem;
+      padding: 0.75rem 1rem;
+      transition: all 0.3s ease;
     }
 
     .form-control::placeholder {
       color: var(--text-muted);
     }
 
+
     .form-control:focus {
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-      border-color: var(--main-gold);
-      box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+      border-color: #fac30c;
+      box-shadow: 0 0 8px rgba(250, 195, 12, 0.4);
+      background-color: #222;
+      color: #fff;
+    }
+
+    .form-label {
+      font-weight: bold;
+      color: #fac30c;
+      font-size: 1.05rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .radio-card {
+      display: inline-block;
+      border: 2px solid transparent;
+      border-radius: 1rem;
+      padding: 0.5rem 0.5rem;
+      margin-right: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background-color: #1a1a1a;
+      color: #fff;
+    }
+
+    .radio-card:hover {
+      border-color: #999;
+    }
+
+    .form-check-input:checked+.radio-card {
+      border-color: #fac30c;
+      background-color: #2a2a2a;
+      color: #fac30c;
+      box-shadow: 0 0 12px rgba(250, 195, 12, 0.4);
+      font-weight: bold;
+    }
+
+    .form-check-input {
+      display: none;
     }
   </style>
 </head>
@@ -135,27 +259,31 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
         <textarea class="form-control" id="nota" name="nota" rows="3"></textarea>
       </div>
 
-      <div class="mb-3">
-        <label for="metodo_pago" class="form-label">Método de pago:</label>
-        <select class="form-control" id="metodo_pago" name="metodo_pago" required>
-          <option value="">Seleccionar</option>
-          <option value="Efectivo">Efectivo</option>
-          <option value="Tarjeta">Tarjeta</option>
-          <option value="MercadoPago">Mercado Pago</option>
-        </select>
+      <div class="mb-4">
+        <label class="form-label d-block mb-3 fw-bold fs-5">Método de pago:</label>
+
+        <input type="radio" class="form-check-input" id="pago_efectivo" name="metodo_pago" value="Efectivo" required>
+        <label class="radio-card" for="pago_efectivo">💵 Efectivo</label>
+
+        <input type="radio" class="form-check-input" id="pago_tarjeta" name="metodo_pago" value="Tarjeta">
+        <label class="radio-card" for="pago_tarjeta">💳 Tarjeta</label>
+
+        <input type="radio" class="form-check-input" id="pago_mp" name="metodo_pago" value="MercadoPago">
+        <label class="radio-card" for="pago_mp">📱 Mercado Pago</label>
       </div>
 
-      <div class="mb-3">
-        <label for="tipo_entrega" class="form-label">Tipo de entrega:</label>
-        <select class="form-control" id="tipo_entrega" name="tipo_entrega" required onchange="mostrarDireccion(this.value)">
-          <option value="">Seleccionar</option>
-          <option value="Retiro">Retiro en el local</option>
-          <option value="Delivery">Delivery</option>
-        </select>
-        <div class="alert alert-warning" id="aviso-delivery" style="display: none; font-size: 1.2rem;">
-          🚚 El servicio de delivery tiene un costo adicional de entre <strong>$1000</strong> y <strong>$1500</strong>, dependiendo de la zona.
-        </div>
+      <div class="mb-4">
+        <label class="form-label d-block mb-3 fw-bold fs-5">Tipo de entrega:</label>
 
+        <input type="radio" class="form-check-input" id="entrega_retiro" name="tipo_entrega" value="Retiro" required onchange="mostrarDireccion(this.value)">
+        <label class="radio-card" for="entrega_retiro">🏪 Retiro en el local</label>
+
+        <input type="radio" class="form-check-input" id="entrega_delivery" name="tipo_entrega" value="Delivery" onchange="mostrarDireccion(this.value)">
+        <label class="radio-card" for="entrega_delivery">🏍️ Delivery</label>
+
+        <div class="alert alert-warning mt-3" id="aviso-delivery" style="display: none; font-size: 1rem;">
+          🚨 El servicio de delivery tiene un costo adicional de entre <strong>$1000</strong> y <strong>$1500</strong>, dependiendo de la zona.
+        </div>
       </div>
 
       <div class="mb-3" id="grupo-direccion" style="display: none;">
