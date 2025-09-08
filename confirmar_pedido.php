@@ -75,7 +75,7 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
       max-width: 600px;
       margin: 0 auto;
       flex-grow: 1;
-      margin-top: 100px;
+      margin-top: 0;
     }
 
     .navbar>.container,
@@ -221,6 +221,8 @@ $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;
     .form-check-input {
       display: none;
     }
+
+    
   </style>
 </head>
 
@@ -501,6 +503,8 @@ if (resultado.scroll) {
   });
 </script>
   <?php include("componentes/whatsapp_button.php"); ?>
+
+  
 </body>
 
 </html>
