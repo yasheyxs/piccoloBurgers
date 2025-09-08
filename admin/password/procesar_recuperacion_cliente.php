@@ -88,7 +88,7 @@ $telefonoCompleto = validarTelefono($codigo, $numero);
 
 if (empty($telefonoCompleto)) {
   echo "<div class='alert alert-danger'>Por favor, ingresá un número válido.</div>";
-  echo "<div class='mt-3'><a href='../../recuperar_password_cliente.php' class='btn-gold'>Volver</a></div>";
+  echo "<div class='mt-3'><a href='../password/recuperar_password_cliente.php' class='btn-gold'>Volver</a></div>";
   exit();
 }
 
@@ -119,8 +119,8 @@ if ($cliente) {
 } else {
   echo "
     <div class='alert alert-warning'>
-      No encontramos ese número en nuestra base.<br>
-      <a href='../../login_cliente.php' class='btn-gold'>Volver al login</a>
+      No hay una cuenta asociada a este número de teléfono.<br>
+      <a href='../password/recuperar_password_cliente.php' class='btn-gold'>Volver</a>
     </div>
   ";
 }
