@@ -26,17 +26,25 @@ if ($_POST) {
     $resultado->bindParam(':mensaje', $mensaje, PDO::PARAM_STR);
     $resultado->execute();
 
-    $_SESSION['toast'] = "¡Gracias por tu comentario!";
+    $_SESSION['toast'] = [
+  'mensaje' => "¡Gracias por tu comentario!",
+  'tipo' => 'success'
+];
+
   } else {
-    $_SESSION['toast'] = "Hubo un error al enviar el formulario.";
+    $_SESSION['toast'] = [
+  'mensaje' => "Hubo un error al enviar el formulario.",
+  'tipo' => 'danger'
+];
+
   }
 
   header("Location: index.php#contacto");
   exit;
 }
 
-
 ?>
+
 
 <!doctype html>
 <html lang="en">
@@ -53,491 +61,257 @@ if ($_POST) {
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
 
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+
   <!-- AOS CSS -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-
-
-  <style>
-    :root {
-      --main-gold: #fac30c;
-      --gold-hover: #e0ae00;
-      --dark-bg: #1a1a1a;
-      --gray-bg: #2c2c2c;
-      --text-light: #ffffff;
-      --text-muted: #cccccc;
-      --font-main: 'Inter', sans-serif;
-      --font-title: 'Bebas Neue', sans-serif;
-    }
-
-    body {
-      font-family: var(--font-main);
-      background-color: var(--dark-bg);
-      color: var(--text-light);
-      font-size: 1rem;
-      line-height: 1.6;
-      padding-top: 70px;
-    }
-
-    h1,
-    h2,
-    h3,
-    .navbar-brand {
-      font-family: var(--font-title);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    h1 {
-      font-size: 4rem;
-    }
-
-    h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-
-    h3 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    img {
-      max-width: 100%;
-      height: auto;
-    }
-
-    .table-responsive {
-      margin-top: 1rem;
-    }
-
-    table {
-      width: 100%;
-      word-wrap: break-word;
-    }
-
-    .navbar {
-      background-color: #111;
-    }
-
-    .navbar-brand,
-    .nav-link {
-      font-family: var(--font-main);
-      font-size: 1.2rem;
-    }
-
-    .btn,
-    .form-control,
-    #categoria {
-      font-size: 1.2rem;
-      border-radius: 8px;
-      background-color: var(--gray-bg);
-      color: var(--text-light);
-      border: 1px solid #444;
-    }
-
-    .form-control::placeholder,
-    #categoria option {
-      color: var(--text-muted);
-    }
-
-    .form-control:focus {
-      border-color: var(--main-gold);
-      box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
-    }
-
-    #categoria {
-      padding: 0.375rem 1.75rem 0.375rem 0.75rem;
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg width='10' height='7' viewBox='0 0 10 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23fac30c' stroke-width='2'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 0.75rem center;
-      background-size: 10px 7px;
-      cursor: pointer;
-    }
-
-    .btn-gold,
-    .btn-agregar {
-      background-color: var(--main-gold);
-      color: #000;
-      color: #3a2a00 !important;
-      font-weight: bold;
-      border: none;
-      border-radius: 30px;
-      font-size: 1rem;
-      transition: background-color 0.3s ease, transform 0.3s ease;
-    }
-
-    .btn-gold:hover,
-    .btn-agregar:hover {
-      background-color: var(--gold-hover);
-      transform: scale(1.05);
-    }
-
-    .card {
-      background-color: var(--gray-bg);
-      border-radius: 16px;
-      border: none;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      overflow: hidden;
-    }
-
-    .card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    .card-img-top {
-      display: block;
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover .card-img-top {
-      transform: scale(1.05);
-    }
-
-    .card-title {
-      font-family: var(--font-title);
-      font-size: 1.8rem;
-      color: var(--text-light);
-    }
-
-    .card-text {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .card-footer {
-      background-color: transparent;
-      color: var(--text-light);
-      font-weight: 600;
-      font-size: 1rem;
-      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-      border-left: 4px solid var(--main-gold);
-      padding-left: 12px;
-    }
-
-    .card-footer::before {
-      content: "👤 ";
-    }
-
-    #contenedor-menu .card {
-      min-height: 250px;
-    }
-
-    .hero {
-      background: radial-gradient(circle at top left, #2c2c2c 0%, #1a1a1a 100%);
-      padding: 100px 20px;
-      text-align: center;
-      position: relative;
-    }
-
-    .hero h1 {
-      font-family: var(--font-title);
-      font-size: 5rem;
-      color: var(--main-gold);
-      text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
-    }
-
-    .hero p {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      max-width: 600px;
-      margin: 20px auto;
-    }
-
-    #horario p,
-    #horario h3 {
-      color: var(--text-light);
-    }
-
-    footer {
-      background-color: #111;
-      padding: 20px;
-      text-align: center;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .banner-img::after {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 100px;
-      width: 100%;
-      background: linear-gradient(to bottom, rgba(26, 26, 26, 0), #1a1a1a 90%);
-      z-index: 1;
-    }
-
-    .banner-text {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      text-align: center;
-      color: #fff;
-      text-shadow: 5px 5px 9px rgba(0, 0, 0, 0.7);
-      z-index: 2;
-    }
-
-    .banner-text p {
-      text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7);
-    }
-
-    .jumbotron {
-      margin-bottom: 3rem;
-      padding: 2rem;
-      background: linear-gradient(to bottom, #1a1a1a 0%, #1f1f1f 100%);
-      border-radius: 1rem;
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
-    }
-
-    #testimonios {
-      margin-top: 2rem;
-      padding-top: 3rem;
-    }
-
-    #scrollTopBtn {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      background-color: var(--main-gold);
-      color: #000;
-      font-size: 1.8rem;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      z-index: 999;
-      transition: transform 0.3s, box-shadow 0.3s;
-      text-decoration: none;
-    }
-
-    #scrollTopBtn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
-      color: #000;
-      text-decoration: none;
-    }
-
-    .alert-warning {
-      background-color: #3a2a00;
-      color: var(--main-gold);
-      border: 1px solid var(--main-gold);
-    }
-
-    .alert-warning .btn-gold:hover {
-      color: #3a2a00 !important;
-    }
-
-    #btn-mostrar-mas {
-      display: block;
-      margin: 20px auto;
-      text-align: center;
-    }
-
-    .nav-link i.fas.fa-user-circle,
-    .nav-link i.fas.fa-sign-out-alt {
-      font-size: 1.35rem;
-      vertical-align: middle;
-    }
-
-    .no-resize {
-      resize: none;
-    }
-
-    .form-control:focus {
-      background-color: #2c2c2c;
-      color: #fff;
-      border-color: #ffc107;
-      box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
-    }
-  </style>
-
+  <link rel="stylesheet" href="./custom.css">
 
 </head>
 
 <body id="top">
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-navbar bg-dark">
+  <div class="container">
+    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto">
+        <!-- Enlaces principales -->
+        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
+        <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
 
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
-          <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
-          <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
+        <!-- Dropdown compacto -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+            Más
+          </a>
+          <ul class="dropdown-menu dropdown-menu-dark">
+            <li><a class="dropdown-item" href="#puntos">Puntos</a></li>
+            <li><a class="dropdown-item" href="#ubicacion">Ubicación</a></li>
+            <li><a class="dropdown-item" href="#contacto">Contacto</a></li>
+            <li><a class="dropdown-item" href="#horario">Horarios</a></li>
+          </ul>
+        </li>
 
-          <!-- Dropdown compacto -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
-              Más
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="#puntos">Puntos</a></li>
-              <li><a class="dropdown-item" href="#ubicacion">Ubicación</a></li>
-              <li><a class="dropdown-item" href="#contacto">Contacto</a></li>
-              <li><a class="dropdown-item" href="#horario">Horarios</a></li>
-            </ul>
-          </li>
+        <!-- Carrito -->
+        <li class="nav-item">
+          <a class="nav-link position-relative" href="carrito.php">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+              0
+            </span>
+          </a>
+        </li>
 
-          <!-- Carrito -->
+        <!-- Sesión -->
+        <?php if (isset($_SESSION["cliente"])): ?>
           <li class="nav-item">
-            <a class="nav-link position-relative" href="carrito.php">
-              <i class="fas fa-shopping-cart"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-                0
-              </span>
+            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <i class="fas fa-user-circle"></i>
             </a>
           </li>
-
-          <!-- Sesión -->
-          <?php if (isset($_SESSION["cliente"])): ?>
-            <li class="nav-item">
-              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
-                <i class="fas fa-user-circle"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
-                <i class="fas fa-sign-out-alt"></i>
-              </a>
-            </li>
-
-          <?php else: ?>
-            <li class="nav-item">
-              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
-                <i></i> Iniciar sesión / Registrarse
-              </a>
-            </li>
-          <?php endif; ?>
-        </ul>
-      </div>
+          <li class="nav-item">
+            <a href="logout_cliente.php" class="nav-link" title="Cerrar sesión">
+              <i class="fas fa-sign-out-alt"></i>
+            </a>
+          </li>
+        <?php else: ?>
+          <li class="nav-item">
+            <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+              Iniciar sesión / Registrarse
+            </a>
+          </li>
+        <?php endif; ?>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
 
   <?php if (!isset($_SESSION["cliente"])): ?>
-    <section class="container mt-3 text-center">
-      <div class="alert alert-warning alert-dismissible fade show" role="alert" data-aos-up="fade-up" data-aos="fade-up" style="font-weight: bold; font-size: 1.2rem;">
-        🎉 ¡Registrate ahora, ganá puntos y <span style="color: #fac30c;">canjealos por descuentos</span>! 🎉
-        <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-3 btn-sm">
-          <i></i> Iniciar sesión / Registrarse
-        </a>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-      </div>
-    </section>
-  <?php endif; ?>
+  <div id="registro-burbuja" class="registro-burbuja">
+    <button type="button" class="cerrar-burbuja" onclick="cerrarBurbuja()">×</button>
+
+    <h5 class="fw-bold mb-2 text-gold">¡Registrate y ganá puntos!</h5>
+    <p>
+      Acumulá <strong class="text-gold">puntos exclusivos</strong> en cada compra y canjealos por <strong>descuentos irresistibles</strong>.
+    </p>
+
+    <a href="registro_cliente.php" class="btn btn-gold w-100 mt-2">Registrarse</a>
+  </div>
+<?php endif; ?>
 
 
-  <section class="container-fluid p-0">
-    <div class="banner-img" style="position:relative; background:url('img/pexels-valeriya-1199960.jpg') center/cover no-repeat; height:400px;">
-      <div class="banner-text" style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); text-align:center; color:#fff; text-shadow: 5px 5px 9px rgba(0,0,0,0.7);">
-        <?php foreach ($lista_banners as $banner) { ?>
-          <h1 style="font-size: 5rem;"><?php echo $banner['titulo']; ?></h1>
-          <p><?php echo $banner['descripcion']; ?></p>
-          <a href="<?php echo $banner['link']; ?>" class="btn btn-gold">Ver Menú</a>
-        <?php } ?>
-      </div>
+
+  <section id="inicio" class="container-fluid p-0">
+  <div class="banner-img" style="position:relative; background:url('img/BannerBG.jpg') center/cover no-repeat; height:100vh;">
+    <div class="banner-text">
+      <?php foreach ($lista_banners as $banner): ?>
+        <h1 class="banner-heading"><?php echo $banner['titulo']; ?></h1>
+        <p class="banner-subtext"><?php echo $banner['descripcion']; ?></p>
+        <a href="<?php echo $banner['link']; ?>" class="btn btn-gold banner-btn">Ver Menú</a>
+      <?php endforeach; ?>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="container mt-4 text-center">
-    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light);">
-      <h2>¡Bienvenidx a Piccolo Burgers!</h2>
-      <p>Descubre las verdaderas hamburguesas. Siempre 100% cargadas de sabor.</p>
+<section id="menu" class="container my-5">
+  <h2 class="text-center mb-4">Nuestro Menú</h2>
+
+  <!-- Controles de filtrado -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
     </div>
-  </section>
-
-  <section id="testimonios" class="py-5" style="background: linear-gradient(to bottom, #2c2c2c, #1a1a1a);">
-    <div class="container">
-      <h2 class="text-center mb-4">Testimonios</h2>
-      <div class="row">
-        <?php foreach ($lista_testimonios as $testimonio) { ?>
-          <div class="col-md-6 d-flex" data-aos-up="fade-up" data-aos="fade-up">
-            <div class="card mb-4 w-100">
-              <div class="card-body">
-                <p class="card-text"><?php echo $testimonio["opinion"]; ?></p>
-              </div>
-              <div class="card-footer">
-                <?php echo $testimonio["nombre"]; ?>
-              </div>
-            </div>
-          </div>
-        <?php } ?>
-      </div>
+    <div class="col-md-6">
+      <select id="categoria" class="form-select">
+        <option value="">Todas las categorías</option>
+        <option value="Acompañamientos">Acompañamientos</option>
+        <option value="Hamburguesas">Hamburguesas</option>
+        <option value="Bebidas">Bebidas</option>
+        <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
+        <option value="Pizzas">Pizzas</option>
+      </select>
     </div>
-  </section>
+  </div>
 
-  <section id="menu" class="container my-5">
-    <h2 class="text-center mb-4">Nuestro Menú</h2>
+  <!-- Contenedor de tarjetas -->
+  <div id="contenedor-menu" class="row row-cols-2 row-cols-md-4 g-4">
 
-    <!-- Controles de filtrado -->
-    <div class="row mb-4">
-      <div class="col-md-6">
-        <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
-      </div>
-      <div class="col-md-6">
-        <select id="categoria" class="form-select">
-          <option value="">Todas las categorías</option>
-          <option value="Acompañamientos">Acompañamientos</option>
-          <option value="Hamburguesas">Hamburguesas</option>
-          <option value="Bebidas">Bebidas</option>
-          <option value="Lomitos y Sándwiches">Lomitos y Sándwiches</option>
-          <option value="Pizzas">Pizzas</option>
-        </select>
-      </div>
-    </div>
+  </div>
 
-    <!-- Contenedor de tarjetas -->
-    <div id="contenedor-menu" class="row row-cols-2 row-cols-md-4 g-4">
-      <!-- Las tarjetas se insertan dinámicamente -->
-    </div>
+  <!-- Botón "Mostrar más" -->
+  <div id="contenedor-boton-mas" class="text-center mt-4">
+    <button id="btn-mostrar-mas" class="btn-gold">Mostrar más</button>
+  </div>
+</section>
 
-    <!-- Contenedor del botón "Mostrar más" -->
-    <div id="contenedor-boton-mas" class="text-center mt-4"></div>
-  </section>
-
-
-  <section id="nosotros" class="container mt-5">
-    <h2 class="text-center mb-4">Nosotros</h2>
-    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
-      <p class="lead text-center" style="font-size: 1.2rem; max-width: 700px; margin: 0 auto;">
-        En <strong>Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad. Nuestro compromiso es ofrecerte una experiencia gastronómica inolvidable, con un servicio cálido y un ambiente acogedor. ¡Gracias por elegirnos para compartir momentos deliciosos!
-      </p>
-    </div>
-  </section>
-
-  <section id="puntos" class="container mt-5">
-    <h2 class="text-center mb-4">Sistema de puntos</h2>
-    <div class="jumbotron p-4" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to bottom, #1a1a1a, #111); color: var(--text-light); border-radius: 1rem; box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);">
-      <p class="lead text-center" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto;">
-        Cada vez que hacés un pedido registrado, <strong>ganás puntos</strong> que podés canjear por <strong>descuentos exclusivos</strong> en tus próximas compras.
+<section id="nosotros" class="container mt-5">
+  <div class="row align-items-center p-5"
+       data-aos="fade-up"
+       style="background: linear-gradient(145deg, #1e1e1e, #0d0d0d); color: var(--text-light); border-radius: 1.5rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);">
+    
+    <!-- Texto -->
+    <div class="col-lg-6 mb-4 mb-lg-0 d-flex flex-column align-items-center align-items-lg-start">
+      <h2 class="fw-bold display-6 mb-4 text-center w-100" style="color: var(--main-gold); letter-spacing: 1px;">
+        Nosotros
+      </h2>
+      <p class="lead text-justify" style="font-size: 1.1rem; max-width: 750px; line-height: 1.8; margin: 0 auto; text-align: justify;">
+        En <strong style="color: var(--main-gold);">Piccolo Burgers</strong> somos apasionados por crear las hamburguesas más sabrosas y cargadas de sabor, usando ingredientes frescos y de calidad.
         <br><br>
-        Cuanto más pedís, <strong>más ahorrás</strong> 🍔✨
+        Nuestro compromiso es ofrecerte una <strong>experiencia gastronómica inolvidable</strong>, con un servicio cálido y un ambiente acogedor.
+        <br><br>
+        ¡Gracias por elegirnos para compartir <span style="color: var(--main-gold);">momentos deliciosos</span>!
       </p>
     </div>
-  </section>
 
-  <section id="ubicacion" class="container-fluid p-5 text-center" style="background: linear-gradient(to top, #1a1a1a, #111);">
-    <h2 class="mb-4" data-aos="fade-up">Nuestra Ubicación</h2>
-    <p class="mb-4" data-aos="fade-up" data-aos-delay="100">Encontranos fácilmente en nuestro local 🍔✨</p>
-    <div class="d-flex justify-content-center" data-aos="zoom-in" data-aos-delay="200">
-      <div class="shadow-lg" style="width: 350px; height: 350px; border-radius: 15px; overflow: hidden;">
+    <!-- Imagen -->
+    <div class="col-lg-6 text-center">
+      <img src="img/SobreNosotros.jpg" alt="Nosotros - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg" style="max-height: 350px; object-fit: cover;">
+    </div>
+  </div>
+</section>
+
+<section id="puntos" class="container mt-5">
+  <div class="row align-items-center p-5"
+       data-aos="fade-up"
+       style="background: linear-gradient(145deg, #1e1e1e, #0d0d0d); color: var(--text-light); border-radius: 1.5rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);">
+
+    <!-- Imagen -->
+    <div class="col-lg-6 text-center mb-4 mb-lg-0">
+      <img src="img/Puntos.jpg" alt="Sistema de Puntos - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg" style="max-height: 350px; object-fit: cover;">
+    </div>
+
+    <!-- Texto -->
+    <div class="col-lg-6 d-flex flex-column align-items-center align-items-lg-start">
+      <h2 class="fw-bold display-6 mb-4 text-center w-100" style="color: var(--main-gold); letter-spacing: 1px;">
+        Sistema de Puntos
+      </h2>
+      <p class="lead text-justify" style="font-size: 1.15rem; max-width: 750px; line-height: 1.8; margin: 0 auto; text-align: justify;">
+        Cada vez que hacés un pedido registrado,
+        <strong style="color: var(--main-gold);">ganás puntos</strong>
+        que podés canjear por
+        <strong>descuentos exclusivos</strong> en tus próximas compras.
+        <br><br>
+        Cuanto más pedís,
+        <strong style="color: var(--main-gold);">más ahorrás</strong> 🍔✨
+      </p>
+    </div>
+  </div>
+</section>
+
+<section id="contacto" class="container mt-5">
+  <div class="row p-5 align-items-center"
+       data-aos="fade-up"
+       style="background: linear-gradient(145deg, #1e1e1e, #0d0d0d); color: var(--text-light); border-radius: 1.5rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);">
+
+    <!-- Formulario -->
+    <div class="col-lg-6 d-flex flex-column justify-content-between mb-4 mb-lg-0">
+      <div>
+        <h2 class="fw-bold display-6 mb-3" style="color: var(--main-gold); letter-spacing: 1px;">
+          Contacto
+        </h2>
+        <p class="lead mb-4" style="text-align: justify;">
+          Estamos acá para servirte. Escribinos tu consulta y te respondemos a la brevedad.
+        </p>
+      </div>
+
+      <form action="?" method="post" id="formContacto">
+        <div class="mb-3">
+          <label for="name">Nombre:</label>
+          <input type="text" class="form-control rounded-3" name="nombre" placeholder="Escribe tu nombre..." required>
+        </div>
+        <div class="mb-3">
+          <label for="email">Correo electrónico:</label>
+          <input type="email" class="form-control rounded-3" name="correo" placeholder="Escribe tu correo electrónico..." required>
+        </div>
+        <div class="mb-3">
+          <label for="message">Mensaje:</label>
+          <textarea id="message" class="form-control rounded-3 no-resize" name="mensaje" rows="6" placeholder="Escribe tu mensaje..." required></textarea>
+        </div>
+        <input type="submit" class="btn btn-gold mt-2" value="Enviar mensaje">
+      </form>
+    </div>
+
+    <!-- Imagen decorativa extendida -->
+    <div class="col-lg-6 text-center">
+      <img src="./img/Contacto.webp"
+           alt="Contacto - Piccolo Burgers"
+           class="img-fluid rounded-3 shadow-lg"
+           style="max-height: 350px; width: 100%; object-fit: cover; border-radius: 1.2rem;">
+    </div>
+  </div>
+</section>
+
+
+  <section id="ubicacion" class="container mt-5">
+  <div class="row align-items-center p-5"
+       data-aos="fade-up"
+       style="background: linear-gradient(145deg, #1e1e1e, #0d0d0d); color: var(--text-light); border-radius: 1.5rem; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);">
+
+    <!-- Texto -->
+    <div class="col-lg-6 d-flex flex-column align-items-center align-items-lg-start mb-4 mb-lg-0">
+      <h2 class="fw-bold display-6 mb-4 text-center w-100" style="color: var(--main-gold); letter-spacing: 1px;">
+        Nuestra Ubicación
+      </h2>
+      <p class="lead text-justify" style="font-size: 1.15rem; max-width: 750px; line-height: 1.8; margin: 0 auto; text-align: justify;">
+        Encontranos fácilmente en nuestro local en <strong style="color: var(--main-gold);">Villa del Rosario</strong>, Córdoba.
+        <br><br>
+        Estamos ubicados en <strong>25 de Mayo 1295</strong>, a pasos del centro. Acercate a disfrutar nuestras hamburguesas artesanales en un ambiente cálido y moderno 🍔✨
+      </p>
+    </div>
+
+    <!-- Mapa -->
+    <div class="col-lg-6 text-center">
+      <div class="shadow-lg rounded-3 overflow-hidden" style="height: 350px;">
         <iframe
           src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.107065015397!2d-63.53723899007664!3d-31.548676202549203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94332a4ac325a7ad%3A0x91ff9ca646897a8f!2s25%20de%20Mayo%201295%2C%20X5963%20Villa%20del%20Rosario%2C%20C%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1756841415057!5m2!1ses-419!2sar"
           width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
@@ -545,54 +319,124 @@ if ($_POST) {
         </iframe>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section id="contacto" class="container mt-4" data-aos-up="fade-up" data-aos="fade-up">
-    <h2>Contacto</h2>
-    <p>Estamos acá para servirte.</p>
-    <?php if (isset($_SESSION['mensaje'])): ?>
-      <div class="alert alert-warning text-center mt-3">
-        <?php echo $_SESSION['mensaje'];
-        unset($_SESSION['mensaje']); ?>
-      </div>
-    <?php endif; ?>
 
-    <form action="?" method="post" id="formContacto">
-      <div class="mb-3">
-        <label for="name">Nombre:</label>
-        <input type="text" class="form-control" name="nombre" placeholder="Escribe tu nombre..." required>
-      </div>
-      <div class="mb-3">
-        <label for="email">Correo electrónico:</label>
-        <input type="email" class="form-control" name="correo" placeholder="Escribe tu correo electrónico..." required>
-      </div>
-      <div class="mb-3">
-        <label for="message">Mensaje:</label>
-        <textarea id="message" class="form-control no-resize" name="mensaje" rows="6" required></textarea>
-      </div>
-      <input type="submit" class="btn btn-gold" value="Enviar mensaje">
-    </form>
-  </section>
+  <section id="testimonios" class="py-5" style="background: linear-gradient(to bottom, #2c2c2c, #1a1a1a); overflow: hidden;">
+  <div class="container">
+    <h2 class="text-center mb-4">Testimonios</h2>
 
-  <div id="horario" class="text-center p-5" data-aos-up="fade-up" data-aos="fade-up" style="background: linear-gradient(to top, #2c2c2c, #1a1a1a);">
-    <h3 class="mb-4">Horario de atención</h3>
-    <div>
-      <p><strong>Martes a Domingo y feriados</strong></p>
-      <p><strong>20:00 hs - 00:30 hs</strong></p>
+    <div class="testimonios-carousel-container" style="position: relative; height: 140px; overflow: hidden;">
+      <div class="testimonios-carousel" id="testimonios-carousel">
+        <?php foreach ($lista_testimonios as $testimonio): ?>
+          <div class="testimonio-card">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column justify-content-between">
+                <p class="card-text"><?= htmlspecialchars($testimonio["opinion"]) ?></p>
+                <div class="card-footer mt-auto">
+                  <?= htmlspecialchars($testimonio["nombre"]) ?>
+                </div>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+
+        <?php foreach ($lista_testimonios as $testimonio): ?>
+          <div class="testimonio-card">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column justify-content-between">
+                <p class="card-text"><?= htmlspecialchars($testimonio["opinion"]) ?></p>
+                <div class="card-footer mt-auto">
+                  <?= htmlspecialchars($testimonio["nombre"]) ?>
+                </div>
+              </div>
+            </div>
+          </div>
+        <?php endforeach; ?>
+      </div>
     </div>
-    <div>
-      <p><em>Lunes cerrado</em></p>
+  </div>
+</section>
+
+  <!-- Script Testimonios -->
+  <script>
+    const wrapper = document.getElementById('testimonios-wrapper');
+    const btnLeft = document.getElementById('btn-left');
+    const btnRight = document.getElementById('btn-right');
+    const scrollAmount = 340;
+
+    btnLeft.addEventListener('click', () => {
+      wrapper.scrollBy({
+        left: -scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+
+    btnRight.addEventListener('click', () => {
+      wrapper.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    });
+  </script>
+
+
+<footer id="footer" class="mt-5" style="background: linear-gradient(to top, #111, #1e1e1e); color: var(--text-light);">
+  <div class="container py-5">
+    <div class="row text-center text-md-start">
+
+      <!-- Info principal -->
+      <div class="col-md-4 mb-4">
+        <h4 class="fw-bold mb-3" style="color: var(--main-gold);">Piccolo Burgers VDR</h4>
+        <p>🍔 100% cargadas de sabor</p>
+        <p>📍 25 de Mayo 1295</p>
+        <p>🍽️ Servicio a mesa y Take Away</p>
+      </div>
+
+      <!-- Horarios -->
+      <div class="col-md-4 mb-4">
+        <h4 class="fw-bold mb-3" style="color: var(--main-gold);">Horario de atención</h4>
+        <p><strong>Martes a Domingo y feriados</strong></p>
+        <p>⌚ 20:00 hs - 00:30 hs</p>
+        <p><em>Lunes cerrado</em></p>
+      </div>
+
+      <!-- Contacto -->
+      <div class="col-md-4 mb-4">
+        <h4 class="fw-bold mb-3" style="color: var(--main-gold);">Contacto</h4>
+        <div class="d-flex justify-content-center justify-content-md-start gap-3">
+          <a href="https://wa.me/543573438947" target="_blank" style="color: var(--main-gold);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M13.601 2.326A7.875 7.875 0 0 0 8.003.125a7.875 7.875 0 0 0-6.6 11.95L.125 15.875l3.8-1.25a7.875 7.875 0 0 0 4.078 1.125h.003a7.875 7.875 0 0 0 7.875-7.875 7.875 7.875 0 0 0-2.28-5.574zM8.003 14.25a6.25 6.25 0 0 1-3.2-.875l-.228-.137-2.25.75.75-2.25-.15-.237a6.25 6.25 0 1 1 5.078 2.75zm3.65-4.55c-.2-.1-1.175-.575-1.35-.637-.175-.062-.3-.1-.425.1-.125.2-.487.637-.6.762-.112.125-.225.137-.425.037-.2-.1-.85-.312-1.625-.987-.6-.537-1-1.2-1.125-1.4-.112-.2-.012-.3.088-.4.088-.087.2-.225.3-.337.1-.112.137-.2.2-.325.062-.125.025-.237-.012-.337-.037-.1-.425-1.025-.587-1.4-.15-.362-.3-.312-.425-.312h-.362c-.125 0-.325.037-.487.237-.162.2-.625.612-.625 1.487 0 .875.637 1.725.725 1.85.088.125 1.25 1.912 3.025 2.675.425.183.75.292 1.012.375.425.137.812.118 1.118.075.342-.05 1.175-.475 1.337-.937.162-.462.162-.85.112-.937-.05-.087-.175-.137-.375-.237z"/>
+            </svg>
+          </a>
+          <a href="https://www.facebook.com/profile.php?id=100087896013957" target="_blank" style="color: var(--main-gold);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8.94 8.5H10l.5-2H8.94V5.5c0-.58.12-.9.94-.9H10V2.6c-.16-.02-.72-.06-1.37-.06-1.37 0-2.31.83-2.31 2.36V6.5H5v2h1.26v5h2.68v-5z"/>
+            </svg>
+          </a>
+          <a href="https://www.instagram.com/piccoloburgers/" target="_blank" style="color: var(--main-gold);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 5.5A2.5 2.5 0 1 0 8 10a2.5 2.5 0 0 0 0-4.5zM8 9a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+              <path d="M11.5 1h-7A3.5 3.5 0 0 0 1 4.5v7A3.5 3.5 0 0 0 4.5 15h7a3.5 3.5 0 0 0 3.5-3.5v-7A3.5 3.5 0 0 0 11.5 1zm2.5 10.5a2.5 2.5 0 0 1-2.5 2.5h-7a2.5 2.5 0 0 1-2.5-2.5v-7A2.5 2.5 0 0 1 4.5 2h7a2.5 2.5 0 0 1 2.5 2.5v7z"/>
+              <path d="M12 4.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Línea inferior -->
+  <div class="bg-dark text-light text-center py-3">
+    <p>&copy; 2025 Piccolo Burgers — Developed by:
+      <strong>Jazmin Abigail Gaido - Mariano Jesús Ceballos - Juan Pablo Medina</strong>
+    </p>
+  </div>
+</footer>
 
-  <footer class="bg-dark text-light text-center py-3">
-    <p>&copy; 2025 Piccolo Burgers — Developed by: <strong>Jazmin Abigail Gaido - Mariano Jesús Ceballos - Juan Pablo Medina</strong></p>
-  </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
   <script>
     AOS.init({
       once: false,
@@ -729,16 +573,28 @@ if ($_POST) {
     });
 
     document.addEventListener('DOMContentLoaded', function() {
-      const toastEl = document.getElementById('toastContacto');
-      if (toastEl) {
-        const toast = new bootstrap.Toast(toastEl, {
-          autohide: true,
-          delay: 2500
-        });
-        toast.show();
-      }
+  const toastEl = document.getElementById('toastContacto');
+  if (toastEl) {
+    const toast = new bootstrap.Toast(toastEl, {
+      autohide: true,
+      delay: 2500
     });
+    toast.show();
+  }
+});
+
   </script>
+
+  <script>
+  function cerrarBurbuja() {
+    const burbuja = document.getElementById('registro-burbuja');
+    burbuja.classList.add('fade-out');
+    setTimeout(() => {
+      burbuja.style.display = 'none';
+    }, 500);
+  }
+</script>
+
 
   <!-- Toast fijo en el DOM -->
   <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
@@ -780,19 +636,23 @@ if ($_POST) {
       </div>
     </div>
   </div>
+
   <?php if (isset($_SESSION['toast'])): ?>
-    <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
-      <div id="toastContacto" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">
-            <?php echo $_SESSION['toast'];
-            unset($_SESSION['toast']); ?>
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+  <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
+    <div id="toastContacto"
+         class="toast align-items-center text-bg-<?= $_SESSION['toast']['tipo'] ?> border-0"
+         role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          <?= htmlspecialchars($_SESSION['toast']['mensaje']) ?>
         </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                data-bs-dismiss="toast" aria-label="Cerrar"></button>
       </div>
     </div>
+  </div>
+  <?php unset($_SESSION['toast']); ?>
+<?php endif; ?>
 
-  <?php endif; ?>
 </body>
 </html>
