@@ -1,3 +1,4 @@
+
 <?php
 include("../../bd.php");
 
@@ -194,8 +195,15 @@ include("../../templates/header.php");
 </div>
 
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- jQuery: debe ir primero -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables -->
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
   $(document).ready(function () {
     $('#tablaCompras').DataTable({
@@ -205,10 +213,12 @@ include("../../templates/header.php");
       lengthChange: true,
       responsive: true,
       fixedHeader: true,
+      pageLength: 5,
+      lengthMenu: [5, 10, 25, 50],
       language: {
         emptyTable: "No hay compras registradas",
         search: "Buscar:",
-        lengthMenu: "Mostrar _MENU_ registros",
+        lengthMenu: "Mostrar registros _MENU_",
         paginate: {
           first: "Primero",
           last: "Último",
