@@ -142,26 +142,36 @@ include("../../templates/header.php");
   </div>
 </div>
 
+<!-- jQuery-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- CSS de DataTables -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script>
   $(document).ready(function () {
     $('#tablaMaterias').DataTable({
-      paging: true,
-      searching: true,
-      info: false,
-      responsive: true,
-      fixedHeader: true,
-      language: {
-        emptyTable: "No hay materias primas registradas",
-        search: "Buscar:",
-        paginate: {
-          first: "Primero",
-          last: "Último",
-          next: "Siguiente",
-          previous: "Anterior"
-        }
-      }
-    });
+  paging: true,
+  searching: true,
+  info: false,
+  responsive: true,
+  fixedHeader: true,
+  pageLength: 10,
+  lengthMenu: [10, 25, 50], 
+  language: {
+    emptyTable: "No hay materias primas registradas",
+    search: "Buscar:",
+    lengthMenu: "Mostrar registros _MENU_",
+    paginate: {
+      first: "Primero",
+      last: "Último",
+      next: "Siguiente",
+      previous: "Anterior"
+    }
+  }
+});
+
   });
 </script>
 

@@ -93,35 +93,39 @@ include("../../templates/header.php");
   </div>
 </div>
 
-<!-- ✅ Scripts de DataTables -->
+<!-- Scripts de DataTables -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.4.0/js/dataTables.responsive.min.js"></script>
 <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
 
 <script>
-  $(document).ready(function () {
-    $('#tablaMenu').DataTable({
-      paging: true,
-      searching: true,
-      info: true,
-      responsive: true,
-      fixedHeader: true,
-      lengthMenu: [10, 25, 50, 100],
-      language: {
-        emptyTable: "No hay registros de menú",
-        search: "Buscar:",
-        lengthMenu: "Mostrar _MENU_ registros por página",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-        infoEmpty: "Sin registros disponibles",
-        paginate: {
-          first: "Primero",
-          last: "Último",
-          next: "Siguiente",
-          previous: "Anterior"
+  $(document).ready(function() {
+    if ($.fn.DataTable) {
+      $('#tablaMenu').DataTable({
+        paging: true,
+        searching: true,
+        info: true,
+        responsive: true,
+        fixedHeader: true,
+        lengthMenu: [10, 25, 50, 100],
+        language: {
+          emptyTable: "No hay registros de menú",
+          search: "Buscar:",
+          lengthMenu: "Mostrar _MENU_ registros por página",
+          info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
+          infoEmpty: "Sin registros disponibles",
+          paginate: {
+            first: "Primero",
+            last: "Último",
+            next: "Siguiente",
+            previous: "Anterior"
+          }
         }
-      }
-    });
+      });
+    } else {
+      console.error("DataTables no está disponible.");
+    }
   });
 </script>
 
