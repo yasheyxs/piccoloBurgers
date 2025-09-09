@@ -45,12 +45,14 @@ include("admin/bd.php"); ?>
       background-color: #111;
       transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
     }
+
     /* Estilos de texto del navbar */
     .navbar-brand,
     .nav-link {
       font-family: var(--font-main);
       font-size: 1.2rem;
     }
+
     /* Sticky al hacer scroll */
     .sticky-navbar {
       position: fixed;
@@ -58,6 +60,7 @@ include("admin/bd.php"); ?>
       width: 100%;
       z-index: 999;
     }
+
     /* Estado al cargar */
     .sticky-navbar:not(.scrolled) {
       background-color: rgba(17, 17, 17, 1);
@@ -65,6 +68,7 @@ include("admin/bd.php"); ?>
       backdrop-filter: none;
       box-shadow: none;
     }
+
     .sticky-navbar.scrolled {
       background-color: rgba(17, 17, 17, 0.6);
       /* semitransparente */
@@ -115,7 +119,7 @@ include("admin/bd.php"); ?>
       width: 100%;
       z-index: 1000;
       --bs-bg-opacity: 0.1;
-      padding: 0.5rem ;
+      padding: 0.5rem;
     }
 
     /* Contenedor con efecto Glass */
@@ -131,7 +135,8 @@ include("admin/bd.php"); ?>
       padding-top: 30px;
       flex-grow: 1;
     }
-    .respedido{
+
+    .respedido {
       background: rgba(44, 44, 44, 0.7);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -151,7 +156,9 @@ include("admin/bd.php"); ?>
       box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       overflow: hidden;
-      background: rgba(26, 26, 26, 0.7); /* fondo semi-transparente */backdrop-filter: blur(8px)
+      background: rgba(26, 26, 26, 0.7);
+      /* fondo semi-transparente */
+      backdrop-filter: blur(8px)
     }
 
     .card:hover {
@@ -208,143 +215,167 @@ include("admin/bd.php"); ?>
     }
 
     .btn-gold-circle {
-  background-color: var(--main-gold);
-  color: #000;
-  font-size: 1.5rem;
-  font-weight: bold;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-  transition: all 0.3s ease;
-}
+      background-color: var(--main-gold);
+      color: #000;
+      font-size: 1.5rem;
+      font-weight: bold;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease;
+    }
 
-.btn-gold-circle:hover {
-  background-color: var(--gold-hover);
-  transform: scale(1.1);
-}
-
+    .btn-gold-circle:hover {
+      background-color: var(--gold-hover);
+      transform: scale(1.1);
+    }
   </style>
 </head>
 
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-dark sticky-navbar bg-dark">
-  <div class="container">
-    <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
-        <!-- Enlaces principales -->
-        <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
-        <li class="nav-item"><a class="nav-link" href="./index.php#testimonio">Testimonio</a></li>
-
-        <!-- Dropdown compacto -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
-            Más
-          </a>
-          <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
-            <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
-            <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
-            <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
-          </ul>
-        </li>
-
-        <!-- Carrito -->
-        <li class="nav-item">
-          <a class="nav-link position-relative" href="carrito.php">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-              0
-            </span>
-          </a>
-        </li>
-
-        <!-- Sesión -->
-        <?php if (isset($_SESSION["cliente"])): ?>
-          <li class="nav-item">
-            <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
-              <i class="fas fa-user-circle"></i>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="./logout_cliente.php" class="nav-link" title="Cerrar sesión">
-              <i class="fas fa-sign-out-alt"></i>
-            </a>
-          </li>
-        <?php else: ?>
-          <li class="nav-item">
-            <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
-              Iniciar sesión / Registrarse
-            </a>
-          </li>
-        <?php endif; ?>
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
-<div class="container contenido-ajustado">
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-navbar bg-dark">
     <div class="container">
-    <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
-    <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
-    <div id="btnAgregarMas" class="mt-4"></div>
+      <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <!-- Enlaces principales -->
+          <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="./index.php#testimonio">Testimonio</a></li>
 
-    <div class="d-flex justify-content-center mt-4">
-  <a href="./index.php#menu" class="btn btn-gold-circle" title="Agregar más">
-    <i class="fas fa-plus"></i>
-  </a>
-</div>
+          <!-- Dropdown compacto -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
+              Más
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark">
+              <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
+              <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
+              <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+              <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
+            </ul>
+          </li>
 
+          <!-- Carrito -->
+          <li class="nav-item">
+            <a class="nav-link position-relative" href="carrito.php">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+                0
+              </span>
+            </a>
+          </li>
 
-    <div class="text-end mt-4">
-      <h4>Total: $<span id="total">0.00</span></h4>
-      <?php
-      $descuento_maximo = 0;
-      $puntos_cliente = 0;
+          <!-- Sesión -->
+          <?php if (isset($_SESSION["cliente"])): ?>
+            <li class="nav-item">
+              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+                <i class="fas fa-user-circle"></i>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#logoutModal">
+                <i class="fas fa-sign-out-alt"></i>
+              </a>
 
-      if (isset($_SESSION["cliente"])) {
-        $cliente_id = $_SESSION["cliente"]["id"];
-        $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
-        $stmt->execute([$cliente_id]);
-        $puntos_cliente = $stmt->fetchColumn();
-      }
-      ?>
+            </li>
+          <?php else: ?>
+            <li class="nav-item">
+              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+                Iniciar sesión / Registrarse
+              </a>
+            </li>
+          <?php endif; ?>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-      <?php if (isset($_SESSION["cliente"])): ?>
-        <div class="form-check mt-3 d-flex justify-content-end align-items-center gap-2">
-          <input class="form-check-input mt-0" type="checkbox" id="usarPuntos" onclick="actualizarTotal()">
-          <label class="form-check-label mb-0" for="usarPuntos">
-            Usar puntos (<?php echo $puntos_cliente; ?> disponibles)
-          </label>
-          <input type="hidden" id="puntosDisponibles" value="<?php echo $puntos_cliente; ?>">
+  <!-- Modal de cierre de sesión -->
+  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content bg-dark text-white border-0 shadow-lg">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold" id="logoutModalLabel">
+            <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-
-      <?php endif; ?>
-      <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
-        <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
-          <input type="hidden" name="carrito" id="carritoInput">
-          <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
-          <button type="submit" class="btn btn-gold" id="btnFinalizar">🧾 Finalizar Pedido</button>
-        </form>
-        <button class="btn btn-outline-danger-rounded" id="btnCancelar" onclick="mostrarConfirmacionCancelar()">Cancelar Pedido</button>
+        <div class="modal-body text-center">
+          <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
+        </div>
+        <div class="modal-footer justify-content-center border-top-0">
+          <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
+            <i></i> Quedarme
+          </button>
+          <a href="./logout_cliente.php" class="btn btn-danger px-4">
+            <i class="fas fa-door-open me-1"></i> Cerrar Sesión
+          </a>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <div class="container contenido-ajustado">
+    <div class="container">
+      <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
+      <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
+      <div id="btnAgregarMas" class="mt-4"></div>
+
+
+      <div class="d-flex justify-content-center mt-4">
+        <a href="./index.php#menu" class="btn btn-gold-circle" title="Agregar más">
+          <i class="fas fa-plus"></i>
+        </a>
+      </div>
+
+
+      <div class="text-end mt-4">
+        <h4>Total: $<span id="total">0.00</span></h4>
+        <?php
+        $descuento_maximo = 0;
+        $puntos_cliente = 0;
+
+        if (isset($_SESSION["cliente"])) {
+          $cliente_id = $_SESSION["cliente"]["id"];
+          $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
+          $stmt->execute([$cliente_id]);
+          $puntos_cliente = $stmt->fetchColumn();
+        }
+        ?>
+
+        <?php if (isset($_SESSION["cliente"])): ?>
+          <div class="form-check mt-3 d-flex justify-content-end align-items-center gap-2">
+            <input class="form-check-input mt-0" type="checkbox" id="usarPuntos" onclick="actualizarTotal()">
+            <label class="form-check-label mb-0" for="usarPuntos">
+              Usar puntos (<?php echo $puntos_cliente; ?> disponibles)
+            </label>
+            <input type="hidden" id="puntosDisponibles" value="<?php echo $puntos_cliente; ?>">
+          </div>
+
+        <?php endif; ?>
+        <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
+          <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
+            <input type="hidden" name="carrito" id="carritoInput">
+            <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
+            <button type="submit" class="btn btn-gold" id="btnFinalizar">🧾 Finalizar Pedido</button>
+          </form>
+          <button class="btn btn-outline-danger-rounded" id="btnCancelar" onclick="mostrarConfirmacionCancelar()">Cancelar Pedido</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 
   <footer class="bg-dark text-light text-center py-3 mt-5">
@@ -658,16 +689,16 @@ include("admin/bd.php"); ?>
   <?php include("componentes/whatsapp_button.php"); ?>
 
   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const navbar = document.querySelector(".navbar");
-    const contenido = document.querySelector(".contenido-ajustado");
+    document.addEventListener("DOMContentLoaded", function() {
+      const navbar = document.querySelector(".navbar");
+      const contenido = document.querySelector(".contenido-ajustado");
 
-    if (navbar && contenido) {
-      const alturaNavbar = navbar.getBoundingClientRect().height;
-      contenido.style.paddingTop = alturaNavbar + 24 + "px"; // 24px extra para aire visual
-    }
-  });
-</script>
+      if (navbar && contenido) {
+        const alturaNavbar = navbar.getBoundingClientRect().height;
+        contenido.style.paddingTop = alturaNavbar + 24 + "px"; // 24px extra para aire visual
+      }
+    });
+  </script>
 
 </body>
 

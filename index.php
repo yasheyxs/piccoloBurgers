@@ -118,9 +118,10 @@ if ($_POST) {
             </a>
           </li>
           <li class="nav-item">
-            <a href="logout_cliente.php" class="nav-link" title="Cerrar sesión">
-              <i class="fas fa-sign-out-alt"></i>
-            </a>
+            <a href="#" class="nav-link" title="Cerrar sesión" data-bs-toggle="modal" data-bs-target="#logoutModal">
+  <i class="fas fa-sign-out-alt"></i>
+</a>
+
           </li>
         <?php else: ?>
           <li class="nav-item">
