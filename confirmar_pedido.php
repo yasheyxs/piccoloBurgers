@@ -395,27 +395,34 @@ if (formData.get("metodo_pago") === "MercadoPago") {
 const modalHtml = `
   <div class="modal fade" id="modalGracias" tabindex="-1" aria-labelledby="modalGraciasLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content border-0 shadow">
-        <div class="modal-header bg-success text-white">
-          <h5 class="modal-title" id="modalGraciasLabel">¡Gracias por tu pedido!</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      <div class="modal-content glass-card border-0 shadow-lg" style="border-radius: 20px; background: rgba(30,30,30,0.85); color: #f8f9fa;">
+        <div class="modal-header border-0 px-4 py-3">
+          <h5 class="modal-title fw-bold d-flex align-items-center" id="modalGraciasLabel">
+            <i class="fas fa-check-circle text-success me-2 fa-lg"></i>
+            ¡Gracias por tu pedido!
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <div class="modal-body fs-5">
+        <div class="modal-body fs-5 px-4 py-3">
           <p>🎉 <strong>${resultado.nombre}</strong>, tu pedido está en preparación. 🍔</p>
           ${parseFloat(resultado.descuento) > 0 ? `
-            <p>Total original: $${resultado.total_original}<br>
-            Descuento por puntos: -$${resultado.descuento}</p>` : ""}
-          <p>Total a pagar: <strong>$${resultado.total}</strong></p>
-          ${resultado.puntos_ganados > 0 ? `<p>🎁 Puntos ganados: <strong>${resultado.puntos_ganados}</strong></p>` : ""}
+            <div class="mb-2">
+              <p class="mb-0">💸 <strong>Total original:</strong> $${resultado.total_original}</p>
+              <p class="mb-0">🔻 <strong>Descuento por puntos:</strong> -$${resultado.descuento}</p>
+            </div>` : ""}
+          <p class="mt-3">💰 <strong>Total a pagar:</strong> $${resultado.total}</p>
+          ${resultado.puntos_ganados > 0 ? `<p>🎁 <strong>Puntos ganados:</strong> ${resultado.puntos_ganados}</p>` : ""}
           ${mensajePago}
         </div>
-        <div class="modal-footer">
-          <a href="index.php" class="btn btn-gold">Volver al inicio</a>
+        <div class="modal-footer border-0 px-4 py-3 justify-content-center">
+          <a href="index.php" class="btn btn-gold px-4">Volver al inicio</a>
         </div>
       </div>
     </div>
   </div>
 `;
+
+
 
 
         // Insertar modal al body

@@ -243,10 +243,10 @@ include("admin/bd.php"); ?>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto">
         <!-- Enlaces principales -->
-        <li class="nav-item"><a class="nav-link" href="#inicio">Inicio</a></li>
-        <li class="nav-item"><a class="nav-link" href="#menu">Menú</a></li>
-        <li class="nav-item"><a class="nav-link" href="#nosotros">Nosotros</a></li>
-        <li class="nav-item"><a class="nav-link" href="#testimonios">Testimonio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
+        <li class="nav-item"><a class="nav-link" href="./index.php#testimonio">Testimonio</a></li>
 
         <!-- Dropdown compacto -->
         <li class="nav-item dropdown">
@@ -254,10 +254,10 @@ include("admin/bd.php"); ?>
             Más
           </a>
           <ul class="dropdown-menu dropdown-menu-dark">
-            <li><a class="dropdown-item" href="#puntos">Puntos</a></li>
-            <li><a class="dropdown-item" href="#ubicacion">Ubicación</a></li>
-            <li><a class="dropdown-item" href="#contacto">Contacto</a></li>
-            <li><a class="dropdown-item" href="#horario">Horarios</a></li>
+            <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
+            <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
+            <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+            <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
           </ul>
         </li>
 
@@ -279,7 +279,7 @@ include("admin/bd.php"); ?>
             </a>
           </li>
           <li class="nav-item">
-            <a href="logout_cliente.php" class="nav-link" title="Cerrar sesión">
+            <a href="./logout_cliente.php" class="nav-link" title="Cerrar sesión">
               <i class="fas fa-sign-out-alt"></i>
             </a>
           </li>
