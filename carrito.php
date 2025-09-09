@@ -263,7 +263,7 @@ include("admin/bd.php"); ?>
               <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
               <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
               <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
-              <li><a class="dropdown-item" href="./index.php#horario">Horarios</a></li>
+
             </ul>
           </li>
 
