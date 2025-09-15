@@ -9,50 +9,14 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <style>
-  @media (max-width: 576px) {
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_length {
-      display: flex;
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-
-    .dataTables_wrapper .dataTables_filter input,
-    .dataTables_wrapper .dataTables_length select {
-      width: 100% !important;
-    }
-
-    .dataTables_wrapper .dataTables_paginate {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .dataTables_length label {
-      font-weight: 500;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-    }
-  }
-
   tr.en-camino {
     background-color: #fff3cd !important;
   }
 
   .camion-icono {
-  font-size: 1.2rem;
-  margin-right: 4px;
-  display: inline-block;
-}
-
-
-  @media (min-width: 576px) {
-    .dataTables_length label {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    font-size: 1.2rem;
+    margin-right: 4px;
+    display: inline-block;
   }
 </style>
 
@@ -126,45 +90,9 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
   </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
 <script>
-  $(document).ready(function () {
-    if ($.fn.DataTable.isDataTable('#tabla-pedidos')) {
-      $('#tabla-pedidos').DataTable().clear().destroy();
-    }
-
-    $('#tabla-pedidos').DataTable({
-      paging: true,
-      searching: true,
-      info: false,
-      lengthChange: true,
-      responsive: true,
-      fixedHeader: true,
-      language: {
-        decimal: "",
-        emptyTable: "No hay datos disponibles en la tabla",
-        info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
-        infoEmpty: "Mostrando 0 a 0 de 0 registros",
-        infoFiltered: "(filtrado de _MAX_ registros totales)",
-        lengthMenu: "Mostrar registros: _MENU_",
-        loadingRecords: "Cargando...",
-        processing: "Procesando...",
-        search: "Buscar:",
-        zeroRecords: "No se encontraron registros coincidentes",
-        paginate: {
-          first: "Primero",
-          last: "Último",
-          next: "Siguiente",
-          previous: "Anterior"
-        },
-        aria: {
-          sortAscending: ": activar para ordenar la columna ascendente",
-          sortDescending: ": activar para ordenar la columna descendente"
-        }
-      }
-    });
+  document.addEventListener('DOMContentLoaded', function () {
+    initDataTable('#tabla-pedidos');
   });
 
   async function actualizarEstado(pedidoId, nuevoEstado, boton) {

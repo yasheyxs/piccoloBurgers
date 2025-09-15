@@ -1,0 +1,35 @@
+/* Shared responsive adjustments for DataTables controls */
+@media (max-width: 576px) {
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_length {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .dataTables_wrapper .dataTables_filter input,
+  .dataTables_wrapper .dataTables_length select {
+    width: 100% !important;
+  }
+
+  .dataTables_wrapper .dataTables_paginate {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .dataTables_length label {
+    font-weight: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (min-width: 576px) {
+  .dataTables_length label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
