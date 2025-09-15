@@ -1,6 +1,6 @@
 <?php
-include("../admin/bd.php");
-include("../admin/templates/header.php");
+include("../bd.php");
+include("../templates/header.php");
 
 $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En camino' ORDER BY fecha DESC");
 $sentencia->execute();
@@ -99,7 +99,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       formData.append('pedido_id', pedidoId);
       formData.append('nuevo_estado', 'Listo');
 
-      const response = await fetch('../admin/actualizar_estado.php', {
+      const response = await fetch('../pedidos/actualizar_estado.php', {
         method: 'POST',
         body: formData
       });
@@ -126,4 +126,4 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
   setInterval(() => location.reload(), 10000);
 </script>
 
-<?php include("../admin/templates/footer.php"); ?>
+<?php include("../templates/footer.php"); ?>

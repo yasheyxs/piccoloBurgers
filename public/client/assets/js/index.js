@@ -102,7 +102,7 @@
         contenedorBotonMas.innerHTML = '';
       }
 
-      fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
+      fetch(`../client/filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
         .then((resp) => resp.text())
         .then((html) => {
           const temp = document.createElement('div');
@@ -132,7 +132,7 @@
       const categoria = categoriaSelect.value;
       const texto = buscadorInput.value.trim();
 
-      fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
+      fetch(`../client/filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
         .then((response) => response.text())
         .then((html) => {
           const temp = document.createElement('div');
