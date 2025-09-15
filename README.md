@@ -11,6 +11,9 @@ Piccolo Burgers 🍔✨
 Piccolo Burgers es un sistema web completo pensado para optimizar tanto la experiencia de los **clientes** como la **gestión interna** de un restaurante de comida rápida.
 Incluye un **sitio público** donde los usuarios pueden explorar el menú, hacer pedidos y acumular puntos de fidelidad, además de un **panel administrativo** para gestionar el negocio en tiempo real.
 
+
+  <img width="1835" height="814" alt="image" src="https://github.com/user-attachments/assets/7b501577-a378-4fce-9680-8c07317c5675" />
+
 ---------------
 
 ✨ **Características principales**
@@ -22,6 +25,13 @@ Incluye un **sitio público** donde los usuarios pueden explorar el menú, hacer
 * ⭐ **Acumulación de puntos de fidelidad** y consulta de historial de compras
 * 👤 **Perfil de usuario**, testimonios, reseñas y horarios de atención
 
+
+  <img width="1842" height="826" alt="image" src="https://github.com/user-attachments/assets/d8883206-8405-4486-ab52-06807ba35957" />
+  
+  <img width="1858" height="825" alt="image" src="https://github.com/user-attachments/assets/c328f2fb-8ce9-48d6-953a-08f9ba06b5a5" />
+
+
+
 🔹 **Panel de administración**
 
 * 📦 **Gestión de productos**: agregar, editar o eliminar artículos del menú
@@ -29,6 +39,12 @@ Incluye un **sitio público** donde los usuarios pueden explorar el menú, hacer
 * 🖼️ **Cambio de banners** y publicación de testimonios
 * 💬 **Revisión de comentarios** de clientes
 * ⏱️ **Monitorización de pedidos en tiempo real** con estados (En preparación, Listo, Cancelado)
+
+
+  <img width="1863" height="493" alt="image" src="https://github.com/user-attachments/assets/aa595fb4-e0fb-444d-ba89-717a0d161d17" />
+  
+  <img width="1848" height="716" alt="image" src="https://github.com/user-attachments/assets/956a857f-8460-4a7e-aedd-51b1f71a0e58" />
+
 
 ---------------
 
@@ -95,6 +111,10 @@ piccoloBurgers/
 
 * 👤 **Clientes:** registrarse o iniciar sesión y realizar pedidos
 * 👨‍💼 **Administradores:** gestionar productos, usuarios y pedidos en /admin
+
+
+  <img width="915" height="740" alt="image" src="https://github.com/user-attachments/assets/f48f8585-0f4f-4ecb-8deb-3a96bf66c465" />
+
 
 ---------------
 
