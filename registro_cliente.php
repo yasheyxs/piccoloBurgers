@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("admin/bd.php");
+require_once __DIR__ . '/componentes/validar_telefono.php';
 
 $mensaje = "";
 
@@ -9,32 +10,6 @@ function validarFuerza($pass)
 {
   return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $pass);
 }
-
-function validarTelefono($codigo, $numero)
-{
-  $codigo = preg_replace('/[^\d]/', '', $codigo);
-  $numero = preg_replace('/[^\d]/', '', $numero);
-  $telefono = '+' . $codigo . $numero;
-
-  // Longitudes esperadas por país
-  $longitudes = [
-    '54' => [10],       // Argentina
-    '598' => [8, 9],    // Uruguay
-    '55' => [10, 11],   // Brasil
-    '56' => [9],        // Chile
-    '595' => [9],       // Paraguay
-    '591' => [8],       // Bolivia
-    '51' => [9],        // Perú
-    '1' => [10],        // USA
-    '34' => [9]         // España
-  ];
-
-  if (!isset($longitudes[$codigo])) return false;
-  if (!in_array(strlen($numero), $longitudes[$codigo])) return false;
-
-  return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
-}
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $nombre = trim($_POST["nombre"]);

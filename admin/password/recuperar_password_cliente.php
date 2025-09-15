@@ -1,22 +1,6 @@
 <?php
 $mensaje = "";
-
-function validarTelefono($codigo, $numero)
-{
-  $codigo = preg_replace('/[^\d]/', '', $codigo);
-  $numero = preg_replace('/[^\d]/', '', $numero);
-  $telefono = '+' . $codigo . $numero;
-
-  $longitudes = [
-    '54' => [10], '598' => [8, 9], '55' => [10, 11], '56' => [9],
-    '595' => [9], '591' => [8], '51' => [9], '1' => [10], '34' => [9]
-  ];
-
-  if (!isset($longitudes[$codigo])) return false;
-  if (!in_array(strlen($numero), $longitudes[$codigo])) return false;
-
-  return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
-}
+require_once __DIR__ . '/../../componentes/validar_telefono.php';
 ?>
 
 <!doctype html>
