@@ -1,6 +1,6 @@
 <?php
-include("../admin/bd.php");
-include("../admin/templates/header.php");
+include("../bd.php");
+include("../templates/header.php");
 
 // Consultar pedidos "En preparación" y "En camino"
 $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado IN ('En preparación', 'En camino') ORDER BY fecha DESC");
@@ -173,7 +173,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       formData.append('pedido_id', pedidoId);
       formData.append('nuevo_estado', nuevoEstado);
 
-      const response = await fetch('../admin/actualizar_estado.php', {
+      const response = await fetch('../pedidos/actualizar_estado.php', {
         method: 'POST',
         body: formData
       });
@@ -238,4 +238,4 @@ if (contenedorBotones) {
   setInterval(() => location.reload(), 10000);
 </script>
 
-<?php include("../admin/templates/footer.php"); ?>
+<?php include("../templates/footer.php"); ?>

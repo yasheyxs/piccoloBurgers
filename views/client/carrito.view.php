@@ -9,8 +9,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
-  <link rel="stylesheet" href="assets/css/carrito.css">
+  <link rel="icon" href="../client/img/favicon.png" type="image/x-icon" />
+  <link rel="stylesheet" href="../client/assets/css/carrito.css">
 </head>
 
 <body>
@@ -23,25 +23,25 @@
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
-          <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="./index.php#testimonio">Testimonio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php#menu">Menú</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php#nosotros">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php#testimonio">Testimonio</a></li>
 
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
               Más
             </a>
             <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
-              <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
-              <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+              <li><a class="dropdown-item" href="../index.php#puntos">Puntos</a></li>
+              <li><a class="dropdown-item" href="../index.php#ubicacion">Ubicación</a></li>
+              <li><a class="dropdown-item" href="../index.php#contacto">Contacto</a></li>
 
             </ul>
           </li>
 
           <li class="nav-item">
-            <a class="nav-link position-relative" href="carrito.php">
+            <a class="nav-link position-relative" href="../client/carrito.php">
               <i class="fas fa-shopping-cart"></i>
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
                 0
@@ -51,7 +51,7 @@
 
           <?php if (isset($_SESSION["cliente"])): ?>
             <li class="nav-item">
-              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <a href="../client/perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
                 <i class="fas fa-user-circle"></i>
               </a>
             </li>
@@ -63,7 +63,7 @@
             </li>
           <?php else: ?>
             <li class="nav-item">
-              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+              <a href="../client/login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
                 Iniciar sesión / Registrarse
               </a>
             </li>
@@ -89,7 +89,7 @@
           <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
             <i></i> Quedarme
           </button>
-          <a href="./logout_cliente.php" class="btn btn-danger px-4">
+          <a href="./client/logout_cliente.php" class="btn btn-danger px-4">
             <i class="fas fa-door-open me-1"></i> Cerrar Sesión
           </a>
         </div>
@@ -104,7 +104,7 @@
       <div id="btnAgregarMas" class="mt-4"></div>
 
       <div class="d-flex justify-content-center mt-4">
-        <a href="./index.php#menu" class="btn btn-gold-circle" title="Agregar más">
+        <a href="../index.php#menu" class="btn btn-gold-circle" title="Agregar más">
           <i class="fas fa-plus"></i>
         </a>
       </div>
@@ -123,7 +123,7 @@
 
         <?php endif; ?>
         <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
-          <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
+          <form id="formPedido" action="../client/confirmar_pedido.php" method="post" class="m-0">
             <input type="hidden" name="carrito" id="carritoInput">
             <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
             <button type="submit" class="btn btn-gold" id="btnFinalizar">🧾 Finalizar Pedido</button>
@@ -157,10 +157,10 @@
     </div>
   </div>
 
-  <?php include("componentes/whatsapp_button.php"); ?>
+  <?php include __DIR__ . '/../../componentes/whatsapp_button.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/carrito.js"></script>
+  <script src="../client/assets/js/carrito.js"></script>
 </body>
 
 </html>
