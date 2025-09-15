@@ -1,65 +1,112 @@
-🍔 Sistema Web - Piccolo Burgers
+Piccolo Burgers 🍔✨
 
-**Piccolo Burgers** es un sistema web completo pensado para optimizar tanto la experiencia de los clientes como la gestión interna de un restaurante. Incluye un sitio público donde los usuarios pueden explorar el menú, hacer pedidos y acumular puntos, y un dashboard administrativo con herramientas de control y monitoreo de pedidos en tiempo real.
+👥 **Usuarios de prueba**
 
----------------------------------------------------------------------------------
+* 👤 **Usuario:** Cliente | 🔑 **Clave:** Cliente1!
+* 👤 **Usuario:** Usuario | 🔑 **Clave:** Usuario1!
 
-🌐 Sitio público (clientes)
+---------------
 
-Los clientes pueden:
+📖 **Descripción**
+Piccolo Burgers es un sistema web completo pensado para optimizar tanto la experiencia de los **clientes** como la **gestión interna** de un restaurante de comida rápida.
+Incluye un **sitio público** donde los usuarios pueden explorar el menú, hacer pedidos y acumular puntos de fidelidad, además de un **panel administrativo** para gestionar el negocio en tiempo real.
 
-- Visualizar el **menú** y realizar pedidos online
-- Crear una cuenta y **loguearse**
-- Acceder a su **perfil de usuario**
-- Acumular **puntos de fidelidad** para descuentos
-- Ver su **historial de pedidos**
-- Enviar **opiniones y reseñas**
-- Leer **testimonios**, ver **horarios** y más
+---------------
 
-📍 Acceso:  
-[http://localhost/piccoloBurgers](http://localhost/piccoloBurgers)
+✨ **Características principales**
 
----------------------------------------------------------------------------------
+🔹 **Sitio público (clientes)**
 
-## 🛠️ Panel de administración
+* 📝 **Registro** e inicio de sesión de clientes
+* 🍟 **Visualización del menú** y realización de pedidos en línea
+* ⭐ **Acumulación de puntos de fidelidad** y consulta de historial de compras
+* 👤 **Perfil de usuario**, testimonios, reseñas y horarios de atención
 
-El dashboard para administradores permite:
+🔹 **Panel de administración**
 
-- **Administrar usuarios**
-- Agregar/editar/eliminar **productos**
-- **Cambiar banners** y agregar **testimonios**
-- Ver **comentarios de clientes**
-- Usar el **panel de pedidos en tiempo real**:
-  - Cambiar el estado de los pedidos: *En preparación*, *Listo*, *Cancelado*
+* 📦 **Gestión de productos**: agregar, editar o eliminar artículos del menú
+* 👥 **Administración de usuarios**
+* 🖼️ **Cambio de banners** y publicación de testimonios
+* 💬 **Revisión de comentarios** de clientes
+* ⏱️ **Monitorización de pedidos en tiempo real** con estados (En preparación, Listo, Cancelado)
 
-📍 Acceso:  
-[http://localhost/piccoloBurgers/admin](http://localhost/piccoloBurgers/admin)
+---------------
 
----------------------------------------------------------------------------------
+🛠️ **Tecnologías empleadas**
 
-⚙️ Tecnologías utilizadas
+* 💻 **PHP** (aplicación principal)
+* 🎨 **HTML / CSS** (capa de presentación)
+* 🗄️ **MySQL** (base de datos)
+* 📦 **Composer** (gestión de dependencias):
 
-- `PHP`
-- `HTML`
-- `CSS`
-- Requiere **XAMPP**
+  * 📑 dompdf/dompdf (PDFs)
+  * 📊 phpoffice/phpspreadsheet (hojas de cálculo)
+  * 📧 phpmailer/phpmailer (correos)
 
----------------------------------------------------------------------------------
+---------------
 
-🚀 Instalación y uso
+📋 **Requisitos previos**
 
-1. Asegurate de tener **XAMPP** instalado en tu equipo.
-2. Cloná o descargá el proyecto.
-3. Colocá la carpeta del sistema en: C:\xampp\htdocs\
-4. Iniciá Apache y MySQL desde el panel de XAMPP.
-5. Accedé a [http://localhost/phpmyadmin](http://localhost/phpmyadmin)
-6. Importá el archivo `.sql` que se encuentra en el repositorio.
-7. Accedé al sitio web o al panel administrativo.
+* 🖥️ **PHP:** 8.1 o superior
+* 🗄️ **MySQL:** 8.0 o superior
+* 🌐 **Apache:** 2.4 o superior
+* 📦 **Composer:** 2.x
 
----------------------------------------------------------------------------------
+💡 Se recomienda instalar **XAMPP** que incluya Apache, PHP y MySQL.
 
-🔧 Estado del proyecto
+---------------
 
+🚀 **Instalación en otra PC**
+1️⃣ Instalar XAMPP (o similar con Apache, PHP y MySQL)
+2️⃣ Clonar o descargar el repositorio:
+git clone [https://github.com/](https://github.com/)<usuario>/piccoloBurgers.git
+3️⃣ Instalar dependencias con: composer install
+4️⃣ Mover el proyecto a la ruta del servidor web:
+
+* 🪟 Windows: C:\xampp\htdocs\piccoloBurgers
+* 🐧 Linux/Mac: /opt/lampp/htdocs/piccoloBurgers
+  5️⃣ Crear base de datos en MySQL:
+* Iniciar Apache y MySQL
+* Acceder a [http://localhost/phpmyadmin](http://localhost/phpmyadmin) y crear base de datos **piccolodb**
+* Importar **piccolodb.sql**
+  6️⃣ Configurar credenciales en **admin/bd.php**
+  7️⃣ Acceder al sitio:
+* 🌍 Público: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
+* 🔐 Admin: [http://localhost/piccoloBurgers/admin/](http://localhost/piccoloBurgers/admin/)
+
+---------------
+
+📂 **Estructura del proyecto**
+
+piccoloBurgers/
+├─ 🛠️ admin/ (panel de administración y utilidades)
+│  └─ bd.php (conexión a la base de datos)
+├─ 📁 componentes/ (nav, footer, etc.)
+├─ 🖼️ img/ (recursos gráficos)
+├─ 📦 vendor/ (dependencias Composer)
+├─ 🗄️ piccolodb.sql (script de la base de datos)
+├─ ⚙️ config.php (configuración global)
+├─ 🏠 index.php (entrada principal)
+└─ ...
+
+---------------
+
+📖 **Uso básico**
+
+* 👤 **Clientes:** registrarse o iniciar sesión y realizar pedidos
+* 👨‍💼 **Administradores:** gestionar productos, usuarios y pedidos en /admin
+
+---------------
+
+🌐 **Consideraciones para despliegue**
+
+* 🔑 Actualizar credenciales de base de datos en servidores remotos
+* ✍️ Verificar permisos de escritura en directorios de PDFs o exports
+* 🔄 Mantener dependencias al día con composer update
+
+---------------
+
+📌 **Estado del proyecto**
 🧪 **Prototipo** – Funcional y demostrativo, ideal para pruebas y mejoras futuras.
 
----------------------------------------------------------------------------------
+---------------
