@@ -1,5 +1,6 @@
 <?php
 include("admin/bd.php");
+require_once __DIR__ . '/componentes/validar_telefono.php';
 session_start();
 
 if (!isset($_SESSION["cliente"])) {
@@ -19,30 +20,6 @@ $cliente_id = $cliente["id"];
 $stmt = $conexion->prepare("SELECT nombre, telefono, email, fecha_registro, puntos FROM tbl_clientes WHERE ID = ?");
 $stmt->execute([$cliente_id]);
 $datos = $stmt->fetch(PDO::FETCH_ASSOC);
-
-function validarTelefono($codigo, $numero)
-{
-  $codigo = preg_replace('/[^\d]/', '', $codigo);
-  $numero = preg_replace('/[^\d]/', '', $numero);
-  $telefono = '+' . $codigo . $numero;
-
-  $longitudes = [
-    '54' => [10],
-    '598' => [8, 9],
-    '55' => [10, 11],
-    '56' => [9],
-    '595' => [9],
-    '591' => [8],
-    '51' => [9],
-    '1' => [10],
-    '34' => [9]
-  ];
-
-  if (!isset($longitudes[$codigo])) return false;
-  if (!in_array(strlen($numero), $longitudes[$codigo])) return false;
-
-  return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
-}
 
 // ACTUALIZAR DATOS PERSONALES
 if (isset($_POST["guardar_datos"])) {
