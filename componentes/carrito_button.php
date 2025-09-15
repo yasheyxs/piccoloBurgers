@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Botón de carrito -->
-<a href="../client/carrito.php" class="btn-carrito" aria-label="Ir al carrito">
+<a href="carrito.php" class="btn-carrito" aria-label="Ir al carrito">
   <i class="fa-solid fa-cart-shopping"></i>
 </a>
 

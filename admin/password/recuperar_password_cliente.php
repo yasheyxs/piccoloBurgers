@@ -105,7 +105,7 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
     </form>
 
     <div class="mt-3 text-center">
-      <a href="../../public/client/login_cliente.php" style="color: var(--main-gold); font-weight: bold;">Volver al login</a>
+      <a href="../../public/login_cliente.php" style="color: var(--main-gold); font-weight: bold;">Volver al login</a>
     </div>
 
     <div class="mt-4 text-center">
