@@ -1,8 +1,8 @@
 <?php
 
-if (!isset($conexion)) {
-    throw new RuntimeException('No se encontró la conexión a la base de datos.');
-}
+require_once __DIR__ . '/bootstrap.php';
+
+$conexion = requireConnection($conexion ?? null);
 
 $sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY id DESC LIMIT 1");
 $sentencia->execute();
