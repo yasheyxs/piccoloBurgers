@@ -158,7 +158,7 @@ include("admin/bd.php"); ?>
       overflow: hidden;
       background: rgba(26, 26, 26, 0.7);
       /* fondo semi-transparente */
-      backdrop-filter: blur(8px)
+      backdrop-filter: blur(8px);
     }
 
     .card:hover {
