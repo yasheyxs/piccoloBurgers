@@ -78,7 +78,7 @@
     </div>
   </div>
 
-  <?php include("componentes/whatsapp_button.php"); ?>
+  <?php include("../componentes/whatsapp_button.php"); ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/carrito.js"></script>
