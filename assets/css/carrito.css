@@ -1,0 +1,203 @@
+:root {
+  --main-gold: #fac30c;
+  --gold-hover: #e0ae00;
+  --dark-bg: #1a1a1a;
+  --gray-bg: #2c2c2c;
+  --text-light: #ffffff;
+  --text-muted: #cccccc;
+  --font-main: 'Inter', sans-serif;
+  --font-title: 'Bebas Neue', sans-serif;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  color: var(--text-light);
+  background: url('../../img/HamLoginCliente.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.navbar {
+  background-color: #111;
+  transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  --bs-bg-opacity: 0.1;
+  padding: 0.5rem;
+}
+
+.navbar-brand,
+.nav-link {
+  font-family: var(--font-main);
+  font-size: 1.2rem;
+}
+
+.sticky-navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 999;
+}
+
+.sticky-navbar:not(.scrolled) {
+  background-color: rgba(17, 17, 17, 1);
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.sticky-navbar.scrolled {
+  background-color: rgba(17, 17, 17, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn-gold {
+  background-color: var(--main-gold);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 30px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-gold:hover {
+  background-color: var(--gold-hover);
+  transform: scale(1.05);
+}
+
+.btn-outline-danger-rounded {
+  color: #fff;
+  background-color: transparent;
+  border: 2px solid #dc3545;
+  border-radius: 30px;
+  padding: 10px 30px;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-danger-rounded:hover {
+  background-color: #dc3545;
+  color: #fff;
+  transform: scale(1.05);
+}
+
+.container {
+  background: rgba(44, 44, 44, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  margin-top: 0;
+  padding-top: 30px;
+  flex-grow: 1;
+}
+
+.respedido {
+  background: rgba(44, 44, 44, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
+  flex-grow: 1;
+  padding-top: 50px;
+}
+
+.card {
+  background-color: var(--gray-bg);
+  border-radius: 16px;
+  border: none;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  background: rgba(26, 26, 26, 0.7);
+  backdrop-filter: blur(8px);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.card-img-top {
+  display: block;
+  max-height: 200px;
+  width: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-title {
+  font-family: var(--font-title);
+  font-size: 1.8rem;
+  color: var(--text-light);
+}
+
+.card-text {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.card-footer {
+  background-color: transparent;
+  color: var(--text-light);
+  font-weight: 600;
+  font-size: 1rem;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  border-left: 4px solid var(--main-gold);
+  padding-left: 12px;
+}
+
+.card-footer::before {
+  content: "👤 ";
+}
+
+.modal-content {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+}
+
+.modal-body .list-group-item {
+  background-color: transparent;
+  color: var(--text-light);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-gold-circle {
+  background-color: var(--main-gold);
+  color: #000;
+  font-size: 1.5rem;
+  font-weight: bold;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+.btn-gold-circle:hover {
+  background-color: var(--gold-hover);
+  transform: scale(1.1);
+}
