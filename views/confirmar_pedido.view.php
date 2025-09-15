@@ -2,26 +2,26 @@
 <html lang="es">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Confirmar Pedido - Piccolo Burgers</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
-  <link rel="stylesheet" href="assets/css/confirmar_pedido.css">
+  <?php
+  $pageTitle = 'Confirmar Pedido - Piccolo Burgers';
+  $extraCss = [
+    'assets/css/confirmar_pedido.css',
+  ];
+  include __DIR__ . '/partials/head.php';
+  ?>
 </head>
 
 <body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container">
-      <a class="navbar-brand" href="index.php"><i class="fas fa-utensils"></i> PICCOLO BURGERS</a>
-      <a class="btn btn-gold ms-auto" href="carrito.php"><i class="fas fa-chevron-left"></i> Volver</a>
-    </div>
-  </nav>
+  <?php
+  $navBasePath = 'index.php';
+  $navHomeLink = 'index.php';
+  include __DIR__ . '/partials/navbar.php';
+  ?>
 
   <div class="container mt-5">
+    <div class="d-flex justify-content-end mb-3">
+      <a class="btn btn-gold" href="carrito.php"><i class="fas fa-chevron-left"></i> Volver</a>
+    </div>
     <h2 class="mb-4 text-center">Confirmar Pedido</h2>
 
     <form id="form-pedido" method="post">
