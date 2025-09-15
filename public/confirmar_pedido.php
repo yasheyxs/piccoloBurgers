@@ -1,4 +1,4 @@
-<?php include("admin/bd.php"); ?>
+<?php require_once __DIR__ . '/../admin/bd.php'; ?>
 <?php
 session_start();
 $cliente = isset($_SESSION['cliente']) ? $_SESSION['cliente'] : null;

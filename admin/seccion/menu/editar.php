@@ -34,7 +34,7 @@ if ($_POST) {
       if ($foto && $tmp_foto) {
         $fecha_foto = new DateTime();
         $nombre_foto = $fecha_foto->getTimestamp() . "_" . basename($foto);
-        $destino = "../../../img/menu/" . $nombre_foto;
+        $destino = "../../../public/img/menu/" . $nombre_foto;
 
         if (!move_uploaded_file($tmp_foto, $destino)) {
           throw new Exception("No se pudo guardar la imagen.");
@@ -48,7 +48,7 @@ if ($_POST) {
 
         if ($registro_foto && isset($registro_foto['foto'])) {
           $foto_anterior = $registro_foto['foto'];
-          $ruta_anterior = "../../../img/menu/" . $foto_anterior;
+          $ruta_anterior = "../../../public/img/menu/" . $foto_anterior;
           if (file_exists($ruta_anterior)) {
             unlink($ruta_anterior);
           }
@@ -136,7 +136,7 @@ include("../../templates/header.php");
       <div class="mb-3">
         <label for="foto" class="form-label">Foto:</label><br />
         <?php if ($foto): ?>
-          <img width="50" src="../../../img/menu/<?= htmlspecialchars($foto) ?>" alt="Foto actual">
+          <img width="50" src="../../../public/img/menu/<?= htmlspecialchars($foto) ?>" alt="Foto actual">
         <?php endif; ?>
         <input type="file" class="form-control mt-2" name="foto" id="foto" accept="image/*">
       </div>
