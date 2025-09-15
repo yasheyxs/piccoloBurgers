@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 05, 2025 at 06:27 AM
+-- Generation Time: Sep 15, 2025 at 11:42 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -66,9 +66,12 @@ CREATE TABLE `tbl_clientes` (
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`, `reset_token`, `token_expira`) VALUES
 (2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
 (3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
-(4, 'Yass', '123', '', '$2y$10$ymoDnjJqsUC7idNrtSc6huvuuZLymLrYJT0fkAFqLV4OVli3vVHry', '2025-07-29 19:11:37', 159, NULL, NULL),
+(4, 'Yass', '+541111111111', NULL, '$2y$10$LPVkO1.2qyrK9e2CQUMHjep6njTTBbrxEfZWepeqzLPxybfh8Z8tm', '2025-07-29 19:11:37', 159, NULL, NULL),
 (5, 'Morrón', '543573451913', '', '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
-(6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL);
+(6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
+(7, 'Prueba', '+541234567890', '', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
+(8, 'Uu', '+541231231231', '', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
+(9, 'Cliente', '+541234512345', '', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -88,14 +91,10 @@ CREATE TABLE `tbl_comentarios` (
 --
 
 INSERT INTO `tbl_comentarios` (`ID`, `nombre`, `correo`, `mensaje`) VALUES
-(4, 'Feedback', 'Feedback@gmail.com', 'Feedback'),
-(5, 'Feedback', 'Feedback@gmail.com', 'feedback'),
-(6, 'Feedback', 'Feedback@gmail.com', 'feedback'),
-(7, 'Feedback', 'delivery@gmail.com', 'feedback'),
-(8, 'Feedback', 'Feedback@gmail.com', 'feedback'),
-(9, 'Feedback', 'Feedback@gmail.com', 'feedback'),
-(10, 'Feedback', 'Feedback@gmail.com', 'feed'),
-(11, 'Feedback', 'Feedback@gmail.com', 'feed');
+(14, 'Yass', 'Feedback@gmail.com', 'feed'),
+(15, 'Yass', 'Feedback@gmail.com', 'aaa'),
+(16, 'Yass', 'Feedback@gmail.com', 'aaa'),
+(17, 'Yass', 'Feedback@gmail.com', '3123');
 
 -- --------------------------------------------------------
 
@@ -192,10 +191,10 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (11, 'Mostaza', 'litro', 2.75, 1, 1, NULL),
 (12, 'Ketchup', 'litro', 3.65, 1, 1, NULL),
 (13, 'Salsa BBQ', 'litro', 1.06, 1, 1, NULL),
-(14, 'Queso Tybo', 'kg', 1.18, 1, 1, NULL),
+(14, 'Queso Tybo', 'kg', 1.03, 1, 1, NULL),
 (15, 'Queso Cheddar', 'kg', 2.21, 1, 1, NULL),
 (16, 'Queso Cheddar Litro', 'litro', 2.23, 1, 1, NULL),
-(17, 'Jamón cocido', 'kg', 3.51, 1, 1, NULL),
+(17, 'Jamón cocido', 'kg', 3.36, 1, 1, NULL),
 (18, 'Huevo', 'unidad', 35.00, 0, 1, NULL),
 (19, 'Panceta', 'kg', 1.85, 1, 1, NULL),
 (20, 'Salsa Piccolo', 'litro', 1.73, 1, 1, NULL),
@@ -203,7 +202,7 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (22, 'Bondiola', 'kg', 4.30, 1, 1, NULL),
 (23, 'Cebolla morada', 'kg', 2.19, 1, 1, NULL),
 (24, 'Milanesa Vegetariana', 'unidad', 38.00, 1, 1, NULL),
-(25, 'Milanesa de pollo', 'kg', 0.88, 1, 1, NULL),
+(25, 'Milanesa de pollo', 'kg', 50.00, 0, 1, NULL),
 (26, 'Milanesa de carne', 'kg', 1.66, 1, 1, NULL),
 (27, 'Prepizza', 'unidad', 35.00, 1, 1, NULL),
 (28, 'Aceituna', 'tarro', 4.19, 1, 1, NULL),
@@ -212,7 +211,7 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (32, 'Salsa para pizza', 'litro', 3.30, 1, 1, NULL),
 (33, 'Anchoas', 'lata', 2.00, 0, 1, NULL),
 (34, 'Pepperoni', 'kg', 3.65, 1, 1, NULL),
-(35, 'Discos de empanada', 'unidad', 33.00, 1, 1, NULL),
+(35, 'Discos de empanada', 'unidad', 30.00, 1, 1, NULL),
 (101, 'Pepsi (lata)', 'unidad', 31.00, 0, 1, 10.00),
 (102, 'Coca-cola 1.5L', 'unidad', 49.00, 0, 1, 10.00),
 (103, 'Paso de los Toros (lata)', 'unidad', 35.00, 0, 1, 10.00),
@@ -223,7 +222,7 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (108, 'Cerveza (porrón)', 'unidad', 38.00, 0, 1, 10.00),
 (109, 'Stella (porrón)', 'unidad', 48.00, 0, 1, 10.00),
 (110, 'Agua saborizada 1L', 'unidad', 34.00, 0, 1, 10.00),
-(111, 'Agua saborizada 500ml', 'unidad', 36.00, 0, 1, 10.00),
+(111, 'Agua saborizada 500ml', 'unidad', 35.00, 0, 1, 10.00),
 (112, 'Sprite 1.5L', 'unidad', 50.00, 0, 1, 10.00),
 (113, 'Fanta 1.5L', 'unidad', 30.00, 0, 1, 10.00),
 (114, 'Queso Muzzarella', 'kg', 3.32, 1, 1, 1.00),
@@ -617,15 +616,20 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (83, 'Yass', '123', '', '', 1500, '2025-09-03 22:29:04', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4),
 (84, 'Yass', '123', '', '', 4500, '2025-09-03 22:30:02', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4),
 (85, 'Yass', '123', '', '', 4500, '2025-09-03 22:31:09', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4),
-(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'En preparación', 4),
-(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'En camino', 4),
+(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'Cancelado', 4),
+(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4),
 (88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4),
 (89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4),
-(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'En preparación', 4),
-(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'En camino', 5),
+(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'Cancelado', 4),
+(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'Cancelado', 5),
 (92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5),
-(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'En preparación', 5),
-(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5);
+(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'Cancelado', 5),
+(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5),
+(95, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 20:47:11', 'Efectivo', 'Retiro', '', 'Listo', 8),
+(96, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 21:30:08', 'Efectivo', 'Retiro', '', 'Listo', 8),
+(97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8),
+(98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8),
+(99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8);
 
 -- --------------------------------------------------------
 
@@ -695,7 +699,12 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (123, 94, 51, 'Lomo de bondiola', 13000, 1),
 (124, 94, 55, 'Lomo de pollo', 10000, 1),
 (125, 94, 56, 'Sándwich de milanesa', 11000, 1),
-(126, 94, 57, 'Sándwich de suprema', 11000, 1);
+(126, 94, 57, 'Sándwich de suprema', 11000, 1),
+(127, 95, 47, 'Empanada de jamón y queso x1', 1500, 1),
+(128, 96, 66, 'Agua Saborizada', 1500, 1),
+(129, 97, 50, 'Especial', 13000, 1),
+(130, 98, 55, 'Lomo de pollo', 10000, 1),
+(131, 99, 47, 'Empanada de jamón y queso x1', 3000, 2);
 
 -- --------------------------------------------------------
 
@@ -767,8 +776,8 @@ CREATE TABLE `tbl_usuarios` (
 --
 
 INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
-(3, 'Jazmin Gaido', '$2y$10$tFXh5i9maQp3somQfBMKD.igABc.OS8nxQfGVY.HZFZh0BuP4Neo.', 'jazmingaidoyxs@gmail.com', 'admin', NULL, NULL),
-(4, 'Delivery', '202cb962ac59075b964b07152d234b70', 'delivery@gmail.com', 'delivery', NULL, NULL);
+(4, 'Delivery', '202cb962ac59075b964b07152d234b70', 'delivery@gmail.com', 'delivery', NULL, NULL),
+(5, 'Usuario', 'c702aebe2d2a9bcea7cc6e72a52206cc', 'Usuario@usuario.com', 'admin', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -897,13 +906,13 @@ ALTER TABLE `tbl_banners`
 -- AUTO_INCREMENT for table `tbl_clientes`
 --
 ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbl_comentarios`
 --
 ALTER TABLE `tbl_comentarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tbl_compras`
@@ -939,13 +948,13 @@ ALTER TABLE `tbl_menu_materias_primas`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=95;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=132;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
@@ -963,7 +972,7 @@ ALTER TABLE `tbl_testimonios`
 -- AUTO_INCREMENT for table `tbl_usuarios`
 --
 ALTER TABLE `tbl_usuarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
