@@ -3,7 +3,7 @@ ob_start();
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
-include("admin/bd.php");
+require_once __DIR__ . '/../admin/bd.php';
 session_start();
 
 function responder_error($mensaje) {

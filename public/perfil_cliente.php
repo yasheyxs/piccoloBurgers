@@ -1,6 +1,6 @@
 <?php
-include("admin/bd.php");
-require_once __DIR__ . '/componentes/validar_telefono.php';
+require_once __DIR__ . '/../admin/bd.php';
+require_once __DIR__ . '/../componentes/validar_telefono.php';
 session_start();
 
 if (!isset($_SESSION["cliente"])) {
@@ -886,3 +886,4 @@ const pedidoId = pedido.id ?? (pedidos.length - index);
 </body>
 
 </html>
+

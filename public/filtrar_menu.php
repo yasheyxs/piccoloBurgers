@@ -1,5 +1,5 @@
 <?php
-include("admin/bd.php");
+require_once __DIR__ . '/../admin/bd.php';
 
 $categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
 

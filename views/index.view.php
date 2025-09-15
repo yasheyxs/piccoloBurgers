@@ -19,7 +19,7 @@
 
   <!-- AOS CSS -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="./custom.css">
+  <link rel="stylesheet" href="assets/css/custom.css">
   <link rel="stylesheet" href="assets/css/index.css">
 
 </head>
