@@ -87,7 +87,7 @@ git clone [https://github.com/](https://github.com/)<usuario>/piccoloBurgers.git
 * Importar **database/piccolodb.sql**
   6️⃣ Configurar credenciales en **admin/bd.php**
   7️⃣ Acceder al sitio:
-* 🌍 Público: [http://localhost/piccoloBurgers/public/](http://localhost/piccoloBurgers/public/) _(configurá el DocumentRoot en `/public` para URLs más limpias)_
+* 🌍 Público: [http://localhost/piccoloBurgers/public/](http://localhost/piccoloBurgers/public/)
 * 🔐 Admin: [http://localhost/piccoloBurgers/admin/](http://localhost/piccoloBurgers/admin/)
 
 ---------------
