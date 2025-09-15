@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../admin/bd.php';
-require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../admin/bd.php';
+require_once __DIR__ . '/../../componentes/validar_telefono.php';
 session_start();
 
 if (!isset($_SESSION["cliente"])) {
@@ -132,7 +132,7 @@ if ($datos_guardados_exitosamente) {
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 
 
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="../img/favicon.png" type="image/x-icon" />
 
   <style>
     :root {
@@ -153,7 +153,7 @@ if ($datos_guardados_exitosamente) {
       padding: 0;
       font-family: var(--font-main);
       color: var(--text-light);
-      background: url('img/HamLoginCliente.jpg') no-repeat center center fixed;
+      background: url('../img/HamLoginCliente.jpg') no-repeat center center fixed;
       background-size: cover;
       background-attachment: fixed;
       overflow-x: hidden;
@@ -371,11 +371,11 @@ if ($datos_guardados_exitosamente) {
 
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="./index.php">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="./index.php#menu">Menú</a></li>
-          
-          <li class="nav-item"><a class="nav-link" href="./index.php#nosotros">Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="./index.php#testimonios">Testimonio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php#menu">Menú</a></li>
+
+          <li class="nav-item"><a class="nav-link" href="../index.php#nosotros">Nosotros</a></li>
+          <li class="nav-item"><a class="nav-link" href="../index.php#testimonios">Testimonio</a></li>
 
           <!-- Dropdown compacto -->
           <li class="nav-item dropdown">
@@ -383,16 +383,16 @@ if ($datos_guardados_exitosamente) {
               Más
             </a>
             <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="./index.php#puntos">Puntos</a></li>
-              <li><a class="dropdown-item" href="./index.php#ubicacion">Ubicación</a></li>
-              <li><a class="dropdown-item" href="./index.php#contacto">Contacto</a></li>
+              <li><a class="dropdown-item" href="../index.php#puntos">Puntos</a></li>
+              <li><a class="dropdown-item" href="../index.php#ubicacion">Ubicación</a></li>
+              <li><a class="dropdown-item" href="../index.php#contacto">Contacto</a></li>
 
             </ul>
           </li>
 
         <!-- Carrito -->
         <li class="nav-item">
-          <a class="nav-link position-relative" href="carrito.php">
+          <a class="nav-link position-relative" href="../carrito.php">
             <i class="fas fa-shopping-cart"></i>
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
               0
@@ -731,7 +731,7 @@ value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['
 
   async function actualizarHistorial() {
     try {
-      const response = await fetch('admin/obtener_pedidos_cliente.php');
+      const response = await fetch('../admin/obtener_pedidos_cliente.php');
       const pedidos = await response.json();
 
       const historialContenedor = document.getElementById('historial-pedidos');
@@ -800,11 +800,11 @@ const pedidoId = pedido.id ?? (pedidos.length - index);
 </script>
 
 
-  <?php include("componentes/whatsapp_button.php"); ?>
+  <?php include __DIR__ . '/../../componentes/whatsapp_button.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <?php include("componentes/carrito_button.php"); ?>
+  <?php include __DIR__ . '/../../componentes/carrito_button.php'; ?>
 
   <!-- Modal de cierre de sesión -->
   <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">

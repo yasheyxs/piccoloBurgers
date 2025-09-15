@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../admin/bd.php';
-require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../admin/bd.php';
+require_once __DIR__ . '/../../componentes/validar_telefono.php';
 
 $mensaje = "";
 
@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           "email" => $cliente["email"]
         ];
         $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
-        $mensaje .= "<script>setTimeout(() => window.location.href = 'index.php', 1500);</script>";
+        $mensaje .= "<script>setTimeout(() => window.location.href = '../index.php', 1500);</script>";
       } else {
         $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";
       }
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="../img/favicon.png" type="image/x-icon" />
   <style>
         :root {
           --main-gold: #fac30c;
@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         .login-image {
           flex: 1;
-          background: url('img/HamLoginCliente2.jpg') center/cover no-repeat;
+          background: url('../img/HamLoginCliente2.jpg') center/cover no-repeat;
         }
 
         .login-form-wrapper {
@@ -177,7 +177,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             position: relative;
             flex-direction: column;
             height: 100%;
-            background: url('img/HamLoginClim,jpg') center/cover no-repeat;
+            background: url('../img/HamLoginClim,jpg') center/cover no-repeat;
             background-size: cover;
             display: flex;
             justify-content: center;
@@ -275,7 +275,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
       <div class="extra-links">
         ¿No tenés cuenta? <a href="registro_cliente.php">Registrate acá</a><br><br>
         <a href="admin/password/recuperar_password_cliente.php?tipo=cliente">¿Olvidaste tu contraseña?</a><br><br>
-        <a href="index.php" class="btn btn-outline-light">← Volver al inicio</a>
+        <a href="../index.php" class="btn btn-outline-light">← Volver al inicio</a>
       </div>
     </form>
   </div>
