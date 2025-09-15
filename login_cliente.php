@@ -263,7 +263,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           </select>
           <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
         </div>
-        <small class="form-text">Ingresá solo números, sin espacios ni guiones.</small>
       </div>
 
       <div class="mb-3 mt-3">
