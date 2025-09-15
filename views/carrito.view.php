@@ -51,7 +51,7 @@
 
           <?php if (isset($_SESSION["cliente"])): ?>
             <li class="nav-item">
-              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <a href="cliente/perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
                 <i class="fas fa-user-circle"></i>
               </a>
             </li>
@@ -63,7 +63,7 @@
             </li>
           <?php else: ?>
             <li class="nav-item">
-              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+              <a href="cliente/login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
                 Iniciar sesión / Registrarse
               </a>
             </li>
@@ -89,7 +89,7 @@
           <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
             <i></i> Quedarme
           </button>
-          <a href="./logout_cliente.php" class="btn btn-danger px-4">
+          <a href="cliente/logout_cliente.php" class="btn btn-danger px-4">
             <i class="fas fa-door-open me-1"></i> Cerrar Sesión
           </a>
         </div>
