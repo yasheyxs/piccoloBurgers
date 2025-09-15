@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="../client/img/favicon.png" type="image/x-icon" />
 
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
@@ -19,8 +19,8 @@
 
   <!-- AOS CSS -->
   <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
-  <link rel="stylesheet" href="assets/css/custom.css">
-  <link rel="stylesheet" href="assets/css/index.css">
+  <link rel="stylesheet" href="../client/assets/css/custom.css">
+  <link rel="stylesheet" href="../client/assets/css/index.css">
 
 </head>
 
@@ -55,7 +55,7 @@
 
           <!-- Carrito -->
           <li class="nav-item">
-            <a class="nav-link position-relative" href="carrito.php">
+            <a class="nav-link position-relative" href="../client/carrito.php">
               <i class="fas fa-shopping-cart"></i>
               <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter" id="contador-carrito">
                 0
@@ -66,7 +66,7 @@
           <!-- Sesión -->
           <?php if (isset($_SESSION["cliente"])): ?>
             <li class="nav-item">
-              <a href="perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
+              <a href="../client/perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
                 <i class="fas fa-user-circle"></i>
               </a>
             </li>
@@ -78,7 +78,7 @@
             </li>
           <?php else: ?>
             <li class="nav-item">
-              <a href="login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
+              <a href="../client/login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
                 Iniciar sesión / Registrarse
               </a>
             </li>
@@ -98,7 +98,7 @@
         Acumulá <strong class="text-gold">puntos exclusivos</strong> en cada compra y canjealos por <strong>descuentos irresistibles</strong>.
       </p>
 
-      <a href="registro_cliente.php" class="btn btn-gold w-100 mt-2">Registrarse</a>
+      <a href="../client/registro_cliente.php" class="btn btn-gold w-100 mt-2">Registrarse</a>
     </div>
   <?php endif; ?>
 
@@ -166,7 +166,7 @@
 
       <!-- Imagen -->
       <div class="col-lg-6 text-center">
-        <img src="img/SobreNosotros.jpg" alt="Nosotros - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg section-image">
+        <img src="../client/img/SobreNosotros.jpg" alt="Nosotros - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg section-image">
       </div>
     </div>
   </section>
@@ -177,7 +177,7 @@
 
       <!-- Imagen -->
       <div class="col-lg-6 text-center mb-4 mb-lg-0">
-        <img src="img/Puntos.jpg" alt="Sistema de Puntos - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg section-image">
+        <img src="../client/img/Puntos.jpg" alt="Sistema de Puntos - Piccolo Burgers" class="img-fluid rounded-3 shadow-lg section-image">
       </div>
 
       <!-- Texto -->
@@ -232,7 +232,7 @@
 
       <!-- Imagen decorativa extendida -->
       <div class="col-lg-6 text-center">
-        <img src="./img/Contacto.webp"
+        <img src="../client/img/Contacto.webp"
           alt="Contacto - Piccolo Burgers"
           class="img-fluid rounded-3 shadow-lg contact-image">
       </div>
@@ -391,7 +391,7 @@
           <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
             <i></i> Quedarme
           </button>
-          <a href="./logout_cliente.php" class="btn btn-danger px-4">
+          <a href="./client/logout_cliente.php" class="btn btn-danger px-4">
             <i class="fas fa-door-open me-1"></i> Cerrar Sesión
           </a>
         </div>
@@ -416,11 +416,11 @@
     <?php unset($_SESSION['toast']); ?>
   <?php endif; ?>
 
-  <?php include __DIR__ . '/../componentes/carrito_button.php'; ?>
-  <?php include __DIR__ . '/../componentes/whatsapp_button.php'; ?>
-  <?php include __DIR__ . '/../componentes/scroll_button.php'; ?>
+  <?php include __DIR__ . '/../../componentes/carrito_button.php'; ?>
+  <?php include __DIR__ . '/../../componentes/whatsapp_button.php'; ?>
+  <?php include __DIR__ . '/../../componentes/scroll_button.php'; ?>
 
-  <script src="assets/js/index.js"></script>
+  <script src="../client/assets/js/index.js"></script>
 
 </body>
 
