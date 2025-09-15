@@ -20,7 +20,7 @@ if ($_POST) {
         $fecha_foto = new DateTime();
         $nombre_foto = $fecha_foto->getTimestamp() . "_" . basename($foto);
 
-        $destino = "../../../img/menu/" . $nombre_foto;
+        $destino = "../../../public/img/menu/" . $nombre_foto;
         if (!move_uploaded_file($tmp_foto, $destino)) {
           throw new Exception("No se pudo guardar la imagen.");
         }
