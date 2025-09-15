@@ -84,10 +84,10 @@ git clone [https://github.com/](https://github.com/)<usuario>/piccoloBurgers.git
   5️⃣ Crear base de datos en MySQL:
 * Iniciar Apache y MySQL
 * Acceder a [http://localhost/phpmyadmin](http://localhost/phpmyadmin) y crear base de datos **piccolodb**
-* Importar **piccolodb.sql**
+* Importar **database/piccolodb.sql**
   6️⃣ Configurar credenciales en **admin/bd.php**
   7️⃣ Acceder al sitio:
-* 🌍 Público: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
+* 🌍 Público: [http://localhost/piccoloBurgers/public/](http://localhost/piccoloBurgers/public/) _(configurá el DocumentRoot en `/public` para URLs más limpias)_
 * 🔐 Admin: [http://localhost/piccoloBurgers/admin/](http://localhost/piccoloBurgers/admin/)
 
 ---------------
@@ -98,12 +98,18 @@ piccoloBurgers/
 ├─ 🛠️ admin/ (panel de administración y utilidades)
 │  └─ bd.php (conexión a la base de datos)
 ├─ 📁 componentes/ (nav, footer, etc.)
-├─ 🖼️ img/ (recursos gráficos)
+├─ ⚙️ config/
+│  └─ config.php (configuración global)
+├─ 🗄️ database/
+│  └─ piccolodb.sql (script de la base de datos)
+├─ 📂 public/ (páginas y recursos expuestos)
+│  ├─ assets/ (CSS y JS públicos)
+│  ├─ img/ (recursos gráficos públicos)
+│  └─ *.php (páginas visibles por los clientes)
+├─ 📚 includes/ (controladores ligeros para las vistas)
+├─ 👁️ views/ (plantillas renderizadas)
 ├─ 📦 vendor/ (dependencias Composer)
-├─ 🗄️ piccolodb.sql (script de la base de datos)
-├─ ⚙️ config.php (configuración global)
-├─ 🏠 index.php (entrada principal)
-└─ ...
+└─ tests/, README.md, composer.json, ...
 
 ---------------
 

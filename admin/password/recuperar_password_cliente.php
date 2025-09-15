@@ -12,7 +12,7 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="../../img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="../../public/img/favicon.png" type="image/x-icon" />
   <style>
     :root {
       --main-gold: #fac30c;
@@ -77,7 +77,7 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
 <body>
   <nav class="navbar navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="../../index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
+      <a class="navbar-brand" href="../../public/index.php"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
     </div>
   </nav>
 
@@ -105,7 +105,7 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
     </form>
 
     <div class="mt-3 text-center">
-      <a href="../../login_cliente.php" style="color: var(--main-gold); font-weight: bold;">Volver al login</a>
+      <a href="../../public/login_cliente.php" style="color: var(--main-gold); font-weight: bold;">Volver al login</a>
     </div>
 
     <div class="mt-4 text-center">
