@@ -54,7 +54,7 @@ $stmt->bindParam(":token", $token);
 $stmt->execute();
 
 echo "<div class='alert alert-success text-center'>Contraseña actualizada correctamente. Redirigiendo al login...</div>";
-echo "<script>setTimeout(() => window.location.href = '" . ($tipo === "cliente" ? "../../public/login_cliente.php" : "../login.php") . "', 3000);</script>";
+echo "<script>setTimeout(() => window.location.href = '" . ($tipo === "cliente" ? "../../public/cliente/login_cliente.php" : "../login.php") . "', 3000);</script>";
 
 echo '</div></div></div>';
 include(__DIR__ . "/../templates/footer.php");

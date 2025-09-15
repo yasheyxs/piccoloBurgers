@@ -1,7 +1,7 @@
 <?php
 session_start();
-require_once __DIR__ . '/../admin/bd.php';
-require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../admin/bd.php';
+require_once __DIR__ . '/../../componentes/validar_telefono.php';
 
 $mensaje = "";
 
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
+  <link rel="icon" href="../img/favicon.png" type="image/x-icon" />
 
   <style>
     :root {
@@ -102,7 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     .register-image {
       flex: 1;
-      background: url('img/HamLoginCliente.jpg') center/cover no-repeat;
+      background: url('../img/HamLoginCliente.jpg') center/cover no-repeat;
       background-size: cover;
       min-height: 100%;
     }
@@ -212,7 +212,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     @media (max-width: 768px) {
   .register-container {
     flex-direction: column;
-    background: url('./img/HamLoginCliente.jpg') center/cover no-repeat;
+    background: url('../img/HamLoginCliente.jpg') center/cover no-repeat;
     background-size: cover;
     min-height: 100vh;
     padding-top: 40px;
@@ -293,7 +293,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="extra-links">
           ¿Ya tenés cuenta? <a href="./login_cliente.php">Iniciar sesión</a><br><br>
-          <a href="index.php" class="btn btn-outline-light">← Volver a la página principal</a>
+          <a href="../index.php" class="btn btn-outline-light">← Volver a la página principal</a>
         </div>
       </form>
     </div>
