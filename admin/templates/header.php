@@ -33,12 +33,16 @@ $rol = $_SESSION["rol"] ?? "";
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="icon" type="image/png" href="<?php echo $url_base; ?>../public/img/favicon.png" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="<?php echo $url_base; ?>assets/css/datatables-custom.css">
 
   <style>
     .dropdown-menu {
       z-index: 1050;
     }
   </style>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
+  <script src="<?php echo $url_base; ?>assets/js/datatables-init.js"></script>
 </head>
 
 <body>
