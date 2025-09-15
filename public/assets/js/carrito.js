@@ -1,3 +1,9 @@
+const estadoTotalCarrito = {
+  items: [],
+  total: 0,
+};
+
+
 function cargarCarrito() {
   const items = JSON.parse(localStorage.getItem('carrito')) || [];
   const contenedor = document.getElementById('carrito-contenido');
@@ -30,6 +36,8 @@ function cargarCarrito() {
   const productos = Object.values(agrupado);
 
   if (productos.length === 0) {
+    estadoTotalCarrito.items = [];
+    estadoTotalCarrito.total = 0;
     contenedor.innerHTML = "<p class='text-center'>Tu carrito está vacío.</p>";
     totalSpan.textContent = '0.00';
 
@@ -53,17 +61,20 @@ function cargarCarrito() {
     cancelarBtn.disabled = false;
   }
 
-  productos.forEach((item) => {
-    total += item.precio;
-    contenedor.innerHTML += `
+  const html = productos
+    .map((item) => {
+      const subtotal = Number(item.precio) || 0;
+      const cantidad = Number(item.cantidad) || 1;
+      total += subtotal;
+      return `
       <div class="col d-flex" data-aos="fade-up">
         <div class="card position-relative d-flex flex-column h-100 w-100">
           <img src="${item.img}" class="card-img-top" alt="Foto de ${item.nombre}">
           <div class="card-body d-flex flex-column">
             <h5 class="card-title">${item.nombre}</h5>
-            <p class="card-text mb-1"><strong>Precio unitario:</strong> $${(item.precio / item.cantidad).toFixed(2)}</p>
-            <p class="card-text mb-1"><strong>Cantidad:</strong> ${item.cantidad}</p>
-            <p class="card-text"><strong>Subtotal:</strong> $${item.precio.toFixed(2)}</p>
+            <p class="card-text mb-1"><strong>Precio unitario:</strong> $${(subtotal / cantidad).toFixed(2)}</p>
+            <p class="card-text mb-1"><strong>Cantidad:</strong> ${cantidad}</p>
+            <p class="card-text"><strong>Subtotal:</strong> $${subtotal.toFixed(2)}</p>
             <div class="mt-auto d-flex flex-wrap gap-2">
               <button class="btn btn-secondary" onclick="disminuirCantidad(${item.id})">-</button>
               <button class="btn btn-secondary" onclick="aumentarCantidad(${item.id})">+</button>
@@ -72,7 +83,15 @@ function cargarCarrito() {
           </div>
         </div>
       </div>`;
-  });
+  })
+    .join('');
+
+  contenedor.innerHTML = html;
+  estadoTotalCarrito.items = productos;
+  estadoTotalCarrito.total = total;
+  totalSpan.textContent = total.toFixed(2);
+  actualizarTotal();
+  actualizarTotal(productos, total);
 
   totalSpan.textContent = total.toFixed(2);
   actualizarTotal();
@@ -126,18 +145,27 @@ function actualizarContador() {
   }
 }
 
-function actualizarTotal() {
+function actualizarTotal(items = estadoTotalCarrito.items, total = estadoTotalCarrito.total) {
+
   const usarPuntos = document.getElementById('usarPuntos')?.checked;
   localStorage.setItem('usar_puntos_activado', usarPuntos ? '1' : '0');
-
-  const items = JSON.parse(localStorage.getItem('carrito')) || [];
   const totalSpan = document.getElementById('total');
   if (!totalSpan) {
     return;
   }
 
+  if (!Array.isArray(items)) {
+    items = estadoTotalCarrito.items;
+  } else {
+    estadoTotalCarrito.items = items;
+  }
+
+  if (typeof total !== 'number' || Number.isNaN(total)) {
+    total = items.reduce((acc, item) => acc + Number(item.precio || 0), 0);
+  }
+  estadoTotalCarrito.total = total;
+
   const puntosDisponibles = parseInt(document.getElementById('puntosDisponibles')?.value || '0', 10);
-  let total = items.reduce((acc, item) => acc + item.precio, 0);
   let descuento = 0;
 
   document.getElementById('puntos_usados')?.remove();
