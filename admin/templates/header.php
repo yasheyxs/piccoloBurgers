@@ -89,10 +89,10 @@ $rol = $_SESSION["rol"] ?? "";
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="panelDropdown">
                   <?php if ($rol === "admin" || $rol === "empleado") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel/panel_cocina.php">Panel de cocina</a></li>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
                   <?php } ?>
                   <?php if ($rol === "admin" || $rol === "delivery") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel/panel_delivery.php">Panel de delivery</a></li>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
                   <?php } ?>
                 </ul>
               </li>
