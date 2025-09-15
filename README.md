@@ -92,27 +92,6 @@ git clone [https://github.com/](https://github.com/)<usuario>/piccoloBurgers.git
 
 ---------------
 
-📂 **Estructura del proyecto**
-
-piccoloBurgers/
-├─ 🛠️ admin/ (panel de administración y utilidades)
-│  └─ bd.php (conexión a la base de datos)
-├─ 📁 componentes/ (nav, footer, etc.)
-├─ ⚙️ config/
-│  └─ config.php (configuración global)
-├─ 🗄️ database/
-│  └─ piccolodb.sql (script de la base de datos)
-├─ 📂 public/ (páginas y recursos expuestos)
-│  ├─ assets/ (CSS y JS públicos)
-│  ├─ img/ (recursos gráficos públicos)
-│  └─ *.php (páginas visibles por los clientes)
-├─ 📚 includes/ (controladores ligeros para las vistas)
-├─ 👁️ views/ (plantillas renderizadas)
-├─ 📦 vendor/ (dependencias Composer)
-└─ tests/, README.md, composer.json, ...
-
----------------
-
 📖 **Uso básico**
 
 * 👤 **Clientes:** registrarse o iniciar sesión y realizar pedidos
