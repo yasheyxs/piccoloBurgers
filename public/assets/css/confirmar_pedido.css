@@ -1,0 +1,200 @@
+:root {
+  --main-gold: #fac30c;
+  --gold-hover: #e0ae00;
+  --dark-bg: #1a1a1a;
+  --gray-bg: #2c2c2c;
+  --text-light: #ffffff;
+  --text-muted: #cccccc;
+  --font-main: 'Inter', sans-serif;
+  --font-title: 'Bebas Neue', sans-serif;
+}
+
+/* Estilo global */
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-main);
+  color: var(--text-light);
+  background: url('../../img/HamLoginCliente.jpg') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--dark-bg);
+  color: var(--text-light);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Navbar fija */
+.navbar {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  --bs-bg-opacity: 0.1;
+  padding: 0.5rem 1rem;
+}
+
+/* Contenedor con efecto Glass */
+.container {
+  background: rgba(44, 44, 44, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  margin: 0 auto;
+  flex-grow: 1;
+  margin-top: 0;
+}
+
+.navbar>.container,
+.navbar>.container-fluid,
+.navbar>.container-lg,
+.navbar>.container-md,
+.navbar>.container-sm,
+.navbar>.container-xl,
+.navbar>.container-xxl {
+  display: flex;
+  flex-wrap: inherit;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  color: var(--main-gold);
+  text-align: center;
+}
+
+.form-control {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  border: 1px solid #444;
+  font-size: 1.2rem;
+  border-radius: 8px;
+}
+
+.form-control:focus {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  border-color: var(--main-gold);
+  box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+}
+
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35
+ 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+.btn-gold {
+  background-color: var(--main-gold);
+  color: #000;
+  font-weight: bold;
+  border: none;
+  border-radius: 30px;
+  padding: 10px 30px;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-gold:hover {
+  background-color: var(--gold-hover);
+  transform: scale(1.05);
+}
+
+/* Contenedor con efecto glass */
+.container {
+  background: rgba(44, 44, 44, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 3rem 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  max-width: 600px;
+  margin: 0 auto;
+  flex-grow: 1;
+  /* Garantiza que este contenido crezca */
+}
+
+.modal-content {
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+}
+
+.modal-body .list-group-item {
+  background-color: transparent;
+  color: var(--text-light);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.form-control {
+  background-color: #1e1e1e;
+  color: #fff;
+  border: 1px solid #444;
+  border-radius: 0.75rem;
+  font-size: 1.1rem;
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-control::placeholder {
+  color: var(--text-muted);
+}
+
+.form-control:focus {
+  border-color: #fac30c;
+  box-shadow: 0 0 8px rgba(250, 195, 12, 0.4);
+  background-color: #222;
+  color: #fff;
+}
+
+.form-label {
+  font-weight: bold;
+  color: #fac30c;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.radio-card {
+  display: inline-block;
+  border: 2px solid transparent;
+  border-radius: 1rem;
+  padding: 0.5rem 0.5rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: #1a1a1a;
+  color: #fff;
+}
+
+.radio-card:hover {
+  border-color: #999;
+}
+
+.form-check-input:checked + .radio-card {
+  border-color: #fac30c;
+  background-color: #2a2a2a;
+  color: #fac30c;
+  box-shadow: 0 0 12px rgba(250, 195, 12, 0.4);
+  font-weight: bold;
+}
+
+.form-check-input {
+  display: none;
+}
