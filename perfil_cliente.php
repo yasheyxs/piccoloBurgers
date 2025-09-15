@@ -613,8 +613,8 @@ if ($datos_guardados_exitosamente) {
       </select>
     </span>
     <input type="text" class="form-control bg-dark text-light border-secondary" name="telefono" id="telefono_editar"
-      value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['telefono']) : '' ?>" required placeholder="Ej: 3511234567">
-  </div>
+value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['telefono']) : '' ?>" required placeholder="Ej: 3511234567"
+      oninput="this.value = this.value.replace(/[^0-9]/g, '');" inputmode="numeric" pattern="[0-9]*">  </div>
   <small class="form-text text-muted">Ingresá solo números, sin espacios ni guiones.</small>
 </div>
 
