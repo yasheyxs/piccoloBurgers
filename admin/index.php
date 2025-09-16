@@ -2,6 +2,15 @@
 include("templates/header.php");
 
 $rolActual = $rol ?? 'admin';
+$rolSesion = $_SESSION['rol'] ?? null;
+
+if (!isset($_SESSION['rol_autenticado']) && $rolSesion !== null) {
+  $_SESSION['rol_autenticado'] = $rolSesion;
+}
+
+$rolAutenticado = $_SESSION['rol_autenticado'] ?? $rolSesion;
+$esAdminAutenticado = $rolAutenticado === 'admin';
+
 $etiquetasRol = [
   'admin' => 'Administrador',
   'empleado' => 'Empleado',
@@ -124,64 +133,69 @@ $etiquetasRol = [
     </div>
 
     <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-provider w-100" type="button"> <!-- 🔹 corregido -->
+      <button class="quick-action btn-provider w-100" type="button"> 
         <span>📋</span>
         Crear proveedor
       </button>
     </div>
 
     <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-user w-100" type="button"> <!-- 🔹 corregido -->
+      <button class="quick-action btn-user w-100" type="button"> 
         <span>👤</span>
         Invitar usuario
       </button>
     </div>
 
     <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-report w-100" type="button"> <!-- 🔹 corregido -->
+      <button class="quick-action btn-report w-100" type="button"> 
         <span>📑</span>
         Generar PDF
       </button>
     </div>
 
-    <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-roles w-100" type="button"> <!-- 🔹 único btn-roles -->
-        <span>🔑</span>
-        Acceso a roles
-      </button>
-    </div>
+    <?php if ($esAdminAutenticado) { ?>
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-roles w-100" type="button">
+          <span>🔑</span>
+          Acceso a roles
+        </button>
+      </div>
+    <?php } ?>
 
 
   </div>
 </div>
 
-<div class="container">
-  <div class="row justify-content-center mt-3">
-    <div class="col-md-6 col-lg-4">
-      <div id="rolesPanel" class="card shadow-sm d-none" aria-hidden="true">
-        <div class="card-body">
-          <h5 class="card-title text-center mb-3">Cambiar vista rápida</h5>
-          <form id="rolForm" class="d-grid gap-2">
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="rol" id="rolAdmin" value="admin" <?= $rolActual === 'admin' ? 'checked' : '' ?>>
-              <label class="form-check-label" for="rolAdmin">Vista administrador</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="rol" id="rolEmpleado" value="empleado" <?= $rolActual === 'empleado' ? 'checked' : '' ?>>
-              <label class="form-check-label" for="rolEmpleado">Vista empleado</label>
-            </div>
-            <div class="form-check">
-              <input class="form-check-input" type="radio" name="rol" id="rolDelivery" value="delivery" <?= $rolActual === 'delivery' ? 'checked' : '' ?>>
-              <label class="form-check-label" for="rolDelivery">Vista delivery</label>
-            </div>
-          </form>
-          <div id="rolMensaje" class="alert mt-3 d-none" role="alert"></div>
-          <p class="text-muted small text-center mb-0">Vista actual: <strong><?= htmlspecialchars($etiquetasRol[$rolActual] ?? ucfirst($rolActual)) ?></strong></p>
+<?php if ($esAdminAutenticado) { ?>
+  <div class="container">
+    <div class="row justify-content-center mt-3">
+      <div class="col-md-6 col-lg-4">
+        <div id="rolesPanel" class="card shadow-sm d-none" aria-hidden="true">
+          <div class="card-body">
+            <h5 class="card-title text-center mb-3">Cambiar vista rápida</h5>
+            <form id="rolForm" class="d-grid gap-2">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="rol" id="rolAdmin" value="admin" <?= $rolActual === 'admin' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="rolAdmin">Vista administrador</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="rol" id="rolEmpleado" value="empleado" <?= $rolActual === 'empleado' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="rolEmpleado">Vista empleado</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="rol" id="rolDelivery" value="delivery" <?= $rolActual === 'delivery' ? 'checked' : '' ?>>
+                <label class="form-check-label" for="rolDelivery">Vista delivery</label>
+              </div>
+            </form>
+            <div id="rolMensaje" class="alert mt-3 d-none" role="alert"></div>
+            <p class="text-muted small text-center mb-0">Vista actual: <strong><?= htmlspecialchars($etiquetasRol[$rolActual] ?? ucfirst($rolActual)) ?></strong></p>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
+<?php } ?>
+<br><br>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
