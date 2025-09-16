@@ -41,6 +41,8 @@
     }
 
     let offset = 0;
+    let totalItems = 0;
+    let isLoadingMore = false;
     const limit = 8;
 
     const actualizarContador = () => {
@@ -92,32 +94,53 @@
       };
     };
 
-    const filtrarMenu = (reset = true) => {
+    const renderTarjetas = (htmlString) => {
+      if (!htmlString) {
+        return 0;
+      }
+
+      const temp = document.createElement('div');
+      temp.innerHTML = htmlString;
+
+      const tarjetas = temp.querySelectorAll('.col');
+      tarjetas.forEach((tarjeta) => contenedor.appendChild(tarjeta));
+
+      return tarjetas.length;
+    };
+
+    function filtrarMenu(reset = true) {
       const texto = buscadorInput.value.trim();
       const categoria = categoriaSelect.value;
 
       if (reset) {
         offset = 0;
+        totalItems = 0;
+        isLoadingMore = false;
         contenedor.innerHTML = '';
         contenedorBotonMas.innerHTML = '';
       }
 
       fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
-        .then((resp) => resp.text())
-        .then((html) => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
+        .then((resp) => {
+          if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}`);
+          }
+return resp.json();
+        })
+        .then((data) => {
+          const html = data && typeof data.html === 'string' ? data.html : '';
+          const nuevasTarjetas = renderTarjetas(html);
 
-          const tarjetas = temp.querySelectorAll('.col');
-          tarjetas.forEach((tarjeta) => contenedor.appendChild(tarjeta));
-
-          const boton = temp.querySelector('#btn-mostrar-mas');
-          if (boton) {
-            contenedorBotonMas.innerHTML = '';
-            contenedorBotonMas.appendChild(boton);
-            boton.addEventListener('click', cargarMasProductos);
+          if (reset) {
+            offset = nuevasTarjetas;
+          } else {
+            offset += nuevasTarjetas;
           }
 
+          const total = Number(data && data.totalItems !== undefined ? data.totalItems : 0);
+          totalItems = Number.isFinite(total) ? total : 0;
+
+          actualizarBotonMas();
           reattachAddButtons();
           if (typeof AOS !== 'undefined') {
             AOS.refresh();
@@ -126,29 +149,35 @@
         .catch((error) => {
           console.error('Error al filtrar menú:', error);
         });
-    };
+    }
 
-    const cargarMasProductos = () => {
+    function cargarMasProductos() {
+      if (isLoadingMore || offset >= totalItems) {
+        return;
+      }
+
+      isLoadingMore = true;
       const categoria = categoriaSelect.value;
       const texto = buscadorInput.value.trim();
 
       fetch(`filtrar_menu.php?categoria=${encodeURIComponent(categoria)}&busqueda=${encodeURIComponent(texto)}&offset=${offset}&limit=${limit}`)
-        .then((response) => response.text())
-        .then((html) => {
-          const temp = document.createElement('div');
-          temp.innerHTML = html;
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const html = data && typeof data.html === 'string' ? data.html : '';
+          const nuevasTarjetas = renderTarjetas(html);
+          offset += nuevasTarjetas;
 
-          const tarjetas = temp.querySelectorAll('.col');
-          tarjetas.forEach((tarjeta) => contenedor.appendChild(tarjeta));
-
-          const boton = temp.querySelector('#btn-mostrar-mas');
-          contenedorBotonMas.innerHTML = '';
-          if (boton) {
-            contenedorBotonMas.appendChild(boton);
-            boton.addEventListener('click', cargarMasProductos);
+          const total = Number(data && data.totalItems !== undefined ? data.totalItems : totalItems);
+          if (Number.isFinite(total)) {
+            totalItems = total;
           }
 
-          offset += limit;
+          actualizarBotonMas();
           reattachAddButtons();
           if (typeof AOS !== 'undefined') {
             AOS.refresh();
@@ -156,8 +185,23 @@
         })
         .catch((error) => {
           console.error('Error al cargar más productos:', error);
+          })
+        .finally(() => {
+          isLoadingMore = false;
         });
-    };
+    }
+
+    function actualizarBotonMas() {
+      contenedorBotonMas.innerHTML = '';
+      if (offset < totalItems) {
+        const boton = document.createElement('button');
+        boton.id = 'btn-mostrar-mas';
+        boton.className = 'btn btn-gold';
+        boton.textContent = 'Mostrar más';
+        boton.addEventListener('click', cargarMasProductos);
+        contenedorBotonMas.appendChild(boton);
+      }
+    }
 
     buscadorInput.addEventListener('input', debounce(() => filtrarMenu(true), 300));
     categoriaSelect.addEventListener('change', () => filtrarMenu(true));

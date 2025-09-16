@@ -102,10 +102,9 @@ $sql .= " LIMIT $limit OFFSET $offset";
 $stmt = $conexion->prepare($sql);
 $stmt->execute($parametros);
 $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
-?>
 
-<!-- Tarjetas: se insertan en #contenedor-menu -->
-<?php foreach ($lista_menu as $registro): ?>
+ob_start();
+foreach ($lista_menu as $registro): ?>
   <div class="col d-flex" data-aos="fade-up">
     <div class="card position-relative d-flex flex-column h-100 w-100">
       <img src="img/menu/<?= htmlspecialchars($registro["foto"]) ?>" class="card-img-top" alt="Foto de <?= htmlspecialchars($registro["nombre"]) ?>">
@@ -124,11 +123,12 @@ $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </div>
     </div>
   </div>
-<?php endforeach; ?>
+<?php endforeach;
+$htmlContent = ob_get_clean();
 
-<!-- Botón se insertará en #contenedor-boton-mas por el JS -->
-<?php if (($offset + count($lista_menu)) < $totalItems): ?>
-  <div id="btn-mostrar-mas-wrapper">
-    <button id="btn-mostrar-mas" class="btn btn-gold">Mostrar más</button>
-  </div>
-<?php endif; ?>
+header('Content-Type: application/json');
+echo json_encode([
+  'html' => $htmlContent,
+  'totalItems' => (int) $totalItems,
+]);
+exit;
