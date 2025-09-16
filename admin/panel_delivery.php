@@ -85,7 +85,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
             <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
           <?php endforeach; ?>
         </ul>
-        <p><strong>📝 Nota:</strong> <?= htmlspecialchars($pedido['nota']) ?: 'Sin nota' ?></p>
+        <p><strong>📍 Referencias:</strong> <?= htmlspecialchars($pedido['referencias'] ?? '') ?: 'Sin referencias' ?></p>
         <button class="btn btn-entregado" data-id="<?= $pedido['ID'] ?>">Entregado</button>
       </div>
     <?php endforeach; ?>

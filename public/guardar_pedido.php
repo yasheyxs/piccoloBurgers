@@ -26,7 +26,18 @@ $email = $_POST["email"] ?? null;
 $nota = $_POST["nota"] ?? "";
 $metodo_pago = $_POST["metodo_pago"] ?? "";
 $tipo_entrega = $_POST["tipo_entrega"] ?? "";
-$direccion = $_POST["direccion"] ?? null;
+$direccion = isset($_POST["direccion"]) ? trim($_POST["direccion"]) : '';
+$referencias = isset($_POST["referencias"]) ? trim($_POST["referencias"]) : '';
+
+if ($referencias !== '') {
+    $referencias = function_exists('mb_substr') ? mb_substr($referencias, 0, 255) : substr($referencias, 0, 255);
+} else {
+    $referencias = null;
+}
+
+if ($tipo_entrega !== "Delivery") {
+    $referencias = null;
+}
 
 if (empty($_POST["carrito"])) {
     responder_error("El carrito está vacío.");
@@ -106,8 +117,8 @@ try {
     $estado_inicial = "En preparación";
     $cliente_id = $_SESSION["cliente"]["id"] ?? null;
 
-    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, estado, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $estado_inicial, $cliente_id]);
+    $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, referencias, estado, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $referencias, $estado_inicial, $cliente_id]);
     $pedido_id = $conexion->lastInsertId();
 
     $stmt = $conexion->prepare("INSERT INTO tbl_pedidos_detalle (pedido_id, producto_id, nombre, precio, cantidad) VALUES (?, ?, ?, ?, ?)");
