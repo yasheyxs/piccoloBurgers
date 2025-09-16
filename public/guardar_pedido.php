@@ -4,6 +4,8 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../admin/bd.php';
+require_once __DIR__ . '/../componentes/validar_telefono.php';
+
 session_start();
 
 function responder_error($mensaje) {
@@ -16,18 +18,25 @@ function responder_error($mensaje) {
     exit;
 }
 
-if (!isset($_POST["nombre"], $_POST["telefono"], $_POST["carrito"])) {
+if (!isset($_POST["nombre"], $_POST["telefono"], $_POST["codigo_pais"], $_POST["carrito"])) {
     responder_error("Faltan datos obligatorios.");
 }
 
 $nombre = $_POST["nombre"];
-$telefono = $_POST["telefono"];
+$telefono = trim($_POST["telefono"]);
+$codigoPais = trim($_POST["codigo_pais"] ?? '');
 $email = $_POST["email"] ?? null;
 $nota = $_POST["nota"] ?? "";
 $metodo_pago = $_POST["metodo_pago"] ?? "";
 $tipo_entrega = $_POST["tipo_entrega"] ?? "";
 $direccion = isset($_POST["direccion"]) ? trim($_POST["direccion"]) : '';
 $referencias = isset($_POST["referencias"]) ? trim($_POST["referencias"]) : '';
+
+$telefonoFormateado = validarTelefono($codigoPais, $telefono);
+if ($telefonoFormateado === false) {
+    responder_error("Ingresá un número de teléfono válido.");
+}
+$telefono = $telefonoFormateado;
 
 if ($referencias !== '') {
     $referencias = function_exists('mb_substr') ? mb_substr($referencias, 0, 255) : substr($referencias, 0, 255);
