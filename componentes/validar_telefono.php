@@ -3,9 +3,9 @@
 if (!function_exists('validarTelefono')) {
   function validarTelefono($codigo, $numero)
   {
-    $codigo = preg_replace('/[^\d]/', '', $codigo);
-    $numero = preg_replace('/[^\d]/', '', $numero);
-    $telefono = '+' . $codigo . $numero;
+    $codigo = preg_replace('/[^\d]/', '', (string) $codigo);
+    $numeroOriginal = (string) $numero;
+    $numero = preg_replace('/[^\d]/', '', $numeroOriginal);
 
     $longitudes = [
       '54' => [10],       // Argentina
@@ -19,13 +19,39 @@ if (!function_exists('validarTelefono')) {
       '34' => [9],        // España
     ];
 
+    if ($codigo === '' || $numero === '') {
+      return false;
+    }
+
     if (!isset($longitudes[$codigo])) {
       return false;
     }
 
-    if (!in_array(strlen($numero), $longitudes[$codigo], true)) {
+    $longitudesPermitidas = $longitudes[$codigo];
+    $numeroNormalizado = $numero;
+    $longitudCodigo = strlen($codigo);
+    $contienePrefijoInternacional = preg_match('/^\s*(\+|00)/', $numeroOriginal) === 1;
+
+    foreach ($longitudesPermitidas as $longitudValida) {
+      if (strlen($numero) === $longitudValida) {
+        $numeroNormalizado = $numero;
+        break;
+      }
+
+      if ($contienePrefijoInternacional) {
+        $longitudConCodigo = $longitudCodigo + $longitudValida;
+        if (strlen($numero) === $longitudConCodigo && strncmp($numero, $codigo, $longitudCodigo) === 0) {
+          $numeroNormalizado = substr($numero, $longitudCodigo);
+          break;
+        }
+      }
+    }
+
+    if (!in_array(strlen($numeroNormalizado), $longitudesPermitidas, true)) {
       return false;
     }
+
+    $telefono = '+' . $codigo . $numeroNormalizado;
 
     return preg_match('/^\+\d{10,15}$/', $telefono) ? $telefono : false;
   }
