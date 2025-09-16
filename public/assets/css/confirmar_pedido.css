@@ -39,7 +39,13 @@ body {
   width: 100%;
   z-index: 1000;
   --bs-bg-opacity: 0.1;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 1.5rem;
+}
+
+.navbar .navbar-brand,
+.navbar .nav-link {
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
 }
 
 /* Contenedor con efecto Glass */
@@ -67,7 +73,7 @@ body {
   flex-wrap: inherit;
   align-items: center;
   justify-content: space-between;
-  padding: 0.5rem 1rem;
+  padding: 0;
 }
 
 h2 {
@@ -93,14 +99,14 @@ h2 {
 
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35
- 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1rem;
   padding-right: 2.5rem;
   cursor: pointer;
 }
+
 
 .btn-gold {
   background-color: var(--main-gold);
@@ -154,8 +160,10 @@ select.form-control {
 }
 
 .form-control::placeholder {
-  color: var(--text-muted);
+  color: #bbb !important;
+  opacity: 1 !important;
 }
+
 
 .form-control:focus {
   border-color: #fac30c;
@@ -197,4 +205,40 @@ select.form-control {
 
 .form-check-input {
   display: none;
+}
+
+.telefono-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.telefono-group select.form-control {
+  flex: 0 0 90px !important;
+  min-width: 80px !important;
+  max-width: 100px !important;
+  padding: 0.4rem !important;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+
+.telefono-group input.form-control {
+  flex: 1 1 200px;
+}
+
+#nota {
+  resize: none;
+}
+
+.modal-footer .btn-gold {
+  background: linear-gradient(135deg, var(--main-gold), #ffd866);
+  color: #000;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.65rem 2.5rem;
+}
+
+.modal-footer .btn-gold:hover {
+  background: linear-gradient(135deg, var(--gold-hover), #fbdc7c);
 }

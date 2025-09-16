@@ -1,9 +1,106 @@
 document.addEventListener('DOMContentLoaded', () => {
   const formPedido = document.getElementById('form-pedido');
 
+  const telefonoInput = document.getElementById('telefono');
+  const codigoPaisSelect = document.getElementById('codigo_pais');
+  const longitudesTelefono = {
+    54: [10],
+    598: [8, 9],
+    55: [10, 11],
+    56: [9],
+    595: [9],
+    591: [8],
+    51: [9],
+    1: [10],
+    34: [9],
+  };
+
+  const limpiarNumero = (valor) => valor.replace(/[^0-9]/g, '');
+
+  const actualizarMaxlengthTelefono = () => {
+    if (!telefonoInput || !codigoPaisSelect) {
+      return;
+    }
+
+    const codigoSeleccionado = codigoPaisSelect.value;
+    const longitudesPermitidas = longitudesTelefono[codigoSeleccionado];
+    if (Array.isArray(longitudesPermitidas) && longitudesPermitidas.length > 0) {
+      telefonoInput.maxLength = Math.max(...longitudesPermitidas);
+    } else {
+      telefonoInput.removeAttribute('maxLength');
+    }
+  };
+
+  const obtenerTelefonoFormateado = () => {
+    if (!telefonoInput || !codigoPaisSelect) {
+      return null;
+    }
+
+    const codigo = codigoPaisSelect.value;
+    const numero = limpiarNumero(telefonoInput.value);
+    const longitudesPermitidas = longitudesTelefono[codigo];
+
+    if (!Array.isArray(longitudesPermitidas) || !longitudesPermitidas.includes(numero.length)) {
+      return null;
+    }
+
+    const telefonoCompleto = `+${codigo}${numero}`;
+    if (!/^\+\d{10,15}$/.test(telefonoCompleto)) {
+      return null;
+    }
+
+    return {
+      telefonoCompleto,
+      codigo,
+      numero,
+    };
+  };
+
+  const marcarTelefonoValido = (esValido) => {
+    if (!telefonoInput) {
+      return;
+    }
+
+    telefonoInput.classList.toggle('is-invalid', !esValido);
+    telefonoInput.setCustomValidity(esValido ? '' : 'Ingresá un número de teléfono válido.');
+  };
+
+  if (telefonoInput) {
+    telefonoInput.value = limpiarNumero(telefonoInput.value);
+  }
+
+  if (codigoPaisSelect && telefonoInput) {
+    actualizarMaxlengthTelefono();
+
+    codigoPaisSelect.addEventListener('change', () => {
+      actualizarMaxlengthTelefono();
+      marcarTelefonoValido(true);
+    });
+
+    telefonoInput.addEventListener('input', () => {
+      telefonoInput.value = limpiarNumero(telefonoInput.value);
+      marcarTelefonoValido(true);
+    });
+
+    telefonoInput.addEventListener('blur', () => {
+      const telefono = obtenerTelefonoFormateado();
+      if (!telefono) {
+        marcarTelefonoValido(false);
+      }
+    });
+  }
+
   if (formPedido) {
     formPedido.addEventListener('submit', async (e) => {
       e.preventDefault();
+
+      const telefonoNormalizado = obtenerTelefonoFormateado();
+      if (!telefonoNormalizado) {
+        marcarTelefonoValido(false);
+        telefonoInput?.reportValidity();
+        telefonoInput?.focus();
+        return;
+      }
 
       const carritoSinAgrupar = JSON.parse(localStorage.getItem('carrito') || '[]');
       if (carritoSinAgrupar.length === 0) {
@@ -43,6 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const form = e.target;
       const formData = new FormData(form);
       formData.set('carrito', JSON.stringify(carritoFinal));
+      formData.set('telefono', telefonoNormalizado.telefonoCompleto);
+      formData.set('codigo_pais', telefonoNormalizado.codigo);
 
       const usarPuntosCheckbox = localStorage.getItem('usar_puntos_activado') === '1';
       formData.set('usar_puntos', usarPuntosCheckbox ? '1' : '0');
@@ -143,6 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         form.reset();
+        actualizarMaxlengthTelefono();
+        marcarTelefonoValido(true);
         document.getElementById('mensaje').innerHTML = '';
       } else {
         // Mostrar error en div mensaje
@@ -163,14 +264,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Validar que solo se escriban números en el campo teléfono
-  const telefonoInput = document.getElementById('telefono');
-  if (telefonoInput) {
-    telefonoInput.addEventListener('input', function () {
-      this.value = this.value.replace(/[^0-9]/g, '');
-    });
-  }
-
   // Validar que solo se escriban letras y espacios en el campo nombre
   const nombreInput = document.getElementById('nombre');
   if (nombreInput) {
@@ -178,21 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
       this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
     });
   }
-
-  fetch('ruta-del-endpoint', { method: 'POST', body: datos })
-    .then((res) => res.json())
-    .then((data) => {
-      if (!data.exito) {
-        const errorDiv = document.getElementById('mensaje-error');
-        errorDiv.innerText = data.mensaje;
-        errorDiv.style.display = 'block';
-        if (data.scroll) {
-          setTimeout(() => {
-            errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          }, 100);
-        }
-      }
-    });
 });
 
 // Mostrar/ocultar campo dirección según tipo de entrega
