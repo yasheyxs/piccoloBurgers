@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+
   if (formPedido) {
     formPedido.addEventListener('submit', async (e) => {
       e.preventDefault();
