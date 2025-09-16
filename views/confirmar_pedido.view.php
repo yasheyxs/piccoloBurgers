@@ -80,6 +80,12 @@
         <input type="text" class="form-control" id="direccion" name="direccion">
       </div>
 
+      <div class="mb-3" id="grupo-referencias" style="display: none;">
+        <label for="referencias" class="form-label">Referencias (opcional):</label>
+        <input type="text" class="form-control" id="referencias" name="referencias" maxlength="255"
+          placeholder="Frente al parque, puerta negra, piso 2" value="<?= htmlspecialchars($cliente['referencias'] ?? '', ENT_QUOTES); ?>">
+      </div>
+
       <input type="hidden" name="carrito" id="carrito">
       <input type="hidden" name="usar_puntos" id="usar_puntos" value="0">
       <button type="submit" class="btn btn-gold w-100">Enviar Pedido</button>

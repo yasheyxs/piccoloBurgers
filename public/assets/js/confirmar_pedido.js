@@ -198,12 +198,16 @@ document.addEventListener('DOMContentLoaded', () => {
 // Mostrar/ocultar campo dirección según tipo de entrega
 window.mostrarDireccion = function mostrarDireccion(valor) {
   const grupoDireccion = document.getElementById('grupo-direccion');
+  const grupoReferencias = document.getElementById('grupo-referencias');
   const aviso = document.getElementById('aviso-delivery');
 
   if (valor === 'Delivery') {
     // Si es Delivery, mostrar campo dirección y aviso
     if (grupoDireccion) {
       grupoDireccion.style.display = 'block';
+    }
+    if (grupoReferencias) {
+      grupoReferencias.style.display = 'block';
     }
     if (aviso) {
       aviso.style.display = 'block';
@@ -216,6 +220,9 @@ window.mostrarDireccion = function mostrarDireccion(valor) {
     // Si es Retiro, ocultar campo dirección y aviso
     if (grupoDireccion) {
       grupoDireccion.style.display = 'none';
+    }
+    if (grupoReferencias) {
+      grupoReferencias.style.display = 'none';
     }
     if (aviso) {
       aviso.style.display = 'none';
