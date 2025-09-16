@@ -39,13 +39,13 @@ body {
   width: 100%;
   z-index: 1000;
   --bs-bg-opacity: 0.1;
-  padding: 0.5rem 1.5rem;
+  padding: 1rem 1.5rem;
 }
 
 .navbar .navbar-brand,
 .navbar .nav-link {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 
 /* Contenedor con efecto Glass */
@@ -162,14 +162,14 @@ select.form-control {
 
 .form-control::placeholder,
 textarea.form-control::placeholder {
-  color: #d1d5db !important;
+  color: #555558 !important;
   opacity: 1;
 }
 
 input#telefono::placeholder,
 input#referencias::placeholder,
 textarea#nota::placeholder {
-  color: #d8dce3 !important;
+  color: #555558 !important;
   opacity: 1;
 }
 

@@ -68,9 +68,7 @@ $navExtraSections = [
           </li>
         <?php else: ?>
           <li class="nav-item">
-            <a href="cliente/login_cliente.php" class="btn btn-gold rounded-pill px-4 py-2 ms-2">
-              Iniciar sesión / Registrarse
-            </a>
+
           </li>
         <?php endif; ?>
       </ul>
