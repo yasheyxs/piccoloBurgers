@@ -73,7 +73,8 @@ body {
   flex-wrap: inherit;
   align-items: center;
   justify-content: space-between;
-  padding: 0;
+    padding: 0;
+
 }
 
 h2 {
@@ -99,7 +100,7 @@ h2 {
 
 select.form-control {
   appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M35 50l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M350l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
   background-size: 1rem;
@@ -107,10 +108,9 @@ select.form-control {
   cursor: pointer;
 }
 
-
 .btn-gold {
-  background-color: var(--main-gold);
-  color: #000;
+  background-color: var(--main-gold) !important;
+  color: #000 !important;
   font-weight: bold;
   border: none;
   border-radius: 30px;
@@ -120,7 +120,8 @@ select.form-control {
 }
 
 .btn-gold:hover {
-  background-color: var(--gold-hover);
+   background-color: var(--gold-hover) !important;
+  color: #000 !important;
   transform: scale(1.05);
 }
 
@@ -159,11 +160,18 @@ select.form-control {
   transition: all 0.3s ease;
 }
 
-.form-control::placeholder {
-  color: #bbb !important;
-  opacity: 1 !important;
+.form-control::placeholder,
+textarea.form-control::placeholder {
+  color: #d1d5db !important;
+  opacity: 1;
 }
 
+input#telefono::placeholder,
+input#referencias::placeholder,
+textarea#nota::placeholder {
+  color: #d8dce3 !important;
+  opacity: 1;
+}
 
 .form-control:focus {
   border-color: #fac30c;
@@ -209,22 +217,35 @@ select.form-control {
 
 .telefono-group {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .telefono-group select.form-control {
-  flex: 0 0 90px !important;
-  min-width: 80px !important;
-  max-width: 100px !important;
-  padding: 0.4rem !important;
-  font-size: 0.9rem;
+  flex: 0 0 auto;
+  width: 7rem;
+  min-width: 6.25rem;
+  max-width: 7.25rem;
+  padding-right: 2rem;
   text-align: center;
 }
 
-
 .telefono-group input.form-control {
-  flex: 1 1 200px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .telefono-group {
+    flex-wrap: wrap;
+  }
+
+  .telefono-group select.form-control,
+  .telefono-group input.form-control {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }
 
 #nota {
@@ -232,13 +253,6 @@ select.form-control {
 }
 
 .modal-footer .btn-gold {
-  background: linear-gradient(135deg, var(--main-gold), #ffd866);
-  color: #000;
   font-weight: 600;
-  border-radius: 999px;
   padding: 0.65rem 2.5rem;
-}
-
-.modal-footer .btn-gold:hover {
-  background: linear-gradient(135deg, var(--gold-hover), #fbdc7c);
 }
