@@ -71,6 +71,12 @@ try {
     'El validador debe desacerse de carácteres no numéricos antes de la validación.'
   );
 
+  $formattedFromE164 = validarTelefono('54', '+543511234567');
+  assertCondition(
+    $formattedFromE164 === '+543511234567',
+    'El validador debe aceptar números ya formateados en E.164 sin duplicar el código de país.'
+  );
+
   echo "todos los tests para validar telefono pasaron.\n";
   exit(0);
 } catch (Throwable $throwable) {
