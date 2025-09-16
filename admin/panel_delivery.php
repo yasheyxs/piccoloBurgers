@@ -8,66 +8,131 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap');
+
+  :root {
+    --main-gold: #fac30c;
+    --gold-hover: #e0ae00;
+    --dark-bg: #1a1a1a;
+    --gray-bg: #2c2c2c;
+    --text-light: #ffffff;
+    --text-muted: #cccccc;
+    --font-main: 'Inter', sans-serif;
+    --font-title: 'Bebas Neue', sans-serif;
+  }
+
   body {
-    background-color: #1a1a1a;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-main);
+    color: var(--text-light);
+    background: url('../public/img/HamLoginCliente.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
   }
 
-  .card-pedido {
-    background-color: #2c2c2c;
-    border-left: 5px solid #fac30c;
+  main {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+  }
+
+  h3.page-title {
+    font-family: var(--font-title);
+    font-size: 2.4rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--text-light);
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.6);
+  }
+
+  .glass-card {
+    background: rgba(44, 44, 44, 0.7);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-left: 5px solid var(--main-gold);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  .glass-card h5 {
+    font-family: var(--font-title);
+    font-size: 1.9rem;
+    color: var(--text-light);
+    letter-spacing: 0.5px;
     margin-bottom: 1rem;
-    padding: 1rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(250, 195, 12, 0.2);
+    text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
   }
 
-  .card-pedido h5 {
-    font-size: 1.3rem;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-    color: #fac30c;
-  }
-
-  .card-pedido p,
-  .card-pedido li {
+  .glass-card p,
+  .glass-card li,
+  .glass-card span,
+  .glass-card strong {
+    color: var(--text-light);
     font-size: 1rem;
-    margin-bottom: 0.3rem;
-    color: #ddd;
   }
 
-  .btn-entregado {
-    background-color: #fac30c;
+  .glass-card ul {
+    padding-left: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  .glass-card i {
+    color: var(--main-gold);
+  }
+
+  .contact-link {
+    color: var(--main-gold);
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .contact-link:hover {
+    color: var(--gold-hover);
+    text-decoration: underline;
+  }
+
+  .btn-gold {
+    background-color: var(--main-gold);
     color: #000;
     font-weight: bold;
+    border: none;
     border-radius: 30px;
-    padding: 0.6rem 1.2rem;
+    padding: 0.7rem 1.5rem;
     font-size: 1rem;
-    width: 100%;
-    margin-top: 0.5rem;
+    transition: all 0.3s ease;
   }
 
-  .btn-entregado:hover {
-    background-color: #e0ae00;
-    transform: scale(1.03);
+  .btn-gold:hover {
+    background-color: var(--gold-hover);
+    transform: scale(1.05);
+  }
+
+  .text-muted {
+    color: var(--text-muted) !important;
   }
 
   .alert-info {
-    background-color: #2c2c2c;
-    color: #fff;
-    border: 1px solid #fac30c;
-    text-align: center;
-    padding: 1rem;
-    border-radius: 12px;
+    background: rgba(44, 44, 44, 0.75);
+    border: 1px solid var(--main-gold);
+    color: var(--text-light);
+    border-radius: 16px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
   }
 </style>
 
 <div class="container mt-4">
-  <h3 class="text-center mb-4">🚚 Pedidos en camino</h3>
+  <h3 class="page-title mb-4">Pedidos a entregar</h3>
 
   <?php if (count($pedidos) === 0): ?>
-    <div class="alert alert-info">No hay pedidos en camino por el momento.</div>
+    <div class="alert alert-info">No hay pedidos para entregar por el momento.</div>
   <?php else: ?>
     <?php $localidadPredeterminada = 'Villa del Rosario, Córdoba, Argentina'; ?>
     <?php foreach ($pedidos as $pedido): ?>
@@ -89,36 +154,38 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
       $referencias = trim((string)($pedido['referencias'] ?? ''));
       ?>
-      <div class="card-pedido" data-pedido-id="<?= $pedido['ID'] ?>">
+      <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>">
         <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
-        <p>
-          <i class="fas fa-phone"></i>
+        <p class="mb-2">
+          <i class="fas fa-phone me-2"></i>
           <?php if ($telefono !== '' && $telefonoEnlace !== ''): ?>
-            <a href="tel:<?= htmlspecialchars($telefonoEnlace) ?>" style="color:#fac30c; text-decoration:none;">
+            <a class="contact-link" href="tel:<?= htmlspecialchars($telefonoEnlace) ?>">
+
               <?= htmlspecialchars($telefono) ?>
             </a>
           <?php else: ?>
-            <span>Sin teléfono</span>
+            <span class="text-muted">Sin teléfono</span>
           <?php endif; ?>
         </p>
-        <p>
-          <i class="fas fa-map-marker-alt"></i>
+        <p class="mb-2">
+          <i class="fas fa-map-marker-alt me-2"></i>
           <?php if ($mapUrl !== ''): ?>
-            <a href="<?= htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer" style="color:#fac30c; text-decoration:none;">
-              <?= htmlspecialchars($direccionBase) ?>
+            <a class="contact-link" href="<?= htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"> <?= htmlspecialchars($direccionBase) ?>
             </a>
           <?php else: ?>
-            <span>Sin dirección</span>
+            <span class="text-muted">Sin dirección</span>
           <?php endif; ?>
         </p>
-        <p><strong>🛍️ Productos:</strong></p>
-        <ul class="mb-2">
+        <p class="fw-semibold mb-2">🛍️ Productos:</p>
+        <ul class="mb-3">
           <?php foreach ($productos as $producto): ?>
             <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
           <?php endforeach; ?>
         </ul>
-        <p><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
-        <button class="btn btn-entregado" data-id="<?= $pedido['ID'] ?>">Entregado</button>
+        <p class="mb-0"><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
+        <div class="mt-4">
+          <button class="btn btn-gold w-100" data-id="<?= $pedido['ID'] ?>" data-action="entregado">Entregado</button>
+        </div>
       </div>
     <?php endforeach; ?>
   <?php endif; ?>
@@ -157,17 +224,17 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
       if (resultado && resultado.success) {
         pedidoActualizado = true;
-        boton.closest('.card-pedido').remove();
+        boton.closest('.glass-card').remove();
       } else {
-        const mensaje = resultado && resultado.message
-          ? resultado.message
-          : 'La respuesta del servidor no es válida.';
+        const mensaje = resultado && resultado.message ?
+          resultado.message :
+          'La respuesta del servidor no es válida.';
         throw new Error(mensaje);
       }
     } catch (error) {
-      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch'
-        ? error.message
-        : 'Error al conectar con el servidor.';
+      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch' ?
+        error.message :
+        'Error al conectar con el servidor.';
       alert(mensajeError);
       console.error(error);
     } finally {
@@ -178,7 +245,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     }
   }
 
-  document.querySelectorAll('.btn-entregado').forEach(btn => {
+  document.querySelectorAll('[data-action="entregado"]').forEach(btn => {
     btn.addEventListener('click', () => {
       const pedidoId = btn.getAttribute('data-id');
       marcarEntregado(pedidoId, btn);
