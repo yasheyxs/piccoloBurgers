@@ -8,7 +8,17 @@ require_once __DIR__ . '/../componentes/validar_telefono.php';
 
 session_start();
 
-function responder_error($mensaje) {
+function responder_error($mensaje)
+{
+    global $conexion;
+
+    if ($conexion instanceof PDO && $conexion->inTransaction()) {
+        $conexion->rollBack();
+    }
+
+    if (ob_get_length()) {
+        ob_end_clean();
+    }
     header('Content-Type: application/json');
     echo json_encode([
         "exito" => false,
@@ -76,55 +86,62 @@ $total = $total_original;
 $usar_puntos = isset($_POST["usar_puntos"]) && $_POST["usar_puntos"] == "1";
 $puntos_usados = 0;
 $descuento = 0;
-
-if ($usar_puntos && isset($_SESSION["cliente"])) {
-    $valor_por_punto = 20;
-    $minimo_puntos_para_canjear = 50;
-    $redondear_a_multiplo = 100;
-
-    $cliente_id = $_SESSION["cliente"]["id"];
-    $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
-    $stmt->execute([$cliente_id]);
-    $puntos_disponibles = $stmt->fetchColumn();
-
-    if ($puntos_disponibles >= $minimo_puntos_para_canjear) {
-        $descuento_max = $total * 0.25;
-        $descuento_max_redondeado = floor($descuento_max / $redondear_a_multiplo) * $redondear_a_multiplo;
-        $puntos_posibles = floor($descuento_max_redondeado / $valor_por_punto);
-        $puntos_usados = min($puntos_disponibles, $puntos_posibles);
-        $descuento = $puntos_usados * $valor_por_punto;
-        $total -= $descuento;
-
-        $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos - ? WHERE ID = ?");
-        $stmt->execute([$puntos_usados, $cliente_id]);
-    }
-}
-
-// Validar stock antes de registrar el pedido
-foreach ($carrito as $item) {
-    $producto_id = $item["id"];
-    $cantidadVendida = $item["cantidad"];
-
-    $stmt = $conexion->prepare("
-        SELECT mp.ID, mp.nombre, mp.cantidad AS stock_actual, mp_req.cantidad AS requerido
-        FROM tbl_menu_materias_primas mp_req
-        JOIN tbl_materias_primas mp ON mp_req.materia_prima_id = mp.ID
-        WHERE mp_req.menu_id = ?
-    ");
-    $stmt->execute([$producto_id]);
-    $insumos = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    foreach ($insumos as $insumo) {
-        $consumo = $insumo['requerido'] * $cantidadVendida;
-        if ($insumo['stock_actual'] < $consumo) {
-            responder_error("Ups... hubo un inconveniente al procesar tu pedido. Por favor, revisá tu carrito o intentá nuevamente en unos minutos.");
-        }
-    }
-}
+$puntos_ganados = 0;
+$cliente_id = $_SESSION["cliente"]["id"] ?? null;
 
 try {
+    $conexion->beginTransaction();
+
+    // Validar stock antes de registrar el pedido y tocar puntos
+    foreach ($carrito as $item) {
+        $producto_id = $item["id"];
+        $cantidadVendida = $item["cantidad"];
+
+        $stmt = $conexion->prepare("
+            SELECT mp.ID, mp.nombre, mp.cantidad AS stock_actual, mp_req.cantidad AS requerido
+            FROM tbl_menu_materias_primas mp_req
+            JOIN tbl_materias_primas mp ON mp_req.materia_prima_id = mp.ID
+            WHERE mp_req.menu_id = ?
+        ");
+        $stmt->execute([$producto_id]);
+        $insumos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($insumos as $insumo) {
+            $consumo = $insumo['requerido'] * $cantidadVendida;
+            if ($insumo['stock_actual'] < $consumo) {
+                responder_error("Ups... hubo un inconveniente al procesar tu pedido. Por favor, revisá tu carrito o intentá nuevamente en unos minutos.");
+            }
+        }
+    }
+
+
+    // Validar stock antes de registrar el pedido
+    if ($usar_puntos && $cliente_id) {
+        $valor_por_punto = 20;
+        $minimo_puntos_para_canjear = 50;
+        $redondear_a_multiplo = 100;
+
+        $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
+        $stmt->execute([$cliente_id]);
+        $puntos_disponibles = $stmt->fetchColumn();
+
+        if ($puntos_disponibles >= $minimo_puntos_para_canjear) {
+            $descuento_max = $total * 0.25;
+            $descuento_max_redondeado = floor($descuento_max / $redondear_a_multiplo) * $redondear_a_multiplo;
+            $puntos_posibles = floor($descuento_max_redondeado / $valor_por_punto);
+            $puntos_usados = min($puntos_disponibles, $puntos_posibles);
+
+            if ($puntos_usados > 0) {
+                $descuento = $puntos_usados * $valor_por_punto;
+                $total -= $descuento;
+
+                $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos - ? WHERE ID = ?");
+                $stmt->execute([$puntos_usados, $cliente_id]);
+            }
+        }
+    }
+
     $estado_inicial = "En preparación";
-    $cliente_id = $_SESSION["cliente"]["id"] ?? null;
 
     $stmt = $conexion->prepare("INSERT INTO tbl_pedidos (nombre, telefono, email, nota, total, metodo_pago, tipo_entrega, direccion, referencias, estado, cliente_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     $stmt->execute([$nombre, $telefono, $email, $nota, $total, $metodo_pago, $tipo_entrega, $direccion, $referencias, $estado_inicial, $cliente_id]);
@@ -145,12 +162,14 @@ try {
     }
 
     // Sumar puntos
-    $puntos_ganados = 0;
-    if (isset($_SESSION["cliente"])) {
+    if ($cliente_id) {
         $puntos_ganados = floor($total / 1500);
         $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos + ? WHERE ID = ?");
         $stmt->execute([$puntos_ganados, $cliente_id]);
     }
+
+    $conexion->commit();
+
 
     header('Content-Type: application/json');
     ob_end_clean();
@@ -164,7 +183,13 @@ try {
     ]);
     exit;
 } catch (Exception $e) {
-    ob_end_clean();
+    if ($conexion->inTransaction()) {
+        $conexion->rollBack();
+    }
+
+    if (ob_get_length()) {
+        ob_end_clean();
+    }
     header('Content-Type: application/json');
     echo json_encode([
         "exito" => false,
