@@ -11,7 +11,7 @@ if (!isset($_SESSION["cliente"])) {
 $errores = [];
 $mensaje_error = "";
 $mensaje_exito = "";
-$datos_guardados_exitosamente = false; // ✅ Inicializada para evitar warning
+$datos_guardados_exitosamente = false; // Inicializada para evitar warning
 
 $cliente = $_SESSION["cliente"];
 $cliente_id = $cliente["id"];
@@ -61,7 +61,7 @@ if (isset($_POST["guardar_datos"])) {
     $_SESSION["cliente"]["email"] = $valor_email;
 
     $mensaje_exito = "Datos actualizados correctamente.";
-    $datos_guardados_exitosamente = true; // ✅ Marcamos éxito
+    $datos_guardados_exitosamente = true; 
   }
 }
 
