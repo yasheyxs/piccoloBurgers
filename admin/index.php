@@ -123,47 +123,52 @@ $etiquetasRol = [
 <!-- 🔹 Sección de Acciones Rápidas -->
 <div class="container my-5">
   <h3 class="mb-4 text-center">⚡ Acciones rápidas</h3>
-  <div class="row g-4 justify-content-center">
+  <?php if ($esAdminAutenticado) { ?>
+    <div class="row g-4 justify-content-center">
 
-    <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-add w-100" type="button">
-        <span>➕</span>
-        Agregar producto
-      </button>
-    </div>
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-add w-100" type="button">
+          <span>➕</span>
+          Agregar producto
+        </button>
+      </div>
 
-    <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-provider w-100" type="button"> 
-        <span>📋</span>
-        Crear proveedor
-      </button>
-    </div>
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-provider w-100" type="button">
+          <span>📋</span>
+          Crear proveedor
+        </button>
+      </div>
 
-    <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-user w-100" type="button"> 
-        <span>👤</span>
-        Invitar usuario
-      </button>
-    </div>
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-user w-100" type="button">
+          <span>👤</span>
+          Invitar usuario
+        </button>
+      </div>
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-report w-100" type="button">
+          <span>📑</span>
+          Generar PDF
+        </button>
+      </div>
 
-    <div class="col-md-3 col-lg-2">
-      <button class="quick-action btn-report w-100" type="button"> 
-        <span>📑</span>
-        Generar PDF
-      </button>
-    </div>
 
-    <?php if ($esAdminAutenticado) { ?>
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-roles w-100" type="button">
           <span>🔑</span>
           Acceso a roles
         </button>
       </div>
-    <?php } ?>
 
 
-  </div>
+
+    </div>
+  <?php } else { ?>
+    <div class="alert alert-warning text-center" role="alert">
+      Solo los administradores pueden acceder a estas acciones rápidas.
+    </div>
+  <?php } ?>
 </div>
 
 <?php if ($esAdminAutenticado) { ?>
