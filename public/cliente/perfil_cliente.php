@@ -61,7 +61,7 @@ if (isset($_POST["guardar_datos"])) {
     $_SESSION["cliente"]["email"] = $valor_email;
 
     $mensaje_exito = "Datos actualizados correctamente.";
-    $datos_guardados_exitosamente = true; 
+    $datos_guardados_exitosamente = true;
   }
 }
 
@@ -356,9 +356,9 @@ if ($datos_guardados_exitosamente) {
       background-color: rgba(255, 255, 255, 0.25);
       color: white;
     }
-
   </style>
 </head>
+
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -390,15 +390,15 @@ if ($datos_guardados_exitosamente) {
             </ul>
           </li>
 
-        <!-- Carrito -->
-        <li class="nav-item">
-          <a class="nav-link position-relative" href="../carrito.php">
-            <i class="fas fa-shopping-cart"></i>
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-              0
-            </span>
-          </a>
-        </li>
+          <!-- Carrito -->
+          <li class="nav-item">
+            <a class="nav-link position-relative" href="../carrito.php">
+              <i class="fas fa-shopping-cart"></i>
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
+                0
+              </span>
+            </a>
+          </li>
 
           <!-- Sesión -->
           <?php if (isset($_SESSION["cliente"])): ?>
@@ -428,57 +428,57 @@ if ($datos_guardados_exitosamente) {
     <div class="card glass-card p-4 mb-5" style="max-width: 600px; margin: 0 auto; border-radius: 15px;">
 
       <div class="row mb-3 align-items-center info-item">
-  <div class="col-3 text-center">
-    <i class="fas fa-user fa-2x text-white"></i>
-  </div>
-  <div class="col-9">
-    <div class="info-label fw-semibold text-uppercase text-white small">Nombre</div>
-    <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["nombre"]) ?></div>
-  </div>
-</div>
-<div class="row mb-3 align-items-center info-item">
-  <div class="col-3 text-center">
-    <i class="fas fa-phone fa-2x text-white"></i>
-  </div>
-  <div class="col-9">
-    <div class="info-label fw-semibold text-uppercase text-white small">Teléfono</div>
-    <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["telefono"]) ?></div>
-  </div>
-</div>
-<div class="row mb-3 align-items-center info-item">
-  <div class="col-3 text-center">
-    <i class="fas fa-envelope fa-2x text-white"></i>
-  </div>
-  <div class="col-9">
-    <div class="info-label fw-semibold text-uppercase text-white small">Email</div>
-    <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["email"]) ?></div>
-  </div>
-</div>
-<div class="row mb-3 align-items-center info-item">
-  <div class="col-3 text-center">
-    <i class="fas fa-calendar-alt fa-2x text-white"></i>
-  </div>
-  <div class="col-9">
-    <div class="info-label fw-semibold text-uppercase text-white small">Fecha de Registro</div>
-    <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["fecha_registro"]) ?></div>
-  </div>
-</div>
-<div class="row mb-3 align-items-center info-item">
-  <div class="col-3 text-center">
-    <i class="fas fa-star fa-2x text-warning"></i>
-  </div>
-  <div class="col-9">
-    <div class="info-label fw-semibold text-uppercase text-white small">Puntos</div>
-    <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["puntos"]) ?></div>
-  </div>
-</div>
+        <div class="col-3 text-center">
+          <i class="fas fa-user fa-2x text-white"></i>
+        </div>
+        <div class="col-9">
+          <div class="info-label fw-semibold text-uppercase text-white small">Nombre</div>
+          <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["nombre"]) ?></div>
+        </div>
+      </div>
+      <div class="row mb-3 align-items-center info-item">
+        <div class="col-3 text-center">
+          <i class="fas fa-phone fa-2x text-white"></i>
+        </div>
+        <div class="col-9">
+          <div class="info-label fw-semibold text-uppercase text-white small">Teléfono</div>
+          <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["telefono"]) ?></div>
+        </div>
+      </div>
+      <div class="row mb-3 align-items-center info-item">
+        <div class="col-3 text-center">
+          <i class="fas fa-envelope fa-2x text-white"></i>
+        </div>
+        <div class="col-9">
+          <div class="info-label fw-semibold text-uppercase text-white small">Email</div>
+          <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["email"]) ?></div>
+        </div>
+      </div>
+      <div class="row mb-3 align-items-center info-item">
+        <div class="col-3 text-center">
+          <i class="fas fa-calendar-alt fa-2x text-white"></i>
+        </div>
+        <div class="col-9">
+          <div class="info-label fw-semibold text-uppercase text-white small">Fecha de Registro</div>
+          <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["fecha_registro"]) ?></div>
+        </div>
+      </div>
+      <div class="row mb-3 align-items-center info-item">
+        <div class="col-3 text-center">
+          <i class="fas fa-star fa-2x text-warning"></i>
+        </div>
+        <div class="col-9">
+          <div class="info-label fw-semibold text-uppercase text-white small">Puntos</div>
+          <div class="info-value fs-5 text-white"><?= htmlspecialchars($datos["puntos"]) ?></div>
+        </div>
+      </div>
 
 
       <div class="text-center mt-3">
-  <button type="button" class="btn btn-outline-light btn-lg fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditarCliente" style="border-radius: 50px;">
-    ✏️ Editar mis datos
-  </button>
-</div>
+        <button type="button" class="btn btn-outline-light btn-lg fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditarCliente" style="border-radius: 50px;">
+          ✏️ Editar mis datos
+        </button>
+      </div>
 
     </div>
 
@@ -569,155 +569,156 @@ if ($datos_guardados_exitosamente) {
   </style>
 
   <!-- Modal Editar Cliente -->
-<div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-labelledby="modalEditarClienteLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content glass-card border-0 shadow-lg">
-      <div class="modal-header border-0">
-        <h5 class="modal-title text-light fw-bold" id="modalEditarClienteLabel">
-          <i class="fas fa-user-edit me-2 text-warning"></i>Editar Cliente
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
+  <div class="modal fade" id="modalEditarCliente" tabindex="-1" aria-labelledby="modalEditarClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content glass-card border-0 shadow-lg">
+        <div class="modal-header border-0">
+          <h5 class="modal-title text-light fw-bold" id="modalEditarClienteLabel">
+            <i class="fas fa-user-edit me-2 text-warning"></i>Editar Cliente
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
 
-      <div class="modal-body text-light">
-        <!-- FORMULARIO DATOS -->
-        <form method="POST">
-          <h5 class="mb-3 text-warning">Datos del cliente</h5>
+        <div class="modal-body text-light">
+          <!-- FORMULARIO DATOS -->
+          <form method="POST">
+            <h5 class="mb-3 text-warning">Datos del cliente</h5>
 
-          <div class="mb-3">
-            <label for="nombre" class="form-label text-light">Nombre:</label>
-            <input type="text" class="form-control bg-dark text-light border-secondary" name="nombre" id="nombre"
-              value="<?= isset($cliente['nombre']) ? $cliente['nombre'] : '' ?>" required>
-          </div>
+            <div class="mb-3">
+              <label for="nombre" class="form-label text-light">Nombre:</label>
+              <input type="text" class="form-control bg-dark text-light border-secondary" name="nombre" id="nombre"
+                value="<?= isset($cliente['nombre']) ? $cliente['nombre'] : '' ?>" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="email" class="form-label text-light">Email:</label>
-            <input type="email" class="form-control bg-dark text-light border-secondary" name="email" id="email"
-              value="<?= isset($cliente['email']) ? $cliente['email'] : '' ?>" placeholder="Opcional">
-          </div>
+            <div class="mb-3">
+              <label for="email" class="form-label text-light">Email:</label>
+              <input type="email" class="form-control bg-dark text-light border-secondary" name="email" id="email"
+                value="<?= isset($cliente['email']) ? $cliente['email'] : '' ?>" placeholder="Opcional">
+            </div>
 
-          <div class="mb-3">
-  <label for="telefono_editar" class="form-label text-light">Teléfono:</label>
-  <div class="input-group">
-    <span class="input-group-text bg-dark text-light border-secondary p-0">
-      <select name="codigo_pais" class="form-select bg-dark text-light border-0 px-3" id="codigo_pais_editar" required style="min-width: 100px;">
-        <option value="54" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+54') === 0 ? 'selected' : '' ?>>🇦🇷 +54</option>
-        <option value="598" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+598') === 0 ? 'selected' : '' ?>>🇺🇾 +598</option>
-        <option value="55" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+55') === 0 ? 'selected' : '' ?>>🇧🇷 +55</option>
-        <option value="56" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+56') === 0 ? 'selected' : '' ?>>🇨🇱 +56</option>
-        <option value="595" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+595') === 0 ? 'selected' : '' ?>>🇵🇾 +595</option>
-        <option value="591" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+591') === 0 ? 'selected' : '' ?>>🇧🇴 +591</option>
-        <option value="51" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+51') === 0 ? 'selected' : '' ?>>🇵🇪 +51</option>
-        <option value="1" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+1') === 0 ? 'selected' : '' ?>>🇺🇸 +1</option>
-        <option value="34" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+34') === 0 ? 'selected' : '' ?>>🇪🇸 +34</option>
-      </select>
-    </span>
-    <input type="text" class="form-control bg-dark text-light border-secondary" name="telefono" id="telefono_editar"
-value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['telefono']) : '' ?>" required placeholder="Ej: 3511234567"
-      oninput="this.value = this.value.replace(/[^0-9]/g, '');" inputmode="numeric" pattern="[0-9]*">  </div>
-  <small class="form-text text-muted">Ingresá solo números, sin espacios ni guiones.</small>
-</div>
+            <div class="mb-3">
+              <label for="telefono_editar" class="form-label text-light">Teléfono:</label>
+              <div class="input-group">
+                <span class="input-group-text bg-dark text-light border-secondary p-0">
+                  <select name="codigo_pais" class="form-select bg-dark text-light border-0 px-3" id="codigo_pais_editar" required style="min-width: 100px;">
+                    <option value="54" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+54') === 0 ? 'selected' : '' ?>>🇦🇷 +54</option>
+                    <option value="598" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+598') === 0 ? 'selected' : '' ?>>🇺🇾 +598</option>
+                    <option value="55" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+55') === 0 ? 'selected' : '' ?>>🇧🇷 +55</option>
+                    <option value="56" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+56') === 0 ? 'selected' : '' ?>>🇨🇱 +56</option>
+                    <option value="595" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+595') === 0 ? 'selected' : '' ?>>🇵🇾 +595</option>
+                    <option value="591" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+591') === 0 ? 'selected' : '' ?>>🇧🇴 +591</option>
+                    <option value="51" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+51') === 0 ? 'selected' : '' ?>>🇵🇪 +51</option>
+                    <option value="1" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+1') === 0 ? 'selected' : '' ?>>🇺🇸 +1</option>
+                    <option value="34" <?= isset($cliente['telefono']) && strpos($cliente['telefono'], '+34') === 0 ? 'selected' : '' ?>>🇪🇸 +34</option>
+                  </select>
+                </span>
+                <input type="text" class="form-control bg-dark text-light border-secondary" name="telefono" id="telefono_editar"
+                  value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['telefono']) : '' ?>" required placeholder="Ej: 3511234567"
+                  oninput="this.value = this.value.replace(/[^0-9]/g, '');" inputmode="numeric" pattern="[0-9]*">
+              </div>
+              <small class="form-text text-muted">Ingresá solo números, sin espacios ni guiones.</small>
+            </div>
 
 
-          <div class="d-grid">
-            <button type="submit" name="guardar_datos" class="btn btn-gold">Guardar cambios</button>
-          </div>
-        </form>
+            <div class="d-grid">
+              <button type="submit" name="guardar_datos" class="btn btn-gold">Guardar cambios</button>
+            </div>
+          </form>
 
-        <hr class="my-4 border-secondary">
+          <hr class="my-4 border-secondary">
 
-        <!-- FORMULARIO CONTRASEÑA -->
-        <form method="POST">
-          <h5 class="mb-3 text-warning">Cambiar contraseña</h5>
+          <!-- FORMULARIO CONTRASEÑA -->
+          <form method="POST">
+            <h5 class="mb-3 text-warning">Cambiar contraseña</h5>
 
-          <div class="mb-3">
-            <label for="password_actual" class="form-label text-light">Contraseña actual:</label>
-            <input type="password" class="form-control bg-dark text-light border-secondary" name="password_actual" id="password_actual" required>
-          </div>
+            <div class="mb-3">
+              <label for="password_actual" class="form-label text-light">Contraseña actual:</label>
+              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_actual" id="password_actual" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="password_nueva" class="form-label text-light">Nueva contraseña:</label>
-            <input type="password" class="form-control bg-dark text-light border-secondary" name="password_nueva" id="password_nueva" placeholder="Mínimo 8 caracteres" required>
-          </div>
+            <div class="mb-3">
+              <label for="password_nueva" class="form-label text-light">Nueva contraseña:</label>
+              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_nueva" id="password_nueva" placeholder="Mínimo 8 caracteres" required>
+            </div>
 
-          <div class="mb-3">
-            <label for="password_confirmar" class="form-label text-light">Confirmar nueva contraseña:</label>
-            <input type="password" class="form-control bg-dark text-light border-secondary" name="password_confirmar" id="password_confirmar" required>
-          </div>
+            <div class="mb-3">
+              <label for="password_confirmar" class="form-label text-light">Confirmar nueva contraseña:</label>
+              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_confirmar" id="password_confirmar" required>
+            </div>
 
-          <div class="d-grid">
-            <button type="submit" name="guardar_password" class="btn btn-gold">Cambiar contraseña</button>
-          </div>
-        </form>
+            <div class="d-grid">
+              <button type="submit" name="guardar_password" class="btn btn-gold">Cambiar contraseña</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
   <div class="container mt-5">
-  <h2 class="text-center text-white mb-4">
-    <i class="fas fa-receipt text-warning me-2"></i>Historial de Pedidos
-  </h2>
-  <div id="historial-pedidos" class="row justify-content-center"></div>
-</div>
+    <h2 class="text-center text-white mb-4">
+      <i class="fas fa-receipt text-warning me-2"></i>Historial de Pedidos
+    </h2>
+    <div id="historial-pedidos" class="row justify-content-center"></div>
+  </div>
 
-<!-- Modal para mostrar detalles -->
-<div class="modal fade" id="modalDetallePedido" tabindex="-1" aria-labelledby="modalDetallePedidoLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
-    <div class="modal-content glass-card border-0 shadow-lg" style="border-radius: 20px;">
-      <div class="modal-header border-0 bg-dark text-light rounded-top px-4 py-3">
-        <h5 class="modal-title fw-bold d-flex align-items-center" id="modalDetallePedidoLabel">
-          <i class="fas fa-box-open text-warning me-2 fa-lg"></i>
-          <span>Detalle del Pedido</span>
-        </h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-      </div>
-      <div class="modal-body text-light px-4 py-3" style="background-color: rgba(30,30,30,0.85); border-radius: 0 0 20px 20px;">
-        <div class="text-center mb-3">
-          <i class="fas fa-info-circle fa-2x text-warning"></i>
-          <p class="mt-2 text-muted">Aquí verás todos los detalles de tu pedido.</p>
+  <!-- Modal para mostrar detalles -->
+  <div class="modal fade" id="modalDetallePedido" tabindex="-1" aria-labelledby="modalDetallePedidoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content glass-card border-0 shadow-lg" style="border-radius: 20px;">
+        <div class="modal-header border-0 bg-dark text-light rounded-top px-4 py-3">
+          <h5 class="modal-title fw-bold d-flex align-items-center" id="modalDetallePedidoLabel">
+            <i class="fas fa-box-open text-warning me-2 fa-lg"></i>
+            <span>Detalle del Pedido</span>
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
-        <!-- Aquí se insertan los detalles dinámicamente -->
+        <div class="modal-body text-light px-4 py-3" style="background-color: rgba(30,30,30,0.85); border-radius: 0 0 20px 20px;">
+          <div class="text-center mb-3">
+            <i class="fas fa-info-circle fa-2x text-warning"></i>
+            <p class="mt-2 text-muted">Aquí verás todos los detalles de tu pedido.</p>
+          </div>
+          <!-- Aquí se insertan los detalles dinámicamente -->
+        </div>
       </div>
     </div>
   </div>
-</div>
 
 
 
-<script>
-  // Función para construir el HTML del detalle del pedido
-  function crearHtmlDetalle(pedido) {
-    let estadoHtml = '';
-    switch (pedido.estado) {
-      case 'Cancelado':
-        estadoHtml = `<span class="text-danger">Cancelado ❌ - Esperamos poder servirte mejor en el futuro.</span>`;
-        break;
-      case 'Listo':
-        estadoHtml = `<span class="text-success">Listo ✅</span>`;
-        break;
-      case 'En preparación':
-        estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
-        break;
-      case 'En camino':
-        estadoHtml = `<span class="text-info">En camino 🚚</span>`;
-        break;
-      default:
-        estadoHtml = pedido.estado;
-    }
+  <script>
+    // Función para construir el HTML del detalle del pedido
+    function crearHtmlDetalle(pedido) {
+      let estadoHtml = '';
+      switch (pedido.estado) {
+        case 'Cancelado':
+          estadoHtml = `<span class="text-danger">Cancelado ❌ - Esperamos poder servirte mejor en el futuro.</span>`;
+          break;
+        case 'Listo':
+          estadoHtml = `<span class="text-success">Listo ✅</span>`;
+          break;
+        case 'En preparación':
+          estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
+          break;
+        case 'En camino':
+          estadoHtml = `<span class="text-info">En camino 🚚</span>`;
+          break;
+        default:
+          estadoHtml = pedido.estado;
+      }
 
-    let productosHtml = '';
-    pedido.detalles.forEach(detalle => {
-      productosHtml += `
+      let productosHtml = '';
+      pedido.detalles.forEach(detalle => {
+        productosHtml += `
         <div class="producto-tarjeta mb-2">
           <strong>${detalle.nombre}</strong><br>
           <small>Precio: $${Number(detalle.precio).toFixed(2)} | Cantidad: ${detalle.cantidad} | Subtotal: $${(detalle.precio * detalle.cantidad).toFixed(2)}</small>
         </div>
       `;
-    });
+      });
 
-    return `
+      return `
       <div class="detalle-card bg-dark text-light p-3 border border-secondary rounded">
         <p><strong>Entrega:</strong> ${pedido.tipo_entrega}</p>
         <p><strong>Método de pago:</strong> ${pedido.metodo_pago}</p>
@@ -727,77 +728,79 @@ value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['
         <div class="mt-2">${productosHtml}</div>
       </div>
     `;
-  }
-
-  async function actualizarHistorial() {
-    try {
-      const response = await fetch('../admin/obtener_pedidos_cliente.php');
-      const pedidos = await response.json();
-
-      const historialContenedor = document.getElementById('historial-pedidos');
-      let htmlPedidos = '';
-
-      if (pedidos.length === 0) {
-        htmlPedidos = `
-          <div class="col-12">
-            <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
-          </div>`;
-      } else {
-        pedidos.forEach((pedido, index) => {
-const pedidoId = pedido.id ?? (pedidos.length - index);
-          htmlPedidos += `
-            <div class="col-md-6 col-lg-3 mb-3">
-              <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
-                <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
-                <h5 class="card-title">Pedido #${pedidoId}</h5>
-                <p><strong>Fecha:</strong><br>${new Date(pedido.fecha).toLocaleDateString()}</p>
-                <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
-                <button class="btn btn-outline-warning btn-sm mt-2 ver-detalle-btn" data-index="${index}">Ver detalle</button>
-              </div>
-            </div>
-          `;
-        });
-      }
-
-      historialContenedor.innerHTML = htmlPedidos;
-
-      // Actualizar contenido del modal si está abierto
-      const modalEl = document.getElementById('modalDetallePedido');
-      if (modalEl.classList.contains('show')) {
-        const idx = modalEl.getAttribute('data-index');
-        const pedido = pedidos[idx];
-        const modalBody = modalEl.querySelector('.modal-body');
-        modalBody.innerHTML = crearHtmlDetalle(pedido);
-      }
-
-      // Delegación de eventos para los botones "Ver detalle"
-      historialContenedor.addEventListener('click', (e) => {
-        const btn = e.target.closest('.ver-detalle-btn');
-        if (!btn) return;
-
-        const idx = btn.getAttribute('data-index');
-        const pedido = pedidos[idx];
-
-        const modalBody = document.querySelector('#modalDetallePedido .modal-body');
-        const modalTitle = document.querySelector('#modalDetallePedidoLabel');
-        const pedidoId = pedido.id ?? (parseInt(idx) + 1);
-
-        modalTitle.textContent = `Detalle del Pedido #${pedidoId}`;
-        modalBody.innerHTML = crearHtmlDetalle(pedido);
-
-        const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-        modalEl.setAttribute('data-index', idx);
-        modal.show();
-      });
-
-    } catch (e) {
-      console.error('Error al actualizar historial:', e);
     }
-  }
 
-  document.addEventListener('DOMContentLoaded', actualizarHistorial);
-  setInterval(actualizarHistorial, 10000);
-</script>
+    async function actualizarHistorial() {
+      try {
+        const response = await fetch('obtener_pedidos_cliente.php');
+        const pedidos = await response.json();
+
+        const historialContenedor = document.getElementById('historial-pedidos');
+        let htmlPedidos = '';
+
+        if (pedidos.length === 0) {
+          htmlPedidos = `
+            <div class="col-12">
+              <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
+            </div>`;
+        } else {
+          pedidos.forEach((pedido, index) => {
+            const pedidoId = pedido.ID ?? pedido.id ?? (pedidos.length - index);
+            htmlPedidos += `
+              <div class="col-md-6 col-lg-3 mb-3">
+                <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
+                  <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
+                  <h5 class="card-title">Pedido #${pedidoId}</h5>
+                  <p><strong>Fecha:</strong><br>${new Date(pedido.fecha).toLocaleDateString()}</p>
+                  <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
+                  <button class="btn btn-outline-warning btn-sm mt-2 ver-detalle-btn" data-index="${index}">Ver detalle</button>
+                </div>
+                </div>
+              </div>
+
+          `;
+          });
+        }
+
+        historialContenedor.innerHTML = htmlPedidos;
+
+        // Actualizar contenido del modal si está abierto
+        const modalEl = document.getElementById('modalDetallePedido');
+        if (modalEl.classList.contains('show')) {
+          const idx = modalEl.getAttribute('data-index');
+          const pedido = pedidos[idx];
+          const modalBody = modalEl.querySelector('.modal-body');
+          modalBody.innerHTML = crearHtmlDetalle(pedido);
+        }
+
+        // Delegación de eventos para los botones "Ver detalle"
+        historialContenedor.addEventListener('click', (e) => {
+          const btn = e.target.closest('.ver-detalle-btn');
+          if (!btn) return;
+
+          const idx = btn.getAttribute('data-index');
+          const pedido = pedidos[idx];
+
+          const modalBody = document.querySelector('#modalDetallePedido .modal-body');
+          const modalTitle = document.querySelector('#modalDetallePedidoLabel');
+          const pedidoId = pedido.ID ?? pedido.id ?? (parseInt(idx) + 1);
+
+          modalTitle.textContent = `Detalle del Pedido #${pedidoId}`;
+          modalBody.innerHTML = crearHtmlDetalle(pedido);
+
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modalEl.setAttribute('data-index', idx);
+          modal.show();
+        });
+
+      } catch (e) {
+        console.error('Error al actualizar historial:', e);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', actualizarHistorial);
+    setInterval(actualizarHistorial, 10000);
+  </script>
 
 
   <?php include __DIR__ . '/../../componentes/whatsapp_button.php'; ?>
@@ -874,16 +877,15 @@ const pedidoId = pedido.id ?? (pedidos.length - index);
   </script>
 
   <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const contador = document.getElementById("contador-carrito");
-    const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
-    contador.textContent = carrito.length;
-  });
-</script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const contador = document.getElementById("contador-carrito");
+      const carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+      contador.textContent = carrito.length;
+    });
+  </script>
 
-  
+
 
 </body>
 
 </html>
-
