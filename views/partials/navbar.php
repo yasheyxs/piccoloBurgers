@@ -3,6 +3,8 @@ $navBasePath = isset($navBasePath) ? (string) $navBasePath : '';
 $navHomeLink = isset($navHomeLink) ? (string) $navHomeLink : ($navBasePath !== '' ? $navBasePath : '#');
 $navBrandLabel = isset($navBrandLabel) ? (string) $navBrandLabel : 'Piccolo Burgers';
 $navCarritoLink = isset($navCarritoLink) ? (string) $navCarritoLink : 'carrito.php';
+$navAuthLink = isset($navAuthLink) ? (string) $navAuthLink : 'cliente/login_cliente.php';
+$navAuthLabel = isset($navAuthLabel) ? (string) $navAuthLabel : 'Iniciar sesión / Registrarse';
 
 $navSectionBase = $navBasePath !== '' ? rtrim($navBasePath, '#') : '';
 $sectionLinkPrefix = $navSectionBase !== '' ? $navSectionBase . '#' : '#';
@@ -67,7 +69,11 @@ $navExtraSections = [
             </a>
           </li>
         <?php else: ?>
-          <li class="nav-item">
+          <li class="nav-item ms-lg-3">
+            <a class="btn btn-gold rounded-pill nav-auth-btn"
+              href="<?= htmlspecialchars($navAuthLink, ENT_QUOTES, 'UTF-8'); ?>">
+              <?= htmlspecialchars($navAuthLabel, ENT_QUOTES, 'UTF-8'); ?>
+            </a>
 
           </li>
         <?php endif; ?>
