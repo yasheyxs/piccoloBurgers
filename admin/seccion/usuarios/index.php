@@ -8,6 +8,9 @@ if (!isset($_SESSION["rol"]) || $_SESSION["rol"] !== "admin") {
     exit();
 }
 
+$mensajeUsuarios = $_SESSION['mensaje_usuarios'] ?? '';
+unset($_SESSION['mensaje_usuarios']);
+
 // Eliminar usuario si se pasa txtID
 if (isset($_GET["txtID"])) {
     $txtID = intval($_GET["txtID"]);
@@ -53,6 +56,12 @@ include("../../templates/header.php");
     <a class="btn btn-primary" href="crear.php" role="button">Agregar registros</a>
   </div>
   <div class="card-body">
+    <?php if ($mensajeUsuarios) { ?>
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?php echo htmlspecialchars($mensajeUsuarios, ENT_QUOTES, 'UTF-8'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+    <?php } ?>
     <div class="table-responsive">
       <table id="tablaUsuarios" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
@@ -71,29 +80,31 @@ include("../../templates/header.php");
               <td><?php echo $registro["usuario"]; ?></td>
               <td><?php echo $registro["correo"]; ?></td>
               <td><?php echo ucfirst($registro["rol"]); ?></td>
-              <td>
-  <?php
-    $mostrarBoton = true;
+              <td class="d-flex gap-2 flex-wrap">
+                <a class="btn btn-warning btn-sm" href="editar.php?id=<?php echo $registro["ID"]; ?>">Editar</a>
+                <?php
+                  $mostrarBoton = true;
 
-    if ($registro["rol"] === "admin") {
-      // Contar admins
-      $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
-      $stmt->execute();
-      $totalAdmins = $stmt->fetchColumn();
+                  if ($registro["rol"] === "admin") {
+                      // Contar admins
+                      $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
+                      $stmt->execute();
+                      $totalAdmins = $stmt->fetchColumn();
 
-      // Si es el último admin, no mostrar botón
-      if ($totalAdmins <= 1) {
-        $mostrarBoton = false;
-      }
-    }
+                      // Si es el último admin, no mostrar botón
+                      if ($totalAdmins <= 1) {
+                          $mostrarBoton = false;
+                      }
+                  }
 
-    if ($mostrarBoton) {
-  ?>
-    <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro["ID"]; ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">Borrar</a>
-  <?php } else { ?>
-    <span class="text-muted">Protegido</span>
-  <?php } ?>
-</td>
+                  if ($mostrarBoton) {
+                ?>
+                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro["ID"]; ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">Borrar</a>
+                <?php } else { ?>
+                  <span class="text-muted">Protegido</span>
+                <?php } ?>
+
+              </td>
 
             </tr>
           <?php } ?>
