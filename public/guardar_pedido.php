@@ -5,6 +5,7 @@ error_reporting(E_ALL);
 
 require_once __DIR__ . '/../admin/bd.php';
 require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../includes/email_requirement.php';
 
 session_start();
 
@@ -28,6 +29,11 @@ function responder_error($mensaje)
     exit;
 }
 
+if (clienteDebeRegistrarEmail()) {
+    registrarAvisoEmailObligatorio();
+    responder_error("Necesitamos que actualices el email de tu cuenta para continuar. Si preferís no hacerlo, podés cerrar sesión.");
+}
+
 if (!isset($_POST["nombre"], $_POST["telefono"], $_POST["codigo_pais"], $_POST["carrito"])) {
     responder_error("Faltan datos obligatorios.");
 }
@@ -35,7 +41,14 @@ if (!isset($_POST["nombre"], $_POST["telefono"], $_POST["codigo_pais"], $_POST["
 $nombre = $_POST["nombre"];
 $telefono = trim($_POST["telefono"]);
 $codigoPais = trim($_POST["codigo_pais"] ?? '');
-$email = $_POST["email"] ?? null;
+if (!isset($_POST["email"])) {
+    responder_error("Faltan datos obligatorios.");
+}
+
+$email = trim((string) $_POST["email"]);
+if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    responder_error("Ingresá un email válido.");
+}
 $nota = $_POST["nota"] ?? "";
 $metodo_pago = $_POST["metodo_pago"] ?? "";
 $tipo_entrega = $_POST["tipo_entrega"] ?? "";

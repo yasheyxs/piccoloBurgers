@@ -23,8 +23,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if ($password !== $confirmar) {
     $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
-  } elseif (empty($nombre) || empty($codigo) || empty($numero) || empty($password)) {
+    } elseif (empty($nombre) || empty($codigo) || empty($numero) || empty($email) || empty($password)) {
+
     $mensaje = "<div class='alert alert-danger'>Por favor, completá todos los campos requeridos.</div>";
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $mensaje = "<div class='alert alert-danger'>Ingresá un email válido.</div>";
   } elseif (!validarFuerza($password)) {
     $mensaje = "<div class='alert alert-danger'>La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.</div>";
   } elseif (!$telefonoCompleto) {
@@ -275,8 +278,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
 
         <div class="mb-3">
-          <label for="email" class="form-label">Email (opcional):</label>
-          <input type="email" class="form-control" name="email">
+          <label for="email" class="form-label">Email:</label>
+          <input type="email" class="form-control" name="email" required autocomplete="email">
         </div>
 
         <div class="mb-3">

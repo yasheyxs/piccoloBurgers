@@ -2,6 +2,8 @@
 session_start();
 require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../includes/email_requirement.php';
+
 
 $mensaje = "";
 
@@ -34,6 +36,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           "telefono" => $cliente["telefono"],
           "email" => $cliente["email"]
         ];
+
+        if (clienteDebeRegistrarEmail()) {
+          registrarAvisoEmailObligatorio();
+          header("Location: perfil_cliente.php");
+          exit;
+        }
+
+        limpiarAvisoEmailObligatorio();
+
         $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
         $mensaje .= "<script>setTimeout(() => window.location.href = '../index.php', 1500);</script>";
       } else {

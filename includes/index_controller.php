@@ -1,6 +1,10 @@
 <?php
 
 require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/email_requirement.php';
+require_once __DIR__ . '/../../includes/email_requirement.php';
+
+enforceEmailRequirement();
 
 $conexion = requireConnection($conexion ?? null);
 
