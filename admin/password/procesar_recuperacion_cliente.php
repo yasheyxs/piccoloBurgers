@@ -1,6 +1,7 @@
 <?php
 include("../bd.php");
-require_once __DIR__ . '/../../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../config/mailer.php';
+
 ?>
 
 <!doctype html>
@@ -66,18 +67,16 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
     <div class="col-md-8">
 
 <?php
-$codigo = trim($_POST["codigo_pais"] ?? "");
-$numero = trim($_POST["telefono"] ?? "");
-$telefonoCompleto = validarTelefono($codigo, $numero);
+$correo = trim($_POST["correo"] ?? "");
 
-if (empty($telefonoCompleto)) {
-  echo "<div class='alert alert-danger'>Por favor, ingresá un número válido.</div>";
+if (empty($correo) || !filter_var($correo, FILTER_VALIDATE_EMAIL)) {
+  echo "<div class='alert alert-danger'>Por favor, ingresá un correo válido.</div>";
   echo "<div class='mt-3'><a href='../password/recuperar_password_cliente.php' class='btn-gold'>Volver</a></div>";
   exit();
 }
 
-$stmt = $conexion->prepare("SELECT * FROM tbl_clientes WHERE telefono = :telefono");
-$stmt->bindParam(":telefono", $telefonoCompleto);
+$stmt = $conexion->prepare("SELECT * FROM tbl_clientes WHERE email = :correo");
+$stmt->bindParam(":correo", $correo);
 $stmt->execute();
 $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -85,29 +84,66 @@ if ($cliente) {
   $token = bin2hex(random_bytes(32));
   $expira = date("Y-m-d H:i:s", strtotime("+30 minutes"));
 
-  $stmt = $conexion->prepare("UPDATE tbl_clientes SET reset_token = :token, token_expira = :expira WHERE telefono = :telefono");
+  $stmt = $conexion->prepare("UPDATE tbl_clientes SET reset_token = :token, token_expira = :expira WHERE email = :correo");
   $stmt->bindParam(":token", $token);
   $stmt->bindParam(":expira", $expira);
-  $stmt->bindParam(":telefono", $telefonoCompleto);
+  $stmt->bindParam(":correo", $correo);
   $stmt->execute();
 
-  $host = $_SERVER['HTTP_HOST'];
+  $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
   $link = "http://$host/piccoloBurgers/admin/password/reset_password.php?token=$token&tipo=cliente";
+  $linkHtml = htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-  echo "
-    <div class='alert alert-success'>
-      Si el teléfono está registrado, se ha generado un enlace de recuperación.<br>
-      <a href='$link' class='btn-gold'>Hacé clic aquí</a>
-    </div>
-  ";
+
+  $correoEnviado = false;
+
+  try {
+    $mailer = crearMailer();
+    $nombreCliente = $cliente['nombre'] ?? '';
+    $mailer->addAddress($correo, $nombreCliente);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'Recuperación de contraseña - Piccolo Burgers';
+
+    $mensajePlano = "Hola $nombreCliente,\n\n" .
+      "Recibimos una solicitud para restablecer la contraseña de tu cuenta de cliente.\n" .
+      "Podés crear una nueva contraseña ingresando al siguiente enlace dentro de los próximos 30 minutos:\n$link\n\n" .
+      "Si no solicitaste este cambio, ignorá este mensaje.";
+
+    $mensajeHtml = nl2br(htmlspecialchars($mensajePlano, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+
+    $mailer->Body = $mensajeHtml . "<br><br><a href='$linkHtml' class='btn-gold'>Restablecer contraseña</a>";
+    $mailer->AltBody = $mensajePlano;
+    $mailer->send();
+    $correoEnviado = true;
+  } catch (Throwable $ex) {
+    error_log('Error al enviar correo de recuperación (cliente): ' . $ex->getMessage());
+  }
+
+  if ($correoEnviado) {
+    echo "
+      <div class='alert alert-success'>
+        Te enviamos un correo con las instrucciones para restablecer tu contraseña.<br><br>
+      </div>
+    ";
+  } else {
+    echo "
+      <div class='alert alert-warning'>
+        Se generó el enlace de recuperación pero no pudimos enviar el correo automáticamente.<br><br>
+        Utilizá el siguiente botón para continuar:<br>
+        <a href='$linkHtml' class='btn-gold mt-2'>Restablecer contraseña</a>
+      </div>
+    ";
+  }
 } else {
   echo "
-    <div class='alert alert-warning'>
-      No hay una cuenta asociada a este número de teléfono.<br>
-      <a href='../password/recuperar_password_cliente.php' class='btn-gold'>Volver</a>
+    <div class='alert alert-success'>
+      Si el correo está registrado, vas a recibir un correo con los pasos para restablecer tu contraseña en los próximos minutos.
     </div>
   ";
 }
+
+echo "<div class='mt-3'><a href='../password/recuperar_password_cliente.php' class='btn-gold'>Volver</a></div>";
+
 ?>
 
     </div>

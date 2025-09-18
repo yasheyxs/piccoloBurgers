@@ -1,6 +1,5 @@
 <?php
 $mensaje = "";
-require_once __DIR__ . '/../../componentes/validar_telefono.php';
 ?>
 
 <!doctype html>
@@ -84,22 +83,9 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
   <div class="container mt-5">
     <h2 class="mb-4 text-center">Recuperar contraseña</h2>
     <form method="post" action="./procesar_recuperacion_cliente.php">
-      <label for="telefono" class="form-label">Teléfono registrado:</label>
-      <div class="d-flex gap-2">
-        <select name="codigo_pais" class="form-control" style="max-width: 140px;" required id="codigo_pais">
-          <option value="54" selected>🇦🇷 +54</option>
-          <option value="598">🇺🇾 +598</option>
-          <option value="55">🇧🇷 +55</option>
-          <option value="56">🇨🇱 +56</option>
-          <option value="595">🇵🇾 +595</option>
-          <option value="591">🇧🇴 +591</option>
-          <option value="51">🇵🇪 +51</option>
-          <option value="1">🇺🇸 +1</option>
-          <option value="34">🇪🇸 +34</option>
-        </select>
-        <input type="text" class="form-control" name="telefono" id="telefono" required placeholder="Ej: 3511234567">
-      </div>
-      <small class="form-text">Ingresá solo números, sin espacios ni guiones.</small>
+      <label for="correo" class="form-label">Correo electrónico registrado:</label>
+      <input type="email" class="form-control" name="correo" id="correo" required placeholder="ejemplo@correo.com">
+      <small class="form-text">Te enviaremos un enlace a este correo para que puedas restablecer tu contraseña.</small>
 
       <button type="submit" class="btn btn-gold w-100 mt-3">Enviar enlace de recuperación</button>
     </form>
@@ -112,28 +98,5 @@ require_once __DIR__ . '/../../componentes/validar_telefono.php';
       <?= $mensaje ?>
     </div>
   </div>
-
-  <script>
-    const longitudes = {
-      '54': 10, '598': 9, '55': 11, '56': 9, '595': 9,
-      '591': 8, '51': 9, '1': 10, '34': 9
-    };
-
-    const selectPais = document.getElementById('codigo_pais');
-    const inputTel = document.getElementById('telefono');
-
-    function actualizarMaxLength() {
-      const cod = selectPais.value;
-      const max = longitudes[cod] || 15;
-      inputTel.maxLength = max;
-    }
-
-    inputTel.addEventListener("input", function () {
-      this.value = this.value.replace(/[^\d]/g, "");
-    });
-
-    selectPais.addEventListener("change", actualizarMaxLength);
-    document.addEventListener("DOMContentLoaded", actualizarMaxLength);
-  </script>
 </body>
 </html>
