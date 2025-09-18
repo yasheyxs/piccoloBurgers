@@ -1,6 +1,7 @@
 <?php
 // No requiere sesión activa
 include("../bd.php");
+require_once __DIR__ . '/../../config/mailer.php';
 include($_SERVER['DOCUMENT_ROOT'] . "/piccoloBurgers/admin/templates/header_public.php");
 
 $correo = trim($_POST["correo"] ?? "");
@@ -40,12 +41,47 @@ if ($usuario) {
     </div>
   ";
 } else {
-  echo "
-    <div class='alert alert-warning text-center'>
-      No encontramos ese correo en nuestra base.<br><br>
-      <a href='recuperar_password_usuario.php' class='btn btn-secondary'>Volver al formulario</a>
-    </div>
-  ";
+  $correoEnviado = false;
+
+  try {
+    $mailer = crearMailer();
+    $nombreUsuario = $usuario['usuario'] ?? '';
+    $mailer->addAddress($correo, $nombreUsuario);
+    $mailer->isHTML(true);
+    $mailer->Subject = 'Recuperación de contraseña - Piccolo Burgers';
+
+    $mensajePlano = "Hola $nombreUsuario,\n\n" .
+      "Recibimos una solicitud para restablecer tu contraseña del panel administrativo.\n" .
+      "Podés crear una nueva contraseña ingresando al siguiente enlace dentro de los próximos 30 minutos:\n$link\n\n" .
+      "Si no solicitaste este cambio, ignorá este mensaje.";
+
+    $mensajeHtml = nl2br(htmlspecialchars($mensajePlano, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
+
+    $mailer->Body = $mensajeHtml . "<br><br><a href='$link' class='btn btn-success'>Restablecer contraseña</a>";
+    $mailer->AltBody = $mensajePlano;
+    $mailer->send();
+    $correoEnviado = true;
+  } catch (Throwable $ex) {
+    error_log('Error al enviar correo de recuperación: ' . $ex->getMessage());
+  }
+
+  if ($correoEnviado) {
+    echo "
+      <div class='alert alert-success text-center'>
+        Te enviamos un correo con las instrucciones para restablecer tu contraseña.<br><br>
+        También podés acceder directamente desde aquí:<br>
+        <a href='$link' class='btn btn-success mt-2'>Restablecer contraseña</a>
+      </div>
+    ";
+  } else {
+    echo "
+      <div class='alert alert-warning text-center'>
+        Se generó el enlace de recuperación pero no pudimos enviar el correo automáticamente.<br><br>
+        Utilizá el siguiente botón para continuar:<br>
+        <a href='$link' class='btn btn-success mt-2'>Restablecer contraseña</a>
+      </div>
+    ";
+  }
 }
 
 echo '</div></div></div>';
