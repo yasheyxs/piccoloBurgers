@@ -1,12 +1,18 @@
 <?php
 require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../includes/email_requirement.php';
+
 session_start();
 
 if (!isset($_SESSION["cliente"])) {
   header("Location: login_cliente.php");
   exit;
 }
+
+enforceEmailRequirement('perfil_cliente.php', true);
+
+$emailObligatorioMensaje = $_SESSION['email_obligatorio_mensaje'] ?? '';
 
 $errores = [];
 $mensaje_error = "";
@@ -34,10 +40,10 @@ if (isset($_POST["guardar_datos"])) {
     $errores[] = "Número de teléfono inválido.";
   }
 
-  if ($nuevo_email !== "") {
-    if (!filter_var($nuevo_email, FILTER_VALIDATE_EMAIL)) {
-      $errores[] = "Email inválido.";
-    }
+  if ($nuevo_email === '') {
+    $errores[] = "Ingresá un email.";
+  } elseif (!filter_var($nuevo_email, FILTER_VALIDATE_EMAIL)) {
+    $errores[] = "Email inválido.";
   }
 
   if (empty($errores)) {
@@ -51,14 +57,14 @@ if (isset($_POST["guardar_datos"])) {
   }
 
   if (empty($errores)) {
-    $valor_email = $nuevo_email === "" ? null : $nuevo_email;
 
     $actualizar = $conexion->prepare("UPDATE tbl_clientes SET nombre = ?, telefono = ?, email = ? WHERE ID = ?");
-    $actualizar->execute([$nuevo_nombre, $nuevo_telefono, $valor_email, $cliente_id]);
-
+    $actualizar->execute([$nuevo_nombre, $nuevo_telefono, $nuevo_email, $cliente_id]);
     $_SESSION["cliente"]["nombre"] = $nuevo_nombre;
     $_SESSION["cliente"]["telefono"] = $nuevo_telefono;
-    $_SESSION["cliente"]["email"] = $valor_email;
+    $_SESSION["cliente"]["email"] = $nuevo_email;
+
+    limpiarAvisoEmailObligatorio();
 
     $mensaje_exito = "Datos actualizados correctamente.";
     $datos_guardados_exitosamente = true;
@@ -424,6 +430,14 @@ if ($datos_guardados_exitosamente) {
   </nav>
 
   <div class="container mt-5 pt-5">
+    <?php if ($emailObligatorioMensaje !== ''): ?>
+      <div class="alert alert-warning text-dark fw-semibold" role="alert">
+        <?= htmlspecialchars($emailObligatorioMensaje); ?>
+        <div class="mt-2 fw-normal">
+          Si no querés actualizarlo ahora, podés <a href="logout_cliente.php" class="alert-link">cerrar sesión</a>.
+        </div>
+      </div>
+    <?php endif; ?>
     <h2 class="mb-4 text-center">👤 Información del Cliente</h2>
     <div class="card glass-card p-4 mb-5" style="max-width: 600px; margin: 0 auto; border-radius: 15px;">
 
@@ -593,7 +607,8 @@ if ($datos_guardados_exitosamente) {
             <div class="mb-3">
               <label for="email" class="form-label text-light">Email:</label>
               <input type="email" class="form-control bg-dark text-light border-secondary" name="email" id="email"
-                value="<?= isset($cliente['email']) ? $cliente['email'] : '' ?>" placeholder="Opcional">
+                value="<?= isset($cliente['email']) ? $cliente['email'] : '' ?>" placeholder="ejemplo@correo.com" required
+                autocomplete="email">
             </div>
 
             <div class="mb-3">
