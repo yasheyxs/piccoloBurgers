@@ -63,8 +63,6 @@ if ($usuario) {
     echo "
       <div class='alert alert-success text-center'>
         Te enviamos un correo con las instrucciones para restablecer tu contraseña.<br><br>
-        También podés acceder directamente desde aquí:<br>
-        <a href='$link' class='btn btn-success mt-2'>Restablecer contraseña</a>
       </div>
     ";
   } else {
