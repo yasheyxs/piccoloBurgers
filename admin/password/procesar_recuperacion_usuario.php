@@ -34,13 +34,7 @@ if ($usuario) {
   $host = $_SERVER['HTTP_HOST'];
   $link = "http://$host/piccoloBurgers/admin/password/reset_password.php?token=$token&tipo=usuario";
 
-  echo "
-    <div class='alert alert-success text-center'>
-      Si el correo está registrado, se ha generado un enlace de recuperación.<br><br>
-      <a href='$link' class='btn btn-success'>Hacé clic aquí</a>
-    </div>
-  ";
-} else {
+  
   $correoEnviado = false;
 
   try {
@@ -82,6 +76,12 @@ if ($usuario) {
       </div>
     ";
   }
+  } else {
+  echo "
+    <div class='alert alert-success text-center'>
+      Si el correo está registrado, vas a recibir un correo con los pasos para restablecer tu contraseña en los próximos minutos.
+    </div>
+  ";
 }
 
 echo '</div></div></div>';
