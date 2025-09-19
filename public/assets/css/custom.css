@@ -138,6 +138,26 @@
     .form-control::placeholder {
       color: var(--text-muted);
     }
+
+    .btn-clear-filter {
+      border: 1px solid #444;
+      background-color: transparent;
+      color: var(--text-light);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+      font-weight: 600;
+    }
+    .btn-clear-filter:hover:not(:disabled) {
+      background-color: var(--main-gold);
+      border-color: var(--main-gold);
+      color: #000;
+    }
+    .btn-clear-filter:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .form-control:focus {
       background-color: var(--gray-bg);
       color: var(--text-light);

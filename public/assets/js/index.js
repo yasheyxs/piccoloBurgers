@@ -35,6 +35,7 @@
     const categoriaSelect = document.getElementById('categoria');
     const contenedor = document.getElementById('contenedor-menu');
     const contenedorBotonMas = document.getElementById('contenedor-boton-mas');
+    const limpiarFiltroBtn = document.getElementById('limpiar-filtro-menu');
 
     if (!buscadorInput || !categoriaSelect || !contenedor || !contenedorBotonMas) {
       return;
@@ -108,6 +109,15 @@
       return tarjetas.length;
     };
 
+     const actualizarEstadoLimpiar = () => {
+      if (!limpiarFiltroBtn) {
+        return;
+      }
+
+      const tieneTexto = buscadorInput.value.trim().length > 0;
+      limpiarFiltroBtn.disabled = !tieneTexto;
+    };
+
     function filtrarMenu(reset = true) {
       const texto = buscadorInput.value.trim();
       const categoria = categoriaSelect.value;
@@ -150,6 +160,8 @@ return resp.json();
           console.error('Error al filtrar menú:', error);
         });
     }
+
+    const filtrarMenuDebounced = debounce(() => filtrarMenu(true), 300);
 
     function cargarMasProductos() {
       if (isLoadingMore || offset >= totalItems) {
@@ -203,10 +215,27 @@ return resp.json();
       }
     }
 
-    buscadorInput.addEventListener('input', debounce(() => filtrarMenu(true), 300));
+    buscadorInput.addEventListener('input', () => {
+      actualizarEstadoLimpiar();
+      filtrarMenuDebounced();
+    });
     categoriaSelect.addEventListener('change', () => filtrarMenu(true));
 
+    if (limpiarFiltroBtn) {
+      limpiarFiltroBtn.addEventListener('click', () => {
+        if (!buscadorInput.value.trim()) {
+          return;
+        }
+
+        buscadorInput.value = '';
+        actualizarEstadoLimpiar();
+        filtrarMenu(true);
+        buscadorInput.focus();
+      });
+    }
+
     actualizarContador();
+    actualizarEstadoLimpiar();
     filtrarMenu(true);
   }
 

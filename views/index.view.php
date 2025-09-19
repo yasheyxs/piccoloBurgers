@@ -58,7 +58,12 @@
     <!-- Controles de filtrado -->
     <div class="row mb-4">
       <div class="col-md-6">
-        <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
+        <div class="input-group">
+          <input type="text" id="buscador-menu" class="form-control" placeholder="Buscar en el menú...">
+          <button type="button" id="limpiar-filtro-menu" class="btn btn-outline-light btn-clear-filter" title="Limpiar búsqueda">
+            Limpiar
+          </button>
+        </div>
       </div>
       <div class="col-md-6">
         <select id="categoria" class="form-select">
