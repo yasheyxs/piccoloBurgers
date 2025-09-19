@@ -152,6 +152,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         ? 'https://www.google.com/maps/search/?api=1&query=' . urlencode($direccionCompleta)
         : '';
 
+      $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
       $referencias = trim((string)($pedido['referencias'] ?? ''));
       ?>
       <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>">
@@ -174,6 +175,14 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
             </a>
           <?php else: ?>
             <span class="text-muted">Sin dirección</span>
+          <?php endif; ?>
+        </p>
+        <p class="mb-2">
+          <i class="fas fa-credit-card me-2"></i>
+          <?php if ($metodoPago !== ''): ?>
+            <?= htmlspecialchars($metodoPago) ?>
+          <?php else: ?>
+            <span class="text-muted">Sin método de pago</span>
           <?php endif; ?>
         </p>
         <p class="fw-semibold mb-2">🛍️ Productos:</p>

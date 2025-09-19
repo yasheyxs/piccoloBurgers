@@ -36,6 +36,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               <th>ID</th>
               <th>Cliente</th>
               <th>Entrega</th>
+              <th>Pago</th>
               <th>Dirección</th>
               <th>Productos</th>
               <th>Nota</th>
@@ -48,11 +49,15 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
               $stmt_detalle->execute([$pedido['ID']]);
               $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
+              $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
+
               ?>
               <tr data-pedido-id="<?= $pedido['ID'] ?>" class="<?= $pedido['estado'] === 'En camino' ? 'en-camino' : '' ?>">
                 <td><?= $pedido['ID'] ?></td>
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
                 <td><?= htmlspecialchars($pedido['tipo_entrega']) ?></td>
+
+                <td><?= $metodoPago !== '' ? htmlspecialchars($metodoPago) : '-' ?></td>
 
 
                 <td>

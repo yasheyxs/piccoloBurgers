@@ -703,6 +703,21 @@ if ($datos_guardados_exitosamente) {
 
 
   <script>
+
+    function escapeHtml(texto) {
+      const elemento = document.createElement('div');
+      elemento.textContent = texto ?? '';
+      return elemento.innerHTML;
+    }
+
+    function obtenerMetodoPago(pedido) {
+      if (!pedido) {
+        return 'No especificado';
+      }
+      const metodo = (pedido.metodo_pago ?? '').toString().trim();
+      return metodo !== '' ? metodo : 'No especificado';
+    }
+
     // Función para construir el HTML del detalle del pedido
     function crearHtmlDetalle(pedido) {
       let estadoHtml = '';
@@ -727,18 +742,22 @@ if ($datos_guardados_exitosamente) {
       pedido.detalles.forEach(detalle => {
         productosHtml += `
         <div class="producto-tarjeta mb-2">
-          <strong>${detalle.nombre}</strong><br>
+          <strong>${escapeHtml(detalle.nombre)}</strong><br>
           <small>Precio: $${Number(detalle.precio).toFixed(2)} | Cantidad: ${detalle.cantidad} | Subtotal: $${(detalle.precio * detalle.cantidad).toFixed(2)}</small>
         </div>
       `;
       });
 
+      const tipoEntregaTexto = escapeHtml(((pedido.tipo_entrega ?? '').toString().trim()) || 'No especificado');
+      const metodoPagoTexto = escapeHtml(obtenerMetodoPago(pedido));
+      const notaTexto = pedido.nota ? escapeHtml(pedido.nota).replace(/\n/g, '<br>') : 'Sin nota';
+
       return `
       <div class="detalle-card bg-dark text-light p-3 border border-secondary rounded">
-        <p><strong>Entrega:</strong> ${pedido.tipo_entrega}</p>
-        <p><strong>Método de pago:</strong> ${pedido.metodo_pago}</p>
+        <p><strong>Entrega:</strong> ${tipoEntregaTexto}</p>
+        <p><strong>Método de pago:</strong> ${metodoPagoTexto}</p>
         <p><strong>Estado:</strong> ${estadoHtml}</p>
-        <p><strong>Nota:</strong> ${pedido.nota ? pedido.nota.replace(/\n/g, '<br>') : 'Sin nota'}</p>
+        <p><strong>Nota:</strong> ${notaTexto}</p>
         <strong>Productos:</strong>
         <div class="mt-2">${productosHtml}</div>
       </div>
@@ -761,6 +780,8 @@ if ($datos_guardados_exitosamente) {
         } else {
           pedidos.forEach((pedido, index) => {
             const pedidoId = pedido.ID ?? pedido.id ?? (pedidos.length - index);
+            const metodoPagoCard = escapeHtml(obtenerMetodoPago(pedido));
+
             htmlPedidos += `
               <div class="col-md-6 col-lg-3 mb-3">
                 <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
@@ -768,6 +789,8 @@ if ($datos_guardados_exitosamente) {
                   <h5 class="card-title">Pedido #${pedidoId}</h5>
                   <p><strong>Fecha:</strong><br>${new Date(pedido.fecha).toLocaleDateString()}</p>
                   <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
+                  <p><strong>Pago:</strong> ${metodoPagoCard}</p>
+
                   <button class="btn btn-outline-warning btn-sm mt-2 ver-detalle-btn" data-index="${index}">Ver detalle</button>
                 </div>
                 </div>
