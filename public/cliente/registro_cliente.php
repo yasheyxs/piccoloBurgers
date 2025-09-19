@@ -2,14 +2,10 @@
 session_start();
 require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../componentes/password_utils.php';
+
 
 $mensaje = "";
-
-// Validación de fuerza de contraseña
-function validarFuerza($pass)
-{
-  return preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $pass);
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $nombre = trim($_POST["nombre"]);
@@ -23,13 +19,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
   if ($password !== $confirmar) {
     $mensaje = "<div class='alert alert-danger'>Las contraseñas no coinciden.</div>";
-    } elseif (empty($nombre) || empty($codigo) || empty($numero) || empty($email) || empty($password)) {
+  } elseif (empty($nombre) || empty($codigo) || empty($numero) || empty($email) || empty($password)) {
 
     $mensaje = "<div class='alert alert-danger'>Por favor, completá todos los campos requeridos.</div>";
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+  } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $mensaje = "<div class='alert alert-danger'>Ingresá un email válido.</div>";
-  } elseif (!validarFuerza($password)) {
-    $mensaje = "<div class='alert alert-danger'>La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.</div>";
+  } elseif (!passwordCumpleRequisitos($password)) {
+    $mensaje = "<div class='alert alert-danger'>" . mensajeRequisitosPassword() . "</div>";
   } elseif (!$telefonoCompleto) {
     $mensaje = "<div class='alert alert-danger'>El número ingresado no parece válido. Verificá que esté completo y sin espacios.</div>";
   } else {
@@ -92,16 +88,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     .navbar {
-  position: relative;
-  z-index: 10;
-}
+      position: relative;
+      z-index: 10;
+    }
 
 
     .register-container {
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-}
+      display: flex;
+      min-height: 100vh;
+      width: 100%;
+    }
 
     .register-image {
       flex: 1;
@@ -213,35 +209,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     @media (max-width: 768px) {
-  .register-container {
-    flex-direction: column;
-    background: url('../img/HamLoginCliente.jpg') center/cover no-repeat;
-    background-size: cover;
-    min-height: 100vh;
-    padding-top: 40px;
-    padding-bottom: 2rem;
-  }
+      .register-container {
+        flex-direction: column;
+        background: url('../img/HamLoginCliente.jpg') center/cover no-repeat;
+        background-size: cover;
+        min-height: 100vh;
+        padding-top: 40px;
+        padding-bottom: 2rem;
+      }
 
-  .register-image {
-    display: none;
-  }
+      .register-image {
+        display: none;
+      }
 
-  .register-form-wrapper {
-    padding: 2rem 1.5rem;
-    background: rgba(44, 44, 44, 0.6);
-    border-radius: 15px;
-    width: 90%;
-    max-width: 450px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    margin: auto;
-  }
-  
-}
+      .register-form-wrapper {
+        padding: 2rem 1.5rem;
+        background: rgba(44, 44, 44, 0.6);
+        border-radius: 15px;
+        width: 90%;
+        max-width: 450px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin: auto;
+      }
+
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+
 <body>
   <div class="register-container">
     <!-- Imagen a la izquierda -->
@@ -284,7 +281,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña:</label>
-          <input type="password" class="form-control" name="password" id="password" required>
+          <input
+            type="password"
+            class="form-control"
+            name="password"
+            id="password"
+            required
+            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}"
+            title="<?php echo mensajeRequisitosPassword(); ?>">
+          <div class="form-text text-muted"><?php echo mensajeRequisitosPassword(); ?></div>
         </div>
 
         <div class="mb-3">
@@ -313,7 +318,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     document.getElementById("password")?.addEventListener("input", function() {
       const val = this.value;
       const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-      this.setCustomValidity(regex.test(val) ? "" : "La contraseña no cumple con los requisitos.");
+      this.setCustomValidity(regex.test(val) ? "" : "<?php echo mensajeRequisitosPassword(); ?>");
     });
   </script>
 

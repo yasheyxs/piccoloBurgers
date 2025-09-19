@@ -1,5 +1,7 @@
 <?php
 include("../bd.php");
+require_once __DIR__ . '/../../componentes/password_utils.php';
+
 
 $token = $_GET["token"] ?? "";
 $tipo  = $_GET["tipo"] ?? "";
@@ -45,8 +47,10 @@ if (!in_array($tipo, ["usuario", "cliente"])) {
           <div class="mb-3">
             <label for="nueva" class="form-label">Nueva contraseña</label>
             <input type="password" class="form-control" name="nueva" id="nueva" required
-                   pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}"
-                   title="Debe tener al menos 8 caracteres, incluyendo una mayúscula, una minúscula y un número.">
+                   autocomplete="new-password"
+                   pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}"
+                   title="<?php echo mensajeRequisitosPassword(); ?>">
+            <div class="form-text"><?php echo mensajeRequisitosPassword(); ?></div>
           </div>
 
           <div class="mb-3">
