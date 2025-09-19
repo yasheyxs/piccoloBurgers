@@ -1,11 +1,12 @@
 <?php
 include("../bd.php");
+require_once __DIR__ . '/../../componentes/password_utils.php';
 include($_SERVER['DOCUMENT_ROOT'] . "/piccoloBurgers/admin/templates/header_public.php");
 
 $token     = trim($_POST["token"] ?? "");
 $tipo      = $_POST["tipo"] ?? "";
-$nueva     = $_POST["nueva"] ?? "";
-$confirmar = $_POST["confirmar"] ?? "";
+$nueva     = trim($_POST["nueva"] ?? "");
+$confirmar = trim($_POST["confirmar"] ?? "");
 
 echo '<div class="container mt-5"><div class="row justify-content-center"><div class="col-md-6">';
 
@@ -18,6 +19,13 @@ if (!in_array($tipo, ["usuario", "cliente"])) {
 
 if (empty($nueva) || empty($confirmar)) {
   echo "<div class='alert alert-danger text-center'>Completá ambos campos de contraseña.</div>";
+  echo "<div class='mt-3 text-center'><a href='recuperar_password_{$tipo}.php' class='btn btn-secondary'>Volver</a></div>";
+  include(__DIR__ . "/../templates/footer.php");
+  exit();
+}
+
+if (!passwordCumpleRequisitos($nueva)) {
+  echo "<div class='alert alert-danger text-center'>" . mensajeRequisitosPassword() . "</div>";
   echo "<div class='mt-3 text-center'><a href='recuperar_password_{$tipo}.php' class='btn btn-secondary'>Volver</a></div>";
   include(__DIR__ . "/../templates/footer.php");
   exit();
@@ -41,6 +49,13 @@ $registro = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$registro) {
   echo "<div class='alert alert-danger text-center'>El enlace es inválido o ha expirado. Por favor, solicitá uno nuevo.</div>";
   echo "<div class='mt-3 text-center'><a href='recuperar_password_{$tipo}.php' class='btn btn-warning'>Volver a recuperar contraseña</a></div>";
+  include(__DIR__ . "/../templates/footer.php");
+  exit();
+}
+
+if (passwordCoincideConHash($nueva, $registro['password'] ?? '')) {
+  echo "<div class='alert alert-danger text-center'>La nueva contraseña debe ser distinta de la actual.</div>";
+  echo "<div class='mt-3 text-center'><a href='recuperar_password_{$tipo}.php' class='btn btn-secondary'>Volver</a></div>";
   include(__DIR__ . "/../templates/footer.php");
   exit();
 }

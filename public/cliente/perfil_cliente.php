@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
+require_once __DIR__ . '/../../componentes/password_utils.php';
 require_once __DIR__ . '/../../includes/email_requirement.php';
 
 session_start();
@@ -81,16 +82,20 @@ if (isset($_POST["guardar_password"])) {
     $errores[] = "Ingresá tu contraseña actual.";
   }
 
+  if ($nueva === "") {
+    $errores[] = "Ingresá una nueva contraseña.";
+  }
+
   if ($confirmar === "") {
     $errores[] = "Confirmá la nueva contraseña.";
   }
 
-  if ($nueva !== "" && $confirmar !== "" && $nueva !== $confirmar) {
-    $errores[] = "Las contraseñas no coinciden.";
+  if ($nueva !== "" && !passwordCumpleRequisitos($nueva)) {
+    $errores[] = mensajeRequisitosPassword();
   }
 
-  if ($nueva !== "" && strlen($nueva) < 8) {
-    $errores[] = "La nueva contraseña debe tener al menos 8 caracteres.";
+  if ($nueva !== "" && $confirmar !== "" && passwordCumpleRequisitos($nueva) && $nueva !== $confirmar) {
+    $errores[] = "Las contraseñas no coinciden.";
   }
 
   if (empty($errores)) {
@@ -98,15 +103,12 @@ if (isset($_POST["guardar_password"])) {
     $consulta->execute([$cliente_id]);
     $cliente = $consulta->fetch(PDO::FETCH_ASSOC);
 
-    $hashAlmacenado = $cliente["password"];
-    $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+    $hashAlmacenado = $cliente["password"] ?? '';
 
-    $valido = $esHashModerno
-      ? password_verify($actual, $hashAlmacenado)
-      : md5($actual) === $hashAlmacenado;
-
-    if (!$valido) {
+    if (!passwordCoincideConHash($actual, $hashAlmacenado)) {
       $errores[] = "La contraseña actual es incorrecta.";
+    } elseif (passwordCoincideConHash($nueva, $hashAlmacenado)) {
+      $errores[] = "La nueva contraseña debe ser distinta de la actual.";
     } else {
       $nuevoHash = password_hash($nueva, PASSWORD_BCRYPT);
       $update = $conexion->prepare("UPDATE tbl_clientes SET password = ? WHERE ID = ?");
@@ -648,17 +650,26 @@ if ($datos_guardados_exitosamente) {
 
             <div class="mb-3">
               <label for="password_actual" class="form-label text-light">Contraseña actual:</label>
-              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_actual" id="password_actual" required>
+              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_actual" id="password_actual" required autocomplete="current-password">
             </div>
 
             <div class="mb-3">
               <label for="password_nueva" class="form-label text-light">Nueva contraseña:</label>
-              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_nueva" id="password_nueva" placeholder="Mínimo 8 caracteres" required>
+              <input
+                type="password"
+                class="form-control bg-dark text-light border-secondary"
+                name="password_nueva"
+                id="password_nueva"
+                required
+                autocomplete="new-password"
+                pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}"
+                title="<?php echo mensajeRequisitosPassword(); ?>">
+              <div class="form-text text-muted"><?php echo mensajeRequisitosPassword(); ?></div>
             </div>
 
             <div class="mb-3">
               <label for="password_confirmar" class="form-label text-light">Confirmar nueva contraseña:</label>
-              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_confirmar" id="password_confirmar" required>
+              <input type="password" class="form-control bg-dark text-light border-secondary" name="password_confirmar" id="password_confirmar" required autocomplete="new-password">
             </div>
 
             <div class="d-grid">
@@ -703,7 +714,6 @@ if ($datos_guardados_exitosamente) {
 
 
   <script>
-
     function escapeHtml(texto) {
       const elemento = document.createElement('div');
       elemento.textContent = texto ?? '';
@@ -921,9 +931,6 @@ if ($datos_guardados_exitosamente) {
       contador.textContent = carrito.length;
     });
   </script>
-
-
-
 </body>
 
 </html>
