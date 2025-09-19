@@ -131,40 +131,47 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 <div class="container mt-4">
   <h3 class="page-title mb-4">Pedidos a entregar</h3>
 
-  <?php if (count($pedidos) === 0): ?>
-    <div class="alert alert-info">No hay pedidos para entregar por el momento.</div>
-  <?php else: ?>
-    <?php $localidadPredeterminada = 'Villa del Rosario, Córdoba, Argentina'; ?>
-    <?php foreach ($pedidos as $pedido): ?>
-      <?php
-      $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
-      $stmt_detalle->execute([$pedido['ID']]);
-      $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
+  <?php $localidadPredeterminada = 'Villa del Rosario, Córdoba, Argentina'; ?>
 
-      $telefono = trim((string)($pedido['telefono'] ?? ''));
-      $telefonoEnlace = preg_replace('/[^0-9+]/', '', $telefono);
+  <div id="alerta-sin-pedidos" class="alert alert-info<?= count($pedidos) === 0 ? '' : ' d-none' ?>">
+    No hay pedidos para entregar por el momento.
+  </div>
 
-      $direccionBase = trim((string)($pedido['direccion'] ?? ''));
-      $direccionCompleta = $direccionBase !== ''
-        ? $direccionBase . ', ' . $localidadPredeterminada
-        : '';
-      $mapUrl = $direccionCompleta !== ''
-        ? 'https://www.google.com/maps/search/?api=1&query=' . urlencode($direccionCompleta)
-        : '';
+  <div id="lista-pedidos">
+    <?php if (count($pedidos) > 0): ?>
+      <?php foreach ($pedidos as $pedido): ?>
+        <?php
+        $stmt_detalle = $conexion->prepare("SELECT nombre, cantidad FROM tbl_pedidos_detalle WHERE pedido_id = ?");
+        $stmt_detalle->execute([$pedido['ID']]);
+        $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
 
-      $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
-      $referencias = trim((string)($pedido['referencias'] ?? ''));
-      $estadoPago = ($pedido['esta_pago'] ?? 'No') === 'Sí' ? 'Sí' : 'No';
-      $estadoPagoTexto = $estadoPago === 'Sí' ? 'Sí ✅' : 'No ❌';
-      $estadoPagoClase = $estadoPago === 'Sí' ? 'text-success fw-semibold' : 'text-warning fw-semibold';
-      $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
-      ?>
-      <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>">
-        <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
-        <p class="mb-2">
-          <i class="fas fa-phone me-2"></i>
-          <?php if ($telefono !== '' && $telefonoEnlace !== ''): ?>
-            <a class="contact-link" href="tel:<?= htmlspecialchars($telefonoEnlace) ?>">
+        $telefono = trim((string)($pedido['telefono'] ?? ''));
+        $telefonoEnlace = preg_replace('/[^0-9+]/', '', $telefono);
+
+        $direccionBase = trim((string)($pedido['direccion'] ?? ''));
+        $direccionCompleta = $direccionBase !== ''
+          ? $direccionBase . ', ' . $localidadPredeterminada
+          : '';
+        $mapUrl = $direccionCompleta !== ''
+          ? 'https://www.google.com/maps/search/?api=1&query=' . urlencode($direccionCompleta)
+          : '';
+
+        $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
+        $referencias = trim((string)($pedido['referencias'] ?? ''));
+        $estadoPagoCrudo = trim((string)($pedido['esta_pago'] ?? ''));
+        $estadoPagoNormalizado = strtolower($estadoPagoCrudo);
+        $estadoPagoNormalizado = str_replace('í', 'i', $estadoPagoNormalizado);
+        $estadoPago = $estadoPagoNormalizado === 'si' ? 'Si' : 'No';
+        $estadoPagoTexto = $estadoPago === 'Si' ? 'Sí ✅' : 'No ❌';
+        $estadoPagoClase = $estadoPago === 'Si' ? 'text-success fw-semibold' : 'text-warning fw-semibold';
+        $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
+        ?>
+        <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>" data-esta-pago="<?= $estadoPago ?>">
+          <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
+          <p class="mb-2">
+            <i class="fas fa-phone me-2"></i>
+            <?php if ($telefono !== '' && $telefonoEnlace !== ''): ?>
+              <a class="contact-link" href="tel:<?= htmlspecialchars($telefonoEnlace) ?>">
 
               <?= htmlspecialchars($telefono) ?>
             </a>
@@ -195,24 +202,252 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         </p>
         <p class="mb-2">
           <i class="fas fa-receipt me-2"></i>
-          ¿Está pago?: <span class="<?= $estadoPagoClase ?>"><?= $estadoPagoTexto ?></span>
+          ¿Está pago?: <span class="<?= $estadoPagoClase ?>" data-estado-pago><?= $estadoPagoTexto ?></span>
         </p>
         <p class="fw-semibold mb-2">🛍️ Productos:</p>
         <ul class="mb-3">
-          <?php foreach ($productos as $producto): ?>
-            <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
-          <?php endforeach; ?>
+          <?php if (count($productos) > 0): ?>
+            <?php foreach ($productos as $producto): ?>
+              <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <li class="text-muted">Sin productos</li>
+          <?php endif; ?>
         </ul>
         <p class="mb-0"><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
         <div class="mt-4">
           <button class="btn btn-gold w-100" data-id="<?= $pedido['ID'] ?>" data-action="entregado">Entregado</button>
         </div>
       </div>
-    <?php endforeach; ?>
-  <?php endif; ?>
+      <?php endforeach; ?>
+    <?php endif; ?>
+  </div>
 </div>
 
 <script>
+  const pedidosContainer = document.getElementById('lista-pedidos');
+  const alertaSinPedidos = document.getElementById('alerta-sin-pedidos');
+  const LOCALIDAD_PREDETERMINADA = 'Villa del Rosario, Córdoba, Argentina';
+  const formateadorPesos = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  let sincronizacionEnCurso = false;
+
+  function actualizarVisibilidadMensaje() {
+    if (!alertaSinPedidos || !pedidosContainer) {
+      return;
+    }
+
+    if (pedidosContainer.children.length === 0) {
+      alertaSinPedidos.classList.remove('d-none');
+    } else {
+      alertaSinPedidos.classList.add('d-none');
+    }
+  }
+
+  function normalizarEstadoPago(valor) {
+    if (valor === null || valor === undefined) {
+      return 'No';
+    }
+
+    const texto = valor.toString().trim().toLowerCase().replace('í', 'i');
+    return texto === 'si' ? 'Si' : 'No';
+  }
+
+  function obtenerTextoEstadoPago(estado) {
+    return estado === 'Si' ? 'Sí ✅' : 'No ❌';
+  }
+
+  function obtenerClaseEstadoPago(estado) {
+    return estado === 'Si' ? 'text-success fw-semibold' : 'text-warning fw-semibold';
+  }
+
+  function escapeHtml(texto) {
+    if (texto === null || texto === undefined) {
+      return '';
+    }
+
+    return texto.toString().replace(/[&<>"']/g, (caracter) => {
+      switch (caracter) {
+        case '&':
+          return '&amp;';
+        case '<':
+          return '&lt;';
+        case '>':
+          return '&gt;';
+        case '"':
+          return '&quot;';
+        default:
+          return '&#039;';
+      }
+    });
+  }
+
+  function formatearTotal(total) {
+    const numero = Number(total);
+    const totalValido = Number.isFinite(numero) ? numero : 0;
+    return formateadorPesos.format(totalValido);
+  }
+
+  function crearTarjetaPedido(pedido) {
+    const tarjeta = document.createElement('div');
+    tarjeta.className = 'glass-card';
+
+    const pedidoId = pedido && pedido.ID !== undefined ? String(pedido.ID) : '';
+    if (pedidoId === '') {
+      return null;
+    }
+
+    tarjeta.dataset.pedidoId = pedidoId;
+
+    const estadoPago = normalizarEstadoPago(pedido.esta_pago);
+    tarjeta.dataset.estaPago = estadoPago;
+
+    const telefono = pedido && pedido.telefono != null ? String(pedido.telefono).trim() : '';
+    const telefonoEnlace = telefono.replace(/[^0-9+]/g, '');
+
+    const direccionBase = pedido && pedido.direccion != null ? String(pedido.direccion).trim() : '';
+    const mapaQuery = direccionBase !== '' ? `${direccionBase}, ${LOCALIDAD_PREDETERMINADA}` : '';
+    const mapUrl = mapaQuery !== '' ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(mapaQuery)}` : '';
+
+    const metodoPago = pedido && pedido.metodo_pago != null ? String(pedido.metodo_pago).trim() : '';
+    const referencias = pedido && pedido.referencias != null ? String(pedido.referencias).trim() : '';
+
+    const productos = Array.isArray(pedido.productos) ? pedido.productos : [];
+    const productosHtml = productos.length > 0
+      ? productos
+        .map((producto) => {
+          const cantidad = producto && producto.cantidad != null ? String(producto.cantidad) : '';
+          const nombre = producto && producto.nombre != null ? String(producto.nombre) : '';
+          return `<li>${escapeHtml(cantidad)} x ${escapeHtml(nombre)}</li>`;
+        })
+        .join('')
+      : '<li class="text-muted">Sin productos</li>';
+
+    const telefonoHtml = (telefono !== '' && telefonoEnlace !== '')
+      ? `<a class="contact-link" href="tel:${escapeHtml(telefonoEnlace)}">${escapeHtml(telefono)}</a>`
+      : '<span class="text-muted">Sin teléfono</span>';
+
+    const direccionHtml = mapUrl !== ''
+      ? `<a class="contact-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer"> ${escapeHtml(direccionBase)}</a>`
+      : '<span class="text-muted">Sin dirección</span>';
+
+    const metodoPagoHtml = metodoPago !== ''
+      ? escapeHtml(metodoPago)
+      : '<span class="text-muted">Sin método de pago</span>';
+
+    const referenciasHtml = referencias !== '' ? escapeHtml(referencias) : 'Sin referencias';
+
+    const totalFormateado = formatearTotal(pedido.total);
+
+    tarjeta.innerHTML = `
+      <h5>#${escapeHtml(pedidoId)} - ${escapeHtml(pedido.nombre ?? '')}</h5>
+      <p class="mb-2">
+        <i class="fas fa-phone me-2"></i>
+        ${telefonoHtml}
+      </p>
+      <p class="mb-2">
+        <i class="fas fa-map-marker-alt me-2"></i>
+        ${direccionHtml}
+      </p>
+      <p class="mb-2">
+        <i class="fas fa-credit-card me-2"></i>
+        ${metodoPagoHtml}
+      </p>
+      <p class="mb-2">
+        <i class="fas fa-money-bill-wave me-2"></i>
+        Total: $${escapeHtml(totalFormateado)}
+      </p>
+      <p class="mb-2">
+        <i class="fas fa-receipt me-2"></i>
+        ¿Está pago?: <span class="${obtenerClaseEstadoPago(estadoPago)}" data-estado-pago>${obtenerTextoEstadoPago(estadoPago)}</span>
+      </p>
+      <p class="fw-semibold mb-2">🛍️ Productos:</p>
+      <ul class="mb-3">
+        ${productosHtml}
+      </ul>
+        <p class="mb-0"><strong>📌 Referencias:</strong> ${referenciasHtml}</p>
+        <div class="mt-4">
+          <button class="btn btn-gold w-100" data-id="${escapeHtml(pedidoId)}" data-action="entregado">Entregado</button>
+        </div>
+    `;
+
+    return tarjeta;
+  }
+
+  function actualizarTarjetaConDatos(pedido) {
+    if (!pedidosContainer || !pedido || pedido.ID === undefined || pedido.ID === null) {
+      return;
+    }
+
+    const pedidoId = String(pedido.ID);
+    const estadoPago = normalizarEstadoPago(pedido.esta_pago);
+    const selector = `.glass-card[data-pedido-id="${pedidoId}"]`;
+    const tarjetaExistente = pedidosContainer.querySelector(selector);
+
+    if (tarjetaExistente) {
+      tarjetaExistente.dataset.estaPago = estadoPago;
+      const spanEstadoPago = tarjetaExistente.querySelector('[data-estado-pago]');
+      if (spanEstadoPago) {
+        spanEstadoPago.textContent = obtenerTextoEstadoPago(estadoPago);
+        spanEstadoPago.className = obtenerClaseEstadoPago(estadoPago);
+      }
+      return;
+    }
+
+    const nuevaTarjeta = crearTarjetaPedido(pedido);
+    if (nuevaTarjeta) {
+      pedidosContainer.prepend(nuevaTarjeta);
+    }
+  }
+
+  async function sincronizarPedidos() {
+    if (!pedidosContainer || sincronizacionEnCurso) {
+      return;
+    }
+
+    sincronizacionEnCurso = true;
+
+    try {
+      const response = await fetch('../admin/obtener_pedidos_delivery.php', {
+        cache: 'no-store'
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al obtener los pedidos.');
+      }
+
+      const data = await response.json();
+      if (!data || data.success !== true || !Array.isArray(data.pedidos)) {
+        const mensaje = data && data.message ? data.message : 'La respuesta del servidor no es válida.';
+        throw new Error(mensaje);
+      }
+
+      const idsVigentes = new Set();
+
+      data.pedidos.forEach((pedido) => {
+        if (!pedido || pedido.ID === undefined || pedido.ID === null) {
+          return;
+        }
+
+        const id = String(pedido.ID);
+        idsVigentes.add(id);
+        actualizarTarjetaConDatos(pedido);
+      });
+
+      pedidosContainer.querySelectorAll('.glass-card').forEach((tarjeta) => {
+        const id = tarjeta.getAttribute('data-pedido-id');
+        if (id && !idsVigentes.has(id)) {
+          tarjeta.remove();
+        }
+      });
+
+      actualizarVisibilidadMensaje();
+    } catch (error) {
+      console.error('No se pudo sincronizar la información de los pedidos:', error);
+    } finally {
+      sincronizacionEnCurso = false;
+    }
+  }
+
   async function marcarEntregado(pedidoId, boton) {
 
     const textoOriginal = boton.textContent;
@@ -245,17 +480,19 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
       if (resultado && resultado.success) {
         pedidoActualizado = true;
-        boton.closest('.glass-card').remove();
+        const tarjeta = boton.closest('.glass-card');
+        if (tarjeta) {
+          tarjeta.remove();
+          actualizarVisibilidadMensaje();
+        }
       } else {
-        const mensaje = resultado && resultado.message ?
-          resultado.message :
-          'La respuesta del servidor no es válida.';
+        const mensaje = resultado && resultado.message ? resultado.message : 'La respuesta del servidor no es válida.';
         throw new Error(mensaje);
       }
     } catch (error) {
-      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch' ?
-        error.message :
-        'Error al conectar con el servidor.';
+      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch'
+        ? error.message
+        : 'Error al conectar con el servidor.';
       alert(mensajeError);
       console.error(error);
     } finally {
@@ -266,14 +503,21 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     }
   }
 
-  document.querySelectorAll('[data-action="entregado"]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const pedidoId = btn.getAttribute('data-id');
-      marcarEntregado(pedidoId, btn);
-    });
+  document.addEventListener('click', (event) => {
+    const boton = event.target.closest('[data-action="entregado"]');
+    if (!boton || !pedidosContainer || !pedidosContainer.contains(boton)) {
+      return;
+    }
+
+    const pedidoId = boton.getAttribute('data-id');
+    if (pedidoId) {
+      marcarEntregado(pedidoId, boton);
+    }
   });
 
-  setInterval(() => location.reload(), 10000);
+  actualizarVisibilidadMensaje();
+  sincronizarPedidos();
+  setInterval(sincronizarPedidos, 4000);
 </script>
 
 <?php include("../admin/templates/footer.php"); ?>
