@@ -33,12 +33,13 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         <table class="table table-bordered table-hover table-sm align-middle text-center w-100" id="tabla-pedidos">
           <thead class="table-light">
             <tr>
-              <th>ID</th>
               <th>Cliente</th>
               <th>Entrega</th>
               <th>Pago</th>
+              <th>¿Está pago?</th>
               <th>Dirección</th>
               <th>Productos</th>
+              <th>Total</th>
               <th>Nota</th>
               <th>Acciones</th>
             </tr>
@@ -50,15 +51,22 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $stmt_detalle->execute([$pedido['ID']]);
               $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
               $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
+              $estadoPago = ($pedido['esta_pago'] ?? 'No') === 'Sí' ? 'Sí' : 'No';
+              $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
 
               ?>
               <tr data-pedido-id="<?= $pedido['ID'] ?>" class="<?= $pedido['estado'] === 'En camino' ? 'en-camino' : '' ?>">
-                <td><?= $pedido['ID'] ?></td>
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
                 <td><?= htmlspecialchars($pedido['tipo_entrega']) ?></td>
 
                 <td><?= $metodoPago !== '' ? htmlspecialchars($metodoPago) : '-' ?></td>
 
+                <td>
+                  <select class="form-select form-select-sm estado-pago" data-id="<?= $pedido['ID'] ?>">
+                    <option value="No" <?= $estadoPago === 'No' ? 'selected' : '' ?>>No</option>
+                    <option value="Sí" <?= $estadoPago === 'Sí' ? 'selected' : '' ?>>Sí</option>
+                  </select>
+                </td>
 
                 <td>
                   <?= $pedido['tipo_entrega'] === 'Delivery' && !empty($pedido['direccion'])
@@ -72,19 +80,20 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                     <?php endforeach; ?>
                   </ul>
                 </td>
+                <td>$<?= $totalPedido ?></td>
                 <td><?= htmlspecialchars($pedido['nota']) ?: '-' ?></td>
                 <td>
-  <div class="d-flex flex-wrap justify-content-center gap-1 align-items-center">
-    <?php if ($pedido['estado'] === 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
-      <span class="camion-icono">🚚</span>
-    <?php endif; ?>
-    <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
-    <?php if ($pedido['estado'] !== 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
-      <button class="btn btn-warning btn-sm btn-estado" data-estado="En camino" data-id="<?= $pedido['ID'] ?>">En camino</button>
-    <?php endif; ?>
-    <button class="btn btn-danger btn-sm btn-estado" data-estado="Cancelado" data-id="<?= $pedido['ID'] ?>">Cancelar</button>
-  </div>
-</td>
+                  <div class="d-flex flex-wrap justify-content-center gap-1 align-items-center">
+                    <?php if ($pedido['estado'] === 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
+                      <span class="camion-icono">🚚</span>
+                    <?php endif; ?>
+                    <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
+                    <?php if ($pedido['estado'] !== 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
+                      <button class="btn btn-warning btn-sm btn-estado" data-estado="En camino" data-id="<?= $pedido['ID'] ?>">En camino</button>
+                    <?php endif; ?>
+                    <button class="btn btn-danger btn-sm btn-estado" data-estado="Cancelado" data-id="<?= $pedido['ID'] ?>">Cancelar</button>
+                  </div>
+                </td>
 
               </tr>
             <?php endforeach; ?>
@@ -96,7 +105,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
     initDataTable('#tabla-pedidos');
   });
 
@@ -127,19 +136,16 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         }
 
         // Insertar ícono 🚚 en la columna de acciones
-const celdaAcciones = fila.cells[6];
-if (celdaAcciones && !celdaAcciones.querySelector('.camion-icono')) {
-  const icono = document.createElement('span');
-  icono.className = 'camion-icono';
-  icono.textContent = '🚚';
-  const contenedorBotones = celdaAcciones.querySelector('.d-flex');
-if (contenedorBotones) {
-  contenedorBotones.insertBefore(icono, contenedorBotones.firstChild);
-
-}
-
-}
-
+        const celdaAcciones = fila.cells[8];
+        if (celdaAcciones && !celdaAcciones.querySelector('.camion-icono')) {
+          const icono = document.createElement('span');
+          icono.className = 'camion-icono';
+          icono.textContent = '🚚';
+          const contenedorBotones = celdaAcciones.querySelector('.d-flex');
+          if (contenedorBotones) {
+            contenedorBotones.insertBefore(icono, contenedorBotones.firstChild);
+          }
+        }
 
         const tbody = document.querySelector('#tabla-pedidos tbody');
         if (tbody.children.length === 0) {
@@ -155,6 +161,45 @@ if (contenedorBotones) {
     }
   }
 
+  async function actualizarEstadoPago(pedidoId, estadoPago, selectElemento) {
+    const valorAnterior = selectElemento.dataset.valorAnterior ?? selectElemento.value;
+    selectElemento.disabled = true;
+
+    try {
+      const formData = new FormData();
+      formData.append('pedido_id', pedidoId);
+      formData.append('esta_pago', estadoPago);
+
+      const response = await fetch('../admin/actualizar_estado.php', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar el estado de pago.');
+      }
+
+      let resultado;
+      try {
+        resultado = await response.json();
+      } catch (errorJson) {
+        throw new Error('La respuesta del servidor no es válida.');
+      }
+
+      if (!resultado.success) {
+        throw new Error(resultado.message || 'No se pudo actualizar el estado de pago.');
+      }
+
+      selectElemento.dataset.valorAnterior = estadoPago;
+    } catch (error) {
+      const mensaje = error instanceof Error && error.message ? error.message : 'Error al actualizar el estado de pago.';
+      alert(mensaje);
+      selectElemento.value = valorAnterior;
+    } finally {
+      selectElemento.disabled = false;
+    }
+  }
+
   document.querySelectorAll('.btn-estado').forEach(btn => {
     btn.addEventListener('click', () => {
       const pedidoId = btn.getAttribute('data-id');
@@ -165,6 +210,14 @@ if (contenedorBotones) {
       }
 
       actualizarEstado(pedidoId, nuevoEstado, btn);
+    });
+  });
+
+  document.querySelectorAll('.estado-pago').forEach(select => {
+    select.dataset.valorAnterior = select.value;
+    select.addEventListener('change', () => {
+      const pedidoId = select.getAttribute('data-id');
+      actualizarEstadoPago(pedidoId, select.value, select);
     });
   });
 

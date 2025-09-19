@@ -154,6 +154,10 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
       $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
       $referencias = trim((string)($pedido['referencias'] ?? ''));
+      $estadoPago = ($pedido['esta_pago'] ?? 'No') === 'Sí' ? 'Sí' : 'No';
+      $estadoPagoTexto = $estadoPago === 'Sí' ? 'Sí ✅' : 'No ❌';
+      $estadoPagoClase = $estadoPago === 'Sí' ? 'text-success fw-semibold' : 'text-warning fw-semibold';
+      $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
       ?>
       <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>">
         <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
@@ -184,6 +188,14 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
           <?php else: ?>
             <span class="text-muted">Sin método de pago</span>
           <?php endif; ?>
+        </p>
+         <p class="mb-2">
+          <i class="fas fa-money-bill-wave me-2"></i>
+          Total: $<?= $totalPedido ?>
+        </p>
+        <p class="mb-2">
+          <i class="fas fa-receipt me-2"></i>
+          ¿Está pago?: <span class="<?= $estadoPagoClase ?>"><?= $estadoPagoTexto ?></span>
         </p>
         <p class="fw-semibold mb-2">🛍️ Productos:</p>
         <ul class="mb-3">
