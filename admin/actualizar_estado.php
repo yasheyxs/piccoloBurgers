@@ -44,17 +44,29 @@ if ($estado_pago_recibido !== null) {
         $estado_pago_normalizado = str_replace('í', 'i', $estado_pago_normalizado);
 
         if ($estado_pago_normalizado === 'si') {
-            $estado_pago = 'Sí';
+            $estado_pago = 'Si';
         } elseif ($estado_pago_normalizado === 'no') {
             $estado_pago = 'No';
         } else {
             echo json_encode(["success" => false, "message" => "Valor de pago inválido."]);
             exit;
         }
+        }
+}
 
-        $actualizaciones[] = "esta_pago = ?";
-        $valores[] = $estado_pago;
+$estado_pago_por_estado = null;
+if ($nuevo_estado !== null) {
+    if (in_array($nuevo_estado, ['Listo', 'Entregado'], true)) {
+        $estado_pago_por_estado = 'Si';
+    } elseif ($nuevo_estado === 'Cancelado') {
+        $estado_pago_por_estado = 'No';
     }
+}
+
+$estado_pago_final = $estado_pago_por_estado ?? $estado_pago;
+if ($estado_pago_final !== null) {
+    $actualizaciones[] = "esta_pago = ?";
+    $valores[] = $estado_pago_final;
 }
 
 if (count($actualizaciones) === 0) {

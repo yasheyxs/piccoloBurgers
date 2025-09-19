@@ -52,6 +52,10 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
               $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
               $estadoPago = ($pedido['esta_pago'] ?? 'No') === 'Sí' ? 'Sí' : 'No';
+              $estadoPagoCrudo = trim((string)($pedido['esta_pago'] ?? ''));
+              $estadoPagoNormalizado = strtolower($estadoPagoCrudo);
+              $estadoPagoNormalizado = str_replace('í', 'i', $estadoPagoNormalizado);
+              $estadoPago = $estadoPagoNormalizado === 'si' ? 'Si' : 'No';
               $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
 
               ?>
@@ -64,7 +68,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                 <td>
                   <select class="form-select form-select-sm estado-pago" data-id="<?= $pedido['ID'] ?>">
                     <option value="No" <?= $estadoPago === 'No' ? 'selected' : '' ?>>No</option>
-                    <option value="Sí" <?= $estadoPago === 'Sí' ? 'selected' : '' ?>>Sí</option>
+                    <option value="Si" <?= $estadoPago === 'Si' ? 'selected' : '' ?>>Sí</option>
                   </select>
                 </td>
 
