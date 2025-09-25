@@ -20,5 +20,11 @@ RUN chown -R www-data:www-data /var/www/html
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 RUN composer install --no-dev --optimize-autoloader || true
+
+# Exponer puerto
 EXPOSE 8080
+
+# Establecer public como directorio de trabajo final
+WORKDIR /var/www/html/public
+
 CMD ["apache2-foreground"]
