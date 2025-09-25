@@ -243,8 +243,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
-  <?php echo "<h1>CAMBIO EN VIVO</h1>"; ?>
-
   <div class="register-container">
     <!-- Imagen a la izquierda -->
     <div class="register-image"></div>
