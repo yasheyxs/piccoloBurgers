@@ -633,7 +633,7 @@ if ($datos_guardados_exitosamente) {
                   value="<?= isset($cliente['telefono']) ? preg_replace('/^\+\d+/', '', $cliente['telefono']) : '' ?>" required placeholder="Ej: 3511234567"
                   oninput="this.value = this.value.replace(/[^0-9]/g, '');" inputmode="numeric" pattern="[0-9]*">
               </div>
-              <small class="form-text text-muted">Ingresá solo números, sin espacios ni guiones.</small>
+              <small class="form-text text-light">Ingresá solo números, sin espacios ni guiones.</small>
             </div>
 
 
@@ -664,7 +664,7 @@ if ($datos_guardados_exitosamente) {
                 autocomplete="new-password"
                 pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}"
                 title="<?php echo mensajeRequisitosPassword(); ?>">
-              <div class="form-text text-muted"><?php echo mensajeRequisitosPassword(); ?></div>
+              <div class="form-text text-light"><?php echo mensajeRequisitosPassword(); ?></div>
             </div>
 
             <div class="mb-3">
