@@ -1,15 +1,24 @@
 <?php
-$servidor = "localhost";
-$baseDatos = "piccolodb";
-$usuario = "root";
-$contrasenia = "";
+$servidor   = getenv('MYSQL_HOST') ?: 'mysql';
+$baseDatos  = getenv('MYSQL_DATABASE') ?: 'piccolodb';
+$usuario    = getenv('MYSQL_USER') ?: 'piccolo';
+$contrasenia= getenv('MYSQL_PASSWORD') ?: 'piccolo_pass';
+
 try {
-    $conexion = new PDO("mysql:host=$servidor;dbname=$baseDatos", $usuario, $contrasenia);
-    $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch (Exception $error) {// Capturar errores de conexión
+    $dsn = "mysql:host={$servidor};dbname={$baseDatos};charset=utf8mb4";
+    $opciones = [
+        PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_PERSISTENT         => false,
+    ];
+    $conexion = new PDO($dsn, $usuario, $contrasenia, $opciones);
+} catch (Exception $error) {
     http_response_code(500);
     header('Content-Type: application/json');
-    echo json_encode(["exito" => false, "mensaje" => "Error de conexión a la base de datos"]);
+    echo json_encode([
+        "exito"   => false,
+        "mensaje" => "Error de conexión a la base de datos"
+    ]);
     exit;
 }
 
@@ -20,4 +29,3 @@ function verificarRol($rolPermitido) {
         exit();
     }
 }
-
