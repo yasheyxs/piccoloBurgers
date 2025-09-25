@@ -10,6 +10,9 @@ RUN apt-get update \
 # Copia el código al contenedor
 COPY . /var/www/html
 
+# Cambiar DocumentRoot a /var/www/html/public
+RUN sed -i 's#/var/www/html#/var/www/html/public#g' /etc/apache2/sites-available/000-default.conf
+
 # Ajusta permisos (opcional)
 RUN chown -R www-data:www-data /var/www/html
 
@@ -17,3 +20,5 @@ RUN chown -R www-data:www-data /var/www/html
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 RUN composer install --no-dev --optimize-autoloader || true
+EXPOSE 8080
+CMD ["apache2-foreground"]
