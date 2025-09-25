@@ -49,7 +49,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 ?>
 
-
 <!doctype html>
 <html lang="es">
 
@@ -134,6 +133,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       border: 1px solid #444;
       font-size: 1.1rem;
       border-radius: 10px;
+    }
+
+    .requirement-text {
+      color: var(--text-light);
     }
 
     .form-control::placeholder {
@@ -240,6 +243,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+  <?php echo "<h1>CAMBIO EN VIVO</h1>"; ?>
+
   <div class="register-container">
     <!-- Imagen a la izquierda -->
     <div class="register-image"></div>
@@ -289,7 +294,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             required
             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}"
             title="<?php echo mensajeRequisitosPassword(); ?>">
-          <div class="form-text text-light"><?php echo mensajeRequisitosPassword(); ?></div>
+          <div class="form-text requirement-text"><?php echo mensajeRequisitosPassword(); ?></div>
         </div>
 
         <div class="mb-3">
