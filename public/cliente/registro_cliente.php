@@ -289,7 +289,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             required
             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}"
             title="<?php echo mensajeRequisitosPassword(); ?>">
-          <div class="form-text text-muted"><?php echo mensajeRequisitosPassword(); ?></div>
+          <div class="form-text text-light"><?php echo mensajeRequisitosPassword(); ?></div>
         </div>
 
         <div class="mb-3">
