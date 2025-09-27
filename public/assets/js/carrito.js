@@ -1,3 +1,6 @@
+const DEBUG_CARRITO = false;
+
+
 const estadoTotalCarrito = {
   items: [],
   total: 0,
@@ -518,8 +521,9 @@ function ajustarPaddingContenido() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  console.log("Contenido del carrito:", localStorage.getItem("carrito"));
-
+if (DEBUG_CARRITO) {
+    console.log("Contenido del carrito:", localStorage.getItem("carrito"));
+  }
   const usarPuntosCheckbox = document.getElementById("usarPuntos");
   const usarPuntosGuardado =
     localStorage.getItem("usar_puntos_activado") === "1";
