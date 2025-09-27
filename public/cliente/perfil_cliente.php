@@ -141,24 +141,14 @@ if ($datos_guardados_exitosamente) {
 
 
   <link rel="icon" href="../img/favicon.png" type="image/x-icon" />
+  <link rel="stylesheet" href="../assets/css/custom.css">
 
   <style>
-    :root {
-      --main-gold: #fac30c;
-      --gold-hover: #e0ae00;
-      --dark-bg: #1a1a1a;
-      --gray-bg: #2c2c2c;
-      --text-light: #ffffff;
-      --text-muted: #cccccc;
-      --font-main: 'Inter', sans-serif;
-      --font-title: 'Bebas Neue', sans-serif;
-    }
-
     body {
       height: 100%;
       /* Asegura que el body ocupe toda la altura */
       margin: 0;
-      padding: 0;
+      padding: var(--navbar-height) 0 0;
       font-family: var(--font-main);
       color: var(--text-light);
       background: url('../img/HamLoginCliente.jpg') no-repeat center center fixed;
@@ -168,22 +158,6 @@ if ($datos_guardados_exitosamente) {
       overflow-y: auto;
     }
 
-    .navbar-brand {
-      font-family: var(--font-title);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-size: 1.5rem;
-    }
-
-    .navbar {
-      background-color: #111;
-    }
-
-    .navbar-brand,
-    .nav-link {
-      font-family: var(--font-main);
-      font-size: 1.2rem;
-    }
 
     /* Contenedor con efecto Glass */
     .glass {
@@ -373,67 +347,15 @@ if ($datos_guardados_exitosamente) {
 
 <body>
 
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-
-    <div class="container">
-      <a class="navbar-brand" href="#"><i class="fas fa-utensils"></i> Piccolo Burgers</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item"><a class="nav-link" href="../index.php">Inicio</a></li>
-          <li class="nav-item"><a class="nav-link" href="../index.php#menu">Menú</a></li>
-
-          <li class="nav-item"><a class="nav-link" href="../index.php#nosotros">Nosotros</a></li>
-          <li class="nav-item"><a class="nav-link" href="../index.php#testimonios">Testimonio</a></li>
-
-          <!-- Dropdown compacto -->
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" id="extrasDropdown" role="button" data-bs-toggle="dropdown">
-              Más
-            </a>
-            <ul class="dropdown-menu dropdown-menu-dark">
-              <li><a class="dropdown-item" href="../index.php#puntos">Puntos</a></li>
-              <li><a class="dropdown-item" href="../index.php#ubicacion">Ubicación</a></li>
-              <li><a class="dropdown-item" href="../index.php#contacto">Contacto</a></li>
-
-            </ul>
-          </li>
-
-          <!-- Carrito -->
-          <li class="nav-item">
-            <a class="nav-link position-relative" href="../carrito.php">
-              <i class="fas fa-shopping-cart"></i>
-              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="contador-carrito" style="font-size: 0.7rem;">
-                0
-              </span>
-            </a>
-          </li>
-
-          <!-- Sesión -->
-          <?php if (isset($_SESSION["cliente"])): ?>
-            <li class="nav-item">
-              <a href="" class="nav-link" title="<?= htmlspecialchars($_SESSION["cliente"]["nombre"]) ?>">
-                <i class="fas fa-user-circle"></i>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#logoutModal" title="Cerrar sesión">
-                <i class="fas fa-sign-out-alt"></i>
-              </a>
-            </li>
-
-          <?php else: ?>
-            <li class="nav-item">
-              <a href="login_cliente.php" class="btn btn-outline-light ms-2">Iniciar sesión</a>
-            </li>
-          <?php endif; ?>
-        </ul>
-      </div>
-    </div>
-  </nav>
+  <?php
+  $navBasePath = '../index.php';
+  $navHomeLink = '../index.php';
+  $navCarritoLink = '../carrito.php';
+  $navAuthLink = 'login_cliente.php';
+  $navProfileLink = 'perfil_cliente.php';
+  $navLogoutLink = 'logout_cliente.php';
+  include __DIR__ . '/../../views/partials/navbar.php';
+  ?>
 
   <div class="container mt-5 pt-5">
     <?php if ($emailObligatorioMensaje !== ''): ?>
@@ -861,30 +783,6 @@ if ($datos_guardados_exitosamente) {
 
   <?php include __DIR__ . '/../../componentes/carrito_button.php'; ?>
 
-  <!-- Modal de cierre de sesión -->
-  <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content bg-dark text-white border-0 shadow-lg">
-        <div class="modal-header border-bottom-0">
-          <h5 class="modal-title fw-bold" id="logoutModalLabel">
-            <i class="fas fa-sign-out-alt me-2 text-warning"></i> ¿Cerrar sesión?
-          </h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-        </div>
-        <div class="modal-body text-center">
-          <p class="fs-5 mb-0">¿Estás seguro de que querés cerrar sesión?</p>
-        </div>
-        <div class="modal-footer justify-content-center border-top-0">
-          <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
-            <i></i> Quedarme
-          </button>
-          <a href="./logout_cliente.php" class="btn btn-danger px-4">
-            <i class="fas fa-door-open me-1"></i> Cerrar Sesión
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
   <?php if (isset($_SESSION['toast'])): ?>
     <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
       <div id="toastContacto" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">

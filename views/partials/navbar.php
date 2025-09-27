@@ -5,6 +5,8 @@ $navBrandLabel = isset($navBrandLabel) ? (string) $navBrandLabel : 'Piccolo Burg
 $navCarritoLink = isset($navCarritoLink) ? (string) $navCarritoLink : 'carrito.php';
 $navAuthLink = isset($navAuthLink) ? (string) $navAuthLink : 'cliente/login_cliente.php';
 $navAuthLabel = isset($navAuthLabel) ? (string) $navAuthLabel : 'Iniciar sesión / Registrarse';
+$navProfileLink = isset($navProfileLink) ? (string) $navProfileLink : 'cliente/perfil_cliente.php';
+$navLogoutLink = isset($navLogoutLink) ? (string) $navLogoutLink : 'cliente/logout_cliente.php';
 
 $navSectionBase = $navBasePath !== '' ? rtrim($navBasePath, '#') : '';
 $sectionLinkPrefix = $navSectionBase !== '' ? $navSectionBase . '#' : '#';
@@ -59,7 +61,7 @@ $navExtraSections = [
 
         <?php if (isset($_SESSION['cliente'])): ?>
           <li class="nav-item">
-            <a href="cliente/perfil_cliente.php" class="nav-link" title="<?= htmlspecialchars($_SESSION['cliente']['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+            <a href="<?= htmlspecialchars($navProfileLink, ENT_QUOTES, 'UTF-8'); ?>" class="nav-link" title="<?= htmlspecialchars($_SESSION['cliente']['nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
               <i class="fas fa-user-circle"></i>
             </a>
           </li>
@@ -98,7 +100,7 @@ $navExtraSections = [
         <button type="button" class="btn btn-success px-4" data-bs-dismiss="modal">
           <i></i> Quedarme
         </button>
-        <a href="cliente/logout_cliente.php" class="btn btn-danger px-4">
+        <a href="<?= htmlspecialchars($navLogoutLink, ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-danger px-4">
           <i class="fas fa-door-open me-1"></i> Cerrar Sesión
         </a>
       </div>
