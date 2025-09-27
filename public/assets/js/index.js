@@ -83,6 +83,9 @@
     const reattachAddButtons = () => {
       document.querySelectorAll('.btn-agregar').forEach((button) => {
         button.removeEventListener('click', onAddClick);
+        if (button.disabled) {
+          return;
+        }
         button.addEventListener('click', onAddClick);
       });
     };
