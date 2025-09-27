@@ -248,9 +248,16 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
       return 'No';
     }
 
-    const texto = valor.toString().trim().toLowerCase().replace('í', 'i');
-    return texto === 'si' ? 'Si' : 'No';
-  }
+    let texto = valor.toString().trim().toLowerCase();
+
+    try {
+      texto = texto.normalize('NFD');
+    } catch (error) {
+      // Algunos navegadores pueden no soportar normalize.
+    }
+
+    texto = texto.replace(/[\u0300-\u036f]/g, '');
+    texto = texto.replace(/[\s'"`’]/g, '');
 
   function obtenerTextoEstadoPago(estado) {
     return estado === 'Si' ? 'Sí ✅' : 'No ❌';

@@ -55,6 +55,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $estadoPagoCrudo = trim((string)($pedido['esta_pago'] ?? ''));
               $estadoPagoNormalizado = strtolower($estadoPagoCrudo);
               $estadoPagoNormalizado = str_replace('í', 'i', $estadoPagoNormalizado);
+              $estadoPagoNormalizado = preg_replace('/[^a-z0-9]/', '', $estadoPagoNormalizado) ?? '';
               $estadoPago = $estadoPagoNormalizado === 'si' ? 'Si' : 'No';
               $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
 
