@@ -7,7 +7,8 @@
       --text-muted: #cccccc;
       --font-main: 'Inter', sans-serif;
       --font-title: 'Bebas Neue', sans-serif;
-      --navbar-height: 72px;
+      --navbar-height: 45px;
+
     }
 
     html {
@@ -58,7 +59,7 @@
     .navbar {
       background-color: #111;
       min-height: var(--navbar-height);
-      padding: 0.75rem 1.5rem;
+      padding: 0.5rem 1.5rem;
       transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
     }
 
@@ -82,8 +83,18 @@
 
     .navbar .nav-link {
       color: rgba(255, 255, 255, 0.85);
-      padding: 0.5rem 0.75rem;
+      padding: 0.4rem 0.75rem;
       transition: color 0.3s ease;
+    }
+
+    .cart-counter {
+      font-size: 0.7rem;
+      min-width: 1.4rem;
+      min-height: 1.4rem;
+      padding: 0.25rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .navbar .nav-link:hover,
@@ -107,8 +118,8 @@
     }
 
     .navbar .btn-gold {
-      padding: 0.6rem 1.8rem;
-      font-size: 1rem;
+      padding: 0.45rem 1.6rem;
+      font-size: 0.95rem;
     }
 
     .navbar-toggler {

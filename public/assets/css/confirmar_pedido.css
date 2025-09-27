@@ -7,6 +7,7 @@
   --text-muted: #cccccc;
   --font-main: 'Inter', sans-serif;
   --font-title: 'Bebas Neue', sans-serif;
+  --navbar-height: 45px;
 }
 
 /* Estilo global */
@@ -32,8 +33,9 @@ body {
   line-height: 1.6;
 }
 
+
 /* Contenedor con efecto Glass */
-.container {
+.glass-container {
   background: rgba(44, 44, 44, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -95,8 +97,7 @@ select.form-control {
   transform: scale(1.05);
 }
 
-/* Contenedor con efecto glass */
-.container {
+body .container:not(.navbar .container) {
   background: rgba(44, 44, 44, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -106,7 +107,6 @@ select.form-control {
   max-width: 600px;
   margin: 0 auto;
   flex-grow: 1;
-  /* Garantiza que este contenido crezca */
 }
 
 .modal-content {
@@ -225,4 +225,19 @@ textarea#nota::placeholder {
 .modal-footer .btn-gold {
   font-weight: 600;
   padding: 0.65rem 2.5rem;
+}
+
+/* Evitar que el container del navbar tenga fondo o bordes */
+.navbar .container,
+.navbar .container-fluid {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+.navbar-collapse {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
 }
