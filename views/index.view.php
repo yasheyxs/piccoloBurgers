@@ -337,7 +337,8 @@
   <?php include __DIR__ . '/../componentes/carrito_button.php'; ?>
   <?php include __DIR__ . '/../componentes/whatsapp_button.php'; ?>
   <?php include __DIR__ . '/../componentes/scroll_button.php'; ?>
-
+  
+  <script src="assets/js/carrito_reservas.js"></script>
   <script src="assets/js/index.js"></script>
 
 </body>

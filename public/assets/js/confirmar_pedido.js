@@ -15,6 +15,41 @@ document.addEventListener('DOMContentLoaded', () => {
     34: [9],
   };
 
+  const limpiarReservasVirtuales = () => {
+    return fetch('api/carrito_actualizar.php', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action: 'clear' }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (
+          data &&
+          window.CarritoReservas &&
+          typeof window.CarritoReservas.procesarRespuesta === 'function'
+        ) {
+          try {
+            window.CarritoReservas.procesarRespuesta(data);
+          } catch (error) {
+            console.error('No se pudo procesar la respuesta de reservas:', error);
+          }
+        }
+      })
+      .catch((error) => {
+        console.error('No se pudieron limpiar las reservas virtuales:', error);
+      })
+      .finally(() => {
+        localStorage.removeItem('carrito');
+      });
+  };
+
   const limpiarNumero = (valor) => valor.replace(/[^0-9]/g, '');
 
   const actualizarMaxlengthTelefono = () => {
@@ -235,12 +270,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const modal = new bootstrap.Modal(document.getElementById('modalGracias'));
         modal.show();
 
-        // Limpiar carrito y contador
-        localStorage.removeItem('carrito');
-        const contador = document.getElementById('contador-carrito');
-        if (contador) {
-          contador.textContent = '0';
-        }
+        // Limpiar carrito virtual y contador
+        limpiarReservasVirtuales().finally(() => {
+          const contador = document.getElementById('contador-carrito');
+          if (contador) {
+            contador.textContent = '0';
+          }
+        });
 
         form.reset();
         actualizarMaxlengthTelefono();

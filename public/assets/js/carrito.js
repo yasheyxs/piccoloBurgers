@@ -8,6 +8,62 @@ const estadoTotalCarrito = {
 
 let timeoutGuardarCarrito = null;
 
+const reservasAPI = window.CarritoReservas || null;
+
+function manejarErrorReserva(error, mensajeFallback = 'Ocurrió un error al actualizar el carrito.') {
+  console.error(mensajeFallback, error);
+  const mensaje = error && error.message ? error.message : mensajeFallback;
+  alert(mensaje);
+}
+
+function solicitarActualizacionReservas(payload, extras = {}) {
+  return fetch('api/carrito_actualizar.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(payload),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (reservasAPI && typeof reservasAPI.procesarRespuesta === 'function') {
+        return reservasAPI.procesarRespuesta(data, extras);
+      }
+
+      if (!data || typeof data !== 'object') {
+        throw new Error('Respuesta inválida del servidor.');
+      }
+
+      if (!data.exito) {
+        throw new Error(data.mensaje || 'No se pudo actualizar el carrito.');
+      }
+
+      return data;
+    })
+    .then((resultado) => {
+      cargarCarrito();
+      actualizarContador();
+      return resultado;
+    });
+}
+
+function sincronizarReservasIniciales() {
+  if (!reservasAPI || typeof reservasAPI.sincronizarConServidor !== 'function') {
+    return Promise.resolve();
+  }
+
+  return reservasAPI
+    .sincronizarConServidor()
+    .catch((error) => {
+      console.error('No se pudo sincronizar el carrito con el servidor:', error);
+    });
+}
+
 function obtenerPrecioUnitario(item = {}) {
   if (typeof item !== "object" || item === null) {
     return 0;
@@ -314,7 +370,10 @@ function cargarCarrito() {
     return 0;
   }
 
-  const items = leerCarritoDesdeStorage();
+  const items =
+    reservasAPI && typeof reservasAPI.leerCarritoDesdeStorage === 'function'
+      ? reservasAPI.leerCarritoDesdeStorage()
+      : leerCarritoDesdeStorage();
   reconstruirResumenDesdeItems(items);
 
   const productos = obtenerProductosDelEstado();
@@ -339,19 +398,12 @@ function aumentarCantidad(id) {
     return;
   }
 
-  entrada.cantidad += 1;
-  estadoTotalCarrito.total += obtenerPrecioUnitario(entrada.producto);
+  const extras = {};
+  extras[clave] = entrada.producto;
 
-  guardarCarritoEnStorage();
-
-  const productoFormateado = formatearProductoParaUI(entrada);
-  if (productoFormateado) {
-    actualizarTarjetaProducto(productoFormateado);
-  }
-
-  actualizarTotal();
-  actualizarContador();
-  actualizarEstadoBotones();
+  solicitarActualizacionReservas({ action: 'increment', menuId: Number(id) }, extras).catch((error) =>
+    manejarErrorReserva(error, 'No se pudo agregar otra unidad. Verificá la disponibilidad de stock.')
+  );
 }
 
 function disminuirCantidad(id) {
@@ -361,33 +413,9 @@ function disminuirCantidad(id) {
     return;
   }
 
-  const precioUnitario = obtenerPrecioUnitario(entrada.producto);
-  entrada.cantidad = Math.max(0, entrada.cantidad - 1);
-  estadoTotalCarrito.total = Math.max(
-    0,
-    estadoTotalCarrito.total - precioUnitario
+  solicitarActualizacionReservas({ action: 'decrement', menuId: Number(id) }).catch((error) =>
+    manejarErrorReserva(error, 'No se pudo quitar la unidad seleccionada.')
   );
-
-  if (entrada.cantidad <= 0) {
-    delete estadoTotalCarrito.items[clave];
-    eliminarTarjetaProducto(id);
-  } else {
-    const productoFormateado = formatearProductoParaUI(entrada);
-    if (productoFormateado) {
-      actualizarTarjetaProducto(productoFormateado);
-
-    }
-  }
-
-  guardarCarritoEnStorage();
-
-  if (obtenerCantidadTotalCarrito() === 0) {
-    mostrarMensajeCarritoVacio();
-  }
-
-  actualizarTotal();
-  actualizarContador();
-  actualizarEstadoBotones();
 }
 
 function eliminarProducto(id) {
@@ -396,36 +424,15 @@ function eliminarProducto(id) {
   if (!entrada) {
     return;
   }
-
-  estadoTotalCarrito.total = Math.max(
-    0,
-    estadoTotalCarrito.total -
-      Number(formatearProductoParaUI(entrada)?.precio || 0)
+    solicitarActualizacionReservas({ action: 'remove', menuId: Number(id) }).catch((error) =>
+    manejarErrorReserva(error, 'No se pudo eliminar el producto del carrito.')
   );
-
-  delete estadoTotalCarrito.items[clave];
-
-  guardarCarritoEnStorage();
-  eliminarTarjetaProducto(id);
-
-  if (obtenerCantidadTotalCarrito() === 0) {
-    mostrarMensajeCarritoVacio();
-  }
-
-  actualizarTotal();
-  actualizarContador();
-  actualizarEstadoBotones();
 }
 
 function vaciarCarrito() {
-  estadoTotalCarrito.items = {};
-  estadoTotalCarrito.total = 0;
-  cancelarGuardadoPendiente();
-  localStorage.removeItem("carrito");
-  mostrarMensajeCarritoVacio();
-  actualizarTotal([], 0);
-  actualizarContador();
-  actualizarEstadoBotones();
+  solicitarActualizacionReservas({ action: 'clear' }).catch((error) =>
+    manejarErrorReserva(error, 'No se pudo vaciar el carrito por completo.')
+  );
 }
 
 function actualizarContador() {
@@ -556,24 +563,19 @@ function mostrarConfirmacionCancelar() {
 }
 
 function confirmarCancelacion() {
-  estadoTotalCarrito.items = {};
-  estadoTotalCarrito.total = 0;
-  cancelarGuardadoPendiente();
-
-  localStorage.removeItem("carrito");
-
-  const modalElement = document.getElementById("modalCancelarPedido");
-  if (modalElement && typeof bootstrap !== "undefined") {
-    const modal = bootstrap.Modal.getInstance(modalElement);
-    if (modal) {
-      modal.hide();
-    }
-  }
-
-  mostrarMensajeCarritoVacio();
-  actualizarTotal([], 0);
-  actualizarContador();
-  actualizarEstadoBotones();
+  solicitarActualizacionReservas({ action: 'clear' })
+    .then(() => {
+      const modalElement = document.getElementById('modalCancelarPedido');
+      if (modalElement && typeof bootstrap !== 'undefined') {
+        const modal = bootstrap.Modal.getInstance(modalElement);
+        if (modal) {
+          modal.hide();
+        }
+      }
+    })
+    .catch((error) =>
+      manejarErrorReserva(error, 'No se pudo cancelar el pedido en este momento.')
+    );
 }
 
 function prepararEnvioPedido(event) {
@@ -656,11 +658,15 @@ document.addEventListener("DOMContentLoaded", () => {
     formPedido.addEventListener("submit", prepararEnvioPedido);
   }
 
-  const totalFinal = cargarCarrito();
-  const totalSpan = document.getElementById("total");
-  if (totalSpan && Number.isFinite(totalFinal)) {
-    totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
-  }
-  actualizarContador();
-  ajustarPaddingContenido();
+  sincronizarReservasIniciales()
+    .catch(() => {})
+    .finally(() => {
+      const totalFinal = cargarCarrito();
+      const totalSpan = document.getElementById('total');
+      if (totalSpan && Number.isFinite(totalFinal)) {
+        totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
+      }
+      actualizarContador();
+      ajustarPaddingContenido();
+    });
 });

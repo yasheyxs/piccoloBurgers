@@ -4,6 +4,7 @@ ob_start();
 
 require_once __DIR__ . '/../admin/bd.php';
 require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../includes/reservas_virtuales.php';
 
 session_start();
 
@@ -181,6 +182,11 @@ try {
 
     $conexion->commit();
 
+    try {
+        limpiarReservasSesion($conexion, obtenerIdSesionActual());
+    } catch (Throwable $cleanupError) {
+        error_log('No se pudieron limpiar las reservas virtuales tras confirmar el pedido: ' . $cleanupError->getMessage());
+    }
 
     header('Content-Type: application/json');
     ob_end_clean();
