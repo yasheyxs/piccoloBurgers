@@ -33,6 +33,17 @@ if (MODO_DESARROLLO) {
 }
 
 $rol = $_SESSION["rol"] ?? "";
+
+$currentScript = basename($_SERVER['PHP_SELF'] ?? '');
+$adminPageIdentifier = $adminPageIdentifier ?? $currentScript;
+
+$bodyClasses = ['admin-body'];
+if (in_array($adminPageIdentifier, ['panel_delivery.php', 'delivery-panel'], true)) {
+  $bodyClasses[] = 'delivery-panel';
+}
+
+$bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
+
 ?>
 
 <!doctype html>
@@ -48,6 +59,7 @@ $rol = $_SESSION["rol"] ?? "";
   <link rel="icon" type="image/png" href="<?php echo $url_base; ?>../public/img/favicon.png" />
   <link rel="stylesheet" href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css">
   <link rel="stylesheet" href="<?php echo $url_base; ?>assets/css/datatables-custom.css">
+  <link rel="stylesheet" href="<?php echo $url_base; ?>assets/css/admin-theme.css">
 
   <style>
     .dropdown-menu {
@@ -59,7 +71,7 @@ $rol = $_SESSION["rol"] ?? "";
   <script src="<?php echo $url_base; ?>assets/js/datatables-init.js"></script>
 </head>
 
-<body>
+<body class="<?php echo htmlspecialchars($bodyClassAttribute, ENT_QUOTES, 'UTF-8'); ?>">
   <header>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
@@ -117,7 +129,12 @@ $rol = $_SESSION["rol"] ?? "";
             <?php } ?>
           </ul>
 
-          <ul class="navbar-nav ms-auto">
+          <ul class="navbar-nav ms-auto align-items-center">
+            <li class="nav-item theme-toggle-wrapper">
+              <button id="darkModeToggle" class="btn btn-sm btn-outline-secondary theme-toggle" type="button" title="Activar modo oscuro" aria-label="Activar modo oscuro" aria-pressed="false">
+                <i class="fa-solid fa-moon"></i>
+              </button>
+            </li>
             <li class="nav-item">
               <a class="nav-link text-danger" href="#" data-bs-toggle="modal" data-bs-target="#modalCerrarSesion" title="Cerrar sesión">
                 <i class="fa-solid fa-right-from-bracket fa-lg"></i>

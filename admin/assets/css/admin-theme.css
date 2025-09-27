@@ -1,0 +1,254 @@
+body.admin-body {
+  --admin-bg: #f5f7fb;
+  --admin-surface: #ffffff;
+  --admin-surface-alt: #f1f3f5;
+  --admin-text: #212529;
+  --admin-border: rgba(0, 0, 0, 0.12);
+  --admin-muted: #6c757d;
+  --admin-link: #0d6efd;
+  --admin-link-hover: #0a58ca;
+  --admin-nav-bg: #f8f9fa;
+  --admin-nav-border: rgba(0, 0, 0, 0.08);
+  --admin-dropdown-bg: #ffffff;
+  --admin-dropdown-hover: #f1f3f5;
+  --admin-input-bg: #ffffff;
+  --admin-input-text: #212529;
+  --admin-input-border: rgba(0, 0, 0, 0.2);
+  --admin-table-stripe: #f8f9fc;
+  --admin-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --admin-transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.admin-body.admin-dark {
+  --admin-bg: #0f1115;
+  --admin-surface: #191c24;
+  --admin-surface-alt: #1f222c;
+  --admin-text: #e4e6eb;
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-muted: #a5adba;
+  --admin-link: #7ab0ff;
+  --admin-link-hover: #9bc2ff;
+  --admin-nav-bg: #14171f;
+  --admin-nav-border: rgba(255, 255, 255, 0.08);
+  --admin-dropdown-bg: #1c2029;
+  --admin-dropdown-hover: #222633;
+  --admin-input-bg: #1c2029;
+  --admin-input-text: #f1f3f5;
+  --admin-input-border: rgba(122, 160, 255, 0.45);
+  --admin-table-stripe: rgba(122, 176, 255, 0.08);
+  --admin-shadow: 0 12px 32px rgba(6, 8, 12, 0.6);
+}
+
+body.admin-body {
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+  min-height: 100vh;
+}
+
+body.admin-body a {
+  color: var(--admin-link);
+  transition: color 0.2s ease;
+}
+
+body.admin-body a:hover,
+body.admin-body a:focus {
+  color: var(--admin-link-hover);
+}
+
+body.admin-body .navbar {
+  background-color: var(--admin-nav-bg) !important;
+  border-bottom: 1px solid var(--admin-nav-border);
+  transition: var(--admin-transition);
+}
+
+body.admin-body .navbar .navbar-brand,
+body.admin-body .navbar .nav-link,
+body.admin-body .navbar .dropdown-item {
+  color: var(--admin-text) !important;
+}
+
+body.admin-body .navbar .dropdown-item:hover,
+body.admin-body .navbar .dropdown-item:focus {
+  background-color: var(--admin-dropdown-hover);
+  color: var(--admin-text) !important;
+}
+
+body.admin-body .navbar .dropdown-menu {
+  background-color: var(--admin-dropdown-bg);
+  border-color: var(--admin-border);
+  box-shadow: var(--admin-shadow);
+}
+
+body.admin-body:not(.delivery-panel) main .container,
+body.admin-body:not(.delivery-panel) main .container-fluid,
+body.admin-body:not(.delivery-panel) main .row > [class*="col"] {
+  transition: var(--admin-transition);
+}
+
+body.admin-body:not(.delivery-panel) .card,
+body.admin-body:not(.delivery-panel) .list-group-item,
+body.admin-body:not(.delivery-panel) .accordion-item,
+body.admin-body:not(.delivery-panel) .modal-content,
+body.admin-body:not(.delivery-panel) .dropdown-menu,
+body.admin-body:not(.delivery-panel) .toast,
+body.admin-body:not(.delivery-panel) .offcanvas,
+body.admin-body:not(.delivery-panel) .table,
+body.admin-body:not(.delivery-panel) .form-control,
+body.admin-body:not(.delivery-panel) .form-select,
+body.admin-body:not(.delivery-panel) .input-group-text,
+body.admin-body:not(.delivery-panel) .pagination .page-link,
+body.admin-body:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body:not(.delivery-panel) .btn-outline-primary,
+body.admin-body:not(.delivery-panel) .btn-outline-danger,
+body.admin-body:not(.delivery-panel) .btn-outline-success,
+body.admin-body:not(.delivery-panel) .btn-outline-warning {
+  background-color: var(--admin-surface);
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  box-shadow: none;
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .card,
+body.admin-body.admin-dark:not(.delivery-panel) .list-group-item,
+body.admin-body.admin-dark:not(.delivery-panel) .accordion-item,
+body.admin-body.admin-dark:not(.delivery-panel) .modal-content,
+body.admin-body.admin-dark:not(.delivery-panel) .dropdown-menu,
+body.admin-body.admin-dark:not(.delivery-panel) .toast,
+body.admin-body.admin-dark:not(.delivery-panel) .offcanvas,
+body.admin-body.admin-dark:not(.delivery-panel) .form-control,
+body.admin-body.admin-dark:not(.delivery-panel) .form-select,
+body.admin-body.admin-dark:not(.delivery-panel) .input-group-text,
+body.admin-body.admin-dark:not(.delivery-panel) .pagination .page-link,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-primary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-danger,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-success,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-warning {
+  box-shadow: var(--admin-shadow);
+}
+
+body.admin-body:not(.delivery-panel) .table thead,
+body.admin-body:not(.delivery-panel) .table th {
+  background-color: var(--admin-surface-alt);
+  color: var(--admin-text);
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr:nth-of-type(odd) {
+  background-color: var(--admin-table-stripe);
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .table tbody tr:hover {
+  background-color: rgba(122, 176, 255, 0.12);
+}
+
+body.admin-body:not(.delivery-panel) .form-control,
+body.admin-body:not(.delivery-panel) .form-select,
+body.admin-body:not(.delivery-panel) .form-check-input,
+body.admin-body:not(.delivery-panel) .input-group-text {
+  background-color: var(--admin-input-bg);
+  color: var(--admin-input-text);
+  border-color: var(--admin-input-border);
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .form-control:focus,
+body.admin-body.admin-dark:not(.delivery-panel) .form-select:focus,
+body.admin-body.admin-dark:not(.delivery-panel) .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(122, 176, 255, 0.25);
+}
+
+body.admin-body .btn-primary,
+body.admin-body .btn-success,
+body.admin-body .btn-danger,
+body.admin-body .btn-warning {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.admin-body .btn-primary:hover,
+body.admin-body .btn-success:hover,
+body.admin-body .btn-danger:hover,
+body.admin-body .btn-warning:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+body.admin-body.admin-dark .btn-primary,
+body.admin-body.admin-dark .btn-success,
+body.admin-body.admin-dark .btn-danger,
+body.admin-body.admin-dark .btn-warning {
+  box-shadow: none;
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-primary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-danger,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-success,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-warning {
+  color: var(--admin-text);
+}
+
+body.admin-body .modal-backdrop.show {
+  opacity: 0.55;
+}
+
+body.admin-body .badge {
+  transition: var(--admin-transition);
+}
+
+body.admin-body .table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: inherit;
+}
+
+body.admin-body .text-muted {
+  color: var(--admin-muted) !important;
+}
+
+body.admin-body .theme-toggle {
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  transition: var(--admin-transition);
+}
+
+body.admin-body .theme-toggle i {
+  transition: transform 0.2s ease;
+}
+
+body.admin-body .theme-toggle:hover i {
+  transform: scale(1.1);
+}
+
+body.admin-body .theme-toggle.btn-outline-secondary {
+  border-color: var(--admin-border);
+  color: var(--admin-text);
+}
+
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary {
+  border-color: rgba(122, 176, 255, 0.6);
+  color: var(--admin-link);
+}
+
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:hover {
+  background-color: rgba(122, 176, 255, 0.15);
+}
+
+@media (max-width: 991.98px) {
+  body.admin-body .navbar .nav-item.theme-toggle-wrapper {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  body.admin-body .theme-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
