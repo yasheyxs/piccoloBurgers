@@ -117,13 +117,13 @@ include("../../templates/header.php");
         </button>
       </div>
       <div id="materias-container"></div>
-      <br>
+      <br> 
       <button type="submit" class="btn btn-success">Registrar compra</button>
       <a class="btn btn-primary" href="index.php" role="button">Cancelar</a>
     </form>
   </div>
   <div class="card-footer text-muted"></div>
-</div>
+</div> 
 
 <script>
   const materias = <?= json_encode($lista_materias) ?>;
