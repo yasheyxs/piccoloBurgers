@@ -40,5 +40,29 @@ function passwordCoincideConHash(string $passwordPlano, string $hashAlmacenado):
         return password_verify($passwordPlano, $hashAlmacenado);
     }
 
-    return md5($passwordPlano) === $hashAlmacenado;
+ return hash_equals(md5($passwordPlano), $hashAlmacenado);
+}
+
+/**
+ * Determina si un hash almacenado requiere ser re-generado utilizando el algoritmo actual.
+ */
+function passwordDebeRehash(string $hashAlmacenado): bool
+{
+    if ($hashAlmacenado === '') {
+        return true;
+    }
+
+    if (!esHashPasswordModerno($hashAlmacenado)) {
+        return true;
+    }
+
+    return password_needs_rehash($hashAlmacenado, PASSWORD_DEFAULT);
+}
+
+/**
+ * Genera un hash seguro utilizando el algoritmo por defecto configurado en PHP.
+ */
+function generarHashPassword(string $passwordPlano): string
+{
+    return password_hash($passwordPlano, PASSWORD_DEFAULT);
 }

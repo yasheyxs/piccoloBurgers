@@ -2,6 +2,7 @@
 session_start();
 if ($_POST) {
   include("bd.php");
+  require_once __DIR__ . '/../componentes/password_utils.php';
 
   $usuario  = trim($_POST["usuario"] ?? "");
   $password = $_POST["password"] ?? "";
@@ -12,16 +13,24 @@ if ($_POST) {
   $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
 
   if ($usuarioEncontrado) {
-    $hashAlmacenado = $usuarioEncontrado["password"];
+     $hashAlmacenado = $usuarioEncontrado["password"] ?? '';
 
-    // Verificar si el hash es moderno (password_hash) o legacy (md5)
-    $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+    if (passwordCoincideConHash($password, $hashAlmacenado)) {
+      if (passwordDebeRehash($hashAlmacenado) && isset($usuarioEncontrado['ID'])) {
+        $nuevoHash = generarHashPassword($password);
 
-    $valido = $esHashModerno
-      ? password_verify($password, $hashAlmacenado)
-      : md5($password) === $hashAlmacenado;
+        try {
+          $actualizar = $conexion->prepare("UPDATE tbl_usuarios SET password = :password WHERE ID = :id");
+          $actualizar->bindParam(':password', $nuevoHash);
+          $actualizar->bindParam(':id', $usuarioEncontrado['ID']);
+          $actualizar->execute();
+          $hashAlmacenado = $nuevoHash;
+        } catch (Throwable $error) {
+          error_log('No se pudo actualizar el hash del usuario ' . $usuarioEncontrado['ID'] . ': ' . $error->getMessage());
+        }
+      }
 
-    if ($valido) {
+    
       $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
       $_SESSION["admin_logueado"] = true;
       $_SESSION["rol"] = $usuarioEncontrado["rol"];
