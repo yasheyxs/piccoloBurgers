@@ -5,36 +5,30 @@
   --gray-bg: #2c2c2c;
   --text-light: #ffffff;
   --text-muted: #cccccc;
-  --font-main: 'Inter', sans-serif;
-  --font-title: 'Bebas Neue', sans-serif;
+  --font-main: "Inter", sans-serif;
+  --font-title: "Bebas Neue", sans-serif;
   --navbar-height: 45px;
-}
-
-/* Estilo global */
+} /* Estilo global */
 html,
 body {
   height: 100%;
   margin: 0;
-  padding: var(--navbar-height) 0 0;
+  padding: 20px 0 0;
   font-family: var(--font-main);
   color: var(--text-light);
-  background: url('../../img/HamLoginCliente.jpg') no-repeat center center fixed;
+  background: url("../../img/HamLoginCliente.jpg") no-repeat center center fixed;
   background-size: cover;
   background-attachment: fixed;
   overflow-x: hidden;
   overflow-y: auto;
 }
-
 body {
   font-family: var(--font-main);
   background-color: var(--dark-bg);
   color: var(--text-light);
   font-size: 1rem;
   line-height: 1.6;
-}
-
-
-/* Contenedor con efecto Glass */
+} /* Contenedor con efecto Glass */
 .glass-container {
   background: rgba(44, 44, 44, 0.7);
   backdrop-filter: blur(10px);
@@ -47,14 +41,11 @@ body {
   flex-grow: 1;
   margin-top: 0;
 }
-
-
 h2 {
   font-size: 2.5rem;
   color: var(--main-gold);
   text-align: center;
 }
-
 .form-control {
   background-color: var(--gray-bg);
   color: var(--text-light);
@@ -62,14 +53,12 @@ h2 {
   font-size: 1.2rem;
   border-radius: 8px;
 }
-
 .form-control:focus {
   background-color: var(--gray-bg);
   color: var(--text-light);
   border-color: var(--main-gold);
   box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
 }
-
 select.form-control {
   appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M350l35 40 35-40' stroke='%23ccc' stroke-width='15' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
@@ -79,7 +68,6 @@ select.form-control {
   padding-right: 2.5rem;
   cursor: pointer;
 }
-
 .btn-gold {
   background-color: var(--main-gold) !important;
   color: #000 !important;
@@ -90,13 +78,11 @@ select.form-control {
   transition: all 0.3s ease;
   font-size: 1rem;
 }
-
 .btn-gold:hover {
-   background-color: var(--gold-hover) !important;
+  background-color: var(--gold-hover) !important;
   color: #000 !important;
   transform: scale(1.05);
 }
-
 body .container:not(.navbar .container) {
   background: rgba(44, 44, 44, 0.7);
   backdrop-filter: blur(10px);
@@ -108,18 +94,15 @@ body .container:not(.navbar .container) {
   margin: 0 auto;
   flex-grow: 1;
 }
-
 .modal-content {
   background-color: var(--gray-bg);
   color: var(--text-light);
 }
-
 .modal-body .list-group-item {
   background-color: transparent;
   color: var(--text-light);
   border-color: rgba(255, 255, 255, 0.1);
 }
-
 .form-control {
   background-color: #1e1e1e;
   color: #fff;
@@ -129,34 +112,29 @@ body .container:not(.navbar .container) {
   padding: 0.75rem 1rem;
   transition: all 0.3s ease;
 }
-
 .form-control::placeholder,
 textarea.form-control::placeholder {
   color: #555558 !important;
   opacity: 1;
 }
-
 input#telefono::placeholder,
 input#referencias::placeholder,
 textarea#nota::placeholder {
   color: #555558 !important;
   opacity: 1;
 }
-
 .form-control:focus {
   border-color: #fac30c;
   box-shadow: 0 0 8px rgba(250, 195, 12, 0.4);
   background-color: #222;
   color: #fff;
 }
-
 .form-label {
   font-weight: bold;
   color: #fac30c;
   font-size: 1.05rem;
   margin-bottom: 0.4rem;
 }
-
 .radio-card {
   display: inline-block;
   border: 2px solid transparent;
@@ -168,11 +146,9 @@ textarea#nota::placeholder {
   background-color: #1a1a1a;
   color: #fff;
 }
-
 .radio-card:hover {
   border-color: #999;
 }
-
 .form-check-input:checked + .radio-card {
   border-color: #fac30c;
   background-color: #2a2a2a;
@@ -180,18 +156,15 @@ textarea#nota::placeholder {
   box-shadow: 0 0 12px rgba(250, 195, 12, 0.4);
   font-weight: bold;
 }
-
 .form-check-input {
   display: none;
 }
-
 .telefono-group {
   display: flex;
   align-items: center;
   gap: 0.75rem;
   flex-wrap: nowrap;
 }
-
 .telefono-group select.form-control {
   flex: 0 0 auto;
   width: 7rem;
@@ -200,34 +173,27 @@ textarea#nota::placeholder {
   padding-right: 2rem;
   text-align: center;
 }
-
 .telefono-group input.form-control {
   flex: 1 1 auto;
   min-width: 0;
 }
-
 @media (max-width: 480px) {
   .telefono-group {
     flex-wrap: wrap;
   }
-
   .telefono-group select.form-control,
   .telefono-group input.form-control {
     flex: 1 1 100%;
     max-width: 100%;
   }
 }
-
 #nota {
   resize: none;
 }
-
 .modal-footer .btn-gold {
   font-weight: 600;
   padding: 0.65rem 2.5rem;
-}
-
-/* Evitar que el container del navbar tenga fondo o bordes */
+} /* Evitar que el container del navbar tenga fondo o bordes */
 .navbar .container,
 .navbar .container-fluid {
   background: transparent !important;
@@ -235,7 +201,6 @@ textarea#nota::placeholder {
   border-radius: 0 !important;
   padding: 0 !important;
 }
-
 .navbar-collapse {
   background: transparent !important;
   box-shadow: none !important;
