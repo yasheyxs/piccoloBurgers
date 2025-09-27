@@ -6,7 +6,6 @@
   $pageTitle = 'Piccolo Burgers';
   $extraCss = [
     'https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css',
-    'assets/css/custom.css',
     'assets/css/index.css',
   ];
   include __DIR__ . '/partials/head.php';

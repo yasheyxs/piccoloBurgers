@@ -14,7 +14,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  padding: 0;
+  padding: var(--navbar-height) 0 0;
   font-family: var(--font-main);
   color: var(--text-light);
   background: url('../../img/HamLoginCliente.jpg') no-repeat center center fixed;
@@ -32,22 +32,6 @@ body {
   line-height: 1.6;
 }
 
-/* Navbar fija */
-.navbar {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  z-index: 1000;
-  --bs-bg-opacity: 0.1;
-  padding: 1rem 1.5rem;
-}
-
-.navbar .navbar-brand,
-.navbar .nav-link {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
 /* Contenedor con efecto Glass */
 .container {
   background: rgba(44, 44, 44, 0.7);
@@ -62,20 +46,6 @@ body {
   margin-top: 0;
 }
 
-.navbar>.container,
-.navbar>.container-fluid,
-.navbar>.container-lg,
-.navbar>.container-md,
-.navbar>.container-sm,
-.navbar>.container-xl,
-.navbar>.container-xxl {
-  display: flex;
-  flex-wrap: inherit;
-  align-items: center;
-  justify-content: space-between;
-    padding: 0;
-
-}
 
 h2 {
   font-size: 2.5rem;

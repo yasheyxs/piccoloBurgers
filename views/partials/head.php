@@ -5,6 +5,11 @@ $extraCss = $extraCss ?? [];
 if (!is_array($extraCss)) {
     $extraCss = [$extraCss];
 }
+
+$baseCss = ['assets/css/custom.css'];
+$cssFiles = array_merge($baseCss, $extraCss);
+$cssFiles = array_values(array_unique($cssFiles));
+
 ?>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,7 +19,7 @@ if (!is_array($extraCss)) {
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
 <link rel="icon" href="./img/favicon.png" type="image/x-icon" />
-<?php foreach ($extraCss as $cssFile): ?>
+<?php foreach ($cssFiles as $cssFile): ?>
   <?php if (is_string($cssFile) && $cssFile !== ''): ?>
     <link rel="stylesheet" href="<?= htmlspecialchars($cssFile, ENT_QUOTES, 'UTF-8'); ?>">
   <?php endif; ?>
