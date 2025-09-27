@@ -20,14 +20,6 @@ require_once dirname(__DIR__) . '/helpers/url.php';
 
 $url_base = piccolo_admin_base_url();
 
-$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
-$adminBasePath = preg_replace('#/admin(?:/.*)?$#', '/admin/', $requestPath);
-
-if (empty($adminBasePath) || $adminBasePath === $requestPath) {
-  $adminBasePath = '/admin/';
-}
-
-$url_base = rtrim(sprintf('%s://%s%s', $scheme, $host, $adminBasePath), '/') . '/';
 
 if (MODO_DESARROLLO) {
   $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
