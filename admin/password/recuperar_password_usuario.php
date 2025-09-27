@@ -2,7 +2,7 @@
 // No requiere sesión activa
 ?>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . "/piccoloBurgers/admin/templates/header_public.php"); ?>
+<?php include(__DIR__ . "/../templates/header_public.php"); ?>
 
 <div class="container mt-5">
   <div class="row justify-content-center">

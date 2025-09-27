@@ -2,7 +2,8 @@
 // No requiere sesión activa
 include("../bd.php");
 require_once __DIR__ . '/../../config/mailer.php';
-include($_SERVER['DOCUMENT_ROOT'] . "/piccoloBurgers/admin/templates/header_public.php");
+require_once dirname(__DIR__) . '/helpers/url.php';
+include(__DIR__ . "/../templates/header_public.php");
 
 $correo = trim($_POST["correo"] ?? "");
 
@@ -31,8 +32,13 @@ if ($usuario) {
   $stmt->bindParam(":correo", $correo);
   $stmt->execute();
 
-  $host = $_SERVER['HTTP_HOST'];
-  $link = "http://$host/piccoloBurgers/admin/password/reset_password.php?token=$token&tipo=usuario";
+$adminBaseUrl = piccolo_admin_base_url();
+  $query = http_build_query([
+    'token' => $token,
+    'tipo'  => 'usuario',
+  ]);
+  $link = $adminBaseUrl . 'password/reset_password.php?' . $query;
+  $linkSeguro = htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
   
   $correoEnviado = false;
@@ -51,7 +57,7 @@ if ($usuario) {
 
     $mensajeHtml = nl2br(htmlspecialchars($mensajePlano, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'));
 
-    $mailer->Body = $mensajeHtml . "<br><br><a href='$link' class='btn btn-success'>Restablecer contraseña</a>";
+    $mailer->Body = $mensajeHtml . "<br><br><a href='" . $linkSeguro . "' class='btn btn-success'>Restablecer contraseña</a>";
     $mailer->AltBody = $mensajePlano;
     $mailer->send();
     $correoEnviado = true;
@@ -70,7 +76,7 @@ if ($usuario) {
       <div class='alert alert-warning text-center'>
         Se generó el enlace de recuperación pero no pudimos enviar el correo automáticamente.<br><br>
         Utilizá el siguiente botón para continuar:<br>
-        <a href='$link' class='btn btn-success mt-2'>Restablecer contraseña</a>
+        <a href='" . $linkSeguro . "' class='btn btn-success mt-2'>Restablecer contraseña</a>
       </div>
     ";
   }

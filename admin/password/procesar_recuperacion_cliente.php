@@ -1,6 +1,8 @@
 <?php
 include("../bd.php");
 require_once __DIR__ . '/../../config/mailer.php';
+require_once dirname(__DIR__) . '/helpers/url.php';
+
 
 ?>
 
@@ -90,8 +92,12 @@ if ($cliente) {
   $stmt->bindParam(":correo", $correo);
   $stmt->execute();
 
-  $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-  $link = "http://$host/piccoloBurgers/admin/password/reset_password.php?token=$token&tipo=cliente";
+$adminBaseUrl = piccolo_admin_base_url();
+  $query = http_build_query([
+    'token' => $token,
+    'tipo'  => 'cliente',
+  ]);
+  $link = $adminBaseUrl . 'password/reset_password.php?' . $query;
   $linkHtml = htmlspecialchars($link, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
 
