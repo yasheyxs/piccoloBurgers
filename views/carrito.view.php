@@ -20,7 +20,7 @@
 
   <main>
     <div class="container contenido-ajustado">
-      <div class="container">
+    <div class="container carrito-panel">
         <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
         <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
         <div id="btnAgregarMas" class="mt-4"></div>
