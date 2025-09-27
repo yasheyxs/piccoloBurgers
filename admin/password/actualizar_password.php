@@ -1,7 +1,7 @@
 <?php
 include("../bd.php");
 require_once __DIR__ . '/../../componentes/password_utils.php';
-include($_SERVER['DOCUMENT_ROOT'] . "/piccoloBurgers/admin/templates/header_public.php");
+include(__DIR__ . "/../templates/header_public.php");
 
 $token     = trim($_POST["token"] ?? "");
 $tipo      = $_POST["tipo"] ?? "";
