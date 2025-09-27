@@ -377,8 +377,9 @@ if ($esAdminAutenticado) {
 
 <?php if ($esAdminAutenticado) { ?>
   <div class="container text-center my-5">
-    <a href="<?= $url_base; ?>seccion/ventas/" class="btn btn-outline-primary btn-lg px-4">
-      Ir al panel de ventas
+    <a href="<?= $url_base; ?>seccion/ventas/" class="btn sales-panel-cta">
+      <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+      <span>Ir al panel de ventas</span>
     </a>
   </div>
 <?php } ?>
