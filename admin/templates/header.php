@@ -17,7 +17,15 @@ if (empty($_SESSION['csrf_token'])) {
 include_once(dirname(__DIR__, 2) . "/config/config.php");
 
 $host = $_SERVER['HTTP_HOST'];
-$url_base = "http://$host/piccoloBurgers/admin/";
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
+$adminBasePath = preg_replace('#/admin(?:/.*)?$#', '/admin/', $requestPath);
+
+if (empty($adminBasePath) || $adminBasePath === $requestPath) {
+  $adminBasePath = '/admin/';
+}
+
+$url_base = rtrim(sprintf('%s://%s%s', $scheme, $host, $adminBasePath), '/') . '/';
 
 if (MODO_DESARROLLO) {
   $_SESSION["admin_usuario"] = USUARIO_DESARROLLO;
