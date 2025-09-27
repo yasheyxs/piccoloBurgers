@@ -3,6 +3,17 @@ if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
 
+if (empty($_SESSION['csrf_token'])) {
+  try {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  } catch (Exception $e) {
+    // Si la generación del token falla, abortamos la carga de la vista para evitar estados inseguros.
+    http_response_code(500);
+    echo 'No fue posible iniciar la sesión de manera segura.';
+    exit;
+  }
+}
+
 include_once(dirname(__DIR__, 2) . "/config/config.php");
 
 $host = $_SERVER['HTTP_HOST'];
@@ -28,6 +39,7 @@ $rol = $_SESSION["rol"] ?? "";
   <title>Administrador del sitio web</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">

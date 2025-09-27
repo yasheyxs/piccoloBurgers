@@ -1,12 +1,59 @@
 <?php
-include("bd.php");
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 header("Content-Type: application/json");
 
-// Usar POST si está, si no usar GET
-$pedido_id = $_POST["pedido_id"] ?? $_GET["id"] ?? null;
-$nuevo_estado = $_POST["nuevo_estado"] ?? $_GET["estado"] ?? null;
-$estado_pago_recibido = $_POST["esta_pago"] ?? $_POST["estado_pago"] ?? $_GET["esta_pago"] ?? $_GET["pago"] ?? null;
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    echo json_encode(["success" => false, "message" => "Método no permitido."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if (empty($_SESSION['admin_usuario'])) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Sesión no válida."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+require_once __DIR__ . '/bd.php';
+
+try {
+    $sentencia = $conexion->prepare('SELECT rol FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1');
+    $sentencia->execute([':usuario' => $_SESSION['admin_usuario']]);
+    $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "No se pudo validar la sesión."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if (!$usuario) {
+    http_response_code(401);
+    echo json_encode(["success" => false, "message" => "Usuario no autorizado."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$rol = $usuario['rol'] ?? '';
+$rolesPermitidos = ['admin', 'empleado', 'delivery'];
+if (!in_array($rol, $rolesPermitidos, true)) {
+    http_response_code(403);
+    echo json_encode(["success" => false, "message" => "No tenés permisos para realizar esta acción."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$tokenSesion = $_SESSION['csrf_token'] ?? '';
+$tokenRecibido = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
+if (!$tokenSesion || !$tokenRecibido || !hash_equals($tokenSesion, $tokenRecibido)) {
+    http_response_code(403);
+    echo json_encode(["success" => false, "message" => "Token CSRF inválido."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$pedido_id = $_POST["pedido_id"] ?? null;
+$nuevo_estado = $_POST["nuevo_estado"] ?? null;
+$estado_pago_recibido = $_POST["esta_pago"] ?? $_POST["estado_pago"] ?? null;
 
 if (!$pedido_id) {// Validar que se reciba el ID del pedido
 
