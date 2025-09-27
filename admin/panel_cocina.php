@@ -10,7 +10,11 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 <style>
   tr.en-camino {
-    background-color: #fff3cd !important;
+    background-color: #f4e3b6 !important;
+  }
+
+  body.admin-dark tr.en-camino {
+    background-color: rgba(191, 148, 57, 0.28) !important;
   }
 
   .camion-icono {

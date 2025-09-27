@@ -252,8 +252,53 @@ include("../../templates/header.php");
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+  const chartRegistry = [];
+
+function getChartThemeColors() {
+  const isDark = document.body.classList.contains('admin-dark');
+  return {
+    text: isDark ? '#e8ecf4' : '#212529',
+    grid: isDark ? 'rgba(232, 236, 244, 0.18)' : 'rgba(33, 37, 41, 0.12)'
+  };
+}
+
+function applyChartTheme(chart) {
+  const { text, grid } = getChartThemeColors();
+
+  if (chart.options.plugins?.legend?.labels) {
+    chart.options.plugins.legend.labels.color = text;
+  }
+
+  if (chart.options.plugins?.title) {
+    chart.options.plugins.title.color = text;
+  }
+
+  if (chart.options.scales) {
+    Object.values(chart.options.scales).forEach(axis => {
+      if (axis.ticks) {
+        axis.ticks.color = text;
+      }
+      if (axis.grid) {
+        axis.grid.color = grid;
+      }
+    });
+  }
+
+  chart.update('none');
+}
+
+function registerChart(chart) {
+  chartRegistry.push(chart);
+  applyChartTheme(chart);
+}
+
+document.addEventListener('theme:changed', function () {
+  chartRegistry.forEach(applyChartTheme);
+});
+
+
 const ctx1 = document.getElementById('productosChart').getContext('2d');
-new Chart(ctx1, {
+const productosChart = new Chart(ctx1, {
   type: 'pie',
   data: {
     labels: <?= $productos_labels ?>,
@@ -264,12 +309,19 @@ new Chart(ctx1, {
   },
   options: {
     responsive: true,
-    plugins: { legend: { position: 'bottom' } }
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          color: '#212529'
+        }
+      }
+    }
   }
 });
 
 const ctx2 = document.getElementById('ventasChart').getContext('2d');
-new Chart(ctx2, {
+const ventasChart = new Chart(ctx2, {
   type: 'bar',
   data: {
     labels: <?= $meses ?>,
@@ -281,9 +333,37 @@ new Chart(ctx2, {
   },
   options: {
     responsive: true,
-    scales: { y: { beginAtZero: true } }
+    plugins: {
+      legend: {
+        labels: {
+          color: '#212529'
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          color: '#212529'
+        },
+        grid: {
+          color: 'rgba(33, 37, 41, 0.12)'
+        }
+      },
+      y: {
+        beginAtZero: true,
+        ticks: {
+          color: '#212529'
+        },
+        grid: {
+          color: 'rgba(33, 37, 41, 0.12)'
+        }
+      }
+    }
   }
 });
+
+registerChart(productosChart);
+registerChart(ventasChart);
 </script>
 
 <?php include("../../templates/footer.php"); ?>

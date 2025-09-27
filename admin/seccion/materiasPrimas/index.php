@@ -47,20 +47,36 @@ include("../../templates/header.php");
 
 <style>
   .stock-bajo {
-    background-color: #fff3cd !important;
-    color: #856404;
-    font-weight: bold;
+    background-color: #f3e4c2 !important;
+    color: #6d5310;
+    font-weight: 600;
   }
 
   .stock-cero {
-    background-color: #f8d7da !important;
-    color: #721c24;
-    font-weight: bold;
+    background-color: #f4ccd2 !important;
+    color: #8a3d47;
+    font-weight: 600;
   }
 
   .stock-ok {
-    background-color: #d4edda !important;
-    color: #155724;
+    background-color: #d6ebde !important;
+    color: #2f6543;
+    font-weight: 500;
+  }
+
+  body.admin-dark .stock-bajo {
+    background-color: rgba(173, 137, 57, 0.32) !important;
+    color: #f3dba2;
+  }
+
+  body.admin-dark .stock-cero {
+    background-color: rgba(172, 63, 72, 0.33) !important;
+    color: #f5b8c1;
+  }
+
+  body.admin-dark .stock-ok {
+    background-color: rgba(61, 122, 87, 0.32) !important;
+    color: #bce6ce;
   }
 
   .table td, .table th {

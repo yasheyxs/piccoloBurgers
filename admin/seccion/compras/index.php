@@ -205,6 +205,50 @@ include("../../templates/header.php");
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+  const chartRegistry = [];
+
+  function getChartThemeColors() {
+    const isDark = document.body.classList.contains('admin-dark');
+    return {
+      text: isDark ? '#e8ecf4' : '#212529',
+      grid: isDark ? 'rgba(232, 236, 244, 0.18)' : 'rgba(33, 37, 41, 0.12)'
+    };
+  }
+
+  function applyChartTheme(chart) {
+    const { text, grid } = getChartThemeColors();
+
+    if (chart.options.plugins?.legend?.labels) {
+      chart.options.plugins.legend.labels.color = text;
+    }
+
+    if (chart.options.plugins?.title) {
+      chart.options.plugins.title.color = text;
+    }
+
+    if (chart.options.scales) {
+      Object.values(chart.options.scales).forEach(axis => {
+        if (axis.ticks) {
+          axis.ticks.color = text;
+        }
+        if (axis.grid) {
+          axis.grid.color = grid;
+        }
+      });
+    }
+
+    chart.update('none');
+  }
+
+  function registerChart(chart) {
+    chartRegistry.push(chart);
+    applyChartTheme(chart);
+  }
+
+  document.addEventListener('theme:changed', function () {
+    chartRegistry.forEach(applyChartTheme);
+  });
+
   $(document).ready(function () {
     $('#tablaCompras').DataTable({
       paging: true,
@@ -228,7 +272,7 @@ include("../../templates/header.php");
       }
     });
 
-    new Chart(document.getElementById('graficoProveedores'), {
+    const graficoProveedores = new Chart(document.getElementById('graficoProveedores'), {
       type: 'bar',
       data: {
         labels: <?= $labels_prov ?>,
@@ -240,13 +284,36 @@ include("../../templates/header.php");
       },
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              color: '#212529'
+            }
+          }
+        },
         scales: {
-          y: { beginAtZero: true }
+          x: {
+            ticks: {
+              color: '#212529'
+            },
+            grid: {
+              color: 'rgba(33, 37, 41, 0.12)'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: '#212529'
+            },
+            grid: {
+              color: 'rgba(33, 37, 41, 0.12)'
+            }
+          }
         }
       }
     });
 
-    new Chart(document.getElementById('graficoMaterias'), {
+    const graficoMaterias = new Chart(document.getElementById('graficoMaterias'), {
       type: 'pie',
       data: {
         labels: <?= $labels_mat ?>,
@@ -258,9 +325,19 @@ include("../../templates/header.php");
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#212529'
+            }
+          }
+        }
       }
     });
+    registerChart(graficoProveedores);
+    registerChart(graficoMaterias);
   });
 </script>
 
