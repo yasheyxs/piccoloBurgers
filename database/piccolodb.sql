@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.2
 -- https://www.phpmyadmin.net/
 --
--- Host: 127.0.0.1
--- Generation Time: Sep 16, 2025 at 11:12 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Host: mysql
+-- Generation Time: Sep 27, 2025 at 07:01 PM
+-- Server version: 8.0.43
+-- PHP Version: 8.2.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -28,10 +28,10 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `tbl_banners` (
-  `ID` int(11) NOT NULL,
-  `titulo` varchar(255) NOT NULL,
-  `descripcion` varchar(255) NOT NULL,
-  `link` varchar(255) NOT NULL
+  `ID` int NOT NULL,
+  `titulo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `link` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -48,14 +48,14 @@ INSERT INTO `tbl_banners` (`ID`, `titulo`, `descripcion`, `link`) VALUES
 --
 
 CREATE TABLE `tbl_clientes` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `telefono` varchar(255) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `password` varchar(255) NOT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp(),
-  `puntos` int(11) DEFAULT 0,
-  `reset_token` varchar(255) DEFAULT NULL,
+  `ID` int NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `puntos` int DEFAULT '0',
+  `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -80,10 +80,10 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 --
 
 CREATE TABLE `tbl_comentarios` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `correo` varchar(255) NOT NULL,
-  `mensaje` varchar(255) NOT NULL
+  `ID` int NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `correo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `mensaje` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -103,9 +103,9 @@ INSERT INTO `tbl_comentarios` (`ID`, `nombre`, `correo`, `mensaje`) VALUES
 --
 
 CREATE TABLE `tbl_compras` (
-  `ID` int(11) NOT NULL,
+  `ID` int NOT NULL,
   `fecha` date NOT NULL,
-  `proveedor_id` int(11) NOT NULL
+  `proveedor_id` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -130,9 +130,9 @@ INSERT INTO `tbl_compras` (`ID`, `fecha`, `proveedor_id`) VALUES
 --
 
 CREATE TABLE `tbl_compras_detalle` (
-  `ID` int(11) NOT NULL,
-  `compra_id` int(11) NOT NULL,
-  `materia_prima_id` int(11) NOT NULL,
+  `ID` int NOT NULL,
+  `compra_id` int NOT NULL,
+  `materia_prima_id` int NOT NULL,
   `cantidad` decimal(10,0) NOT NULL,
   `precio_unitario` decimal(10,0) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -164,12 +164,12 @@ INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `canti
 --
 
 CREATE TABLE `tbl_materias_primas` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `unidad_medida` varchar(50) NOT NULL,
+  `ID` int NOT NULL,
+  `nombre` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `unidad_medida` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
   `cantidad` decimal(10,2) NOT NULL,
-  `proveedor_id` int(11) NOT NULL,
-  `unidades_por_pack` int(11) NOT NULL DEFAULT 1,
+  `proveedor_id` int NOT NULL,
+  `unidades_por_pack` int NOT NULL DEFAULT '1',
   `stock_minimo` decimal(10,2) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -241,13 +241,13 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 --
 
 CREATE TABLE `tbl_menu` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `ingredientes` varchar(255) NOT NULL,
-  `foto` varchar(255) NOT NULL,
-  `precio` varchar(255) NOT NULL,
-  `categoria` varchar(30) NOT NULL DEFAULT 'General',
-  `visible_en_menu` tinyint(1) DEFAULT 1
+  `ID` int NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `ingredientes` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `foto` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `precio` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `categoria` varchar(30) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'General',
+  `visible_en_menu` tinyint(1) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -320,9 +320,9 @@ INSERT INTO `tbl_menu` (`ID`, `nombre`, `ingredientes`, `foto`, `precio`, `categ
 --
 
 CREATE TABLE `tbl_menu_materias_primas` (
-  `ID` int(11) NOT NULL,
-  `menu_id` int(11) NOT NULL,
-  `materia_prima_id` int(11) NOT NULL,
+  `ID` int NOT NULL,
+  `menu_id` int NOT NULL,
+  `materia_prima_id` int NOT NULL,
   `cantidad` decimal(10,4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -578,60 +578,61 @@ INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `ca
 --
 
 CREATE TABLE `tbl_pedidos` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
-  `telefono` varchar(255) NOT NULL,
-  `email` varchar(255) DEFAULT NULL,
-  `nota` text DEFAULT NULL,
+  `ID` int NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `nota` text COLLATE utf8mb4_general_ci,
   `total` decimal(10,0) NOT NULL,
-  `fecha` datetime NOT NULL DEFAULT current_timestamp(),
-  `metodo_pago` varchar(255) NOT NULL,
-  `tipo_entrega` varchar(255) NOT NULL,
-  `direccion` varchar(255) DEFAULT NULL,
-  `estado` varchar(20) NOT NULL DEFAULT 'En preparación',
-  `cliente_id` int(11) DEFAULT NULL,
-  `referencias` varchar(255) DEFAULT NULL
+  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `metodo_pago` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_entrega` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `direccion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `estado` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'En preparación',
+  `cliente_id` int DEFAULT NULL,
+  `referencias` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `esta_pago` enum('''No''','''Si''') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '''No'''
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_pedidos`
 --
 
-INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`, `referencias`) VALUES
-(67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL),
-(69, 'Yass', '123', '', '', 16600, '2025-09-01 22:33:41', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL),
-(70, 'Yass', '123', '', 'Todo sin aderezo', 66500, '2025-09-02 04:40:37', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL),
-(71, 'Juana', '123', '', '', 21200, '2025-09-03 19:14:42', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL),
-(72, 'Yass', '123', '', '', 1500, '2025-09-03 19:18:38', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL),
-(73, 'Yass', '123', '', '', 1500, '2025-09-03 22:02:59', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL),
-(74, 'Yass', '123', '', '', 3000, '2025-09-03 22:11:49', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(75, 'Yass', '123', '', '', 22000, '2025-09-03 22:12:08', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL),
-(76, 'Yass', '123', '', '', 1500, '2025-09-03 22:15:01', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(77, 'Yass', '123', '', '', 11000, '2025-09-03 22:16:35', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(78, 'Yass', '123', '', '', 22500, '2025-09-03 22:19:22', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(79, 'Yass', '123', '', '', 7000, '2025-09-03 22:20:56', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(80, 'Yass', '123', '', '', 21000, '2025-09-03 22:22:56', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(81, 'Yass', '123', '', '', 13000, '2025-09-03 22:25:34', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(82, 'Yass', '123', '', '', 10000, '2025-09-03 22:27:54', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(83, 'Yass', '123', '', '', 1500, '2025-09-03 22:29:04', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(84, 'Yass', '123', '', '', 4500, '2025-09-03 22:30:02', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(85, 'Yass', '123', '', '', 4500, '2025-09-03 22:31:09', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL),
-(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL),
-(88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL),
-(89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL),
-(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL),
-(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'Cancelado', 5, NULL),
-(92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL),
-(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'Cancelado', 5, NULL),
-(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5, NULL),
-(95, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 20:47:11', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL),
-(96, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 21:30:08', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL),
-(97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL),
-(98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL),
-(99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL),
-(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh');
+INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`, `referencias`, `esta_pago`) VALUES
+(67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
+(69, 'Yass', '123', '', '', 16600, '2025-09-01 22:33:41', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
+(70, 'Yass', '123', '', 'Todo sin aderezo', 66500, '2025-09-02 04:40:37', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, '\'No\''),
+(71, 'Juana', '123', '', '', 21200, '2025-09-03 19:14:42', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, '\'No\''),
+(72, 'Yass', '123', '', '', 1500, '2025-09-03 19:18:38', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
+(73, 'Yass', '123', '', '', 1500, '2025-09-03 22:02:59', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
+(74, 'Yass', '123', '', '', 3000, '2025-09-03 22:11:49', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(75, 'Yass', '123', '', '', 22000, '2025-09-03 22:12:08', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
+(76, 'Yass', '123', '', '', 1500, '2025-09-03 22:15:01', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(77, 'Yass', '123', '', '', 11000, '2025-09-03 22:16:35', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(78, 'Yass', '123', '', '', 22500, '2025-09-03 22:19:22', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(79, 'Yass', '123', '', '', 7000, '2025-09-03 22:20:56', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(80, 'Yass', '123', '', '', 21000, '2025-09-03 22:22:56', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(81, 'Yass', '123', '', '', 13000, '2025-09-03 22:25:34', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(82, 'Yass', '123', '', '', 10000, '2025-09-03 22:27:54', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(83, 'Yass', '123', '', '', 1500, '2025-09-03 22:29:04', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(84, 'Yass', '123', '', '', 4500, '2025-09-03 22:30:02', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(85, 'Yass', '123', '', '', 4500, '2025-09-03 22:31:09', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
+(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
+(88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
+(89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
+(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
+(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'Cancelado', 5, NULL, '\'No\''),
+(92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL, '\'No\''),
+(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'Cancelado', 5, NULL, '\'No\''),
+(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5, NULL, '\'No\''),
+(95, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 20:47:11', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, '\'No\''),
+(96, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 21:30:08', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, '\'No\''),
+(97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
+(98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
+(99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, '\'No\''),
+(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', '\'No\'');
 
 -- --------------------------------------------------------
 
@@ -640,12 +641,12 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 --
 
 CREATE TABLE `tbl_pedidos_detalle` (
-  `ID` int(11) NOT NULL,
-  `pedido_id` int(11) NOT NULL,
-  `producto_id` int(11) NOT NULL,
-  `nombre` varchar(255) NOT NULL,
+  `ID` int NOT NULL,
+  `pedido_id` int NOT NULL,
+  `producto_id` int NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
   `precio` decimal(10,0) NOT NULL,
-  `cantidad` int(11) NOT NULL DEFAULT 1
+  `cantidad` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -716,10 +717,10 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 --
 
 CREATE TABLE `tbl_proveedores` (
-  `ID` int(11) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
-  `telefono` varchar(50) NOT NULL,
-  `email` varchar(100) DEFAULT NULL
+  `ID` int NOT NULL,
+  `nombre` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -743,9 +744,9 @@ INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
 --
 
 CREATE TABLE `tbl_testimonios` (
-  `ID` int(11) NOT NULL,
-  `opinion` varchar(255) NOT NULL,
-  `nombre` varchar(255) NOT NULL
+  `ID` int NOT NULL,
+  `opinion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -765,12 +766,12 @@ INSERT INTO `tbl_testimonios` (`ID`, `opinion`, `nombre`) VALUES
 --
 
 CREATE TABLE `tbl_usuarios` (
-  `ID` int(11) NOT NULL,
-  `usuario` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `correo` varchar(255) NOT NULL,
-  `rol` enum('admin','empleado','delivery') NOT NULL DEFAULT 'empleado',
-  `reset_token` varchar(255) DEFAULT NULL,
+  `ID` int NOT NULL,
+  `usuario` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `correo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `rol` enum('admin','empleado','delivery') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'empleado',
+  `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -789,22 +790,13 @@ INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset
 -- (See below for the actual view)
 --
 CREATE TABLE `vw_stock_materias_primas` (
-`ID` int(11)
+`ID` int
 ,`nombre` varchar(50)
-,`unidad_medida` varchar(50)
 ,`stock_pack` decimal(10,2)
-,`unidades_por_pack` int(11)
 ,`stock_unidades_estimado` decimal(20,2)
+,`unidad_medida` varchar(50)
+,`unidades_por_pack` int
 );
-
--- --------------------------------------------------------
-
---
--- Structure for view `vw_stock_materias_primas`
---
-DROP TABLE IF EXISTS `vw_stock_materias_primas`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_stock_materias_primas`  AS SELECT `mp`.`ID` AS `ID`, `mp`.`nombre` AS `nombre`, `mp`.`unidad_medida` AS `unidad_medida`, `mp`.`cantidad` AS `stock_pack`, `mp`.`unidades_por_pack` AS `unidades_por_pack`, `mp`.`cantidad`* `mp`.`unidades_por_pack` AS `stock_unidades_estimado` FROM `tbl_materias_primas` AS `mp` ;
 
 --
 -- Indexes for dumped tables
@@ -903,79 +895,88 @@ ALTER TABLE `tbl_usuarios`
 -- AUTO_INCREMENT for table `tbl_banners`
 --
 ALTER TABLE `tbl_banners`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `tbl_clientes`
 --
 ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbl_comentarios`
 --
 ALTER TABLE `tbl_comentarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tbl_compras`
 --
 ALTER TABLE `tbl_compras`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `tbl_compras_detalle`
 --
 ALTER TABLE `tbl_compras_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `tbl_materias_primas`
 --
 ALTER TABLE `tbl_materias_primas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
 
 --
 -- AUTO_INCREMENT for table `tbl_menu`
 --
 ALTER TABLE `tbl_menu`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `tbl_menu_materias_primas`
 --
 ALTER TABLE `tbl_menu_materias_primas`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
 --
 ALTER TABLE `tbl_proveedores`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
 --
 ALTER TABLE `tbl_testimonios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `tbl_usuarios`
 --
 ALTER TABLE `tbl_usuarios`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `vw_stock_materias_primas`
+--
+DROP TABLE IF EXISTS `vw_stock_materias_primas`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_stock_materias_primas`  AS SELECT `mp`.`ID` AS `ID`, `mp`.`nombre` AS `nombre`, `mp`.`unidad_medida` AS `unidad_medida`, `mp`.`cantidad` AS `stock_pack`, `mp`.`unidades_por_pack` AS `unidades_por_pack`, (`mp`.`cantidad` * `mp`.`unidades_por_pack`) AS `stock_unidades_estimado` FROM `tbl_materias_primas` AS `mp` ;
 
 --
 -- Constraints for dumped tables
