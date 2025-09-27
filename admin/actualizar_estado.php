@@ -165,6 +165,25 @@ if (!$pedido_id) {// Validar que se reciba el ID del pedido
 }
 
 $pedido_id = intval($pedido_id);
+
+try {
+    $stmtPedido = $conexion->prepare('SELECT estado, tipo_entrega FROM tbl_pedidos WHERE ID = ? LIMIT 1');
+    $stmtPedido->execute([$pedido_id]);
+    $pedidoActual = $stmtPedido->fetch(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+    http_response_code(500);
+    echo json_encode(["success" => false, "message" => "No se pudo obtener la información del pedido."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+if (!$pedidoActual) {
+    echo json_encode(["success" => false, "message" => "El pedido indicado no existe."], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$estadoActual = $pedidoActual['estado'] ?? '';
+$tipoEntregaActual = $pedidoActual['tipo_entrega'] ?? '';
+
 $estados_validos = ["En preparación", "Listo", "En camino", "Entregado", "Cancelado"];
 $actualizaciones = [];
 $valores = [];
@@ -174,6 +193,11 @@ if ($nuevo_estado !== null) {
     $estados_validos = ["En preparación", "Listo", "En camino", "Entregado", "Cancelado"];
     if (!in_array($nuevo_estado, $estados_validos, true)) {
         echo json_encode(["success" => false, "message" => "Estado inválido."]);
+        exit;
+    }
+
+    if ($nuevo_estado === 'Listo' && $estadoActual === 'En camino' && $tipoEntregaActual === 'Delivery' && $rol !== 'delivery') {
+        echo json_encode(["success" => false, "message" => "Solo el personal de delivery puede marcar como listo un pedido en camino."], JSON_UNESCAPED_UNICODE);
         exit;
     }
 

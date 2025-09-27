@@ -59,6 +59,8 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
               $estadoPago = $estadoPagoNormalizado === 'si' ? 'Si' : 'No';
               $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
 
+              $mostrarBotonListo = !($pedido['estado'] === 'En camino' && $pedido['tipo_entrega'] === 'Delivery');
+
               ?>
               <tr data-pedido-id="<?= $pedido['ID'] ?>" class="<?= $pedido['estado'] === 'En camino' ? 'en-camino' : '' ?>">
                 <td><?= htmlspecialchars($pedido['nombre']) ?></td>
@@ -92,8 +94,9 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                     <?php if ($pedido['estado'] === 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
                       <span class="camion-icono">🚚</span>
                     <?php endif; ?>
-                    <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
-                    <?php if ($pedido['estado'] !== 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
+                    <?php if ($mostrarBotonListo): ?>
+                      <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
+                    <?php endif; ?> <?php if ($pedido['estado'] !== 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
                       <button class="btn btn-warning btn-sm btn-estado" data-estado="En camino" data-id="<?= $pedido['ID'] ?>">En camino</button>
                     <?php endif; ?>
                     <button class="btn btn-danger btn-sm btn-estado" data-estado="Cancelado" data-id="<?= $pedido['ID'] ?>">Cancelar</button>
@@ -114,7 +117,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     initDataTable('#tabla-pedidos');
   });
 
-   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
 
   function agregarProtecciones(formData) {
     if (!csrfToken) {
