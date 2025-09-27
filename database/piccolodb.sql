@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Sep 27, 2025 at 09:15 PM
+-- Generation Time: Sep 27, 2025 at 10:35 PM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -752,14 +752,6 @@ CREATE TABLE `tbl_reservas_virtuales` (
   `actualizado_en` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `tbl_reservas_virtuales`
---
-
-INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
-(1, 'hln2oi1c76hheid1fe5c910blt', 40, 2, '2025-09-27 21:05:10'),
-(3, 'hln2oi1c76hheid1fe5c910blt', 39, 1, '2025-09-27 20:59:50');
-
 -- --------------------------------------------------------
 
 --
@@ -992,7 +984,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
