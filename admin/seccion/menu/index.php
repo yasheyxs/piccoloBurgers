@@ -112,7 +112,7 @@ include("../../templates/header.php");
         language: {
           emptyTable: "No hay registros de menú",
           search: "Buscar:",
-          lengthMenu: "Mostrar _MENU_ registros por página",
+          lengthMenu: "Mostrar registros: _MENU_",
           info: "Mostrando _START_ a _END_ de _TOTAL_ registros",
           infoEmpty: "Sin registros disponibles",
           paginate: {

@@ -118,6 +118,7 @@ include("../../templates/header.php");
 ?>
 
 <!-- Tabla de compras -->
+ <div class="card mb-4">
 <div class="card">
   <div class="card-header">
     <a class="btn btn-primary" href="crear.php" role="button">Registrar nueva compra</a>
@@ -153,6 +154,7 @@ include("../../templates/header.php");
       </table>
     </div>
   </div>
+</div>
 </div>
 
 <!-- Métricas -->
