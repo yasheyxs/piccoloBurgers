@@ -45,24 +45,26 @@ if (isset($intencion_categoria[$busqueda])) {
 $excluir_lata = ($busqueda === "botella");
 
 // Construir condiciones
-$condiciones = ["visible_en_menu = 1"];
+$condiciones = ["m.visible_en_menu = 1"];
+
 $parametros = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $condiciones[] = "categoria = ?";
+    $condiciones[] = "m.categoria = ?";
+
   $parametros[] = $categoria;
 }
 
 $busquedaCondiciones = [];
 if ($busqueda !== '') {
-  $busquedaCondiciones[] = "(LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ? OR LOWER(categoria) LIKE ?)";
+  $busquedaCondiciones[] = "(LOWER(m.nombre) LIKE ? OR LOWER(m.ingredientes) LIKE ? OR LOWER(m.categoria) LIKE ?)";
   $parametros[] = "%$busqueda%";
   $parametros[] = "%$busqueda%";
   $parametros[] = "%$busqueda%";
 }
 
 if ($extra !== '') {
-  $busquedaCondiciones[] = "(LOWER(nombre) LIKE ? OR LOWER(ingredientes) LIKE ?)";
+  $busquedaCondiciones[] = "(LOWER(m.nombre) LIKE ? OR LOWER(m.ingredientes) LIKE ?)";
   $parametros[] = "%$extra%";
   $parametros[] = "%$extra%";
 }
@@ -72,29 +74,47 @@ if (!empty($busquedaCondiciones)) {
 }
 
 if ($excluir_lata) {
-  $condiciones[] = "LOWER(ingredientes) NOT LIKE ?";
+  $condiciones[] = "LOWER(m.ingredientes) NOT LIKE ?";
   $parametros[] = "%lata%";
 }
 
 // Consulta total
-$sqlTotal = "SELECT COUNT(DISTINCT ID) FROM tbl_menu WHERE " . implode(" AND ", $condiciones);
+$sqlTotal = "SELECT COUNT(DISTINCT m.ID) FROM tbl_menu m WHERE " . implode(" AND ", $condiciones);
 $stmTotal = $conexion->prepare($sqlTotal);
 $stmTotal->execute($parametros);
 $totalItems = $stmTotal->fetchColumn();
 
 // Consulta principal
-$sql = "SELECT DISTINCT * FROM tbl_menu WHERE " . implode(" AND ", $condiciones);
+$sql = "SELECT
+    m.*,
+    CASE
+      WHEN EXISTS (
+        SELECT 1
+        FROM tbl_menu_materias_primas mp
+        INNER JOIN tbl_materias_primas mat ON mat.ID = mp.materia_prima_id
+        WHERE mp.menu_id = m.ID
+          AND (
+            mp.cantidad IS NULL
+            OR mp.cantidad <= 0
+            OR mat.cantidad < mp.cantidad
+          )
+      )
+      THEN 0
+      ELSE 1
+    END AS stock_disponible
+  FROM tbl_menu m
+  WHERE " . implode(" AND ", $condiciones);
 
 // Ordenamiento
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $sql .= " ORDER BY ID DESC";
+  $sql .= " ORDER BY m.ID DESC";
 } else {
   $case = "CASE";
   foreach ($categorias_disponibles as $i => $cat) {
-    $case .= " WHEN categoria = " . $conexion->quote($cat) . " THEN " . ($i + 1);
+    $case .= " WHEN m.categoria = " . $conexion->quote($cat) . " THEN " . ($i + 1);
   }
   $case .= " ELSE " . (count($categorias_disponibles) + 1) . " END";
-  $sql .= " ORDER BY $case, nombre ASC";
+  $sql .= " ORDER BY $case, m.nombre ASC";
 }
 
 $sql .= " LIMIT $limit OFFSET $offset";
@@ -113,12 +133,13 @@ foreach ($lista_menu as $registro): ?>
         <p class="card-text small"><strong><?= htmlspecialchars($registro["ingredientes"]) ?></strong></p>
         <p class="card-text"><strong>Precio:</strong> $<?= htmlspecialchars($registro["precio"]) ?></p>
         <p class="card-text"><small><em><?= htmlspecialchars($registro["categoria"] ?? '') ?></em></small></p>
-        <button class="btn btn-agregar mt-auto"
+        <?php $hayStock = !empty($registro['stock_disponible']); ?>
+        <button class="btn btn-agregar mt-auto<?= $hayStock ? '' : ' btn-sin-stock' ?>"<?= $hayStock ? '' : ' disabled' ?>
           data-id="<?= htmlspecialchars($registro['ID']) ?>"
           data-nombre="<?= htmlspecialchars($registro['nombre']) ?>"
           data-precio="<?= htmlspecialchars($registro['precio']) ?>"
           data-img="img/menu/<?= htmlspecialchars($registro['foto']) ?>">
-          Agregar
+          <?= $hayStock ? 'Agregar' : 'Sin stock' ?>
         </button>
       </div>
     </div>

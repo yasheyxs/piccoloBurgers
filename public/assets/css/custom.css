@@ -286,6 +286,22 @@
       background-color: var(--gold-hover);
       transform: scale(1.05);
     }
+
+    .btn-agregar.btn-sin-stock,
+    .btn-agregar:disabled,
+    .btn-agregar[disabled] {
+      background-color: #6c757d;
+      color: #e9ecef;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-agregar.btn-sin-stock:hover,
+    .btn-agregar:disabled:hover,
+    .btn-agregar[disabled]:hover {
+      background-color: #6c757d;
+      transform: none;
+    }
+
     /* Hero */
     .hero {
       background: radial-gradient(circle at top left, #2c2c2c 0%, #1a1a1a 100%);
