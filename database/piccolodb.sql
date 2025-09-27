@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Sep 27, 2025 at 07:01 PM
+-- Generation Time: Sep 27, 2025 at 09:15 PM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -71,7 +71,8 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 (6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
 (7, 'Prueba', '+541234567890', '', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
 (8, 'Uu', '+541231231231', '', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
-(9, 'Cliente', '+541234512345', '', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL);
+(9, 'Cliente', '+541234512345', '', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL),
+(10, 'Esta es una prueba', '+541234123412', '1234123412@gmail.com', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -632,7 +633,7 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
 (98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
 (99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, '\'No\''),
-(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', '\'No\'');
+(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', '\'Si\'');
 
 -- --------------------------------------------------------
 
@@ -740,6 +741,28 @@ INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_reservas_virtuales`
+--
+
+CREATE TABLE `tbl_reservas_virtuales` (
+  `ID` int NOT NULL,
+  `session_id` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `menu_id` int NOT NULL,
+  `cantidad` int NOT NULL,
+  `actualizado_en` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_reservas_virtuales`
+--
+
+INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
+(1, 'hln2oi1c76hheid1fe5c910blt', 40, 2, '2025-09-27 21:05:10'),
+(3, 'hln2oi1c76hheid1fe5c910blt', 39, 1, '2025-09-27 20:59:50');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_testimonios`
 --
 
@@ -781,7 +804,7 @@ CREATE TABLE `tbl_usuarios` (
 
 INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
 (4, 'Delivery', '202cb962ac59075b964b07152d234b70', 'delivery@gmail.com', 'delivery', NULL, NULL),
-(5, 'Usuario', 'c702aebe2d2a9bcea7cc6e72a52206cc', 'Usuario@usuario.com', 'admin', NULL, NULL);
+(5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'Usuario@usuario.com', 'admin', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -876,6 +899,14 @@ ALTER TABLE `tbl_proveedores`
   ADD PRIMARY KEY (`ID`);
 
 --
+-- Indexes for table `tbl_reservas_virtuales`
+--
+ALTER TABLE `tbl_reservas_virtuales`
+  ADD PRIMARY KEY (`ID`),
+  ADD UNIQUE KEY `session_menu_unique` (`session_id`,`menu_id`),
+  ADD KEY `menu_id` (`menu_id`);
+
+--
 -- Indexes for table `tbl_testimonios`
 --
 ALTER TABLE `tbl_testimonios`
@@ -901,7 +932,7 @@ ALTER TABLE `tbl_banners`
 -- AUTO_INCREMENT for table `tbl_clientes`
 --
 ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `tbl_comentarios`
@@ -958,6 +989,12 @@ ALTER TABLE `tbl_proveedores`
   MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
+-- AUTO_INCREMENT for table `tbl_reservas_virtuales`
+--
+ALTER TABLE `tbl_reservas_virtuales`
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
 -- AUTO_INCREMENT for table `tbl_testimonios`
 --
 ALTER TABLE `tbl_testimonios`
@@ -995,6 +1032,12 @@ ALTER TABLE `tbl_menu_materias_primas`
 ALTER TABLE `tbl_pedidos_detalle`
   ADD CONSTRAINT `tbl_pedidos_detalle_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `tbl_pedidos` (`ID`) ON DELETE CASCADE,
   ADD CONSTRAINT `tbl_pedidos_detalle_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `tbl_menu` (`ID`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `tbl_reservas_virtuales`
+--
+ALTER TABLE `tbl_reservas_virtuales`
+  ADD CONSTRAINT `tbl_reservas_virtuales_menu_fk` FOREIGN KEY (`menu_id`) REFERENCES `tbl_menu` (`ID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
