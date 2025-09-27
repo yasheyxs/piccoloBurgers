@@ -1,5 +1,8 @@
 <?php
 require_once __DIR__ . '/../admin/bd.php';
+require_once __DIR__ . '/../includes/reservas_virtuales.php';
+
+iniciarSesionSiEsNecesario();
 
 $categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
 
@@ -50,7 +53,7 @@ $condiciones = ["m.visible_en_menu = 1"];
 $parametros = [];
 
 if ($categoria && in_array($categoria, $categorias_disponibles)) {
-    $condiciones[] = "m.categoria = ?";
+  $condiciones[] = "m.categoria = ?";
 
   $parametros[] = $categoria;
 }
@@ -86,22 +89,7 @@ $totalItems = $stmTotal->fetchColumn();
 
 // Consulta principal
 $sql = "SELECT
-    m.*,
-    CASE
-      WHEN EXISTS (
-        SELECT 1
-        FROM tbl_menu_materias_primas mp
-        INNER JOIN tbl_materias_primas mat ON mat.ID = mp.materia_prima_id
-        WHERE mp.menu_id = m.ID
-          AND (
-            mp.cantidad IS NULL
-            OR mp.cantidad <= 0
-            OR mat.cantidad < mp.cantidad
-          )
-      )
-      THEN 0
-      ELSE 1
-    END AS stock_disponible
+    m.*
   FROM tbl_menu m
   WHERE " . implode(" AND ", $condiciones);
 
@@ -123,6 +111,10 @@ $stmt = $conexion->prepare($sql);
 $stmt->execute($parametros);
 $lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+$idsMenus = array_map(static fn($item) => $item['ID'] ?? null, $lista_menu);
+$idsMenus = array_values(array_filter($idsMenus, static fn($id) => $id !== null));
+$disponibilidades = obtenerDisponibilidadMenu($conexion, $idsMenus);
+
 ob_start();
 foreach ($lista_menu as $registro): ?>
   <div class="col d-flex" data-aos="fade-up">
@@ -133,12 +125,15 @@ foreach ($lista_menu as $registro): ?>
         <p class="card-text small"><strong><?= htmlspecialchars($registro["ingredientes"]) ?></strong></p>
         <p class="card-text"><strong>Precio:</strong> $<?= htmlspecialchars($registro["precio"]) ?></p>
         <p class="card-text"><small><em><?= htmlspecialchars($registro["categoria"] ?? '') ?></em></small></p>
-        <?php $hayStock = !empty($registro['stock_disponible']); ?>
-        <button class="btn btn-agregar mt-auto<?= $hayStock ? '' : ' btn-sin-stock' ?>"<?= $hayStock ? '' : ' disabled' ?>
+        <?php
+        $infoDisponibilidad = $disponibilidades[(string) $registro['ID']] ?? ['unidades_disponibles' => 0];
+        $hayStock = ($infoDisponibilidad['unidades_disponibles'] ?? 0) > 0;
+        ?> <button class="btn btn-agregar mt-auto<?= $hayStock ? '' : ' btn-sin-stock' ?>" <?= $hayStock ? '' : ' disabled' ?>
           data-id="<?= htmlspecialchars($registro['ID']) ?>"
           data-nombre="<?= htmlspecialchars($registro['nombre']) ?>"
           data-precio="<?= htmlspecialchars($registro['precio']) ?>"
-          data-img="img/menu/<?= htmlspecialchars($registro['foto']) ?>">
+          data-img="img/menu/<?= htmlspecialchars($registro['foto']) ?>"
+          data-disponibles="<?= (int) ($infoDisponibilidad['unidades_disponibles'] ?? 0) ?>">
           <?= $hayStock ? 'Agregar' : 'Sin stock' ?>
         </button>
       </div>
