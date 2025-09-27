@@ -4,23 +4,122 @@ const estadoTotalCarrito = {
   items: {},
   total: 0,
   usarPuntos: null,
+  disponibilidad: {},
 };
 
 let timeoutGuardarCarrito = null;
 
 const reservasAPI = window.CarritoReservas || null;
 
-function manejarErrorReserva(error, mensajeFallback = 'Ocurrió un error al actualizar el carrito.') {
+function normalizarClaveProducto(id) {
+  if (id === null || typeof id === "undefined") {
+    return "";
+  }
+
+  const numero = Number(id);
+  if (Number.isFinite(numero)) {
+    return String(numero);
+  }
+
+  if (typeof id === "string") {
+    const valor = id.trim();
+    return valor;
+  }
+
+  return String(id);
+}
+
+function normalizarMapaDisponibilidad(disponibilidad) {
+  const resultado = {};
+
+  if (!disponibilidad) {
+    return resultado;
+  }
+
+  const procesarEntrada = (entrada, claveFallback) => {
+    if (!entrada && entrada !== 0) {
+      return;
+    }
+
+    const idNormalizado = normalizarClaveProducto(
+      entrada?.menu_id ?? entrada?.menuId ?? entrada?.id ?? claveFallback
+    );
+
+    if (!idNormalizado) {
+      return;
+    }
+
+    const unidades = Number(
+      entrada?.unidades_disponibles ??
+        entrada?.unidadesDisponibles ??
+        entrada?.unidades ??
+        entrada
+    );
+
+    if (!Number.isFinite(unidades)) {
+      return;
+    }
+
+    resultado[idNormalizado] = Math.max(0, Math.floor(unidades));
+  };
+
+  if (Array.isArray(disponibilidad)) {
+    disponibilidad.forEach((entrada) => procesarEntrada(entrada));
+    return resultado;
+  }
+
+  Object.entries(disponibilidad).forEach(([clave, entrada]) =>
+    procesarEntrada(entrada, clave)
+  );
+
+  return resultado;
+}
+
+function actualizarDisponibilidadProductos(disponibilidad) {
+  const mapaNormalizado = normalizarMapaDisponibilidad(disponibilidad);
+  estadoTotalCarrito.disponibilidad = mapaNormalizado;
+}
+
+function obtenerUnidadesDisponiblesProducto(id) {
+  const clave = normalizarClaveProducto(id);
+  if (!clave) {
+    return null;
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      estadoTotalCarrito.disponibilidad,
+      clave
+    )
+  ) {
+    return estadoTotalCarrito.disponibilidad[clave];
+  }
+  return null;
+}
+
+function puedeIncrementarseProducto(id) {
+  const unidadesDisponibles = obtenerUnidadesDisponiblesProducto(id);
+  if (unidadesDisponibles === null) {
+    return true;
+  }
+
+  return unidadesDisponibles > 0;
+}
+
+function manejarErrorReserva(
+  error,
+  mensajeFallback = "Ocurrió un error al actualizar el carrito."
+) {
   console.error(mensajeFallback, error);
   const mensaje = error && error.message ? error.message : mensajeFallback;
   alert(mensaje);
 }
 
 function solicitarActualizacionReservas(payload, extras = {}) {
-  return fetch('api/carrito_actualizar.php', {
-    method: 'POST',
+  return fetch("api/carrito_actualizar.php", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(payload),
   })
@@ -31,21 +130,27 @@ function solicitarActualizacionReservas(payload, extras = {}) {
       return response.json();
     })
     .then((data) => {
-      if (reservasAPI && typeof reservasAPI.procesarRespuesta === 'function') {
+      if (reservasAPI && typeof reservasAPI.procesarRespuesta === "function") {
         return reservasAPI.procesarRespuesta(data, extras);
       }
 
-      if (!data || typeof data !== 'object') {
-        throw new Error('Respuesta inválida del servidor.');
+      if (!data || typeof data !== "object") {
+        throw new Error("Respuesta inválida del servidor.");
       }
 
       if (!data.exito) {
-        throw new Error(data.mensaje || 'No se pudo actualizar el carrito.');
+        throw new Error(data.mensaje || "No se pudo actualizar el carrito.");
       }
 
       return data;
     })
     .then((resultado) => {
+      if (resultado && typeof resultado === "object") {
+        if (Object.prototype.hasOwnProperty.call(resultado, "disponibilidad")) {
+          actualizarDisponibilidadProductos(resultado.disponibilidad);
+        }
+      }
+
       cargarCarrito();
       actualizarContador();
       return resultado;
@@ -53,14 +158,29 @@ function solicitarActualizacionReservas(payload, extras = {}) {
 }
 
 function sincronizarReservasIniciales() {
-  if (!reservasAPI || typeof reservasAPI.sincronizarConServidor !== 'function') {
+  if (
+    !reservasAPI ||
+    typeof reservasAPI.sincronizarConServidor !== "function"
+  ) {
     return Promise.resolve();
   }
 
   return reservasAPI
     .sincronizarConServidor()
+    .then((resultado) => {
+      if (resultado && typeof resultado === "object") {
+        if (Object.prototype.hasOwnProperty.call(resultado, "disponibilidad")) {
+          actualizarDisponibilidadProductos(resultado.disponibilidad);
+        }
+      }
+
+      return resultado;
+    })
     .catch((error) => {
-      console.error('No se pudo sincronizar el carrito con el servidor:', error);
+      console.error(
+        "No se pudo sincronizar el carrito con el servidor:",
+        error
+      );
     });
 }
 
@@ -257,12 +377,18 @@ function crearTarjetaProductoHTML(producto) {
   const subtotal = Number(producto.precio) || 0;
   const cantidad = Number(producto.cantidad) || 1;
   const precioUnitario = Number(producto.precioUnitario) || 0;
+  const unidadesDisponibles = obtenerUnidadesDisponiblesProducto(producto.id);
+  const puedeIncrementar = puedeIncrementarseProducto(producto.id);
+  const disponibilidadAttr =
+    unidadesDisponibles === null
+      ? ""
+      : ` data-unidades-disponibles="${Math.max(0, unidadesDisponibles)}"`;
 
   return `
       <div class="col d-flex" data-aos="fade-up" data-producto-id="${
         producto.id
       }">
-        <div class="card position-relative d-flex flex-column h-100 w-100">
+        <div class="card position-relative d-flex flex-column h-100 w-100"${disponibilidadAttr}>
           <img src="${producto.img}" class="card-img-top" alt="Foto de ${
     producto.nombre
   }">
@@ -276,13 +402,19 @@ function crearTarjetaProductoHTML(producto) {
               2
             )}</span></p>
             <div class="mt-auto d-flex flex-wrap gap-2">
-              <button class="btn btn-secondary" onclick="disminuirCantidad(${
+              <button type="button" class="btn btn-secondary js-btn-disminuir" onclick="disminuirCantidad(${
                 producto.id
               })">-</button>
-              <button class="btn btn-secondary" onclick="aumentarCantidad(${
-                producto.id
-              })">+</button>
-              <button class="btn btn-danger" onclick="eliminarProducto(${
+              <button type="button" class="btn btn-secondary js-btn-incrementar${
+                puedeIncrementar ? "" : " btn-disabled"
+              }" onclick="aumentarCantidad(${producto.id})"${
+    puedeIncrementar ? "" : " disabled"
+  }${
+    unidadesDisponibles === null
+      ? ""
+      : ` data-unidades-disponibles="${Math.max(0, unidadesDisponibles)}"`
+  }>+</button>
+              <button type="button" class="btn btn-danger js-btn-eliminar" onclick="eliminarProducto(${
                 producto.id
               })">Eliminar</button>
             </div>
@@ -308,9 +440,17 @@ function actualizarTarjetaProducto(producto) {
     return;
   }
 
+  const unidadesDisponibles = obtenerUnidadesDisponiblesProducto(producto.id);
+  if (unidadesDisponibles === null) {
+    delete tarjeta.dataset.unidadesDisponibles;
+  } else {
+    tarjeta.dataset.unidadesDisponibles = String(Math.max(0, unidadesDisponibles));
+  }
+
   const cantidadSpan = tarjeta.querySelector(".js-cantidad");
   const subtotalSpan = tarjeta.querySelector(".js-subtotal");
   const precioUnitarioSpan = tarjeta.querySelector(".js-precio-unitario");
+  const botonIncrementar = tarjeta.querySelector(".js-btn-incrementar");
 
   if (cantidadSpan) {
     cantidadSpan.textContent = Number(producto.cantidad || 0).toString();
@@ -323,6 +463,21 @@ function actualizarTarjetaProducto(producto) {
       producto.precioUnitario || 0
     ).toFixed(2);
   }
+
+  if (botonIncrementar) {
+    const puedeIncrementar = puedeIncrementarseProducto(producto.id);
+    botonIncrementar.disabled = !puedeIncrementar;
+    botonIncrementar.classList.toggle("btn-disabled", !puedeIncrementar);
+
+    if (unidadesDisponibles === null) {
+      botonIncrementar.removeAttribute("data-unidades-disponibles");
+    } else {
+      botonIncrementar.dataset.unidadesDisponibles = String(
+        Math.max(0, unidadesDisponibles)
+      );
+    }
+  }
+
 }
 
 function eliminarTarjetaProducto(id) {
@@ -371,7 +526,7 @@ function cargarCarrito() {
   }
 
   const items =
-    reservasAPI && typeof reservasAPI.leerCarritoDesdeStorage === 'function'
+    reservasAPI && typeof reservasAPI.leerCarritoDesdeStorage === "function"
       ? reservasAPI.leerCarritoDesdeStorage()
       : leerCarritoDesdeStorage();
   reconstruirResumenDesdeItems(items);
@@ -398,11 +553,22 @@ function aumentarCantidad(id) {
     return;
   }
 
+  if (!puedeIncrementarseProducto(id)) {
+    return;
+  }
+
+
   const extras = {};
   extras[clave] = entrada.producto;
 
-  solicitarActualizacionReservas({ action: 'increment', menuId: Number(id) }, extras).catch((error) =>
-    manejarErrorReserva(error, 'No se pudo agregar otra unidad. Verificá la disponibilidad de stock.')
+  solicitarActualizacionReservas(
+    { action: "increment", menuId: Number(id) },
+    extras
+  ).catch((error) =>
+    manejarErrorReserva(
+      error,
+      "No se pudo agregar otra unidad. Verificá la disponibilidad de stock."
+    )
   );
 }
 
@@ -413,8 +579,11 @@ function disminuirCantidad(id) {
     return;
   }
 
-  solicitarActualizacionReservas({ action: 'decrement', menuId: Number(id) }).catch((error) =>
-    manejarErrorReserva(error, 'No se pudo quitar la unidad seleccionada.')
+  solicitarActualizacionReservas({
+    action: "decrement",
+    menuId: Number(id),
+  }).catch((error) =>
+    manejarErrorReserva(error, "No se pudo quitar la unidad seleccionada.")
   );
 }
 
@@ -424,14 +593,20 @@ function eliminarProducto(id) {
   if (!entrada) {
     return;
   }
-    solicitarActualizacionReservas({ action: 'remove', menuId: Number(id) }).catch((error) =>
-    manejarErrorReserva(error, 'No se pudo eliminar el producto del carrito.')
+  const extras = {};
+  extras[clave] = entrada.producto;
+
+  solicitarActualizacionReservas(
+    { action: 'remove', menuId: Number(id) },
+    extras
+  ).catch((error) =>
+    manejarErrorReserva(error, "No se pudo eliminar el producto del carrito.")
   );
 }
 
 function vaciarCarrito() {
-  solicitarActualizacionReservas({ action: 'clear' }).catch((error) =>
-    manejarErrorReserva(error, 'No se pudo vaciar el carrito por completo.')
+  solicitarActualizacionReservas({ action: "clear" }).catch((error) =>
+    manejarErrorReserva(error, "No se pudo vaciar el carrito por completo.")
   );
 }
 
@@ -563,10 +738,10 @@ function mostrarConfirmacionCancelar() {
 }
 
 function confirmarCancelacion() {
-  solicitarActualizacionReservas({ action: 'clear' })
+  solicitarActualizacionReservas({ action: "clear" })
     .then(() => {
-      const modalElement = document.getElementById('modalCancelarPedido');
-      if (modalElement && typeof bootstrap !== 'undefined') {
+      const modalElement = document.getElementById("modalCancelarPedido");
+      if (modalElement && typeof bootstrap !== "undefined") {
         const modal = bootstrap.Modal.getInstance(modalElement);
         if (modal) {
           modal.hide();
@@ -574,7 +749,10 @@ function confirmarCancelacion() {
       }
     })
     .catch((error) =>
-      manejarErrorReserva(error, 'No se pudo cancelar el pedido en este momento.')
+      manejarErrorReserva(
+        error,
+        "No se pudo cancelar el pedido en este momento."
+      )
     );
 }
 
@@ -662,7 +840,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(() => {})
     .finally(() => {
       const totalFinal = cargarCarrito();
-      const totalSpan = document.getElementById('total');
+      const totalSpan = document.getElementById("total");
       if (totalSpan && Number.isFinite(totalFinal)) {
         totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
       }
