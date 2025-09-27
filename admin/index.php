@@ -264,65 +264,6 @@ if ($esAdminAutenticado) {
 </div>
 
 <?php if ($esAdminAutenticado) { ?>
-  <div class="container text-center mb-5">
-    <a href="<?= $url_base; ?>seccion/ventas/" class="btn btn-outline-primary btn-lg px-4">
-      Ir al panel de ventas
-    </a>
-  </div>
-
-  <div class="container metrics-section mb-5">
-    <h3 class="mb-4 text-center">📊 Resumen de ventas (mes en curso)</h3>
-
-    <?php if ($metricasVentas['error']) { ?>
-      <div class="alert alert-warning text-center" role="alert">
-        <?= htmlspecialchars($metricasVentas['error']); ?>
-      </div>
-    <?php } ?>
-
-    <div class="row g-4 justify-content-center">
-      <div class="col-md-4 col-sm-6">
-        <div class="card h-100 text-center p-4">
-          <div class="card-body">
-            <div class="metric-icon text-success">💰</div>
-            <h5 class="card-title">Total de ventas</h5>
-            <p class="display-6 fw-bold text-success mb-0">
-              $<?= number_format($metricasVentas['total_ventas'], 2); ?>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 col-sm-6">
-        <div class="card h-100 text-center p-4">
-          <div class="card-body">
-            <div class="metric-icon text-info">🧾</div>
-            <h5 class="card-title">Pedidos totales</h5>
-            <p class="display-6 fw-bold text-info mb-0">
-              <?= number_format($metricasVentas['total_pedidos']); ?>
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-md-4 col-sm-8">
-        <div class="card h-100 text-center p-4">
-          <div class="card-body">
-            <div class="metric-icon text-warning">🌟</div>
-            <h5 class="card-title">Producto estrella</h5>
-            <p class="h4 fw-bold mb-1">
-              <?= htmlspecialchars($metricasVentas['producto_estrella']['nombre']); ?>
-            </p>
-            <p class="text-muted mb-0">
-              Cantidad vendida: <?= number_format($metricasVentas['producto_estrella']['cantidad']); ?>
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-<?php } ?>
-
-<?php if ($esAdminAutenticado) { ?>
   <div class="container">
     <div class="row justify-content-center mt-3">
       <div class="col-md-6 col-lg-4">
@@ -352,7 +293,80 @@ if ($esAdminAutenticado) {
     </div>
   </div>
 <?php } ?>
+
 <br><br>
+
+<?php if ($esAdminAutenticado) { ?>
+
+  <div class="container metrics-section mb-5">
+    <h3 class="mb-4 text-center">
+      <i class="fa-solid fa-chart-column me-2" aria-hidden="true"></i>
+      Resumen de ventas (mes en curso)
+    </h3>
+
+    <?php if ($metricasVentas['error']) { ?>
+      <div class="alert alert-warning text-center" role="alert">
+        <?= htmlspecialchars($metricasVentas['error']); ?>
+      </div>
+    <?php } ?>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-success">
+              <i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
+            </div>
+            <h5 class="card-title">Total de ventas</h5>
+            <p class="display-6 fw-bold text-success mb-0">
+              $<?= number_format($metricasVentas['total_ventas'], 2); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-info">
+              <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+            </div>
+            <h5 class="card-title">Pedidos totales</h5>
+            <p class="display-6 fw-bold text-info mb-0">
+              <?= number_format($metricasVentas['total_pedidos']); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-8">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-warning">
+              <i class="fa-solid fa-star" aria-hidden="true"></i>
+            </div>
+            <h5 class="card-title">Producto estrella</h5>
+            <p class="h4 fw-bold mb-1">
+              <?= htmlspecialchars($metricasVentas['producto_estrella']['nombre']); ?>
+            </p>
+            <p class="text-muted mb-0">
+              Cantidad vendida: <?= number_format($metricasVentas['producto_estrella']['cantidad']); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<?php } ?>
+
+
+<?php if ($esAdminAutenticado) { ?>
+  <div class="container text-center my-5">
+    <a href="<?= $url_base; ?>seccion/ventas/" class="btn btn-outline-primary btn-lg px-4">
+      Ir al panel de ventas
+    </a>
+  </div>
+<?php } ?>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
