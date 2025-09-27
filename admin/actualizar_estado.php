@@ -19,6 +19,109 @@ if (empty($_SESSION['admin_usuario'])) {
 
 require_once __DIR__ . '/bd.php';
 
+function piccolo_normalizar_clave_pago(string $valor): string
+{
+    $valor = trim($valor);
+    if ($valor === '') {
+        return '';
+    }
+
+    if (function_exists('mb_strtolower')) {
+        $valor = mb_strtolower($valor, 'UTF-8');
+    } else {
+        $valor = strtolower($valor);
+    }
+
+    $valor = str_replace(
+        [
+            'á', 'à', 'ä', 'â', 'Á', 'À', 'Ä', 'Â',
+            'é', 'è', 'ë', 'ê', 'É', 'È', 'Ë', 'Ê',
+            'í', 'ì', 'ï', 'î', 'Í', 'Ì', 'Ï', 'Î',
+            'ó', 'ò', 'ö', 'ô', 'Ó', 'Ò', 'Ö', 'Ô',
+            'ú', 'ù', 'ü', 'û', 'Ú', 'Ù', 'Ü', 'Û'
+        ],
+        [
+            'a', 'a', 'a', 'a', 'a', 'a', 'a', 'a',
+            'e', 'e', 'e', 'e', 'e', 'e', 'e', 'e',
+            'i', 'i', 'i', 'i', 'i', 'i', 'i', 'i',
+            'o', 'o', 'o', 'o', 'o', 'o', 'o', 'o',
+            'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'
+        ],
+        $valor
+    );
+
+    $valor = preg_replace('/[^a-z0-9]/', '', $valor) ?? '';
+
+    return $valor;
+}
+
+function piccolo_obtener_mapa_valores_pago(PDO $conexion): array
+{
+    static $cache = null;
+
+    if ($cache !== null) {
+        return $cache;
+    }
+
+    $cache = [
+        'si' => 'Si',
+        'no' => 'No',
+    ];
+
+    try {
+        $consulta = $conexion->query("SHOW COLUMNS FROM tbl_pedidos LIKE 'esta_pago'");
+        $columna = $consulta !== false ? $consulta->fetch(PDO::FETCH_ASSOC) : false;
+
+        if ($columna && isset($columna['Type'])) {
+            if (preg_match_all("/'((?:''|[^'])*)'/", $columna['Type'], $coincidencias)) {
+                $mapa = [];
+
+                foreach ($coincidencias[1] as $valorCrudo) {
+                    $valorPermitido = str_replace("''", "'", $valorCrudo);
+                    $clave = piccolo_normalizar_clave_pago($valorPermitido);
+
+                    if ($clave !== '') {
+                        $mapa[$clave] = $valorPermitido;
+                    }
+                }
+
+                if (isset($mapa['si'], $mapa['no'])) {
+                    $cache = $mapa;
+                } else {
+                    $cache = array_merge($cache, $mapa);
+                }
+            }
+        }
+    } catch (Exception $e) {
+        // Se mantiene el valor por defecto en caso de error al consultar el esquema.
+    }
+
+    return $cache;
+}
+
+function piccolo_resolver_valor_pago(PDO $conexion, string $valorDeseado): ?string
+{
+    $clave = piccolo_normalizar_clave_pago($valorDeseado);
+    if ($clave === '') {
+        return null;
+    }
+
+    $mapa = piccolo_obtener_mapa_valores_pago($conexion);
+    if (isset($mapa[$clave])) {
+        return $mapa[$clave];
+    }
+
+    if ($clave === 'si') {
+        return 'Si';
+    }
+
+    if ($clave === 'no') {
+        return 'No';
+    }
+
+    return null;
+}
+
 try {
     $sentencia = $conexion->prepare('SELECT rol FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1');
     $sentencia->execute([':usuario' => $_SESSION['admin_usuario']]);
@@ -80,33 +183,19 @@ if ($nuevo_estado !== null) {
 
 $estado_pago = null;
 if ($estado_pago_recibido !== null) {
-    $estado_pago_recibido = trim((string)$estado_pago_recibido);
-    if ($estado_pago_recibido !== '') {
-        $estado_pago_normalizado = $estado_pago_recibido;
-        if (function_exists('mb_strtolower')) {
-            $estado_pago_normalizado = mb_strtolower($estado_pago_normalizado, 'UTF-8');
-        } else {
-            $estado_pago_normalizado = strtolower($estado_pago_normalizado);
-        }
-        $estado_pago_normalizado = str_replace('í', 'i', $estado_pago_normalizado);
-
-        if ($estado_pago_normalizado === 'si') {
-            $estado_pago = 'Si';
-        } elseif ($estado_pago_normalizado === 'no') {
-            $estado_pago = 'No';
-        } else {
-            echo json_encode(["success" => false, "message" => "Valor de pago inválido."]);
-            exit;
-        }
-        }
+    $estado_pago = piccolo_resolver_valor_pago($conexion, (string)$estado_pago_recibido);
+    if ($estado_pago === null) {
+        echo json_encode(["success" => false, "message" => "Valor de pago inválido."]);
+        exit;
+    }
 }
 
 $estado_pago_por_estado = null;
 if ($nuevo_estado !== null) {
     if (in_array($nuevo_estado, ['Listo', 'Entregado'], true)) {
-        $estado_pago_por_estado = 'Si';
+        $estado_pago_por_estado = piccolo_resolver_valor_pago($conexion, 'Si');
     } elseif ($nuevo_estado === 'Cancelado') {
-        $estado_pago_por_estado = 'No';
+        $estado_pago_por_estado = piccolo_resolver_valor_pago($conexion, 'No');
     }
 }
 
