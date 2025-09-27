@@ -16,6 +16,79 @@ $etiquetasRol = [
   'empleado' => 'Empleado',
   'delivery' => 'Delivery',
 ];
+
+$metricasVentas = [
+  'total_ventas' => 0,
+  'total_pedidos' => 0,
+  'producto_estrella' => [
+    'nombre' => 'N/A',
+    'cantidad' => 0,
+  ],
+  'error' => null,
+];
+
+if ($esAdminAutenticado) {
+  $variablesRequeridas = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD'];
+  $configuracionDisponible = array_reduce($variablesRequeridas, function ($estado, $variable) {
+    if (!$estado) {
+      return false;
+    }
+
+    $valor = getenv($variable);
+    return $valor !== false && $valor !== '';
+  }, true);
+
+  if ($configuracionDisponible) {
+    try {
+      require_once __DIR__ . '/bd.php';
+
+      $fechaInicio = date('Y-m-01');
+      $fechaFin = date('Y-m-d 23:59:59');
+
+      $stmt = $conexion->prepare("SELECT SUM(pd.precio * pd.cantidad) AS total_ventas
+          FROM tbl_pedidos_detalle pd
+          JOIN tbl_pedidos p ON pd.pedido_id = p.ID
+          WHERE p.fecha BETWEEN :inicio AND :fin");
+      $stmt->bindParam(':inicio', $fechaInicio);
+      $stmt->bindParam(':fin', $fechaFin);
+      $stmt->execute();
+      $metricasVentas['total_ventas'] = (float)($stmt->fetchColumn() ?? 0);
+
+      $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
+          FROM tbl_pedidos p
+          WHERE p.fecha BETWEEN :inicio AND :fin");
+      $stmt->bindParam(':inicio', $fechaInicio);
+      $stmt->bindParam(':fin', $fechaFin);
+      $stmt->execute();
+      $metricasVentas['total_pedidos'] = (int)($stmt->fetchColumn() ?? 0);
+
+      $stmt = $conexion->prepare("SELECT pd.nombre, SUM(pd.cantidad) AS total_vendido
+        FROM tbl_pedidos_detalle pd
+        JOIN tbl_pedidos p ON pd.pedido_id = p.ID
+        WHERE p.fecha BETWEEN :inicio AND :fin
+        GROUP BY pd.nombre
+        ORDER BY total_vendido DESC
+        LIMIT 1");
+      $stmt->bindParam(':inicio', $fechaInicio);
+      $stmt->bindParam(':fin', $fechaFin);
+      $stmt->execute();
+      $productoEstrella = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if ($productoEstrella) {
+        $metricasVentas['producto_estrella'] = [
+          'nombre' => $productoEstrella['nombre'] ?? 'N/A',
+          'cantidad' => (int)($productoEstrella['total_vendido'] ?? 0),
+        ];
+      }
+    } catch (PDOException $exception) {
+      $metricasVentas['error'] = 'No se pudieron cargar las métricas de ventas.';
+      error_log('Error en métricas del panel administrativo: ' . $exception->getMessage());
+    }
+  } else {
+    $metricasVentas['error'] = 'Configuración de base de datos no disponible para calcular métricas.';
+  }
+}
+
 ?>
 
 <style>
@@ -107,6 +180,24 @@ $etiquetasRol = [
     font-size: 0.95rem;
     color: #666 !important;
   }
+
+  .metrics-section .card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .metrics-section .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+  }
+
+  .metrics-section .metric-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+  }
+
 </style>
 
 <br />
@@ -171,6 +262,65 @@ $etiquetasRol = [
     </div>
   <?php } ?>
 </div>
+
+<?php if ($esAdminAutenticado) { ?>
+  <div class="container text-center mb-5">
+    <a href="<?= $url_base; ?>seccion/ventas/" class="btn btn-outline-primary btn-lg px-4">
+      Ir al panel de ventas
+    </a>
+  </div>
+
+  <div class="container metrics-section mb-5">
+    <h3 class="mb-4 text-center">📊 Resumen de ventas (mes en curso)</h3>
+
+    <?php if ($metricasVentas['error']) { ?>
+      <div class="alert alert-warning text-center" role="alert">
+        <?= htmlspecialchars($metricasVentas['error']); ?>
+      </div>
+    <?php } ?>
+
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-success">💰</div>
+            <h5 class="card-title">Total de ventas</h5>
+            <p class="display-6 fw-bold text-success mb-0">
+              $<?= number_format($metricasVentas['total_ventas'], 2); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-6">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-info">🧾</div>
+            <h5 class="card-title">Pedidos totales</h5>
+            <p class="display-6 fw-bold text-info mb-0">
+              <?= number_format($metricasVentas['total_pedidos']); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4 col-sm-8">
+        <div class="card h-100 text-center p-4">
+          <div class="card-body">
+            <div class="metric-icon text-warning">🌟</div>
+            <h5 class="card-title">Producto estrella</h5>
+            <p class="h4 fw-bold mb-1">
+              <?= htmlspecialchars($metricasVentas['producto_estrella']['nombre']); ?>
+            </p>
+            <p class="text-muted mb-0">
+              Cantidad vendida: <?= number_format($metricasVentas['producto_estrella']['cantidad']); ?>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<?php } ?>
 
 <?php if ($esAdminAutenticado) { ?>
   <div class="container">
