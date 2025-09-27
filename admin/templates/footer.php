@@ -12,6 +12,8 @@
   integrity="sha384-7VPbUDkoPSGFnVtYi0QogXtr74QeVeeIs99Qfg5YCF+TidwNdjvaKZX19NZ/e6oz" crossorigin="anonymous">
 </script>
 
+<script src="<?php echo $url_base; ?>assets/js/theme-toggle.js"></script>
+
 <script>
   $(document).ready(function () {
     $('table').each(function () {

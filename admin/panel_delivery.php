@@ -1,5 +1,6 @@
 <?php
 include("../admin/bd.php");
+$adminPageIdentifier = 'delivery-panel';
 include("../admin/templates/header.php");
 
 $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En camino' ORDER BY fecha DESC");
