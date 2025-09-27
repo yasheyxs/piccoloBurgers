@@ -448,6 +448,17 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     }
   }
 
+  const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+
+  function crearFormularioProtegido() {
+    if (!csrfToken) {
+      throw new Error('No se encontró el token CSRF en la página.');
+    }
+    const formData = new FormData();
+    formData.append('csrf_token', csrfToken);
+    return formData;
+  }
+
   async function marcarEntregado(pedidoId, boton) {
 
     const textoOriginal = boton.textContent;
@@ -457,7 +468,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     let pedidoActualizado = false;
 
     try {
-      const formData = new FormData();
+      const formData = crearFormularioProtegido();
       formData.append('pedido_id', pedidoId);
       formData.append('nuevo_estado', 'Listo');
 

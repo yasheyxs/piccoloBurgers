@@ -90,6 +90,7 @@ $etiquetasRol = [
     font-size: 2rem;
     font-weight: 700;
     background: linear-gradient(90deg, #ff6a00, #ee0979);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: 1rem;
@@ -179,6 +180,7 @@ $etiquetasRol = [
           <div class="card-body">
             <h5 class="card-title text-center mb-3">Cambiar vista rápida</h5>
             <form id="rolForm" class="d-grid gap-2">
+              <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8'); ?>">
               <div class="form-check">
                 <input class="form-check-input" type="radio" name="rol" id="rolAdmin" value="admin" <?= $rolActual === 'admin' ? 'checked' : '' ?>>
                 <label class="form-check-label" for="rolAdmin">Vista administrador</label>

@@ -113,9 +113,19 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     initDataTable('#tabla-pedidos');
   });
 
+   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+
+  function agregarProtecciones(formData) {
+    if (!csrfToken) {
+      throw new Error('No se encontró el token CSRF en la página.');
+    }
+    formData.append('csrf_token', csrfToken);
+    return formData;
+  }
+
   async function actualizarEstado(pedidoId, nuevoEstado, boton) {
     try {
-      const formData = new FormData();
+      const formData = agregarProtecciones(new FormData());
       formData.append('pedido_id', pedidoId);
       formData.append('nuevo_estado', nuevoEstado);
 
@@ -170,7 +180,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     selectElemento.disabled = true;
 
     try {
-      const formData = new FormData();
+      const formData = agregarProtecciones(new FormData());
       formData.append('pedido_id', pedidoId);
       formData.append('esta_pago', estadoPago);
 
