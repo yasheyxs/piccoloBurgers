@@ -13,8 +13,8 @@
 
 <body>
   <?php
-  $navBasePath = 'index.php';
-  $navHomeLink = 'index.php';
+  $navBasePath = './index.php';
+  $navHomeLink = './index.php';
   include __DIR__ . '/partials/navbar.php';
   ?>
 
