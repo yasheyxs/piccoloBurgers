@@ -11,8 +11,7 @@
 
 html {
   height: 100%;
-
-  }
+}
 
 body {
   min-height: 100vh;
@@ -23,13 +22,13 @@ body {
   background-color: var(--dark-bg);
   overflow-x: hidden;
   overflow-y: auto;
-  
-position: relative;
+  position: relative;
 }
 
+/* Fondo optimizado */
 body::before {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
   background-image: linear-gradient(
       135deg,
@@ -39,11 +38,10 @@ body::before {
     url("../../img/HamLoginCliente.jpg");
   background-size: cover;
   background-position: center;
-  opacity: 0.65;
+  opacity: 0.6;
   z-index: -1;
   pointer-events: none;
 }
-
 
 main {
   flex: 1 0 auto;
@@ -61,11 +59,10 @@ footer {
   width: 100%;
   z-index: 1000;
   --bs-bg-opacity: 0.1;
-  padding: 0 1rem; 
+  padding: 0 1rem;
   min-height: 50px;
-
   display: flex;
-  justify-content: center; 
+  justify-content: center;
   align-items: center;
 }
 
@@ -92,10 +89,11 @@ footer {
 
 .sticky-navbar.scrolled {
   background-color: rgba(17, 17, 17, 0.88);
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   border-bottom: 1px solid rgba(250, 195, 12, 0.1);
 }
 
+/* Botones */
 .btn-gold {
   background-color: var(--main-gold);
   color: #000;
@@ -134,20 +132,24 @@ footer {
   z-index: 1;
 }
 
+/* Paneles optimizados */
 .carrito-panel,
 .respedido {
   background: rgba(24, 24, 24, 0.82);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   padding: 0.5rem 1rem;
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
   margin: 0 auto;
-  margin-top: 0;
   padding-top: 30px;
   flex-grow: 1;
   position: relative;
   overflow: hidden;
   z-index: 0;
+}
+
+.respedido {
+  padding-top: 50px;
 }
 
 .carrito-panel::before,
@@ -157,11 +159,11 @@ footer {
   inset: 0;
   background: linear-gradient(
     140deg,
-    rgba(250, 195, 12, 0.08),
+    rgba(250, 195, 12, 0.06),
     rgba(255, 255, 255, 0.02) 55%,
-    rgba(0, 0, 0, 0.4)
+    rgba(0, 0, 0, 0.3)
   );
-  opacity: 0.8;
+  opacity: 0.6;
   pointer-events: none;
   z-index: 0;
 }
@@ -172,23 +174,21 @@ footer {
   z-index: 1;
 }
 
-.respedido {
-  padding-top: 50px;
-}
-
+/* Cards optimizadas */
 .card {
   position: relative;
   background: linear-gradient(
     160deg,
-    rgba(34, 34, 34, 0.92),
-    rgba(24, 24, 24, 0.78)
+    rgba(34, 34, 34, 0.9),
+    rgba(24, 24, 24, 0.75)
   );
   border-radius: 16px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   overflow: hidden;
   z-index: 0;
+  will-change: transform;
 }
 
 .card::before {
@@ -197,12 +197,12 @@ footer {
   inset: 0;
   background: linear-gradient(
     120deg,
-    rgba(250, 195, 12, 0.12),
-    rgba(255, 255, 255, 0.04) 45%,
+    rgba(250, 195, 12, 0.1),
+    rgba(255, 255, 255, 0.03) 45%,
     transparent 80%
   );
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.4;
   z-index: 0;
 }
 
@@ -212,8 +212,8 @@ footer {
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
 }
 
 .card-img-top {
@@ -222,10 +222,11 @@ footer {
   width: 100%;
   object-fit: cover;
   transition: transform 0.3s ease;
+  will-change: transform;
 }
 
 .card:hover .card-img-top {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .card-title {
@@ -264,6 +265,7 @@ footer {
   border-color: rgba(255, 255, 255, 0.1);
 }
 
+/* Botón circular */
 .btn-gold-circle {
   background-color: var(--main-gold);
   color: #000;
@@ -276,11 +278,11 @@ footer {
   align-items: center;
   justify-content: center;
   border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
   transition: all 0.3s ease;
 }
 
 .btn-gold-circle:hover {
   background-color: var(--gold-hover);
-  transform: scale(1.1);
+  transform: scale(1.08);
 }
