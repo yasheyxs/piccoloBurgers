@@ -3,7 +3,7 @@ session_start();
 require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
 require_once __DIR__ . '/../../includes/email_requirement.php';
-
+require_once __DIR__ . '/../../componentes/password_utils.php';
 
 $mensaje = "";
 
@@ -22,14 +22,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $cliente = $consulta->fetch(PDO::FETCH_ASSOC);
 
     if ($cliente) {
-      $hashAlmacenado = $cliente["password"];
-      $esHashModerno = strlen($hashAlmacenado) > 30 && str_starts_with($hashAlmacenado, '$2y$');
+      $hashAlmacenado = $cliente["password"] ?? '';
 
-      $valido = $esHashModerno
-        ? password_verify($password, $hashAlmacenado)
-        : md5($password) === $hashAlmacenado;
+      if (passwordCoincideConHash($password, $hashAlmacenado)) {
+        if (passwordDebeRehash($hashAlmacenado) && isset($cliente['ID'])) {
+          $nuevoHash = generarHashPassword($password);
 
-      if ($valido) {
+          try {
+            $actualizar = $conexion->prepare("UPDATE tbl_clientes SET password = ? WHERE ID = ?");
+            $actualizar->execute([$nuevoHash, $cliente['ID']]);
+            $hashAlmacenado = $nuevoHash;
+          } catch (Throwable $error) {
+            error_log('No se pudo actualizar el hash del cliente ' . $cliente['ID'] . ': ' . $error->getMessage());
+          }
+        }
+
+
         $_SESSION["cliente"] = [
           "id" => $cliente["ID"],
           "nombre" => $cliente["nombre"],

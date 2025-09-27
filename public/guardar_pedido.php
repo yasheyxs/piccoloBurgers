@@ -1,7 +1,6 @@
 <?php
 ob_start();
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+
 
 require_once __DIR__ . '/../admin/bd.php';
 require_once __DIR__ . '/../componentes/validar_telefono.php';
@@ -15,6 +14,8 @@ function responder_error($mensaje)
     if ($conexion instanceof PDO && $conexion->inTransaction()) {
         $conexion->rollBack();
     }
+
+    error_log('guardar_pedido.php: ' . $mensaje);
 
     if (ob_get_length()) {
         ob_end_clean();
@@ -200,10 +201,16 @@ try {
     if (ob_get_length()) {
         ob_end_clean();
     }
+    error_log(sprintf(
+        'Error al procesar el pedido en guardar_pedido.php: %s en %s:%d',
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine()
+    ));
     header('Content-Type: application/json');
     echo json_encode([
         "exito" => false,
-        "mensaje" => "Error al procesar el pedido: " . $e->getMessage()
+        "mensaje" => "Ups... hubo un inconveniente al procesar tu pedido. Por favor, intentá nuevamente más tarde."
     ]);
     exit;
 }
