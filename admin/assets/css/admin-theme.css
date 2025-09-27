@@ -559,12 +559,23 @@ body.admin-body .theme-toggle:hover i {
 }
 
 body.admin-body .theme-toggle.btn-outline-secondary {
-  border-color: var(--admin-border);
+  border-color: var(--admin-btn-outline-border);
+  background-color: var(--admin-btn-outline-surface);
+  color: var(--admin-text);
+  box-shadow: none;
+}
+
+body.admin-body .theme-toggle.btn-outline-secondary:hover,
+body.admin-body .theme-toggle.btn-outline-secondary:focus {
+  background-color: rgba(15, 23, 42, 0.08);
+  background-color: rgba(122, 176, 255, 0.12);
   color: var(--admin-text);
 }
 
-body.admin-body.admin-dark .theme-toggle.btn-outline-secondary {
-  border-color: rgba(122, 176, 255, 0.6);
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:hover,
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:focus {
+  background-color: rgba(122, 176, 255, 0.2);
+  color: #f8fafc;
   color: var(--admin-link);
 }
 
