@@ -110,10 +110,14 @@ include("../../templates/header.php");
       </div>
 
       <hr>
-      <h5>Materias primas</h5>
+      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        <h5 class="mb-0 flex-grow-1">Materias primas</h5>
+        <button type="button" class="btn btn-secondary" onclick="agregarMateria()">
+          <span class="fw-semibold">+</span> Agregar materia prima
+        </button>
+      </div>
       <div id="materias-container"></div>
-      <button type="button" class="btn btn-secondary mb-3" onclick="agregarMateria()">+ Agregar materia prima</button>
-
+      <br>
       <button type="submit" class="btn btn-success">Registrar compra</button>
       <a class="btn btn-primary" href="index.php" role="button">Cancelar</a>
     </form>
@@ -152,6 +156,12 @@ include("../../templates/header.php");
     container.appendChild(div);
     materiaIndex++;
   }
+
+  // Al cargar la página, mostrar un bloque por defecto
+  window.addEventListener("DOMContentLoaded", () => {
+    agregarMateria();
+  });
+
 </script>
 
 <?php include("../../templates/footer.php"); ?>

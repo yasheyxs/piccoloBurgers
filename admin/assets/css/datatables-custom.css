@@ -1,4 +1,8 @@
-/* Shared responsive adjustments for DataTables controls */
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_length {
+  margin-bottom: 1rem;
+}
+
 @media (max-width: 576px) {
   .dataTables_wrapper .dataTables_filter,
   .dataTables_wrapper .dataTables_length {
