@@ -60,6 +60,9 @@
     }
 
     storeTheme(theme);
+    document.dispatchEvent(new CustomEvent('theme:changed', {
+      detail: theme
+    }));
   }
 
   function handleToggleClick(event) {

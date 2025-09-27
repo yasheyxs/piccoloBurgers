@@ -143,13 +143,13 @@ if ($esAdminAutenticado) {
   }
 
   .welcome-box {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(240, 240, 240, 0.7));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(235, 239, 244, 0.76));
     border-radius: 20px;
     padding: 3rem;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     text-align: center;
     margin-bottom: 2rem;
   }
@@ -172,13 +172,28 @@ if ($esAdminAutenticado) {
   .welcome-box p {
     font-size: 1.1rem;
     line-height: 1.6;
-    color: #444;
+    color: #3a3f45;
     margin-bottom: 0.75rem;
+    transition: color 0.3s ease;
   }
 
   .welcome-box .text-muted {
     font-size: 0.95rem;
-    color: #666 !important;
+    color: #5b6169 !important;
+    transition: color 0.3s ease;
+  }
+
+  body.admin-dark .welcome-box {
+    background: linear-gradient(135deg, rgba(30, 34, 44, 0.95), rgba(18, 21, 28, 0.92));
+    box-shadow: 0 12px 35px rgba(4, 6, 10, 0.55);
+  }
+
+  body.admin-dark .welcome-box p {
+    color: #d5dae3;
+  }
+
+  body.admin-dark .welcome-box .text-muted {
+    color: #a5adba !important;
   }
 
   .metrics-section .card {

@@ -3,6 +3,7 @@ body.admin-body {
   --admin-surface: #ffffff;
   --admin-surface-alt: #f1f3f5;
   --admin-text: #212529;
+  --admin-input-placeholder: rgba(33, 37, 41, 0.6);
   --admin-border: rgba(0, 0, 0, 0.12);
   --admin-muted: #6c757d;
   --admin-link: #0d6efd;
@@ -24,6 +25,7 @@ body.admin-body.admin-dark {
   --admin-surface: #191c24;
   --admin-surface-alt: #1f222c;
   --admin-text: #e4e6eb;
+  --admin-input-placeholder: rgba(228, 230, 235, 0.55);
   --admin-border: rgba(255, 255, 255, 0.08);
   --admin-muted: #a5adba;
   --admin-link: #7ab0ff;
@@ -155,6 +157,38 @@ body.admin-body:not(.delivery-panel) .input-group-text {
   color: var(--admin-input-text);
   border-color: var(--admin-input-border);
 }
+
+body.admin-body .form-label,
+body.admin-body .form-check-label,
+body.admin-body .form-text,
+body.admin-body .dataTables_wrapper .dataTables_length label,
+body.admin-body .dataTables_wrapper .dataTables_filter label {
+  color: var(--admin-text);
+}
+
+body.admin-body .form-control::placeholder,
+body.admin-body .form-select::placeholder,
+body.admin-body .dataTables_wrapper .dataTables_filter input::placeholder {
+  color: var(--admin-input-placeholder);
+}
+
+body.admin-body .dataTables_wrapper .dataTables_filter input,
+body.admin-body .dataTables_wrapper .dataTables_length select {
+  background-color: var(--admin-input-bg);
+  color: var(--admin-input-text);
+  border-color: var(--admin-input-border);
+  transition: var(--admin-transition);
+}
+
+body.admin-body .dataTables_wrapper .dataTables_length select option {
+  color: #212529;
+}
+
+body.admin-body.admin-dark .dataTables_wrapper .dataTables_length select option {
+  color: #f1f3f5;
+  background-color: #0f1115;
+}
+
 
 body.admin-body.admin-dark:not(.delivery-panel) .form-control:focus,
 body.admin-body.admin-dark:not(.delivery-panel) .form-select:focus,
