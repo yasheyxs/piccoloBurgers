@@ -26,21 +26,22 @@
   ?>
 
 
-  <?php if (!isset($_SESSION["cliente"])): ?>
-    <div id="registro-burbuja" class="registro-burbuja">
-      <button type="button" class="cerrar-burbuja" onclick="cerrarBurbuja()">×</button>
+  <main>
+    <?php if (!isset($_SESSION["cliente"])): ?>
+      <div id="registro-burbuja" class="registro-burbuja">
+        <button type="button" class="cerrar-burbuja" onclick="cerrarBurbuja()">×</button>
 
-      <h5 class="fw-bold mb-2 text-gold">¡Registrate y ganá puntos!</h5>
-      <p>
-        Acumulá <strong class="text-gold">puntos exclusivos</strong> en cada compra y canjealos por <strong>descuentos irresistibles</strong>.
-      </p>
+        <h5 class="fw-bold mb-2 text-gold">¡Registrate y ganá puntos!</h5>
+        <p>
+          Acumulá <strong class="text-gold">puntos exclusivos</strong> en cada compra y canjealos por <strong>descuentos irresistibles</strong>.
+        </p>
 
       <a href="cliente/registro_cliente.php" class="btn btn-gold w-100 mt-2">Registrarse</a>
-    </div>
-  <?php endif; ?>
+      </div>
+    <?php endif; ?>
 
 
-  <section id="inicio" class="container-fluid p-0">
+   <section id="inicio" class="container-fluid p-0">
     <div class="banner-img hero-banner-image">
       <div class="banner-text">
         <?php foreach ($lista_banners as $banner): ?>
@@ -247,6 +248,7 @@
       </div>
     </div>
   </section>
+  </main>
 
   <!-- Script Testimonios -->
   <footer id="footer" class="mt-5 footer-gradient">
