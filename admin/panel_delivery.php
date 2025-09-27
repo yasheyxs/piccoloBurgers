@@ -22,18 +22,27 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     --font-title: 'Bebas Neue', sans-serif;
   }
 
-  body {
-    font-family: var(--font-main);
-    color: var(--text-light);
-    background: url('../public/img/HamLoginCliente.jpg') no-repeat center center fixed;
-    background-size: cover;
-    background-attachment: fixed;
-  }
+  html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-main);
+  color: var(--text-light);
+  background: url("/img/HamLoginCliente.jpg") no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
 
   main {
     padding-top: 2rem;
     padding-bottom: 3rem;
   }
+
+
 
   h3.page-title {
     font-family: var(--font-title);
@@ -258,6 +267,20 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
     texto = texto.replace(/[\u0300-\u036f]/g, '');
     texto = texto.replace(/[\s'"`’]/g, '');
+
+    const valoresPositivos = new Set(['si', 'sí', 'yes', 'pagado', 'pago', 'abonado', '1', 'true']);
+    const valoresNegativos = new Set(['no', '0', '', 'false', 'pendiente']);
+
+    if (valoresPositivos.has(texto)) {
+      return 'Si';
+    }
+
+    if (valoresNegativos.has(texto)) {
+      return 'No';
+    }
+
+    return 'No';
+  }
 
   function obtenerTextoEstadoPago(estado) {
     return estado === 'Si' ? 'Sí ✅' : 'No ❌';
