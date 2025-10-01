@@ -1,11 +1,19 @@
 <?php
 include("../admin/bd.php");
+require_once __DIR__ . '/../includes/estado_pago_helpers.php';
 $adminPageIdentifier = 'delivery-panel';
 include("../admin/templates/header.php");
 
-$sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En camino' ORDER BY fecha DESC");
-$sentencia->execute();
-$pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+try {
+  $sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado = 'En camino' ORDER BY fecha DESC");
+  $sentencia->execute();
+  $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+} catch (Exception $e) {
+  $pedidos = [];
+}
+
+$valorPagoPositivo = piccolo_resolver_valor_pago($conexion, 'Si') ?? 'Si';
+$valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
 ?>
 
 <style>
@@ -168,15 +176,17 @@ body {
 
         $metodoPago = trim((string)($pedido['metodo_pago'] ?? ''));
         $referencias = trim((string)($pedido['referencias'] ?? ''));
-        $estadoPagoCrudo = trim((string)($pedido['esta_pago'] ?? ''));
-        $estadoPagoNormalizado = strtolower($estadoPagoCrudo);
-        $estadoPagoNormalizado = str_replace('í', 'i', $estadoPagoNormalizado);
-        $estadoPago = $estadoPagoNormalizado === 'si' ? 'Si' : 'No';
-        $estadoPagoTexto = $estadoPago === 'Si' ? 'Sí ✅' : 'No ❌';
-        $estadoPagoClase = $estadoPago === 'Si' ? 'text-success fw-semibold' : 'text-warning fw-semibold';
+        $interpretacionPago = piccolo_interpretar_estado_pago_para_presentacion(
+          $pedido['esta_pago'] ?? '',
+          $valorPagoPositivo,
+          $valorPagoNegativo
+        );
+        $estadoPago = $interpretacionPago['valor'];
+        $estadoPagoTexto = $interpretacionPago['texto'];
+        $estadoPagoClase = $interpretacionPago['clase'];
         $totalPedido = number_format((float)($pedido['total'] ?? 0), 2, ',', '.');
         ?>
-        <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>" data-esta-pago="<?= $estadoPago ?>">
+        <div class="glass-card" data-pedido-id="<?= $pedido['ID'] ?>" data-esta-pago="<?= htmlspecialchars($estadoPago, ENT_QUOTES, 'UTF-8') ?>">
           <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
           <p class="mb-2">
             <i class="fas fa-phone me-2"></i>
