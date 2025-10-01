@@ -89,3 +89,28 @@ if (!function_exists('piccolo_admin_base_url')) {
         return rtrim(sprintf('%s://%s%s', $scheme, $host, $basePath), '/') . '/';
     }
 }
+
+if (!function_exists('piccolo_public_base_path')) {
+    function piccolo_public_base_path(): string
+    {
+        $adminBasePath = piccolo_admin_base_path();
+        $publicPath = preg_replace('#/admin/?$#', '/', $adminBasePath, 1);
+
+        if (is_string($publicPath) && $publicPath !== '') {
+            return rtrim($publicPath, '/') . '/';
+        }
+
+        return '/';
+    }
+}
+
+if (!function_exists('piccolo_public_base_url')) {
+    function piccolo_public_base_url(): string
+    {
+        $scheme = piccolo_detect_scheme();
+        $host = piccolo_detect_host();
+        $basePath = piccolo_public_base_path();
+
+        return rtrim(sprintf('%s://%s%s', $scheme, $host, $basePath), '/') . '/';
+    }
+}
