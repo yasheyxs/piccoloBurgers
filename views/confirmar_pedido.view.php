@@ -19,37 +19,53 @@
   ?>
 
   <?php
-  $telefonoCodigo = '54';
-  $telefonoNumero = '';
-  $telefonoOriginal = '';
-  $telefonoRaw = $cliente['telefono'] ?? '';
-  if (is_string($telefonoRaw) && $telefonoRaw !== '') {
-    $telefonoSanitizado = preg_replace('/\s+/', '', $telefonoRaw);
-    $telefonoOriginal = ltrim((string) $telefonoSanitizado, '+');
-    if (preg_match('/^\+(\d{1,3})(\d{6,})$/', (string) $telefonoSanitizado, $coincidencias)) {
-      $telefonoCodigo = $coincidencias[1];
-      $telefonoNumero = $coincidencias[2];
-    } elseif (preg_match('/^(\d{1,3})(\d{6,})$/', (string) $telefonoSanitizado, $coincidencias)) {
-      $telefonoCodigo = $coincidencias[1];
-      $telefonoNumero = $coincidencias[2];
-    }
-  }
-
-  $codigosPais = [
-    '54' => '🇦🇷 +54',
-    '598' => '🇺🇾 +598',
-    '55' => '🇧🇷 +55',
-    '56' => '🇨🇱 +56',
-    '595' => '🇵🇾 +595',
-    '591' => '🇧🇴 +591',
-    '51' => '🇵🇪 +51',
-    '1' => '🇺🇸 +1',
-    '34' => '🇪🇸 +34',
+$codigosPais = [
+    '54' => ['etiqueta' => '🇦🇷 +54', 'longitudes' => [10]],
+    '598' => ['etiqueta' => '🇺🇾 +598', 'longitudes' => [8, 9]],
+    '55' => ['etiqueta' => '🇧🇷 +55', 'longitudes' => [10, 11]],
+    '56' => ['etiqueta' => '🇨🇱 +56', 'longitudes' => [9]],
+    '595' => ['etiqueta' => '🇵🇾 +595', 'longitudes' => [9]],
+    '591' => ['etiqueta' => '🇧🇴 +591', 'longitudes' => [8]],
+    '51' => ['etiqueta' => '🇵🇪 +51', 'longitudes' => [9]],
+    '1' => ['etiqueta' => '🇺🇸 +1', 'longitudes' => [10]],
+    '34' => ['etiqueta' => '🇪🇸 +34', 'longitudes' => [9]],
   ];
 
-  if (!array_key_exists($telefonoCodigo, $codigosPais)) {
-    $telefonoCodigo = '54';
-    $telefonoNumero = $telefonoOriginal ?? '';
+  $telefonoCodigo = '54';
+  $telefonoNumero = '';
+  $telefonoRaw = $cliente['telefono'] ?? '';
+
+  if (is_string($telefonoRaw) && $telefonoRaw !== '') {
+    $telefonoCompacto = preg_replace('/[\s()-]/', '', $telefonoRaw);
+    $telefonoCompacto = ltrim($telefonoCompacto, '+');
+    if (strpos($telefonoCompacto, '00') === 0) {
+      $telefonoCompacto = substr($telefonoCompacto, 2);
+    }
+  
+    $telefonoDigitos = preg_replace('/\D/', '', $telefonoCompacto);
+
+    $codigosOrdenados = array_keys($codigosPais);
+    usort($codigosOrdenados, fn($a, $b) => strlen($b) <=> strlen($a));
+
+    foreach ($codigosOrdenados as $codigo) {
+      $longitudesPermitidas = $codigosPais[$codigo]['longitudes'];
+      if (strpos($telefonoDigitos, $codigo) === 0) {
+        $numeroPosible = substr($telefonoDigitos, strlen($codigo));
+        if (in_array(strlen($numeroPosible), $longitudesPermitidas, true)) {
+          $telefonoCodigo = $codigo;
+          $telefonoNumero = $numeroPosible;
+          break;
+        }
+      }
+    }
+
+  if ($telefonoNumero === '' && preg_match('/^\d{6,}$/', $telefonoDigitos)) {
+      $telefonoNumero = $telefonoDigitos;
+    }
+
+    if (!isset($codigosPais[$telefonoCodigo])) {
+      $telefonoCodigo = '54';
+    }
   }
   ?>
 
@@ -69,9 +85,9 @@
         <label for="telefono" class="form-label">Teléfono (obligatorio):</label>
         <div class="telefono-group">
           <select class="form-control" id="codigo_pais" name="codigo_pais" required>
-            <?php foreach ($codigosPais as $codigo => $etiqueta): ?>
+            <?php foreach ($codigosPais as $codigo => $info): ?>
               <option value="<?= htmlspecialchars($codigo, ENT_QUOTES); ?>" <?= $codigo === $telefonoCodigo ? 'selected' : ''; ?>>
-                <?= htmlspecialchars($etiqueta, ENT_QUOTES); ?>
+                <?= htmlspecialchars($info['etiqueta'], ENT_QUOTES); ?>
               </option>
             <?php endforeach; ?>
           </select>
@@ -79,6 +95,7 @@
             placeholder="Ej: 3511234567" value="<?= htmlspecialchars($telefonoNumero, ENT_QUOTES); ?>">
         </div>
         <div class="invalid-feedback" id="telefono-feedback">Ingresá un número de teléfono válido.</div>
+        <div class="form-text text-muted" id="telefono-formateado"></div>
       </div>
       <div class="mb-3">
         <label for="email" class="form-label">Email (opcional):</label>
