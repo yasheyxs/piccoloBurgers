@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const telefonoInput = document.getElementById('telefono');
   const codigoPaisSelect = document.getElementById('codigo_pais');
+  const telefonoFormateadoTexto = document.getElementById('telefono-formateado');
   const longitudesTelefono = {
     54: [10],
     598: [8, 9],
@@ -13,6 +14,116 @@ document.addEventListener('DOMContentLoaded', () => {
     51: [9],
     1: [10],
     34: [9],
+  };
+
+  const quitarSeparadoresTelefono = (valor) => String(valor ?? '').replace(/[\s()-]/g, '');
+  const limpiarNumero = (valor) => String(valor ?? '').replace(/[^0-9]/g, '');
+  const obtenerCodigosOrdenados = () =>
+    Object.keys(longitudesTelefono).sort((a, b) => b.length - a.length);
+
+  const descomponerTelefono = (valor) => {
+    if (!valor) {
+      return null;
+    }
+
+    const sinSeparadores = quitarSeparadoresTelefono(valor);
+    let normalizado = sinSeparadores;
+    if (normalizado.startsWith('+')) {
+      normalizado = normalizado.slice(1);
+    } else if (normalizado.startsWith('00')) {
+      normalizado = normalizado.slice(2);
+    }
+
+    normalizado = limpiarNumero(normalizado);
+    if (!normalizado) {
+      return null;
+    }
+
+    const codigos = obtenerCodigosOrdenados();
+    for (const codigo of codigos) {
+      if (normalizado.startsWith(codigo)) {
+        const resto = normalizado.slice(codigo.length);
+        const longitudes = longitudesTelefono[codigo];
+        if (Array.isArray(longitudes) && longitudes.includes(resto.length)) {
+          return {
+            codigo,
+            numero: resto,
+          };
+        }
+      }
+    }
+
+    return null;
+  };
+
+  const actualizarTelefonoFormateado = () => {
+    if (!telefonoFormateadoTexto) {
+      return;
+    }
+
+    const codigo = codigoPaisSelect?.value ?? '';
+    const numero = telefonoInput ? limpiarNumero(telefonoInput.value) : '';
+
+    if (!codigo || !numero) {
+      telefonoFormateadoTexto.textContent = '';
+      return;
+    }
+
+    const telefonoValido = obtenerTelefonoFormateado();
+
+    if (telefonoValido) {
+      telefonoFormateadoTexto.textContent = `Teléfono completo: +${telefonoValido.codigo} ${telefonoValido.numero}`;
+      return;
+    }
+
+    telefonoFormateadoTexto.textContent = `Teléfono completo: +${codigo} ${numero}`;
+  };
+
+  const aplicarAutocompletadoTelefono = () => {
+    if (!telefonoInput) {
+      return;
+    }
+
+    const valorActual = telefonoInput.value;
+    if (!valorActual) {
+      telefonoInput.value = '';
+      return;
+    }
+
+    const datos = descomponerTelefono(valorActual);
+    if (datos) {
+      if (codigoPaisSelect && codigoPaisSelect.value !== datos.codigo) {
+        codigoPaisSelect.value = datos.codigo;
+        actualizarMaxlengthTelefono();
+      }
+      telefonoInput.value = datos.numero;
+      return;
+    }
+
+    const soloNumeros = limpiarNumero(valorActual);
+    if (!soloNumeros) {
+      telefonoInput.value = '';
+      return;
+    }
+
+    if (codigoPaisSelect) {
+      const codigo = codigoPaisSelect.value;
+      const longitudes = longitudesTelefono[codigo];
+      if (soloNumeros.startsWith(codigo) && Array.isArray(longitudes)) {
+        const resto = soloNumeros.slice(codigo.length);
+        const coincideLongitud = longitudes.some(
+          (longitudPermitida) => soloNumeros.length === longitudPermitida + codigo.length,
+        );
+        const maxLongitud = longitudes.length > 0 ? Math.max(...longitudes) : 0;
+
+        if (coincideLongitud || (maxLongitud > 0 && resto.length > maxLongitud)) {
+          telefonoInput.value = resto.slice(0, maxLongitud);
+          return;
+        }
+      }
+    }
+
+    telefonoInput.value = soloNumeros;
   };
 
   const limpiarReservasVirtuales = () => {
@@ -49,8 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('carrito');
       });
   };
-
-  const limpiarNumero = (valor) => valor.replace(/[^0-9]/g, '');
 
   const actualizarMaxlengthTelefono = () => {
     if (!telefonoInput || !codigoPaisSelect) {
@@ -107,22 +216,42 @@ document.addEventListener('DOMContentLoaded', () => {
   if (codigoPaisSelect && telefonoInput) {
     actualizarMaxlengthTelefono();
 
+    aplicarAutocompletadoTelefono();
+    actualizarTelefonoFormateado();
+    marcarTelefonoValido(true);
+
+    const reintentosAutocompletado = [0, 200, 600];
+    reintentosAutocompletado.forEach((delay) => {
+      setTimeout(() => {
+        aplicarAutocompletadoTelefono();
+        actualizarTelefonoFormateado();
+        marcarTelefonoValido(true);
+      }, delay);
+    });
+
     codigoPaisSelect.addEventListener('change', () => {
       actualizarMaxlengthTelefono();
+      aplicarAutocompletadoTelefono();
+      actualizarTelefonoFormateado();
       marcarTelefonoValido(true);
     });
 
     telefonoInput.addEventListener('input', () => {
-      telefonoInput.value = limpiarNumero(telefonoInput.value);
+      aplicarAutocompletadoTelefono();
       marcarTelefonoValido(true);
+      actualizarTelefonoFormateado();
     });
 
     telefonoInput.addEventListener('blur', () => {
+      aplicarAutocompletadoTelefono();
       const telefono = obtenerTelefonoFormateado();
       if (!telefono) {
         marcarTelefonoValido(false);
       }
+      actualizarTelefonoFormateado();
     });
+    } else if (telefonoFormateadoTexto) {
+    telefonoFormateadoTexto.textContent = '';
   }
 
 
@@ -176,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const form = e.target;
       const formData = new FormData(form);
       formData.set('carrito', JSON.stringify(carritoFinal));
-      formData.set('telefono', telefonoNormalizado.telefonoCompleto);
+      formData.set('telefono', telefonoNormalizado.numero);
       formData.set('codigo_pais', telefonoNormalizado.codigo);
 
       const usarPuntosCheckbox = localStorage.getItem('usar_puntos_activado') === '1';
@@ -280,7 +409,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         form.reset();
         actualizarMaxlengthTelefono();
+        aplicarAutocompletadoTelefono();
         marcarTelefonoValido(true);
+        actualizarTelefonoFormateado();
         document.getElementById('mensaje').innerHTML = '';
       } else {
         // Mostrar error en div mensaje
