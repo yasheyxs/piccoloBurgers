@@ -1,6 +1,7 @@
 <?php
 include("../bd.php");
 require_once __DIR__ . '/../../componentes/password_utils.php';
+require_once dirname(__DIR__) . '/helpers/url.php';
 include(__DIR__ . "/../templates/header_public.php");
 
 $token     = trim($_POST["token"] ?? "");
@@ -69,7 +70,11 @@ $stmt->bindParam(":token", $token);
 $stmt->execute();
 
 echo "<div class='alert alert-success text-center'>Contraseña actualizada correctamente. Redirigiendo al login...</div>";
-echo "<script>setTimeout(() => window.location.href = '" . ($tipo === "cliente" ? "../../public/cliente/login_cliente.php" : "../login.php") . "', 3000);</script>";
+$loginUrl = $tipo === "cliente"
+  ? piccolo_public_base_url() . 'cliente/login_cliente.php'
+  : piccolo_admin_base_url() . 'login.php';
+$loginUrl = htmlspecialchars($loginUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+echo "<script>setTimeout(() => window.location.href = '" . $loginUrl . "', 3000);</script>";
 
 echo '</div></div></div>';
 include(__DIR__ . "/../templates/footer.php");

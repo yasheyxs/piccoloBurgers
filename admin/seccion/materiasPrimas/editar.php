@@ -18,7 +18,7 @@ if ($_POST) {
   $nombre = $_POST["nombre"] ?? "";
   $unidad_medida = $_POST["unidad_medida"] ?? "";
   $cantidad = $_POST["cantidad"] ?? 0;
-  $proveedor_id = $_POST["proveedor_id"] ?? null;
+  $proveedor_id = isset($_POST["proveedor_id"]) && $_POST["proveedor_id"] !== "" ? intval($_POST["proveedor_id"]) : 0;
 
   if (!is_numeric($txtID)) {
     echo "<script>alert('ID inválido.');</script>";
@@ -34,7 +34,7 @@ if ($_POST) {
       $sentencia->bindParam(":nombre", $nombre);
       $sentencia->bindParam(":unidad_medida", $unidad_medida);
       $sentencia->bindParam(":cantidad", $cantidad);
-      $sentencia->bindParam(":proveedor_id", $proveedor_id);
+      $sentencia->bindParam(":proveedor_id", $proveedor_id, PDO::PARAM_INT);
       $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
       $sentencia->execute();
 
@@ -51,7 +51,7 @@ if ($_POST) {
 $nombre = "";
 $unidad_medida = "";
 $cantidad = "";
-$proveedor_id = "";
+$proveedor_id = 0;
 
 if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
   $txtID = intval($_GET["txtID"]);
@@ -66,7 +66,7 @@ if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
       $nombre = $registro["nombre"];
       $unidad_medida = $registro["unidad_medida"];
       $cantidad = $registro["cantidad"];
-      $proveedor_id = $registro["proveedor_id"];
+      $proveedor_id = isset($registro["proveedor_id"]) ? intval($registro["proveedor_id"]) : 0;
     } else {
       echo "<script>alert('Materia prima no encontrada.'); window.location.href='index.php';</script>";
       exit;
@@ -116,7 +116,7 @@ include("../../templates/header.php");
       <div class="mb-3">
         <label for="proveedor_id" class="form-label">Proveedor:</label>
         <select class="form-select" name="proveedor_id" id="proveedor_id">
-          <option value="">Sin proveedor</option>
+          <option value="0" <?= ($proveedor_id === 0) ? 'selected' : '' ?>>Sin proveedor</option>
           <?php foreach ($lista_proveedores as $proveedor) { ?>
             <option value="<?= htmlspecialchars($proveedor['ID']) ?>" <?= ($proveedor_id == $proveedor['ID']) ? 'selected' : '' ?>>
               <?= htmlspecialchars($proveedor['nombre']) ?>

@@ -17,7 +17,7 @@ if ($_POST) {
   $nombre = $_POST["nombre"] ?? "";
   $unidad_medida = $_POST["unidad_medida"] ?? "";
   $cantidad = $_POST["cantidad"] ?? 0;
-  $proveedor_id = $_POST["proveedor_id"] ?? null;
+  $proveedor_id = isset($_POST["proveedor_id"]) && $_POST["proveedor_id"] !== "" ? intval($_POST["proveedor_id"]) : 0;
 
   if (trim($nombre) === "" || trim($unidad_medida) === "" || !is_numeric($cantidad) || $cantidad < 0) {
     echo "<script>alert('Datos inválidos. Verifica los campos.');</script>";
@@ -30,7 +30,7 @@ if ($_POST) {
       $sentencia->bindParam(":nombre", $nombre);
       $sentencia->bindParam(":unidad_medida", $unidad_medida);
       $sentencia->bindParam(":cantidad", $cantidad);
-      $sentencia->bindParam(":proveedor_id", $proveedor_id);
+      $sentencia->bindParam(":proveedor_id", $proveedor_id, PDO::PARAM_INT);
       $sentencia->execute();
 
       header("Location:index.php");
@@ -72,7 +72,7 @@ include("../../templates/header.php");
       <div class="mb-3">
         <label for="proveedor_id" class="form-label">Proveedor:</label>
         <select class="form-select" name="proveedor_id" id="proveedor_id">
-          <option value="">Sin proveedor</option>
+          <option value="0">Sin proveedor</option>
           <?php foreach ($lista_proveedores as $proveedor) { ?>
             <option value="<?= htmlspecialchars($proveedor['ID']) ?>"><?= htmlspecialchars($proveedor['nombre']) ?></option>
           <?php } ?>

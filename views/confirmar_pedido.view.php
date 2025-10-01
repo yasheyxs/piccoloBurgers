@@ -21,9 +21,11 @@
   <?php
   $telefonoCodigo = '54';
   $telefonoNumero = '';
+  $telefonoOriginal = '';
   $telefonoRaw = $cliente['telefono'] ?? '';
   if (is_string($telefonoRaw) && $telefonoRaw !== '') {
     $telefonoSanitizado = preg_replace('/\s+/', '', $telefonoRaw);
+    $telefonoOriginal = ltrim((string) $telefonoSanitizado, '+');
     if (preg_match('/^\+(\d{1,3})(\d{6,})$/', (string) $telefonoSanitizado, $coincidencias)) {
       $telefonoCodigo = $coincidencias[1];
       $telefonoNumero = $coincidencias[2];
@@ -47,6 +49,7 @@
 
   if (!array_key_exists($telefonoCodigo, $codigosPais)) {
     $telefonoCodigo = '54';
+    $telefonoNumero = $telefonoOriginal ?? '';
   }
   ?>
 
