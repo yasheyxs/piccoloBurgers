@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Sep 27, 2025 at 10:35 PM
+-- Generation Time: Oct 01, 2025 at 09:59 PM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -592,7 +592,7 @@ CREATE TABLE `tbl_pedidos` (
   `estado` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'En preparación',
   `cliente_id` int DEFAULT NULL,
   `referencias` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `esta_pago` enum('''No''','''Si''') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '''No'''
+  `esta_pago` enum('No','Si') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'No'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -600,40 +600,40 @@ CREATE TABLE `tbl_pedidos` (
 --
 
 INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`, `referencias`, `esta_pago`) VALUES
-(67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
-(69, 'Yass', '123', '', '', 16600, '2025-09-01 22:33:41', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
-(70, 'Yass', '123', '', 'Todo sin aderezo', 66500, '2025-09-02 04:40:37', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, '\'No\''),
-(71, 'Juana', '123', '', '', 21200, '2025-09-03 19:14:42', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, '\'No\''),
-(72, 'Yass', '123', '', '', 1500, '2025-09-03 19:18:38', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
-(73, 'Yass', '123', '', '', 1500, '2025-09-03 22:02:59', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
-(74, 'Yass', '123', '', '', 3000, '2025-09-03 22:11:49', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(75, 'Yass', '123', '', '', 22000, '2025-09-03 22:12:08', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
-(76, 'Yass', '123', '', '', 1500, '2025-09-03 22:15:01', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(77, 'Yass', '123', '', '', 11000, '2025-09-03 22:16:35', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(78, 'Yass', '123', '', '', 22500, '2025-09-03 22:19:22', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(79, 'Yass', '123', '', '', 7000, '2025-09-03 22:20:56', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(80, 'Yass', '123', '', '', 21000, '2025-09-03 22:22:56', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(81, 'Yass', '123', '', '', 13000, '2025-09-03 22:25:34', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(82, 'Yass', '123', '', '', 10000, '2025-09-03 22:27:54', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(83, 'Yass', '123', '', '', 1500, '2025-09-03 22:29:04', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(84, 'Yass', '123', '', '', 4500, '2025-09-03 22:30:02', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(85, 'Yass', '123', '', '', 4500, '2025-09-03 22:31:09', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
-(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, '\'No\''),
-(88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, '\'No\''),
-(89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, '\'No\''),
-(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, '\'No\''),
-(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'Cancelado', 5, NULL, '\'No\''),
-(92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL, '\'No\''),
-(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'Cancelado', 5, NULL, '\'No\''),
-(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5, NULL, '\'No\''),
-(95, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 20:47:11', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, '\'No\''),
-(96, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 21:30:08', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, '\'No\''),
-(97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
-(98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, '\'No\''),
-(99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, '\'No\''),
-(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', '\'Si\'');
+(67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, 'No'),
+(69, 'Yass', '123', '', '', 16600, '2025-09-01 22:33:41', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, 'No'),
+(70, 'Yass', '123', '', 'Todo sin aderezo', 66500, '2025-09-02 04:40:37', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, 'No'),
+(71, 'Juana', '123', '', '', 21200, '2025-09-03 19:14:42', 'Efectivo', 'Retiro', '', 'Listo', NULL, NULL, 'No'),
+(72, 'Yass', '123', '', '', 1500, '2025-09-03 19:18:38', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, 'No'),
+(73, 'Yass', '123', '', '', 1500, '2025-09-03 22:02:59', 'Efectivo', 'Retiro', '', 'Cancelado', 4, NULL, 'No'),
+(74, 'Yass', '123', '', '', 3000, '2025-09-03 22:11:49', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(75, 'Yass', '123', '', '', 22000, '2025-09-03 22:12:08', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, 'No'),
+(76, 'Yass', '123', '', '', 1500, '2025-09-03 22:15:01', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(77, 'Yass', '123', '', '', 11000, '2025-09-03 22:16:35', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(78, 'Yass', '123', '', '', 22500, '2025-09-03 22:19:22', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(79, 'Yass', '123', '', '', 7000, '2025-09-03 22:20:56', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(80, 'Yass', '123', '', '', 21000, '2025-09-03 22:22:56', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(81, 'Yass', '123', '', '', 13000, '2025-09-03 22:25:34', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(82, 'Yass', '123', '', '', 10000, '2025-09-03 22:27:54', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(83, 'Yass', '123', '', '', 1500, '2025-09-03 22:29:04', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(84, 'Yass', '123', '', '', 4500, '2025-09-03 22:30:02', 'Efectivo', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(85, 'Yass', '123', '', '', 4500, '2025-09-03 22:31:09', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(86, 'Yass', '123', '', '', 5600, '2025-09-03 22:31:31', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, 'No'),
+(87, 'Yass', '123', '', '', 6500, '2025-09-03 22:45:23', 'MercadoPago', 'Delivery', 'Zona 123', 'Cancelado', 4, NULL, 'No'),
+(88, 'Yass', '123', '', '', 1500, '2025-09-03 22:46:42', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(89, 'Yass', '123', '', '', 9000, '2025-09-04 00:35:05', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, 'No'),
+(90, 'Yass', '123', '', '', 9000, '2025-09-04 00:39:01', 'Tarjeta', 'Retiro', '', 'Cancelado', 4, NULL, 'No'),
+(91, 'Morrón', '543573451913', '', 'SALON PICCOLO', 54800, '2025-09-04 16:43:23', 'Efectivo', 'Delivery', 'san martin 1299', 'Cancelado', 5, NULL, 'No'),
+(92, 'Morrón', '543573451913', '', '', 18400, '2025-09-04 16:43:59', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL, 'No'),
+(93, 'Morrón', '543573451913', '', '', 36800, '2025-09-04 16:47:06', 'MercadoPago', 'Retiro', '', 'Cancelado', 5, NULL, 'No'),
+(94, 'Morrón', '543573451913', '', '', 68000, '2025-09-04 16:47:59', 'Efectivo', 'Retiro', '', 'En preparación', 5, NULL, 'No'),
+(95, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 20:47:11', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, 'No'),
+(96, 'Uu', '+541231231231', '', '', 1500, '2025-09-08 21:30:08', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, 'No'),
+(97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
+(98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
+(99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, 'No'),
+(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', 'Si');
 
 -- --------------------------------------------------------
 
@@ -984,7 +984,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
