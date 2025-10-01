@@ -93,8 +93,7 @@
       <div class="mb-4">
         <label class="form-label d-block mb-3 fw-bold fs-5">Método de pago:</label>
 
-        <input type="radio" class="form-check-input" id="pago_efectivo" name="metodo_pago" value="Efectivo" required>
-        <label class="radio-card" for="pago_efectivo">💵 Efectivo</label>
+<input type="radio" class="form-check-input" id="pago_efectivo" name="metodo_pago" value="Efectivo" required checked>        <label class="radio-card" for="pago_efectivo">💵 Efectivo</label>
 
         <input type="radio" class="form-check-input" id="pago_tarjeta" name="metodo_pago" value="Tarjeta">
         <label class="radio-card" for="pago_tarjeta">💳 Tarjeta</label>
@@ -106,7 +105,7 @@
       <div class="mb-4">
         <label class="form-label d-block mb-3 fw-bold fs-5">Tipo de entrega:</label>
 
-        <input type="radio" class="form-check-input" id="entrega_retiro" name="tipo_entrega" value="Retiro" required
+        <input type="radio" class="form-check-input" id="entrega_retiro" name="tipo_entrega" value="Retiro" required checked
           onchange="mostrarDireccion(this.value)">
         <label class="radio-card" for="entrega_retiro">🏪 Retiro en el local</label>
 
