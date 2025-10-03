@@ -16,7 +16,6 @@ if (!function_exists('piccolo_finalizar_por_error_bd')) {
                 "mensaje" => $mensajeUsuario
             ]);
         }
-
         exit;
     }
 }
@@ -25,73 +24,82 @@ $requiredEnv = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD'];
 $configuracion = [];
 $faltantes = [];
 
+// 1. Intentar primero con variables de entorno (Docker)
 foreach ($requiredEnv as $variable) {
     $valor = getenv($variable) ?: ($_ENV[$variable] ?? $_SERVER[$variable] ?? null);
-
-    if ($valor === false || $valor === '') {
+    if (is_string($valor)) {
+        $valor = trim($valor);
+    }
+    if ($valor === false || $valor === '' || $valor === null) {
         $faltantes[] = $variable;
         continue;
     }
-
     $configuracion[$variable] = $valor;
 }
 
+// 2. Si faltan, cargar config local o docker
 if (!empty($faltantes)) {
-    $rutaConfiguracionLocal = dirname(__DIR__) . '/config/database.php';
+    $rutaLocal   = dirname(__DIR__) . '/config/database.php';
+    $rutaDocker  = dirname(__DIR__) . '/config/database.docker.php';
 
-    if (is_readable($rutaConfiguracionLocal)) {
-        $configuracionLocal = include $rutaConfiguracionLocal;
+    if (getenv('MYSQL_HOST') && is_readable($rutaDocker)) {
+        $configuracionLocal = include $rutaDocker;
+    } elseif (is_readable($rutaLocal)) {
+        $configuracionLocal = include $rutaLocal;
+    } else {
+        $configuracionLocal = [];
+    }
 
-        if (is_array($configuracionLocal)) {
-            $mapa = [
-                'MYSQL_HOST'     => 'host',
-                'MYSQL_DATABASE' => 'database',
-                'MYSQL_USER'     => 'user',
-                'MYSQL_PASSWORD' => 'password',
-            ];
-
-            foreach ($mapa as $variable => $clave) {
-                if (array_key_exists($variable, $configuracion)) {
-                    continue;
-                }
-
-                if (isset($configuracionLocal[$clave]) && $configuracionLocal[$clave] !== '') {
-                    $configuracion[$variable] = (string) $configuracionLocal[$clave];
-                }
+    if (is_array($configuracionLocal)) {
+        $mapa = [
+            'MYSQL_HOST'     => 'host',
+            'MYSQL_DATABASE' => 'database',
+            'MYSQL_USER'     => 'user',
+            'MYSQL_PASSWORD' => 'password',
+        ];
+        foreach ($mapa as $variable => $clave) {
+            if (!array_key_exists($variable, $configuracion) && isset($configuracionLocal[$clave])) {
+                $configuracion[$variable] = trim((string) $configuracionLocal[$clave]);
             }
-
-            $faltantes = array_values(array_diff($requiredEnv, array_keys($configuracion)));
-        } else {
-            error_log('El archivo config/database.php debe devolver un array con la configuración de la base de datos.');
         }
     }
 
+    $faltantes = array_values(array_diff($requiredEnv, array_keys($configuracion)));
     if (!empty($faltantes)) {
         piccolo_finalizar_por_error_bd(
-            'Configuración de base de datos incompleta. Faltan las variables: ' . implode(', ', $faltantes),
+            'Configuración de base de datos incompleta. Faltan: ' . implode(', ', $faltantes),
             'Error de configuración de la base de datos'
         );
     }
 }
 
+// 3. Validar finales
 $servidor    = $configuracion['MYSQL_HOST'];
 $baseDatos   = $configuracion['MYSQL_DATABASE'];
 $usuario     = $configuracion['MYSQL_USER'];
 $contrasenia = $configuracion['MYSQL_PASSWORD'];
 
+foreach (['MYSQL_HOST' => $servidor, 'MYSQL_DATABASE' => $baseDatos, 'MYSQL_USER' => $usuario] as $nombre => $valor) {
+    if (!is_string($valor) || trim($valor) === '') {
+        piccolo_finalizar_por_error_bd(
+            'La variable ' . $nombre . ' está vacía o no es válida.',
+            'Error de configuración de la base de datos'
+        );
+    }
+}
+
+// 4. Conectar PDO
 try {
     $dsn = "mysql:host={$servidor};port=3306;dbname={$baseDatos};charset=utf8mb4";
     $opciones = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_PERSISTENT         => false,
-        // 🔑 Fix TLS error por certificado autofirmado
         PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
         PDO::MYSQL_ATTR_SSL_CA => null,
     ];
     $conexion = new PDO($dsn, $usuario, $contrasenia, $opciones);
 } catch (Exception $error) {
-    // Mostrar directamente el error exacto
     if (PHP_SAPI === 'cli') {
         fwrite(STDERR, $error->getMessage() . PHP_EOL);
     } else {
@@ -107,8 +115,7 @@ try {
     exit;
 }
 
-
-
+// Helpers de sesión
 function verificarRol($rolPermitido) {
     session_start();
     if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== $rolPermitido) {
