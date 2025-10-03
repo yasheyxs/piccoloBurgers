@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Oct 01, 2025 at 09:59 PM
+-- Generation Time: Oct 03, 2025 at 09:48 PM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -29,9 +29,9 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `tbl_banners` (
   `ID` int NOT NULL,
-  `titulo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `descripcion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `link` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -49,13 +49,13 @@ INSERT INTO `tbl_banners` (`ID`, `titulo`, `descripcion`, `link`) VALUES
 
 CREATE TABLE `tbl_clientes` (
   `ID` int NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `puntos` int DEFAULT '0',
-  `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `reset_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -71,7 +71,7 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 (6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
 (7, 'Prueba', '+541234567890', '', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
 (8, 'Uu', '+541231231231', '', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
-(9, 'Cliente', '+541234512345', '', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL),
+(9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL),
 (10, 'Esta es una prueba', '+541234123412', '1234123412@gmail.com', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -82,9 +82,9 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 
 CREATE TABLE `tbl_comentarios` (
   `ID` int NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `correo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `mensaje` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `correo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `mensaje` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -122,7 +122,13 @@ INSERT INTO `tbl_compras` (`ID`, `fecha`, `proveedor_id`) VALUES
 (9, '2025-09-04', 20),
 (10, '2025-09-04', 21),
 (11, '2025-09-04', 21),
-(12, '2025-09-04', 19);
+(12, '2025-09-04', 19),
+(13, '2025-10-01', 20),
+(14, '2025-10-03', 21),
+(15, '2025-10-06', 17),
+(16, '2025-10-09', 23),
+(17, '2025-10-12', 18),
+(18, '2025-10-14', 19);
 
 -- --------------------------------------------------------
 
@@ -156,7 +162,25 @@ INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `canti
 (11, 9, 10, 3, 4999),
 (12, 10, 5, 1, 6000),
 (13, 11, 6, 1, 8000),
-(14, 12, 14, 1, 12000);
+(14, 12, 14, 1, 12000),
+(15, 13, 9, 80, 950),
+(16, 13, 10, 5, 3800),
+(17, 13, 21, 3, 4200),
+(18, 14, 6, 20, 4200),
+(19, 14, 15, 15, 5100),
+(20, 14, 19, 10, 4600),
+(21, 15, 120, 25, 1800),
+(22, 15, 121, 10, 2100),
+(23, 15, 31, 12, 3200),
+(24, 16, 22, 12, 8700),
+(25, 16, 20, 8, 2500),
+(26, 16, 17, 14, 5900),
+(27, 17, 8, 60, 850),
+(28, 17, 14, 12, 4300),
+(29, 17, 18, 90, 780),
+(30, 18, 32, 15, 4100),
+(31, 18, 114, 18, 6200),
+(32, 18, 34, 10, 7400);
 
 -- --------------------------------------------------------
 
@@ -166,8 +190,8 @@ INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `canti
 
 CREATE TABLE `tbl_materias_primas` (
   `ID` int NOT NULL,
-  `nombre` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `unidad_medida` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `unidad_medida` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `cantidad` decimal(10,2) NOT NULL,
   `proveedor_id` int NOT NULL,
   `unidades_por_pack` int NOT NULL DEFAULT '1',
@@ -243,11 +267,11 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 
 CREATE TABLE `tbl_menu` (
   `ID` int NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `ingredientes` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `foto` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `precio` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `categoria` varchar(30) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'General',
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `ingredientes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `precio` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `categoria` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'General',
   `visible_en_menu` tinyint(1) DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -580,19 +604,19 @@ INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `ca
 
 CREATE TABLE `tbl_pedidos` (
   `ID` int NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `nota` text COLLATE utf8mb4_general_ci,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `nota` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `total` decimal(10,0) NOT NULL,
   `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `metodo_pago` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `tipo_entrega` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `direccion` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `estado` varchar(20) COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'En preparación',
+  `metodo_pago` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `tipo_entrega` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `direccion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'En preparación',
   `cliente_id` int DEFAULT NULL,
-  `referencias` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `esta_pago` enum('No','Si') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'No'
+  `referencias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `esta_pago` enum('No','Si') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'No'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -633,7 +657,19 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
 (98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
 (99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, 'No'),
-(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', 'Si');
+(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', 'Si'),
+(101, 'Yass', '123', '', 'Sin pepinos', 16100, '2025-10-01 12:15:00', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si'),
+(102, 'Morrón', '543573451913', '', 'Retirar en mostrador', 18500, '2025-10-02 19:45:00', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL, 'Si'),
+(103, 'Juana', '123', '', 'Entrega puerta', 23100, '2025-10-03 13:20:00', 'MercadoPago', 'Delivery', 'Barrio Centro', 'En preparación', NULL, 'Portón verde', 'No'),
+(104, 'Uu', '+541231231231', '', 'Añadir servilletas', 20500, '2025-10-04 21:10:00', 'Efectivo', 'Retiro', '', 'Listo', 8, NULL, 'No'),
+(105, 'Prueba', '1', '', 'Sin picante', 22000, '2025-10-05 18:30:00', 'Tarjeta', 'Delivery', 'Zona Norte', 'En camino', 6, NULL, 'Si'),
+(106, 'Alma', '123123123', '', 'Familia', 22000, '2025-10-07 12:05:00', 'MercadoPago', 'Delivery', 'Av. Siempre Viva 123', 'Listo', NULL, 'Timbre gris', 'Si'),
+(107, 'Yass', '123', '', 'Extra salsa', 21500, '2025-10-08 22:18:00', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
+(108, 'Morrón', '543573451913', '', 'Dejar en recepcion', 17100, '2025-10-10 14:50:00', 'MercadoPago', 'Delivery', 'san martin 1299', 'En preparación', 5, NULL, 'No'),
+(109, 'Cliente', '+541234512345', '', '', 21200, '2025-10-11 20:05:00', 'Efectivo', 'Delivery', '', 'Listo', 9, NULL, 'Si'),
+(110, 'Juana', '123', '', 'Retira hermano', 18000, '2025-10-12 11:40:00', 'Tarjeta', 'Retiro', '', 'Listo', NULL, NULL, 'Si'),
+(111, 'Prueba', '1', '', 'Cena amigos', 23100, '2025-10-13 19:25:00', 'MercadoPago', 'Delivery', 'Zona Norte', 'En camino', 6, NULL, 'No'),
+(112, 'Yass', '123', '', 'Postre aparte', 20000, '2025-10-14 22:10:00', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si');
 
 -- --------------------------------------------------------
 
@@ -645,7 +681,7 @@ CREATE TABLE `tbl_pedidos_detalle` (
   `ID` int NOT NULL,
   `pedido_id` int NOT NULL,
   `producto_id` int NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `precio` decimal(10,0) NOT NULL,
   `cantidad` int NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -709,7 +745,39 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (129, 97, 50, 'Especial', 13000, 1),
 (130, 98, 55, 'Lomo de pollo', 10000, 1),
 (131, 99, 47, 'Empanada de jamón y queso x1', 3000, 2),
-(132, 100, 38, 'Empanada árabe x1', 1500, 1);
+(132, 100, 38, 'Empanada árabe x1', 1500, 1),
+(133, 101, 13, 'Clásica', 8900, 1),
+(134, 101, 17, 'Fritas', 7200, 1),
+(135, 102, 27, 'Pepperoni', 14000, 1),
+(136, 102, 67, 'Sprite', 4500, 1),
+(137, 103, 23, 'Lomo Piccolo', 13000, 1),
+(138, 103, 65, 'Agua Saborizada', 4500, 1),
+(139, 103, 19, 'Aros de cebolla', 5600, 1),
+(140, 104, 32, 'Monstruosa', 12000, 1),
+(141, 104, 18, 'Fritas con cheddar y bacon', 8500, 1),
+(142, 105, 34, 'Gran Piccolo', 11000, 1),
+(143, 105, 54, 'Nuggets x12', 6500, 1),
+(144, 105, 67, 'Sprite', 4500, 1),
+(145, 106, 39, 'Empanadas árabes x6', 7000, 1),
+(146, 106, 42, 'Empanadas dulces x6', 7000, 1),
+(147, 106, 20, 'Tequeños x6', 8000, 1),
+(148, 107, 33, 'BBQ', 10500, 1),
+(149, 107, 35, 'Chicken', 9500, 1),
+(150, 107, 58, 'Paso de los Toros', 1500, 1),
+(151, 108, 55, 'Lomo de pollo', 10000, 1),
+(152, 108, 19, 'Aros de cebolla', 5600, 1),
+(153, 108, 66, 'Agua Saborizada', 1500, 1),
+(154, 109, 30, 'Sweet Onion', 9500, 1),
+(155, 109, 17, 'Fritas', 7200, 1),
+(156, 109, 67, 'Sprite', 4500, 1),
+(157, 110, 40, 'Empanadas árabes x12', 11000, 1),
+(158, 110, 45, 'Empanadas saladas x6', 7000, 1),
+(159, 111, 25, 'Fuggazetta', 13000, 1),
+(160, 111, 61, 'Lata de Cerveza', 4500, 1),
+(161, 111, 19, 'Aros de cebolla', 5600, 1),
+(162, 112, 34, 'Gran Piccolo', 11000, 1),
+(163, 112, 67, 'Sprite', 4500, 1),
+(164, 112, 65, 'Agua Saborizada', 4500, 1);
 
 -- --------------------------------------------------------
 
@@ -719,9 +787,9 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 
 CREATE TABLE `tbl_proveedores` (
   `ID` int NOT NULL,
-  `nombre` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(50) COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(100) COLLATE utf8mb4_general_ci DEFAULT NULL
+  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `telefono` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -746,11 +814,18 @@ INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
 
 CREATE TABLE `tbl_reservas_virtuales` (
   `ID` int NOT NULL,
-  `session_id` varchar(128) COLLATE utf8mb4_general_ci NOT NULL,
+  `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `menu_id` int NOT NULL,
   `cantidad` int NOT NULL,
   `actualizado_en` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_reservas_virtuales`
+--
+
+INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
+(18, 'hln2oi1c76hheid1fe5c910blt', 47, 1, '2025-10-03 01:33:06');
 
 -- --------------------------------------------------------
 
@@ -760,8 +835,8 @@ CREATE TABLE `tbl_reservas_virtuales` (
 
 CREATE TABLE `tbl_testimonios` (
   `ID` int NOT NULL,
-  `opinion` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `nombre` varchar(255) COLLATE utf8mb4_general_ci NOT NULL
+  `opinion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -782,11 +857,11 @@ INSERT INTO `tbl_testimonios` (`ID`, `opinion`, `nombre`) VALUES
 
 CREATE TABLE `tbl_usuarios` (
   `ID` int NOT NULL,
-  `usuario` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `correo` varchar(255) COLLATE utf8mb4_general_ci NOT NULL,
-  `rol` enum('admin','empleado','delivery') COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'empleado',
-  `reset_token` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `usuario` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `correo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `rol` enum('admin','empleado','delivery') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'empleado',
+  `reset_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `token_expira` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -936,13 +1011,13 @@ ALTER TABLE `tbl_comentarios`
 -- AUTO_INCREMENT for table `tbl_compras`
 --
 ALTER TABLE `tbl_compras`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tbl_compras_detalle`
 --
 ALTER TABLE `tbl_compras_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT for table `tbl_materias_primas`
@@ -966,13 +1041,13 @@ ALTER TABLE `tbl_menu_materias_primas`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=101;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=133;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
@@ -984,7 +1059,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
