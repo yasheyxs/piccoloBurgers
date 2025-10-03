@@ -95,7 +95,7 @@ $ventas_mensuales = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Gráficos con QuickChart
 $productos_labels = array_column($productos, 'nombre');
 $productos_data = array_column($productos, 'total_vendido');
-$productos_chart_url = "https://quickchart.io/chart?c=" . urlencode(json_encode([
+$productos_chart_url = "https://quickchart.io/chart?format=svg&c=" . urlencode(json_encode([
     "type" => "pie",
     "data" => [
         "labels" => $productos_labels,
@@ -108,7 +108,7 @@ $mes_nombres = [1=>"Enero",2=>"Febrero",3=>"Marzo",4=>"Abril",5=>"Mayo",6=>"Juni
 $meses = array_map(fn($v) => $mes_nombres[(int)$v['mes']], $ventas_mensuales);
 
 $ventas_data = array_column($ventas_mensuales, 'total_ventas');
-$ventas_chart_url = "https://quickchart.io/chart?c=" . urlencode(json_encode([
+$ventas_chart_url = "https://quickchart.io/chart?format=svg&c=" . urlencode(json_encode([
     "type" => "bar",
     "data" => [
         "labels" => $meses,
