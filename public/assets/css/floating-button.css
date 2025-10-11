@@ -1,0 +1,72 @@
+.floating-btn {
+  position: fixed;
+  right: 30px;
+  bottom: 30px;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  opacity: 0.6;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease,
+    background-color 0.3s ease, color 0.3s ease;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  line-height: 1;
+}
+
+.floating-btn:hover,
+.floating-btn:focus-visible {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  opacity: 1;
+  text-decoration: none;
+}
+
+.floating-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.floating-btn--gold {
+  background-color: var(--main-gold, #fac30c);
+  color: #000;
+}
+
+.floating-btn--gold:hover,
+.floating-btn--gold:focus-visible {
+  background-color: var(--gold-hover, #e0ae00);
+  color: #000;
+}
+
+.floating-btn--green {
+  background-color: #25d366;
+  color: #fff;
+}
+
+.floating-btn--green:hover,
+.floating-btn--green:focus-visible {
+  color: #fff;
+}
+
+.btn-carrito {
+  bottom: 170px;
+  font-size: 2rem;
+  z-index: 1100;
+}
+
+.btn-scroll-up {
+  display: none;
+  font-size: 1.8rem;
+  z-index: 999;
+}
+
+.btn-whatsapp {
+  bottom: 100px;
+  font-size: 2rem;
+}
