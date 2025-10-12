@@ -621,7 +621,15 @@ if ($datos_guardados_exitosamente) {
     <h2 class="text-center text-white mb-4">
       <i class="fas fa-receipt text-warning me-2"></i>Historial de Pedidos
     </h2>
-    <div id="historial-pedidos" class="row justify-content-center"></div>
+    <div class="historial-wrapper mt-3 position-relative">
+      <button type="button" class="historial-nav historial-nav-left" aria-label="Pedidos anteriores">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div id="historial-pedidos" class="pedidos-scroll"></div>
+      <button type="button" class="historial-nav historial-nav-right" aria-label="Pedidos siguientes">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
   </div>
 
   <!-- Modal para mostrar detalles -->
@@ -672,13 +680,122 @@ if ($datos_guardados_exitosamente) {
         const estilos = document.createElement('style');
         estilos.id = estiloId;
         estilos.textContent = `
-          #historial-pedidos.historial-scroll {
-            flex-wrap: nowrap !important;
-            overflow-x: auto;
+          .historial-wrapper {
+            position: relative;
           }
 
-          #historial-pedidos.historial-scroll > div {
+          .historial-wrapper::before,
+          .historial-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2.5rem;
+            pointer-events: none;
+            z-index: 1;
+            background: linear-gradient(90deg, rgba(14, 14, 14, 0.85), rgba(14, 14, 14, 0));
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+          }
+
+          .historial-wrapper::after {
+            right: 0;
+            left: auto;
+            transform: scaleX(-1);
+          }
+
+          .historial-wrapper::before {
+            left: 0;
+          }
+
+          .historial-wrapper.historial-scroll-activo::before,
+          .historial-wrapper.historial-scroll-activo::after {
+            opacity: 1;
+          }
+
+          #historial-pedidos {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 3.25rem 1rem;
+            margin: 0;
+            scroll-behavior: smooth;
+            scroll-snap-type: x proximity;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+          }
+
+           #historial-pedidos::-webkit-scrollbar {
+            display: none;
+          }
+
+          #historial-pedidos > .pedido-item {
             flex: 0 0 auto;
+            width: min(280px, 82vw);
+            scroll-snap-align: center;
+          }
+
+          @media (min-width: 768px) {
+            #historial-pedidos > .pedido-item {
+              width: 260px;
+            }
+          }
+
+          @media (min-width: 992px) {
+            #historial-pedidos > .pedido-item {
+              width: 280px;
+            }
+          }
+
+          .historial-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: #ffc107;
+            z-index: 2;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+          }
+
+          .historial-wrapper.historial-scroll-activo .historial-nav {
+            opacity: 0.85;
+            pointer-events: auto;
+          }
+
+          .historial-nav-left {
+            left: 0.5rem;
+          }
+
+          .historial-nav-right {
+            right: 0.5rem;
+          }
+
+          .historial-nav:disabled {
+            opacity: 0.35 !important;
+            pointer-events: none;
+          }
+
+          .historial-nav i {
+            pointer-events: none;
+          }
+
+          @media (hover: hover) and (pointer: fine) {
+            .historial-wrapper.historial-scroll-activo .historial-nav:hover {
+              opacity: 1;
+              background-color: rgba(0, 0, 0, 0.8);
+            }
           }
         `;
         document.head.appendChild(estilos);
@@ -732,13 +849,44 @@ if ($datos_guardados_exitosamente) {
     `;
     }
 
-    function aplicarScrollHistorial(cantidadPedidos) {
-      if (cantidadPedidos > 5) {
-        historialContenedor.classList.add('historial-scroll');
-      } else {
-        historialContenedor.classList.remove('historial-scroll');
+    const historialWrapper = document.querySelector('.historial-wrapper');
+    const botonAnteriorHistorial = document.querySelector('.historial-nav-left');
+    const botonSiguienteHistorial = document.querySelector('.historial-nav-right');
+
+    function actualizarEstadoFlechas() {
+      if (!botonAnteriorHistorial || !botonSiguienteHistorial || !historialWrapper) {
+        return;
       }
+      const maxScrollLeft = historialContenedor.scrollWidth - historialContenedor.clientWidth;
+      const scrollLeft = historialContenedor.scrollLeft;
+
+      const hayOverflow = maxScrollLeft > 2;
+      historialWrapper.classList.toggle('historial-scroll-activo', hayOverflow);
+
+      if (!hayOverflow) {
+        botonAnteriorHistorial.disabled = true;
+        botonSiguienteHistorial.disabled = true;
+        return;
+      }
+
+      botonAnteriorHistorial.disabled = scrollLeft <= 8;
+      botonSiguienteHistorial.disabled = scrollLeft >= (maxScrollLeft - 8);
     }
+
+    function aplicarScrollHistorial() {
+      requestAnimationFrame(actualizarEstadoFlechas);
+    }
+
+    function desplazarHistorial(direccion) {
+      const paso = Math.max(historialContenedor.clientWidth * 0.8, 260);
+      historialContenedor.scrollBy({ left: paso * direccion, behavior: 'smooth' });
+    }
+
+    botonAnteriorHistorial?.addEventListener('click', () => desplazarHistorial(-1));
+    botonSiguienteHistorial?.addEventListener('click', () => desplazarHistorial(1));
+    historialContenedor.addEventListener('scroll', () => requestAnimationFrame(actualizarEstadoFlechas), { passive: true });
+    window.addEventListener('resize', aplicarScrollHistorial);
+    actualizarEstadoFlechas();
 
     async function actualizarHistorial() {
       try {
@@ -753,7 +901,7 @@ if ($datos_guardados_exitosamente) {
             <div class="col-12">
               <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
             </div>`;
-          aplicarScrollHistorial(0);
+
         } else {
           const pedidosOrdenados = [...pedidos].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
           const pedidosConNumeros = pedidosOrdenados.map((pedido, idx) => ({
@@ -769,7 +917,7 @@ if ($datos_guardados_exitosamente) {
             const metodoPagoCard = escapeHtml(obtenerMetodoPago(pedido));
 
             return `
-              <div class="col-md-6 col-lg-3 mb-3">
+              <div class="pedido-item">
                 <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
                   <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
                    <h5 class="card-title">Pedido #${pedidoNumero}</h5>
@@ -783,10 +931,10 @@ if ($datos_guardados_exitosamente) {
               </div>
               `;
           }).join('');
-          aplicarScrollHistorial(pedidosParaMostrar.length);
         }
 
         historialContenedor.innerHTML = htmlPedidos;
+        aplicarScrollHistorial();
 
         // Actualizar contenido del modal si está abierto
         const modalEl = document.getElementById('modalDetallePedido');
