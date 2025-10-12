@@ -1,19 +1,6 @@
 <?php
 include("../../bd.php");
 
-if (isset($_GET['txtID'])) {
-  $txtID = $_GET["txtID"] ?? "";
-
-  if (is_numeric($txtID)) {
-    $sentencia = $conexion->prepare("DELETE FROM tbl_banners WHERE ID=:id");
-    $sentencia->bindParam(":id", $txtID);
-    $sentencia->execute();
-  }
-
-  header("Location:index.php");
-  exit;
-}
-
 try {
   $sentencia = $conexion->prepare("SELECT * FROM tbl_banners ORDER BY ID DESC");
   $sentencia->execute();
@@ -59,11 +46,6 @@ $publicBaseUrl = piccolo_public_base_url();
                 <td class="text-center">
                   <div class="d-flex justify-content-center gap-1">
                     <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= urlencode($value['ID']) ?>">Editar</a>
-                    <a class="btn btn-danger btn-sm"
-                       href="index.php?txtID=<?= urlencode($value['ID']) ?>"
-                       onclick="return confirm('¿Seguro que deseas borrar este banner?');">
-                      Borrar
-                    </a>
                   </div>
                 </td>
               </tr>
