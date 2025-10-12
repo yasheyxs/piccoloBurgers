@@ -4,16 +4,21 @@ require_once __DIR__ . '/../../admin/bd.php';
 require_once __DIR__ . '/../../componentes/validar_telefono.php';
 require_once __DIR__ . '/../../componentes/password_utils.php';
 
-
 $mensaje = "";
+$nombre = '';
+$codigo = '54';
+$numero = '';
+$email = '';
+$password = '';
+$confirmar = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $nombre = trim($_POST["nombre"]);
-  $codigo = trim($_POST["codigo_pais"]);
-  $numero = trim($_POST["telefono"]);
-  $email = trim($_POST["email"] ?? "");
-  $password = $_POST["password"];
-  $confirmar = $_POST["confirmar"];
+  $nombre = trim($_POST["nombre"] ?? $nombre);
+  $codigo = trim($_POST["codigo_pais"] ?? $codigo);
+  $numero = trim($_POST["telefono"] ?? $numero);
+  $email = trim($_POST["email"] ?? $email);
+  $password = $_POST["password"] ?? $password;
+  $confirmar = $_POST["confirmar"] ?? $confirmar;
 
   $telefonoCompleto = validarTelefono($codigo, $numero);
 
@@ -46,7 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
           $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
           $sentencia->execute([$nombre, $telefonoCompleto, $email, $hash]);
 
-          $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora podés <a href='./login_cliente.php'>iniciar sesión</a>.</div>";
+          $nombre = '';
+          $codigo = '54';
+          $numero = '';
+          $email = '';
+          $password = '';
+          $confirmar = '';
         }
       }
     } catch (PDOException $e) {
@@ -269,30 +279,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <div class="mb-3">
           <label for="nombre" class="form-label">Nombre completo:</label>
-          <input type="text" class="form-control" name="nombre" required>
+          <input type="text" class="form-control" name="nombre" required
+            value="<?= htmlspecialchars($nombre, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
         </div>
 
         <div class="mb-3">
           <label for="telefono" class="form-label">Teléfono:</label>
           <div class="d-flex gap-2">
             <select name="codigo_pais" class="form-control" style="max-width: 140px;" required id="codigo_pais">
-              <option value="54" selected>🇦🇷 +54</option>
-              <option value="598">🇺🇾 +598</option>
-              <option value="55">🇧🇷 +55</option>
-              <option value="56">🇨🇱 +56</option>
-              <option value="595">🇵🇾 +595</option>
-              <option value="591">🇧🇴 +591</option>
-              <option value="51">🇵🇪 +51</option>
-              <option value="1">🇺🇸 +1</option>
-              <option value="34">🇪🇸 +34</option>
+              <option value="54" <?= $codigo === '54' ? 'selected' : '' ?>>🇦🇷 +54</option>
+              <option value="598" <?= $codigo === '598' ? 'selected' : '' ?>>🇺🇾 +598</option>
+              <option value="55" <?= $codigo === '55' ? 'selected' : '' ?>>🇧🇷 +55</option>
+              <option value="56" <?= $codigo === '56' ? 'selected' : '' ?>>🇨🇱 +56</option>
+              <option value="595" <?= $codigo === '595' ? 'selected' : '' ?>>🇵🇾 +595</option>
+              <option value="591" <?= $codigo === '591' ? 'selected' : '' ?>>🇧🇴 +591</option>
+              <option value="51" <?= $codigo === '51' ? 'selected' : '' ?>>🇵🇪 +51</option>
+              <option value="1" <?= $codigo === '1' ? 'selected' : '' ?>>🇺🇸 +1</option>
+              <option value="34" <?= $codigo === '34' ? 'selected' : '' ?>>🇪🇸 +34</option>
             </select>
-            <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
+            <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required
+              value="<?= htmlspecialchars($numero, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
           </div>
         </div>
 
         <div class="mb-3">
           <label for="email" class="form-label">Email:</label>
-          <input type="email" class="form-control" name="email" required autocomplete="email">
+          <input type="email" class="form-control" name="email" required autocomplete="email"
+            value="<?= htmlspecialchars($email, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
         </div>
 
         <div class="mb-3">
@@ -304,13 +317,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             id="password"
             required
             pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}"
-            title="<?php echo mensajeRequisitosPassword(); ?>">
+            title="<?php echo mensajeRequisitosPassword(); ?>"
+            value="<?= htmlspecialchars($password, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
           <div class="form-text requirement-text"><?php echo mensajeRequisitosPassword(); ?></div>
         </div>
 
         <div class="mb-3">
           <label for="confirmar" class="form-label">Confirmar contraseña:</label>
-          <input type="password" class="form-control" name="confirmar" required>
+          <input type="password" class="form-control" name="confirmar" required
+            value="<?= htmlspecialchars($confirmar, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
         </div>
 
         <button type="submit" class="btn-gold mt-3">Registrarse</button>

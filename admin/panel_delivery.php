@@ -31,19 +31,20 @@ $valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
     --font-title: 'Bebas Neue', sans-serif;
   }
 
-  html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-}
+  html,
+  body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
 
-body {
-  font-family: var(--font-main);
-  color: var(--text-light);
-  background: url("/img/HamLoginCliente.jpg") no-repeat center center fixed;
-  background-size: cover;
-  background-attachment: fixed;
-}
+  body {
+    font-family: var(--font-main);
+    color: var(--text-light);
+    background: url("/img/HamLoginCliente.jpg") no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+  }
 
 
   main {
@@ -164,7 +165,11 @@ body {
         $productos = $stmt_detalle->fetchAll(PDO::FETCH_ASSOC);
 
         $telefono = trim((string)($pedido['telefono'] ?? ''));
+        $telefonoNormalizado = $telefono !== '' ? '+' . ltrim($telefono, '+') : '';
         $telefonoEnlace = preg_replace('/[^0-9+]/', '', $telefono);
+        if ($telefonoEnlace !== '') {
+          $telefonoEnlace = '+' . ltrim($telefonoEnlace, '+');
+        }
 
         $direccionBase = trim((string)($pedido['direccion'] ?? ''));
         $direccionCompleta = $direccionBase !== ''
@@ -190,55 +195,55 @@ body {
           <h5>#<?= $pedido['ID'] ?> - <?= htmlspecialchars($pedido['nombre']) ?></h5>
           <p class="mb-2">
             <i class="fas fa-phone me-2"></i>
-            <?php if ($telefono !== '' && $telefonoEnlace !== ''): ?>
+            <?php if ($telefonoNormalizado !== '' && $telefonoEnlace !== ''): ?>
               <a class="contact-link" href="tel:<?= htmlspecialchars($telefonoEnlace) ?>">
+                <?= htmlspecialchars($telefonoNormalizado) ?>
 
-              <?= htmlspecialchars($telefono) ?>
-            </a>
-          <?php else: ?>
-            <span class="text-muted">Sin teléfono</span>
-          <?php endif; ?>
-        </p>
-        <p class="mb-2">
-          <i class="fas fa-map-marker-alt me-2"></i>
-          <?php if ($mapUrl !== ''): ?>
-            <a class="contact-link" href="<?= htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"> <?= htmlspecialchars($direccionBase) ?>
-            </a>
-          <?php else: ?>
-            <span class="text-muted">Sin dirección</span>
-          <?php endif; ?>
-        </p>
-        <p class="mb-2">
-          <i class="fas fa-credit-card me-2"></i>
-          <?php if ($metodoPago !== ''): ?>
-            <?= htmlspecialchars($metodoPago) ?>
-          <?php else: ?>
-            <span class="text-muted">Sin método de pago</span>
-          <?php endif; ?>
-        </p>
-         <p class="mb-2">
-          <i class="fas fa-money-bill-wave me-2"></i>
-          Total: $<?= $totalPedido ?>
-        </p>
-        <p class="mb-2">
-          <i class="fas fa-receipt me-2"></i>
-          ¿Está pago?: <span class="<?= $estadoPagoClase ?>" data-estado-pago><?= $estadoPagoTexto ?></span>
-        </p>
-        <p class="fw-semibold mb-2">🛍️ Productos:</p>
-        <ul class="mb-3">
-          <?php if (count($productos) > 0): ?>
-            <?php foreach ($productos as $producto): ?>
-              <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
-            <?php endforeach; ?>
-          <?php else: ?>
-            <li class="text-muted">Sin productos</li>
-          <?php endif; ?>
-        </ul>
-        <p class="mb-0"><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
-        <div class="mt-4">
-          <button class="btn btn-gold w-100" data-id="<?= $pedido['ID'] ?>" data-action="entregado">Entregado</button>
+              </a>
+            <?php else: ?>
+              <span class="text-muted">Sin teléfono</span>
+            <?php endif; ?>
+          </p>
+          <p class="mb-2">
+            <i class="fas fa-map-marker-alt me-2"></i>
+            <?php if ($mapUrl !== ''): ?>
+              <a class="contact-link" href="<?= htmlspecialchars($mapUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank" rel="noopener noreferrer"> <?= htmlspecialchars($direccionBase) ?>
+              </a>
+            <?php else: ?>
+              <span class="text-muted">Sin dirección</span>
+            <?php endif; ?>
+          </p>
+          <p class="mb-2">
+            <i class="fas fa-credit-card me-2"></i>
+            <?php if ($metodoPago !== ''): ?>
+              <?= htmlspecialchars($metodoPago) ?>
+            <?php else: ?>
+              <span class="text-muted">Sin método de pago</span>
+            <?php endif; ?>
+          </p>
+          <p class="mb-2">
+            <i class="fas fa-money-bill-wave me-2"></i>
+            Total: $<?= $totalPedido ?>
+          </p>
+          <p class="mb-2">
+            <i class="fas fa-receipt me-2"></i>
+            ¿Está pago?: <span class="<?= $estadoPagoClase ?>" data-estado-pago><?= $estadoPagoTexto ?></span>
+          </p>
+          <p class="fw-semibold mb-2">🛍️ Productos:</p>
+          <ul class="mb-3">
+            <?php if (count($productos) > 0): ?>
+              <?php foreach ($productos as $producto): ?>
+                <li><?= htmlspecialchars($producto['cantidad']) ?> x <?= htmlspecialchars($producto['nombre']) ?></li>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <li class="text-muted">Sin productos</li>
+            <?php endif; ?>
+          </ul>
+          <p class="mb-0"><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
+          <div class="mt-4">
+            <button class="btn btn-gold w-100" data-id="<?= $pedido['ID'] ?>" data-action="entregado">Entregado</button>
+          </div>
         </div>
-      </div>
       <?php endforeach; ?>
     <?php endif; ?>
   </div>
@@ -248,7 +253,10 @@ body {
   const pedidosContainer = document.getElementById('lista-pedidos');
   const alertaSinPedidos = document.getElementById('alerta-sin-pedidos');
   const LOCALIDAD_PREDETERMINADA = 'Villa del Rosario, Córdoba, Argentina';
-  const formateadorPesos = new Intl.NumberFormat('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const formateadorPesos = new Intl.NumberFormat('es-AR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
   let sincronizacionEnCurso = false;
 
   function actualizarVisibilidadMensaje() {
@@ -328,6 +336,34 @@ body {
     return formateadorPesos.format(totalValido);
   }
 
+  function normalizarTelefonoParaMostrar(telefono) {
+    if (telefono === null || telefono === undefined) {
+      return '';
+    }
+
+    const texto = String(telefono).trim();
+    if (texto === '') {
+      return '';
+    }
+
+    const sinPrefijo = texto.replace(/^\++/, '');
+    return `+${sinPrefijo}`;
+  }
+
+  function obtenerTelefonoEnlace(telefono) {
+    if (telefono === null || telefono === undefined) {
+      return '';
+    }
+
+    const numeros = String(telefono).trim().replace(/[^0-9+]/g, '');
+    if (numeros === '') {
+      return '';
+    }
+
+    const sinPrefijo = numeros.replace(/^\++/, '');
+    return `+${sinPrefijo}`;
+  }
+
   function crearTarjetaPedido(pedido) {
     const tarjeta = document.createElement('div');
     tarjeta.className = 'glass-card';
@@ -343,7 +379,8 @@ body {
     tarjeta.dataset.estaPago = estadoPago;
 
     const telefono = pedido && pedido.telefono != null ? String(pedido.telefono).trim() : '';
-    const telefonoEnlace = telefono.replace(/[^0-9+]/g, '');
+    const telefonoNormalizado = normalizarTelefonoParaMostrar(telefono);
+    const telefonoEnlace = obtenerTelefonoEnlace(telefono);
 
     const direccionBase = pedido && pedido.direccion != null ? String(pedido.direccion).trim() : '';
     const mapaQuery = direccionBase !== '' ? `${direccionBase}, ${LOCALIDAD_PREDETERMINADA}` : '';
@@ -353,27 +390,27 @@ body {
     const referencias = pedido && pedido.referencias != null ? String(pedido.referencias).trim() : '';
 
     const productos = Array.isArray(pedido.productos) ? pedido.productos : [];
-    const productosHtml = productos.length > 0
-      ? productos
-        .map((producto) => {
-          const cantidad = producto && producto.cantidad != null ? String(producto.cantidad) : '';
-          const nombre = producto && producto.nombre != null ? String(producto.nombre) : '';
-          return `<li>${escapeHtml(cantidad)} x ${escapeHtml(nombre)}</li>`;
-        })
-        .join('')
-      : '<li class="text-muted">Sin productos</li>';
+    const productosHtml = productos.length > 0 ?
+      productos
+      .map((producto) => {
+        const cantidad = producto && producto.cantidad != null ? String(producto.cantidad) : '';
+        const nombre = producto && producto.nombre != null ? String(producto.nombre) : '';
+        return `<li>${escapeHtml(cantidad)} x ${escapeHtml(nombre)}</li>`;
+      })
+      .join('') :
+      '<li class="text-muted">Sin productos</li>';
 
-    const telefonoHtml = (telefono !== '' && telefonoEnlace !== '')
-      ? `<a class="contact-link" href="tel:${escapeHtml(telefonoEnlace)}">${escapeHtml(telefono)}</a>`
-      : '<span class="text-muted">Sin teléfono</span>';
+    const telefonoHtml = (telefonoNormalizado !== '' && telefonoEnlace !== '')
+      ? `<a class="contact-link" href="tel:${escapeHtml(telefonoEnlace)}">${escapeHtml(telefonoNormalizado)}</a>`:
+      '<span class="text-muted">Sin teléfono</span>';
 
-    const direccionHtml = mapUrl !== ''
-      ? `<a class="contact-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer"> ${escapeHtml(direccionBase)}</a>`
-      : '<span class="text-muted">Sin dirección</span>';
+    const direccionHtml = mapUrl !== '' ?
+      `<a class="contact-link" href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer"> ${escapeHtml(direccionBase)}</a>` :
+      '<span class="text-muted">Sin dirección</span>';
 
-    const metodoPagoHtml = metodoPago !== ''
-      ? escapeHtml(metodoPago)
-      : '<span class="text-muted">Sin método de pago</span>';
+    const metodoPagoHtml = metodoPago !== '' ?
+      escapeHtml(metodoPago) :
+      '<span class="text-muted">Sin método de pago</span>';
 
     const referenciasHtml = referencias !== '' ? escapeHtml(referencias) : 'Sin referencias';
 
@@ -542,9 +579,9 @@ body {
         throw new Error(mensaje);
       }
     } catch (error) {
-      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch'
-        ? error.message
-        : 'Error al conectar con el servidor.';
+      const mensajeError = error instanceof Error && error.message && error.message !== 'Failed to fetch' ?
+        error.message :
+        'Error al conectar con el servidor.';
       alert(mensajeError);
       console.error(error);
     } finally {
