@@ -128,7 +128,6 @@ include("../../templates/header.php");
       <table id="tablaCompras" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Fecha</th>
             <th>Proveedor</th>
             <th>Teléfono</th>
@@ -139,7 +138,6 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_compras as $compra) { ?>
             <tr>
-              <td><?= htmlspecialchars($compra["ID"]) ?></td>
               <td><?= htmlspecialchars($compra["fecha"]) ?></td>
               <td><?= htmlspecialchars($compra["proveedor"]) ?></td>
               <td><?= htmlspecialchars($compra["telefono"]) ?></td>
