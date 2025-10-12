@@ -70,7 +70,6 @@ include("../../templates/header.php");
       <table id="tablaProveedores" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Teléfono</th>
             <th>Email</th>
@@ -81,7 +80,6 @@ include("../../templates/header.php");
           <?php if (!empty($lista_proveedores)) : ?>
             <?php foreach ($lista_proveedores as $registro) { ?>
               <tr>
-                <td><?php echo htmlspecialchars($registro["ID"]); ?></td>
                 <td><?php echo htmlspecialchars($registro["nombre"]); ?></td>
                 <td><?php echo htmlspecialchars($registro["telefono"]); ?></td>
                 <td><?php echo $registro["email"] ? htmlspecialchars($registro["email"]) : '—'; ?></td>
@@ -93,7 +91,7 @@ include("../../templates/header.php");
             <?php } ?>
           <?php else : ?>
             <tr>
-              <td colspan="5" class="text-center">No se encontraron proveedores.</td>
+              <td colspan="4" class="text-center">No se encontraron proveedores.</td>
             </tr>
           <?php endif; ?>
         </tbody>

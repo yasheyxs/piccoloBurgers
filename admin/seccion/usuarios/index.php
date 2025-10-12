@@ -66,7 +66,6 @@ include("../../templates/header.php");
       <table id="tablaUsuarios" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Usuario</th>
             <th>Correo</th>
             <th>Rol</th>
@@ -76,7 +75,6 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_usuarios as $registro) { ?>
             <tr>
-              <td><?php echo $registro["ID"]; ?></td>
               <td><?php echo $registro["usuario"]; ?></td>
               <td><?php echo $registro["correo"]; ?></td>
               <td><?php echo ucfirst($registro["rol"]); ?></td>
