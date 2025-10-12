@@ -152,10 +152,15 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
 <!-- Modal de confirmación de cierre de sesión -->
 <div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content border-danger">
-      <div class="modal-header bg-danger text-white">
-        <h5 class="modal-title" id="modalCerrarSesionLabel">¿Cerrar sesión?</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+    <div class="modal-content logout-modal">
+      <div class="modal-header">
+        <div class="d-flex align-items-center gap-3">
+          <span class="logout-modal__icon" aria-hidden="true">
+            <i class="fa-solid fa-right-from-bracket"></i>
+          </span>
+          <h5 class="modal-title mb-0" id="modalCerrarSesionLabel">¿Cerrar sesión?</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
         ¿Estás seguro de que querés cerrar sesión? Esta acción te desconectará del panel de administración.

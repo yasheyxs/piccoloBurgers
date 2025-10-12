@@ -565,6 +565,67 @@ body.admin-body .theme-toggle.btn-outline-secondary {
   box-shadow: none;
 }
 
+body.admin-body .logout-modal {
+  background-color: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
+  color: var(--admin-text);
+}
+
+body.admin-body .logout-modal .modal-header {
+  background-color: var(--admin-surface-alt);
+  border-bottom: 1px solid var(--admin-border);
+  color: inherit;
+  gap: 1rem;
+}
+
+body.admin-body .logout-modal__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(220, 38, 38, 0.12);
+  color: var(--admin-btn-danger-bg);
+  font-size: 1.35rem;
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.25);
+}
+
+body.admin-body.admin-dark .logout-modal__icon {
+  background-color: rgba(220, 38, 38, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.35);
+}
+
+body.admin-body .logout-modal .modal-body {
+  color: inherit;
+}
+
+body.admin-body .logout-modal .modal-footer {
+  border-top: 1px solid var(--admin-border);
+  gap: 0.75rem;
+}
+
+body.admin-body .logout-modal .btn-close {
+  opacity: 0.65;
+  transition: var(--admin-transition);
+}
+
+body.admin-body .logout-modal .btn-close:hover,
+body.admin-body .logout-modal .btn-close:focus {
+  opacity: 1;
+}
+
+body.admin-body.admin-dark .logout-modal .btn-close {
+  filter: invert(1) brightness(1.2);
+}
+
+@media (max-width: 575.98px) {
+  body.admin-body .logout-modal .modal-footer {
+    flex-direction: column;
+  }
+}
+
 body.admin-body .theme-toggle.btn-outline-secondary:hover,
 body.admin-body .theme-toggle.btn-outline-secondary:focus {
   background-color: rgba(15, 23, 42, 0.08);
