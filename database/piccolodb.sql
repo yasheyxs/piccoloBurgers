@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Oct 12, 2025 at 06:12 AM
+-- Generation Time: Oct 12, 2025 at 06:30 AM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -65,15 +65,15 @@ CREATE TABLE `tbl_clientes` (
 --
 
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`, `reset_token`, `token_expira`) VALUES
-(2, 'Juanita', '123445444141', NULL, '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
-(3, 'fdsdfds', '2342342', NULL, '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
-(4, 'Yass', '+541111111111', NULL, '$2y$10$LPVkO1.2qyrK9e2CQUMHjep6njTTBbrxEfZWepeqzLPxybfh8Z8tm', '2025-07-29 19:11:37', 159, NULL, NULL),
-(5, 'Morrón', '543573451913', NULL, '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
-(6, 'Prueba', '1', NULL, '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
-(7, 'Prueba', '+541234567890', NULL, '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
-(8, 'Uu', '+541231231231', NULL, '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
+(2, 'Juanita', '123445444141', 'cliente0002@piccolo-falso.test', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
+(3, 'fdsdfds', '2342342', 'cliente0003@piccolo-falso.test', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
+(4, 'Yass', '+541111111111', 'cliente0004@piccolo-falso.test', '$2y$10$LPVkO1.2qyrK9e2CQUMHjep6njTTBbrxEfZWepeqzLPxybfh8Z8tm', '2025-07-29 19:11:37', 159, NULL, NULL),
+(5, 'Morrón', '543573451913', 'cliente0005@piccolo-falso.test', '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
+(6, 'Prueba', '1', 'cliente0006@piccolo-falso.test', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
+(7, 'Prueba', '+541234567890', 'cliente0007@piccolo-falso.test', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
+(8, 'Uu', '+541231231231', 'cliente0008@piccolo-falso.test', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
 (9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 59, NULL, NULL),
-(10, 'Esta es una prueba', '+541234123412', NULL, '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
+(10, 'Esta es una prueba', '+541234123412', 'cliente0010@piccolo-falso.test', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -835,7 +835,9 @@ CREATE TABLE `tbl_reservas_virtuales` (
 --
 
 INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
-(18, 'hln2oi1c76hheid1fe5c910blt', 47, 1, '2025-10-03 01:33:06');
+(18, 'hln2oi1c76hheid1fe5c910blt', 47, 1, '2025-10-03 01:33:06'),
+(32, 'ac04105cd58ef5b107c344b939f6fc81', 38, 2, '2025-10-12 06:22:49'),
+(33, 'ac04105cd58ef5b107c344b939f6fc81', 39, 1, '2025-10-12 06:22:51');
 
 -- --------------------------------------------------------
 
@@ -1070,7 +1072,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
