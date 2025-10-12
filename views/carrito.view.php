@@ -34,13 +34,31 @@
       <div class="text-end mt-4">
           <h4>Total: $<span id="total">0.00</span></h4>
 
-        <?php if (isset($_SESSION["cliente"])): ?>
-            <div class="form-check mt-3 d-flex justify-content-end align-items-center gap-2">
-              <input class="form-check-input mt-0" type="checkbox" id="usarPuntos">
-              <label class="form-check-label mb-0" for="usarPuntos">
-                Usar puntos (<?= htmlspecialchars((string) $puntosCliente, ENT_QUOTES, 'UTF-8') ?> disponibles)
-              </label>
-              <input type="hidden" id="puntosDisponibles" value="<?= htmlspecialchars((string) $puntosCliente, ENT_QUOTES, 'UTF-8') ?>">
+        <?php if (isset($_SESSION["cliente"])):
+          $puntosDisponibles = isset($puntosCliente) ? (int) $puntosCliente : 0;
+          $minimoPuntosParaCanjear = 50;
+          $puedeCanjearPuntos = $puntosDisponibles >= $minimoPuntosParaCanjear;
+        ?>
+            <div class="usar-puntos-wrapper mt-3<?= $puedeCanjearPuntos ? '' : ' is-disabled' ?>">
+              <div class="form-check d-flex justify-content-end align-items-center gap-2 m-0">
+                <input
+                  class="form-check-input mt-0"
+                  type="checkbox"
+                  id="usarPuntos"
+                  data-minimo-puntos="<?= $minimoPuntosParaCanjear ?>"
+                  data-puntos-disponibles="<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?>"
+                  <?= $puedeCanjearPuntos ? '' : 'disabled' ?>
+                >
+                <label class="form-check-label mb-0" for="usarPuntos">
+                  Usar puntos (<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?> disponibles)
+                </label>
+              </div>
+              <p class="usar-puntos-helper mb-0 text-end">
+                <?= $puedeCanjearPuntos
+                  ? 'Canjeá hasta el 25% de tu pedido con tus puntos.'
+                  : "Necesitás al menos {$minimoPuntosParaCanjear} puntos para canjear." ?>
+              </p>
+              <input type="hidden" id="puntosDisponibles" value="<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?>">
             </div>
 
         <?php endif; ?>
