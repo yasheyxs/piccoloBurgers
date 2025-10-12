@@ -25,6 +25,14 @@
   ?>
 
 
+  <?php
+  $bannerPrincipal = $lista_banners[0] ?? null;
+  $bannerBackground = 'img/BannerBG.jpg';
+  if ($bannerPrincipal && !empty($bannerPrincipal['imagen'])) {
+    $bannerBackground = $bannerPrincipal['imagen'];
+  }
+  ?>
+
   <main>
     <?php if (!isset($_SESSION["cliente"])): ?>
       <div id="registro-burbuja" class="registro-burbuja">
@@ -41,12 +49,12 @@
 
 
    <section id="inicio" class="container-fluid p-0">
-    <div class="banner-img hero-banner-image">
+    <div class="banner-img hero-banner-image" style="background-image: url('<?php echo htmlspecialchars($bannerBackground, ENT_QUOTES, 'UTF-8'); ?>');">
       <div class="banner-text">
         <?php foreach ($lista_banners as $banner): ?>
-          <h1 class="banner-heading"><?php echo $banner['titulo']; ?></h1>
-          <p class="banner-subtext"><?php echo $banner['descripcion']; ?></p>
-          <a href="<?php echo $banner['link']; ?>" class="btn btn-gold banner-btn">Ver Menú</a>
+          <h1 class="banner-heading"><?php echo htmlspecialchars($banner['titulo'], ENT_QUOTES, 'UTF-8'); ?></h1>
+          <p class="banner-subtext"><?php echo htmlspecialchars($banner['descripcion'], ENT_QUOTES, 'UTF-8'); ?></p>
+          <a href="<?php echo htmlspecialchars($banner['link'], ENT_QUOTES, 'UTF-8'); ?>" class="btn btn-gold banner-btn">Ver Menú</a>
         <?php endforeach; ?>
       </div>
     </div>
