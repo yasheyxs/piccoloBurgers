@@ -19,7 +19,6 @@ include("../admin/templates/header.php");
       <table id="tablaClientes" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Teléfono</th>
             <th>Email</th>
@@ -30,7 +29,6 @@ include("../admin/templates/header.php");
         <tbody>
           <?php foreach ($lista_clientes as $cliente) { ?>
             <tr>
-              <td><?= $cliente["ID"] ?></td>
               <td><?= $cliente["nombre"] ?></td>
               <td><?= $cliente["telefono"] ?></td>
               <td><?= $cliente["email"] ?></td>

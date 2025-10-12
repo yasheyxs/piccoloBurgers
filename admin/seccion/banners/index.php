@@ -29,7 +29,6 @@ include("../../templates/header.php");
       <table id="miTabla" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Título</th>
             <th>Descripción</th>
             <th>Enlace</th>
@@ -39,7 +38,6 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_banners as $value) { ?>
             <tr>
-              <td><?php echo $value['ID']; ?></td>
               <td><?php echo $value['titulo']; ?></td>
               <td><?php echo $value['descripcion']; ?></td>
               <td><?php echo $value['link']; ?></td>
