@@ -31,7 +31,6 @@ include("../../templates/header.php");
       <table id="tablaTestimonios" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Opinión</th>
             <th>Nombre</th>
             <th>Acciones</th>
@@ -40,7 +39,6 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_testimonios as $value) { ?>
             <tr>
-              <td><?php echo $value['ID']; ?></td>
               <td><?php echo $value['opinion']; ?></td>
               <td><?php echo $value['nombre']; ?></td>
               <td>

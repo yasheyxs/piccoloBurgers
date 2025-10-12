@@ -28,7 +28,6 @@ include("../../templates/header.php");
       <table id="tablaComentarios" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Correo</th>
             <th>Mensaje</th>
@@ -38,7 +37,6 @@ include("../../templates/header.php");
         <tbody>
           <?php foreach ($lista_comentarios as $registro) { ?>
             <tr>
-              <td><?php echo $registro["ID"]; ?></td>
               <td><?php echo $registro["nombre"]; ?></td>
               <td><?php echo $registro["correo"]; ?></td>
               <td><?php echo $registro["mensaje"]; ?></td>

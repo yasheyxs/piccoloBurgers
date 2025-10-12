@@ -50,7 +50,6 @@ include("../../templates/header.php");
       <table id="tablaMenu" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Nombre</th>
             <th>Ingredientes</th>
             <th>Precio</th>
@@ -63,7 +62,6 @@ include("../../templates/header.php");
           <?php if (count($lista_menu) > 0): ?>
             <?php foreach ($lista_menu as $registro): ?>
               <tr>
-                <td><?= htmlspecialchars($registro["ID"]) ?></td>
                 <td><?= htmlspecialchars($registro["nombre"]) ?></td>
                 <td><?= htmlspecialchars($registro["ingredientes"]) ?></td>
                 <td>$<?= number_format($registro["precio"], 0) ?></td>
@@ -84,7 +82,7 @@ include("../../templates/header.php");
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="7" class="text-center text-muted">No hay registros de menú disponibles.</td>
+              <td colspan="6" class="text-center text-muted">No hay registros de menú disponibles.</td>
             </tr>
           <?php endif; ?>
         </tbody>

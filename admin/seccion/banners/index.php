@@ -30,7 +30,6 @@ $publicBaseUrl = piccolo_public_base_url();
       <table id="miTabla" class="table table-bordered table-hover table-sm align-middle w-100">
         <thead class="table-light">
           <tr>
-            <th>ID</th>
             <th>Título</th>
             <th>Descripción</th>
             <th>Enlace</th>
@@ -52,6 +51,9 @@ $publicBaseUrl = piccolo_public_base_url();
                   <span class="text-muted">Sin imagen</span>
                 <?php } ?>
               </td>
+              <td><?php echo $value['titulo']; ?></td>
+              <td><?php echo $value['descripcion']; ?></td>
+              <td><?php echo $value['link']; ?></td>
               <td>
                 <div class="d-flex flex-wrap gap-1">
                   <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo $value['ID']; ?>">Editar</a>
