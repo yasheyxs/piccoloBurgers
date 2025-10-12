@@ -35,11 +35,15 @@ include("../admin/templates/header.php");
           </tr>
         </thead>
         <tbody>
-          <?php foreach ($lista_clientes as $cliente) { ?>
+          <?php foreach ($lista_clientes as $cliente) {
+            $nombreSeguro = htmlspecialchars($cliente["nombre"] ?? '', ENT_QUOTES, 'UTF-8');
+            $telefonoSeguro = htmlspecialchars($cliente["telefono"] ?? '', ENT_QUOTES, 'UTF-8');
+            $emailSeguro = htmlspecialchars($cliente["email"] ?? '', ENT_QUOTES, 'UTF-8');
+          ?>
             <tr>
-              <td><?= $cliente["nombre"] ?></td>
-              <td><?= $cliente["telefono"] ?></td>
-              <td><?= $cliente["email"] ?></td>
+              <td><?= $nombreSeguro ?></td>
+              <td><?= $telefonoSeguro ?></td>
+              <td><?= $emailSeguro ?></td>
               <td><?= date("d/m/Y", strtotime($cliente["fecha_registro"])) ?></td>
               <td><?= $cliente["total_pedidos"] ?></td>
               <td>

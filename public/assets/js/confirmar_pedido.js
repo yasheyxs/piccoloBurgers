@@ -277,18 +277,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const agrupado = {};
       carritoSinAgrupar.forEach((item) => {
         const key = item.id;
+        const precioOriginal = Number(item.precio);
+        const precioUnitario = Number.isFinite(precioOriginal) ? precioOriginal : 0;
         if (!agrupado[key]) {
           agrupado[key] = {
             id: item.id,
             nombre: item.nombre,
-            precio: item.precio,
+            precio: precioUnitario,
             cantidad: 1,
           };
-        } else {
-          // Si ya existe, sumar cantidad y precio
-          agrupado[key].cantidad++;
-          agrupado[key].precio += item.precio;
+        return;
         }
+        // Si ya existe, solo sumar cantidad y conservar el precio unitario
+        agrupado[key].cantidad += 1;
+        agrupado[key].precio = precioUnitario;
       });
 
       // Convertir a array limpio para enviar
