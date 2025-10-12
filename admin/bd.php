@@ -78,10 +78,18 @@ if (!function_exists('piccolo_columna_existe')) {
     }
 }
 
-function verificarRol($rolPermitido) {
-    session_start();
-    if (!isset($_SESSION['usuario']) || $_SESSION['rol'] !== $rolPermitido) {
-        header("Location: ../login.php");
+function verificarRol(string $rolPermitido): void
+{
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+
+    $usuarioAutenticado = $_SESSION['admin_usuario'] ?? null;
+    $rolSesion = $_SESSION['rol'] ?? null;
+
+    if ($usuarioAutenticado === null || $rolSesion !== $rolPermitido) {
+        $loginUrl = piccolo_admin_base_url() . 'login.php';
+        header('Location: ' . $loginUrl);
         exit();
     }
 }
