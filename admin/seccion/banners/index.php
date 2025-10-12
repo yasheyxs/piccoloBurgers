@@ -85,20 +85,14 @@ $publicBaseUrl = piccolo_public_base_url();
 <script>
   $(document).ready(function () {
     $('#miTabla').DataTable({
-      pageLength: 10,
-      lengthChange: true,
+      paging: false,
+      searching: false,
+      lengthChange: false,
       info: false,
       ordering: false,
+      dom: 't',
       language: {
-        emptyTable: "No hay registros disponibles",
-        lengthMenu: "Mostrar registros _MENU_ ",
-        search: "Buscar:",
-        paginate: {
-          first: "Primero",
-          last: "Último",
-          next: "Siguiente",
-          previous: "Anterior"
-        }
+        emptyTable: "No hay registros disponibles"
       }
     });
   });
