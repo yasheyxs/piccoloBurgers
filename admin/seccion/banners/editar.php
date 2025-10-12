@@ -2,22 +2,28 @@
 include("../../bd.php");
 
 $txtID = $_GET["txtID"] ?? "";
+if ($txtID === "" || !ctype_digit($txtID)) {
+  header("Location:index.php");
+  exit;
+}
+
+$bannerID = (int) $txtID;
 $titulo = "";
 $descripcion = "";
 $imagen = "";
 
-if ($txtID !== "") {
-  
-  $sentencia = $conexion->prepare("SELECT * FROM `tbl_banners` WHERE ID=:id");
-  $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
-  $sentencia->execute();
-  $registro = $sentencia->fetch(PDO::FETCH_ASSOC);
+$sentencia = $conexion->prepare("SELECT * FROM `tbl_banners` WHERE ID=:id");
+$sentencia->bindValue(":id", $bannerID, PDO::PARAM_INT);
+$sentencia->execute();
+$registro = $sentencia->fetch(PDO::FETCH_ASSOC);
 
-  if ($registro) {
-    $titulo = $registro["titulo"] ?? "";
-    $descripcion = $registro["descripcion"] ?? "";
-    $imagen = $registro["imagen"] ?? "";
-  }
+if ($registro) {
+  $titulo = $registro["titulo"] ?? "";
+  $descripcion = $registro["descripcion"] ?? "";
+  $imagen = $registro["imagen"] ?? "";
+} else {
+  header("Location:index.php");
+  exit;
 }
 
 $errorMensaje = "";
@@ -25,7 +31,6 @@ $errorMensaje = "";
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $titulo = trim($_POST["titulo"] ?? "");
   $descripcion = trim($_POST["descripcion"] ?? "");
-  $txtID = $_POST["txtID"] ?? "";
 
   if ($titulo === "" || $descripcion === "") {
     $errorMensaje = "Debe completar el título y la descripción.";
@@ -86,13 +91,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sentencia = $conexion->prepare("UPDATE `tbl_banners` SET titulo=:titulo, descripcion=:descripcion WHERE ID=:id");
     $sentencia->bindParam(":titulo", $titulo, PDO::PARAM_STR);
     $sentencia->bindParam(":descripcion", $descripcion, PDO::PARAM_STR);
-    $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
+    $sentencia->bindValue(":id", $bannerID, PDO::PARAM_INT);
     $sentencia->execute();
 
     if ($nuevaImagen !== null) {
       $sentenciaImagen = $conexion->prepare("UPDATE `tbl_banners` SET imagen=:imagen WHERE ID=:id");
       $sentenciaImagen->bindParam(":imagen", $nuevaImagen, PDO::PARAM_STR);
-      $sentenciaImagen->bindParam(":id", $txtID, PDO::PARAM_INT);
+      $sentenciaImagen->bindValue(":id", $bannerID, PDO::PARAM_INT);
       $sentenciaImagen->execute();
 
       if (!empty($imagen) && $imagen !== $nuevaImagen) {
@@ -125,12 +130,12 @@ include("../../templates/header.php");
       </div>
     <?php } ?>
 
-    <form action="" method="post" enctype="multipart/form-data">
+    <form action="?txtID=<?= urlencode((string) $bannerID) ?>" method="post" enctype="multipart/form-data">
 
       <div class="mb-3">
-        <label for="titulo" class="form-label">ID:</label>
+        <label for="txtID" class="form-label">ID:</label>
         <input type="text"
-          class="form-control" value="<?php echo htmlspecialchars($txtID, ENT_QUOTES, 'UTF-8'); ?>" name="txtID" id="txtID" aria-describedby="helpId" placeholder="Escriba el título del banner" readonly>
+          class="form-control" value="<?php echo htmlspecialchars((string) $bannerID, ENT_QUOTES, 'UTF-8'); ?>" id="txtID" aria-describedby="helpId" placeholder="Identificador del banner" readonly disabled>
       </div>
 
 
