@@ -41,7 +41,6 @@ include("../admin/templates/header.php");
               <td><?= $cliente["telefono"] ?></td>
               <td><?= $cliente["email"] ?></td>
               <td><?= date("d/m/Y", strtotime($cliente["fecha_registro"])) ?></td>
-              <td><?= $cliente["puntos"] ?></td>
               <td><?= $cliente["total_pedidos"] ?></td>
               <td>
                 <?php if (!empty($cliente["ultimo_pedido"])) { ?>
