@@ -27,7 +27,7 @@ if (MODO_DESARROLLO) {
   $_SESSION["rol"] = "admin";
 } else {
   if (!isset($_SESSION["admin_logueado"])) {
-    header("Location: login.php");
+    header('Location: ' . $url_base . 'login.php');
     exit();
   }
 }
@@ -172,15 +172,3 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
     </div>
   </div>
 </div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-    dropdownElements.forEach(function (dropdownToggleEl) {
-      new bootstrap.Dropdown(dropdownToggleEl);
-    });
-  });
-</script>
-
-</body>
-</html>

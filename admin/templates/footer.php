@@ -33,6 +33,14 @@
   });
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
+    dropdownElements.forEach(function (dropdownToggleEl) {
+      new bootstrap.Dropdown(dropdownToggleEl);
+    });
+  });
+</script>
 
 </body>
 

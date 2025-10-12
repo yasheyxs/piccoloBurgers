@@ -2,6 +2,7 @@
 session_start();
 if ($_POST) {
   include("bd.php");
+  require_once __DIR__ . '/helpers/url.php';
   require_once __DIR__ . '/../componentes/password_utils.php';
 
   $usuario  = trim($_POST["usuario"] ?? "");
@@ -32,11 +33,12 @@ if ($_POST) {
 
       session_regenerate_id(true);
       $parametrosCookie = session_get_cookie_params();
+      $esConexionSegura = piccolo_detect_scheme() === 'https';
       setcookie(session_name(), session_id(), [
         'expires' => 0,
         'path' => $parametrosCookie['path'],
         'domain' => $parametrosCookie['domain'],
-        'secure' => true,
+        'secure' => $esConexionSegura,
         'httponly' => true,
         'samesite' => 'Strict'
       ]);
