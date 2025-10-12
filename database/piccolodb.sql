@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Oct 03, 2025 at 09:48 PM
+-- Generation Time: Oct 12, 2025 at 05:08 AM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -64,15 +64,15 @@ CREATE TABLE `tbl_clientes` (
 --
 
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`, `reset_token`, `token_expira`) VALUES
-(2, 'Juanita', '123445444141', '', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
-(3, 'fdsdfds', '2342342', '', '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
+(2, 'Juanita', '123445444141', NULL, '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
+(3, 'fdsdfds', '2342342', NULL, '$2y$10$FF/cUd0GvtPrl5kvQtfSduqkKNKnDkWLdJvT4HNjXK4BH2ewI9muW', '2025-06-25 23:25:13', 0, NULL, NULL),
 (4, 'Yass', '+541111111111', NULL, '$2y$10$LPVkO1.2qyrK9e2CQUMHjep6njTTBbrxEfZWepeqzLPxybfh8Z8tm', '2025-07-29 19:11:37', 159, NULL, NULL),
-(5, 'Morrón', '543573451913', '', '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
-(6, 'Prueba', '1', '', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
-(7, 'Prueba', '+541234567890', '', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
-(8, 'Uu', '+541231231231', '', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
-(9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 0, NULL, NULL),
-(10, 'Esta es una prueba', '+541234123412', '1234123412@gmail.com', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
+(5, 'Morrón', '543573451913', NULL, '$2y$10$Wn4qn9S/jOeR6r0hhrQpteS/PAWBflgTRVmKIp3y2kwJ9PPdU6m1e', '2025-09-04 19:37:49', 69, NULL, NULL),
+(6, 'Prueba', '1', NULL, '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
+(7, 'Prueba', '+541234567890', NULL, '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
+(8, 'Uu', '+541231231231', NULL, '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
+(9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 59, NULL, NULL),
+(10, 'Esta es una prueba', '+541234123412', NULL, '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -665,11 +665,12 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (105, 'Prueba', '1', '', 'Sin picante', 22000, '2025-10-05 18:30:00', 'Tarjeta', 'Delivery', 'Zona Norte', 'En camino', 6, NULL, 'Si'),
 (106, 'Alma', '123123123', '', 'Familia', 22000, '2025-10-07 12:05:00', 'MercadoPago', 'Delivery', 'Av. Siempre Viva 123', 'Listo', NULL, 'Timbre gris', 'Si'),
 (107, 'Yass', '123', '', 'Extra salsa', 21500, '2025-10-08 22:18:00', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
-(108, 'Morrón', '543573451913', '', 'Dejar en recepcion', 17100, '2025-10-10 14:50:00', 'MercadoPago', 'Delivery', 'san martin 1299', 'En preparación', 5, NULL, 'No'),
+(108, 'Morrón', '543573451913', '', 'Dejar en recepcion', 17100, '2025-10-10 14:50:00', 'MercadoPago', 'Delivery', 'san martin 1299', 'En camino', 5, NULL, 'No'),
 (109, 'Cliente', '+541234512345', '', '', 21200, '2025-10-11 20:05:00', 'Efectivo', 'Delivery', '', 'Listo', 9, NULL, 'Si'),
 (110, 'Juana', '123', '', 'Retira hermano', 18000, '2025-10-12 11:40:00', 'Tarjeta', 'Retiro', '', 'Listo', NULL, NULL, 'Si'),
 (111, 'Prueba', '1', '', 'Cena amigos', 23100, '2025-10-13 19:25:00', 'MercadoPago', 'Delivery', 'Zona Norte', 'En camino', 6, NULL, 'No'),
-(112, 'Yass', '123', '', 'Postre aparte', 20000, '2025-10-14 22:10:00', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si');
+(112, 'Yass', '123', '', 'Postre aparte', 20000, '2025-10-14 22:10:00', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si'),
+(113, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 88500, '2025-10-12 04:38:49', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No');
 
 -- --------------------------------------------------------
 
@@ -777,7 +778,15 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (161, 111, 19, 'Aros de cebolla', 5600, 1),
 (162, 112, 34, 'Gran Piccolo', 11000, 1),
 (163, 112, 67, 'Sprite', 4500, 1),
-(164, 112, 65, 'Agua Saborizada', 4500, 1);
+(164, 112, 65, 'Agua Saborizada', 4500, 1),
+(165, 113, 15, 'Vegetariana', 9000, 1),
+(166, 113, 22, 'Super lomo', 11000, 1),
+(167, 113, 23, 'Lomo Piccolo', 13000, 1),
+(168, 113, 30, 'Sweet Onion', 9500, 1),
+(169, 113, 32, 'Monstruosa', 12000, 1),
+(170, 113, 51, 'Lomo de bondiola', 13000, 1),
+(171, 113, 55, 'Lomo de pollo', 10000, 1),
+(172, 113, 56, 'Sándwich de milanesa', 11000, 1);
 
 -- --------------------------------------------------------
 
@@ -882,10 +891,10 @@ INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset
 CREATE TABLE `vw_stock_materias_primas` (
 `ID` int
 ,`nombre` varchar(50)
-,`stock_pack` decimal(10,2)
-,`stock_unidades_estimado` decimal(20,2)
 ,`unidad_medida` varchar(50)
+,`stock_pack` decimal(10,2)
 ,`unidades_por_pack` int
+,`stock_unidades_estimado` decimal(20,2)
 );
 
 --
@@ -903,7 +912,8 @@ ALTER TABLE `tbl_banners`
 --
 ALTER TABLE `tbl_clientes`
   ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `telefono` (`telefono`);
+  ADD UNIQUE KEY `telefono` (`telefono`),
+  ADD UNIQUE KEY `email` (`email`);
 
 --
 -- Indexes for table `tbl_comentarios`
@@ -1041,13 +1051,13 @@ ALTER TABLE `tbl_menu_materias_primas`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=113;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=165;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
@@ -1059,7 +1069,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
