@@ -133,13 +133,6 @@ include("../../templates/header.php");
     <form action="?txtID=<?= urlencode((string) $bannerID) ?>" method="post" enctype="multipart/form-data">
 
       <div class="mb-3">
-        <label for="txtID" class="form-label">ID:</label>
-        <input type="text"
-          class="form-control" value="<?php echo htmlspecialchars((string) $bannerID, ENT_QUOTES, 'UTF-8'); ?>" id="txtID" aria-describedby="helpId" placeholder="Identificador del banner" readonly disabled>
-      </div>
-
-
-      <div class="mb-3">
         <label for="titulo" class="form-label">Título:</label>
         <input type="text"
           class="form-control" value="<?php echo htmlspecialchars($titulo, ENT_QUOTES, 'UTF-8'); ?>" name="titulo" id="titulo" aria-describedby="helpId" placeholder="Escriba el título del banner">
