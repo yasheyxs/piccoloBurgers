@@ -1,8 +1,15 @@
 <?php
 include("../admin/bd.php");
 
-// Obtener lista de clientes
-$sentencia = $conexion->prepare("SELECT * FROM tbl_clientes ORDER BY fecha_registro DESC");
+// Obtener lista de clientes junto con métricas de pedidos
+$sentencia = $conexion->prepare("SELECT c.*, COALESCE(p.total_pedidos, 0) AS total_pedidos, p.ultimo_pedido
+  FROM tbl_clientes c
+  LEFT JOIN (
+    SELECT cliente_id, COUNT(*) AS total_pedidos, MAX(fecha) AS ultimo_pedido
+    FROM tbl_pedidos
+    GROUP BY cliente_id
+  ) p ON p.cliente_id = c.ID
+  ORDER BY c.fecha_registro DESC");
 $sentencia->execute();
 $lista_clientes = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
@@ -23,7 +30,8 @@ include("../admin/templates/header.php");
             <th>Teléfono</th>
             <th>Email</th>
             <th>Fecha de registro</th>
-            <th>Puntos</th>
+            <th>Cantidad de pedidos</th>
+            <th>Último pedido</th>
           </tr>
         </thead>
         <tbody>
@@ -34,6 +42,14 @@ include("../admin/templates/header.php");
               <td><?= $cliente["email"] ?></td>
               <td><?= date("d/m/Y", strtotime($cliente["fecha_registro"])) ?></td>
               <td><?= $cliente["puntos"] ?></td>
+              <td><?= $cliente["total_pedidos"] ?></td>
+              <td>
+                <?php if (!empty($cliente["ultimo_pedido"])) { ?>
+                  <?= date("d/m/Y H:i", strtotime($cliente["ultimo_pedido"])) ?>
+                <?php } else { ?>
+                  <span class="text-muted">Sin pedidos</span>
+                <?php } ?>
+              </td>
             </tr>
           <?php } ?>
         </tbody>
