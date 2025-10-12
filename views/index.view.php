@@ -28,8 +28,11 @@
   <?php
   $bannerPrincipal = $lista_banners[0] ?? null;
   $bannerBackground = 'img/BannerBG.jpg';
-  if ($bannerPrincipal && !empty($bannerPrincipal['imagen'])) {
-    $bannerBackground = $bannerPrincipal['imagen'];
+  if ($bannerPrincipal) {
+    $imagenPrincipal = $bannerPrincipal['imagen'] ?? null;
+    if (is_string($imagenPrincipal) && $imagenPrincipal !== '') {
+      $bannerBackground = $imagenPrincipal;
+    }
   }
   ?>
 

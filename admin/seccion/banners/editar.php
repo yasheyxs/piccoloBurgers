@@ -8,6 +8,14 @@ if ($txtID === "" || !ctype_digit($txtID)) {
 }
 
 $bannerID = (int) $txtID;
+$columnaImagenDisponible = piccolo_columna_existe($conexion, 'tbl_banners', 'imagen');
+$advertenciaEsquema = '';
+
+if (!$columnaImagenDisponible) {
+  $advertenciaEsquema = 'La columna "imagen" no está disponible en la tabla tbl_banners. '
+    . 'La carga y visualización de imágenes permanecerá deshabilitada hasta que se actualice la base de datos.';
+}
+
 $titulo = "";
 $descripcion = "";
 $imagen = "";
@@ -20,7 +28,9 @@ $registro = $sentencia->fetch(PDO::FETCH_ASSOC);
 if ($registro) {
   $titulo = $registro["titulo"] ?? "";
   $descripcion = $registro["descripcion"] ?? "";
-  $imagen = $registro["imagen"] ?? "";
+  if ($columnaImagenDisponible && array_key_exists('imagen', $registro)) {
+    $imagen = $registro["imagen"] ?? "";
+  }
 } else {
   header("Location:index.php");
   exit;
@@ -38,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $nuevaImagen = null;
 
-  if (!$errorMensaje && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+  if (!$errorMensaje && $columnaImagenDisponible && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
     $archivoImagen = $_FILES['imagen'];
 
     if ($archivoImagen['error'] !== UPLOAD_ERR_OK) {
@@ -85,6 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
       }
     }
+    } elseif (!$errorMensaje && !$columnaImagenDisponible && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $errorMensaje = "La base de datos actual no admite imágenes para los banners.";
   }
 
   if (!$errorMensaje) {
@@ -94,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $sentencia->bindValue(":id", $bannerID, PDO::PARAM_INT);
     $sentencia->execute();
 
-    if ($nuevaImagen !== null) {
+    if ($columnaImagenDisponible && $nuevaImagen !== null) {
       $sentenciaImagen = $conexion->prepare("UPDATE `tbl_banners` SET imagen=:imagen WHERE ID=:id");
       $sentenciaImagen->bindParam(":imagen", $nuevaImagen, PDO::PARAM_STR);
       $sentenciaImagen->bindValue(":id", $bannerID, PDO::PARAM_INT);
@@ -124,6 +136,12 @@ include("../../templates/header.php");
   </div>
   <div class="card-body">
 
+  <?php if ($advertenciaEsquema) { ?>
+      <div class="alert alert-warning" role="alert">
+        <?php echo htmlspecialchars($advertenciaEsquema, ENT_QUOTES, 'UTF-8'); ?>
+      </div>
+    <?php } ?>
+
     <?php if ($errorMensaje) { ?>
       <div class="alert alert-danger" role="alert">
         <?php echo htmlspecialchars($errorMensaje, ENT_QUOTES, 'UTF-8'); ?>
@@ -145,13 +163,15 @@ include("../../templates/header.php");
 
       </div>
 
-      <div class="mb-3">
-        <label for="imagen" class="form-label">Imagen del banner</label>
-        <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg,image/png,image/webp">
-        <div class="form-text">Formatos permitidos: JPG, PNG o WEBP. Tamaño mínimo: 1200x600 píxeles.</div>
-      </div>
+      <?php if ($columnaImagenDisponible) { ?>
+        <div class="mb-3">
+          <label for="imagen" class="form-label">Imagen del banner</label>
+          <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg,image/png,image/webp">
+          <div class="form-text">Formatos permitidos: JPG, PNG o WEBP. Tamaño mínimo: 1200x600 píxeles.</div>
+        </div>
+      <?php } ?>
 
-      <?php if (!empty($imagen)) { ?>
+      <?php if ($columnaImagenDisponible && !empty($imagen)) { ?>
         <div class="mb-3">
           <p class="mb-1">Imagen actual:</p>
           <img src="<?php echo htmlspecialchars(piccolo_public_base_url() . $imagen, ENT_QUOTES, 'UTF-8'); ?>" alt="Banner actual" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">

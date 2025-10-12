@@ -1,6 +1,14 @@
 <?php
 include("../../bd.php");
 
+$columnaImagenDisponible = piccolo_columna_existe($conexion, 'tbl_banners', 'imagen');
+$advertenciaEsquema = '';
+
+if (!$columnaImagenDisponible) {
+  $advertenciaEsquema = 'La columna "imagen" no está disponible en la tabla tbl_banners. '
+    . 'La carga de nuevas imágenes permanecerá deshabilitada hasta que se actualice la base de datos.';
+}
+
 $errorMensaje = "";
 $titulo = "";
 $descripcion = "";
@@ -15,36 +23,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $nuevaImagen = null;
 
-  if (!$errorMensaje && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
-    $archivoImagen = $_FILES['imagen'];
+  if ($columnaImagenDisponible) {
+    if (!$errorMensaje && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+      $archivoImagen = $_FILES['imagen'];
+      $archivoImagen = $_FILES['imagen'];
 
-    if ($archivoImagen['error'] !== UPLOAD_ERR_OK) {
-      $errorMensaje = "No se pudo cargar la imagen seleccionada.";
-    } else {
-      $infoImagen = @getimagesize($archivoImagen['tmp_name']);
-
-      if ($infoImagen === false) {
-        $errorMensaje = "El archivo seleccionado no es una imagen válida.";
+      if ($archivoImagen['error'] !== UPLOAD_ERR_OK) {
+        $errorMensaje = "No se pudo cargar la imagen seleccionada.";
       } else {
-        $mime = $infoImagen['mime'] ?? '';
-        $ancho = $infoImagen[0] ?? 0;
-        $alto = $infoImagen[1] ?? 0;
-        $formatosPermitidos = [
-          'image/jpeg' => 'jpg',
-          'image/png' => 'png',
-          'image/webp' => 'webp',
-        ];
+        $infoImagen = @getimagesize($archivoImagen['tmp_name']);
 
-        if (!array_key_exists($mime, $formatosPermitidos)) {
-          $errorMensaje = "Formato de imagen no permitido. Utilice JPG, PNG o WEBP.";
-        } elseif ($ancho < 1200 || $alto < 600) {
-          $errorMensaje = "La imagen debe tener como mínimo 1200px de ancho y 600px de alto para evitar pixelación.";
+        if ($infoImagen === false) {
+          $errorMensaje = "El archivo seleccionado no es una imagen válida.";
         } else {
-          $directorioSubidas = __DIR__ . '/../../../public/img/banners';
+          $mime = $infoImagen['mime'] ?? '';
+          $ancho = $infoImagen[0] ?? 0;
+          $alto = $infoImagen[1] ?? 0;
+          $formatosPermitidos = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+          ];
 
-          if (!is_dir($directorioSubidas)) {
-            if (!mkdir($directorioSubidas, 0775, true) && !is_dir($directorioSubidas)) {
-              $errorMensaje = "No fue posible preparar el directorio de imágenes.";
+          if (!array_key_exists($mime, $formatosPermitidos)) {
+            $errorMensaje = "Formato de imagen no permitido. Utilice JPG, PNG o WEBP.";
+          } elseif ($ancho < 1200 || $alto < 600) {
+            $errorMensaje = "La imagen debe tener como mínimo 1200px de ancho y 600px de alto para evitar pixelación.";
+          } else {
+            $directorioSubidas = __DIR__ . '/../../../public/img/banners';
+
+            if (!is_dir($directorioSubidas)) {
+              if (!mkdir($directorioSubidas, 0775, true) && !is_dir($directorioSubidas)) {
+                $errorMensaje = "No fue posible preparar el directorio de imágenes.";
+              }
             }
           }
 
@@ -54,32 +65,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rutaDestino = $directorioSubidas . '/' . $nombreArchivo;
 
             if (!move_uploaded_file($archivoImagen['tmp_name'], $rutaDestino)) {
-              $errorMensaje = "No se pudo guardar la imagen en el servidor.";
-            } else {
-              $nuevaImagen = 'img/banners/' . $nombreArchivo;
+                $errorMensaje = "No se pudo guardar la imagen en el servidor.";
+              } else {
+                $nuevaImagen = 'img/banners/' . $nombreArchivo;
+              }
             }
           }
         }
-      }
+      } elseif (!$errorMensaje) {
+      $errorMensaje = "Debe seleccionar una imagen válida para el banner.";
     }
-  } else {
-    $errorMensaje = "Debe seleccionar una imagen válida para el banner.";
+  } elseif (!$errorMensaje && isset($_FILES['imagen']) && $_FILES['imagen']['error'] !== UPLOAD_ERR_NO_FILE) {
+    $errorMensaje = "La base de datos actual no admite imágenes para los banners.";
   }
 
-  if (!$errorMensaje && $nuevaImagen !== null) {
+  if (!$errorMensaje) {
     $link = '#menu';
-    $sentencia = $conexion->prepare("INSERT INTO `tbl_banners`
-             (`titulo`, `descripcion`, `link`, `imagen`)
-             VALUES (:titulo, :descripcion, :link, :imagen);");
+    $columnas = ['`titulo`', '`descripcion`', '`link`'];
+    $valores = [':titulo', ':descripcion', ':link'];
 
-    $sentencia->bindParam(":titulo", $titulo, PDO::PARAM_STR);
-    $sentencia->bindParam(":descripcion", $descripcion, PDO::PARAM_STR);
-    $sentencia->bindParam(":link", $link, PDO::PARAM_STR);
-    $sentencia->bindParam(":imagen", $nuevaImagen, PDO::PARAM_STR);
+    if ($columnaImagenDisponible) {
+      $columnas[] = '`imagen`';
+      $valores[] = ':imagen';
 
-    $sentencia->execute();
-    header("Location:index.php");
-    exit;
+      if ($nuevaImagen === null) {
+        $errorMensaje = "Debe seleccionar una imagen válida para el banner.";
+      }
+    }
+
+    if (!$errorMensaje) {
+      $sql = sprintf(
+        'INSERT INTO `tbl_banners` (%s) VALUES (%s);',
+        implode(', ', $columnas),
+        implode(', ', $valores)
+      );
+
+      $sentencia = $conexion->prepare($sql);
+      $sentencia->bindParam(":titulo", $titulo, PDO::PARAM_STR);
+      $sentencia->bindParam(":descripcion", $descripcion, PDO::PARAM_STR);
+      $sentencia->bindParam(":link", $link, PDO::PARAM_STR);
+
+      if ($columnaImagenDisponible) {
+        $sentencia->bindParam(":imagen", $nuevaImagen, PDO::PARAM_STR);
+      }
+
+      $sentencia->execute();
+      header("Location:index.php");
+      exit;
+    }
   }
 }
 include("../../templates/header.php");
@@ -90,6 +123,12 @@ include("../../templates/header.php");
     Banners
   </div>
   <div class="card-body">
+
+  <?php if ($advertenciaEsquema) { ?>
+      <div class="alert alert-warning" role="alert">
+        <?php echo htmlspecialchars($advertenciaEsquema, ENT_QUOTES, 'UTF-8'); ?>
+      </div>
+    <?php } ?>
 
     <?php if ($errorMensaje) { ?>
       <div class="alert alert-danger" role="alert">
@@ -112,11 +151,13 @@ include("../../templates/header.php");
 
       </div>
 
-      <div class="mb-3">
-        <label for="imagen" class="form-label">Imagen del banner</label>
-        <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg,image/png,image/webp">
-        <div class="form-text">Formatos permitidos: JPG, PNG o WEBP. Tamaño mínimo: 1200x600 píxeles.</div>
-      </div>
+      <?php if ($columnaImagenDisponible) { ?>
+        <div class="mb-3">
+          <label for="imagen" class="form-label">Imagen del banner</label>
+          <input class="form-control" type="file" name="imagen" id="imagen" accept="image/jpeg,image/png,image/webp">
+          <div class="form-text">Formatos permitidos: JPG, PNG o WEBP. Tamaño mínimo: 1200x600 píxeles.</div>
+        </div>
+      <?php } ?>
 
       <button type="submit" class="btn btn-success">Crear banner</button>
       <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>
@@ -128,7 +169,5 @@ include("../../templates/header.php");
   <div class="card-footer text-muted">
   </div>
 </div>
-
-
 
 <?php include("../../templates/footer.php"); ?>
