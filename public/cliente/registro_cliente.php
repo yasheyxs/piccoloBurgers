@@ -36,11 +36,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       if ($consulta->rowCount() > 0) {
         $mensaje = "<div class='alert alert-warning'>Ya existe una cuenta registrada con ese teléfono.</div>";
       } else {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
-        $sentencia->execute([$nombre, $telefonoCompleto, $email, $hash]);
+        $consulta = $conexion->prepare("SELECT ID FROM tbl_clientes WHERE email = ?");
+        $consulta->execute([$email]);
 
-        $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora podés <a href='./login_cliente.php'>iniciar sesión</a>.</div>";
+        if ($consulta->rowCount() > 0) {
+          $mensaje = "<div class='alert alert-warning'>Ya existe una cuenta registrada con ese email.</div>";
+        } else {
+          $hash = password_hash($password, PASSWORD_DEFAULT);
+          $sentencia = $conexion->prepare("INSERT INTO tbl_clientes (nombre, telefono, email, password) VALUES (?, ?, ?, ?)");
+          $sentencia->execute([$nombre, $telefonoCompleto, $email, $hash]);
+
+          $mensaje = "<div class='alert alert-success'>🎉 Registro exitoso. Ahora podés <a href='./login_cliente.php'>iniciar sesión</a>.</div>";
+        }
+      }
+    } catch (PDOException $e) {
+      if ($e->getCode() === '23000') {
+        $mensaje = "<div class='alert alert-danger'>Ya existe una cuenta registrada con los datos proporcionados.</div>";
+      } else {
+        $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";
       }
     } catch (Exception $e) {
       $mensaje = "<div class='alert alert-danger'>Error: " . $e->getMessage() . "</div>";

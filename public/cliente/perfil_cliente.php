@@ -58,6 +58,15 @@ if (isset($_POST["guardar_datos"])) {
   }
 
   if (empty($errores)) {
+    $verificar = $conexion->prepare("SELECT COUNT(*) FROM tbl_clientes WHERE email = ? AND ID != ?");
+    $verificar->execute([$nuevo_email, $cliente_id]);
+
+    if ($verificar->fetchColumn() > 0) {
+      $errores[] = "El email ya está registrado por otro cliente.";
+    }
+  }
+
+  if (empty($errores)) {
 
     $actualizar = $conexion->prepare("UPDATE tbl_clientes SET nombre = ?, telefono = ?, email = ? WHERE ID = ?");
     $actualizar->execute([$nuevo_nombre, $nuevo_telefono, $nuevo_email, $cliente_id]);
