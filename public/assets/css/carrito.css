@@ -109,6 +109,10 @@ footer {
   z-index: 0;
 }
 
+.carrito-panel #carrito-contenido {
+  margin-top: 1rem;
+}
+
 .respedido {
   padding-top: 50px;
 }

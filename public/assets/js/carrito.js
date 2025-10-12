@@ -499,14 +499,39 @@ function obtenerBotonesCarrito() {
 function actualizarEstadoBotones() {
   const { finalizar, cancelar } = obtenerBotonesCarrito();
   const hayProductos = obtenerCantidadTotalCarrito() > 0;
+  const usarPuntosCheckbox = document.getElementById("usarPuntos");
+
 
   if (finalizar) {
-    if (!hayProductos) {
-      finalizar.disabled = true;
-    }
+    finalizar.disabled = !hayProductos;
   }
   if (cancelar) {
     cancelar.disabled = !hayProductos;
+  }
+
+  if (usarPuntosCheckbox) {
+    const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
+    const habilitadoBase =
+      usarPuntosCheckbox.dataset.habilitadoBase !== "0";
+
+    if (!hayProductos) {
+      if (usarPuntosCheckbox.checked) {
+        usarPuntosCheckbox.checked = false;
+      }
+      if (!usarPuntosCheckbox.disabled) {
+        usarPuntosCheckbox.disabled = true;
+      }
+      if (wrapper) {
+        wrapper.classList.add("is-disabled");
+      }
+    } else if (habilitadoBase) {
+      if (usarPuntosCheckbox.disabled) {
+        usarPuntosCheckbox.disabled = false;
+      }
+      if (wrapper) {
+        wrapper.classList.remove("is-disabled");
+      }
+    }
   }
 }
 
@@ -878,6 +903,7 @@ document.addEventListener("DOMContentLoaded", () => {
       : puntosDisponiblesParseado;
     const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
     const puntosSuficientes = puntosDisponibles >= minimoPuntos;
+    usarPuntosCheckbox.dataset.habilitadoBase = puntosSuficientes ? "1" : "0";
 
     if (!puntosSuficientes) {
       usarPuntosInicial = false;

@@ -6,11 +6,14 @@ require_once __DIR__ . '/../../includes/email_requirement.php';
 require_once __DIR__ . '/../../componentes/password_utils.php';
 
 $mensaje = "";
+$codigo = '54';
+$numero = '';
+$password = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-  $codigo = trim($_POST["codigo_pais"] ?? "");
-  $numero = trim($_POST["telefono"] ?? "");
-  $password = $_POST["password"] ?? "";
+  $codigo = trim($_POST["codigo_pais"] ?? $codigo);
+  $numero = trim($_POST["telefono"] ?? $numero);
+  $password = $_POST["password"] ?? $password;
 
   $telefonoCompleto = validarTelefono($codigo, $numero);
 
@@ -270,23 +273,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           <label for="telefono" class="form-label">Teléfono:</label>
           <div class="d-flex gap-2">
             <select name="codigo_pais" class="form-control" style="max-width: 140px;" required id="codigo_pais">
-              <option value="54" selected>🇦🇷 +54</option>
-              <option value="598">🇺🇾 +598</option>
-              <option value="55">🇧🇷 +55</option>
-              <option value="56">🇨🇱 +56</option>
-              <option value="595">🇵🇾 +595</option>
-              <option value="591">🇧🇴 +591</option>
-              <option value="51">🇵🇪 +51</option>
-              <option value="1">🇺🇸 +1</option>
-              <option value="34">🇪🇸 +34</option>
+              <option value="54" <?= $codigo === '54' ? 'selected' : '' ?>>🇦🇷 +54</option>
+              <option value="598" <?= $codigo === '598' ? 'selected' : '' ?>>🇺🇾 +598</option>
+              <option value="55" <?= $codigo === '55' ? 'selected' : '' ?>>🇧🇷 +55</option>
+              <option value="56" <?= $codigo === '56' ? 'selected' : '' ?>>🇨🇱 +56</option>
+              <option value="595" <?= $codigo === '595' ? 'selected' : '' ?>>🇵🇾 +595</option>
+              <option value="591" <?= $codigo === '591' ? 'selected' : '' ?>>🇧🇴 +591</option>
+              <option value="51" <?= $codigo === '51' ? 'selected' : '' ?>>🇵🇪 +51</option>
+              <option value="1" <?= $codigo === '1' ? 'selected' : '' ?>>🇺🇸 +1</option>
+              <option value="34" <?= $codigo === '34' ? 'selected' : '' ?>>🇪🇸 +34</option>
             </select>
-            <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required>
+            <input type="text" class="form-control" name="telefono" id="telefono" placeholder="Ej: 3511234567" required
+              value="<?= htmlspecialchars($numero, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
           </div>
         </div>
 
         <div class="mb-3 mt-3">
           <label for="password" class="form-label">Contraseña:</label>
-          <input type="password" class="form-control" name="password" id="password" required>
+          <input type="password" class="form-control" name="password" id="password" required
+            value="<?= htmlspecialchars($password, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?>">
         </div>
 
         <button type="submit" class="btn-gold mt-3">Iniciar sesión</button>
