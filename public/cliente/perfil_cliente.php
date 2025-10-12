@@ -682,35 +682,7 @@ if ($datos_guardados_exitosamente) {
         estilos.textContent = `
           .historial-wrapper {
             position: relative;
-          }
-
-          .historial-wrapper::before,
-          .historial-wrapper::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            width: 2.5rem;
-            pointer-events: none;
-            z-index: 1;
-            background: linear-gradient(90deg, rgba(14, 14, 14, 0.85), rgba(14, 14, 14, 0));
-            opacity: 0;
-            transition: opacity 0.2s ease-in-out;
-          }
-
-          .historial-wrapper::after {
-            right: 0;
-            left: auto;
-            transform: scaleX(-1);
-          }
-
-          .historial-wrapper::before {
-            left: 0;
-          }
-
-          .historial-wrapper.historial-scroll-activo::before,
-          .historial-wrapper.historial-scroll-activo::after {
-            opacity: 1;
+            --historial-horizontal-padding: 3.25rem;
           }
 
           #historial-pedidos {
@@ -718,12 +690,14 @@ if ($datos_guardados_exitosamente) {
             flex-wrap: nowrap;
             gap: 1rem;
             overflow-x: auto;
-            padding: 0.5rem 3.25rem 1rem;
+            padding: 0.75rem var(--historial-horizontal-padding) 1rem;
             margin: 0;
             scroll-behavior: smooth;
-            scroll-snap-type: x proximity;
+            scroll-snap-type: x mandatory;
+            scroll-snap-stop: always;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
+            scroll-padding: 0 var(--historial-horizontal-padding);
           }
 
            #historial-pedidos::-webkit-scrollbar {
@@ -733,7 +707,7 @@ if ($datos_guardados_exitosamente) {
           #historial-pedidos > .pedido-item {
             flex: 0 0 auto;
             width: min(280px, 82vw);
-            scroll-snap-align: center;
+            scroll-snap-align: start;
           }
 
           @media (min-width: 768px) {
@@ -763,7 +737,6 @@ if ($datos_guardados_exitosamente) {
             color: #ffc107;
             z-index: 2;
             transition: opacity 0.2s ease, transform 0.2s ease;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
             cursor: pointer;
             opacity: 0;
             pointer-events: none;
@@ -775,11 +748,11 @@ if ($datos_guardados_exitosamente) {
           }
 
           .historial-nav-left {
-            left: 0.5rem;
+            left: 0.75rem;
           }
 
           .historial-nav-right {
-            right: 0.5rem;
+            right: 0.75rem;
           }
 
           .historial-nav:disabled {
@@ -853,6 +826,50 @@ if ($datos_guardados_exitosamente) {
     const botonAnteriorHistorial = document.querySelector('.historial-nav-left');
     const botonSiguienteHistorial = document.querySelector('.historial-nav-right');
 
+    function obtenerPasoScroll() {
+      if (!historialContenedor) {
+        return 0;
+      }
+      const primerItem = historialContenedor.querySelector('.pedido-item');
+      if (!primerItem) {
+        return historialContenedor.clientWidth;
+      }
+      const estilos = window.getComputedStyle(historialContenedor);
+      const gapTexto = estilos.columnGap || estilos.gap || '0';
+      const gap = parseFloat(gapTexto) || 0;
+      return primerItem.getBoundingClientRect().width + gap;
+    }
+
+    function actualizarPaddingCarrusel() {
+      if (!historialContenedor) {
+        return;
+      }
+
+      const primerItem = historialContenedor.querySelector('.pedido-item');
+      const anchoFlecha = botonAnteriorHistorial?.offsetWidth ?? 0;
+      const paddingBase = anchoFlecha ? anchoFlecha + 12 : 16;
+
+      if (!primerItem) {
+        historialContenedor.style.setProperty('--historial-horizontal-padding', `${paddingBase}px`);
+        return;
+      }
+
+      const wrapperWidth = historialWrapper?.clientWidth ?? historialContenedor.clientWidth;
+      const estilos = window.getComputedStyle(historialContenedor);
+      const gapTexto = estilos.columnGap || estilos.gap || '0';
+      const gap = parseFloat(gapTexto) || 0;
+      const cardWidth = primerItem.getBoundingClientRect().width;
+      const totalHijos = historialContenedor.children.length;
+      const capacidadFila = Math.max(Math.floor((wrapperWidth + gap) / (cardWidth + gap)), 1);
+      const itemsConsiderados = Math.min(totalHijos, capacidadFila);
+      const anchoContenido = itemsConsiderados * cardWidth + Math.max(itemsConsiderados - 1, 0) * gap;
+      const espacioLibre = Math.max(wrapperWidth - anchoContenido, 0);
+      const paddingCalculado = Math.max(paddingBase, espacioLibre / 2 + gap / 2);
+
+      historialContenedor.style.setProperty('--historial-horizontal-padding', `${paddingCalculado}px`);
+    }
+
+
     function actualizarEstadoFlechas() {
       if (!botonAnteriorHistorial || !botonSiguienteHistorial || !historialWrapper) {
         return;
@@ -874,11 +891,15 @@ if ($datos_guardados_exitosamente) {
     }
 
     function aplicarScrollHistorial() {
-      requestAnimationFrame(actualizarEstadoFlechas);
+      requestAnimationFrame(() => {
+        actualizarPaddingCarrusel();
+        actualizarEstadoFlechas();
+      });
     }
 
     function desplazarHistorial(direccion) {
-      const paso = Math.max(historialContenedor.clientWidth * 0.8, 260);
+      const pasoCalculado = obtenerPasoScroll() || historialContenedor.clientWidth;
+      const paso = pasoCalculado > 0 ? pasoCalculado : historialContenedor.clientWidth;
       historialContenedor.scrollBy({ left: paso * direccion, behavior: 'smooth' });
     }
 
@@ -886,6 +907,7 @@ if ($datos_guardados_exitosamente) {
     botonSiguienteHistorial?.addEventListener('click', () => desplazarHistorial(1));
     historialContenedor.addEventListener('scroll', () => requestAnimationFrame(actualizarEstadoFlechas), { passive: true });
     window.addEventListener('resize', aplicarScrollHistorial);
+    actualizarPaddingCarrusel();
     actualizarEstadoFlechas();
 
     async function actualizarHistorial() {
@@ -934,6 +956,10 @@ if ($datos_guardados_exitosamente) {
         }
 
         historialContenedor.innerHTML = htmlPedidos;
+        requestAnimationFrame(() => {
+          actualizarPaddingCarrusel();
+          actualizarEstadoFlechas();
+        });
         aplicarScrollHistorial();
 
         // Actualizar contenido del modal si está abierto
