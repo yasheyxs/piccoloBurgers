@@ -171,4 +171,5 @@ include("../../templates/header.php");
 
   </div>
 </div>
+<br>
 <?php include("../../templates/footer.php"); ?>
