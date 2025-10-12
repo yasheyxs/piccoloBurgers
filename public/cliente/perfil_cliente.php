@@ -663,6 +663,29 @@ if ($datos_guardados_exitosamente) {
       return metodo !== '' ? metodo : 'No especificado';
     }
 
+    const historialContenedor = document.getElementById('historial-pedidos');
+    let pedidosActuales = [];
+
+    (function inicializarEstilosHistorial() {
+      const estiloId = 'historial-pedidos-scroll-style';
+      if (!document.getElementById(estiloId)) {
+        const estilos = document.createElement('style');
+        estilos.id = estiloId;
+        estilos.textContent = `
+          #historial-pedidos.historial-scroll {
+            flex-wrap: nowrap !important;
+            overflow-x: auto;
+          }
+
+          #historial-pedidos.historial-scroll > div {
+            flex: 0 0 auto;
+          }
+        `;
+        document.head.appendChild(estilos);
+      }
+    })();
+
+
     // Función para construir el HTML del detalle del pedido
     function crearHtmlDetalle(pedido) {
       let estadoHtml = '';
@@ -709,40 +732,58 @@ if ($datos_guardados_exitosamente) {
     `;
     }
 
+    function aplicarScrollHistorial(cantidadPedidos) {
+      if (cantidadPedidos > 5) {
+        historialContenedor.classList.add('historial-scroll');
+      } else {
+        historialContenedor.classList.remove('historial-scroll');
+      }
+    }
+
     async function actualizarHistorial() {
       try {
         const response = await fetch('obtener_pedidos_cliente.php');
         const pedidos = await response.json();
 
-        const historialContenedor = document.getElementById('historial-pedidos');
         let htmlPedidos = '';
 
-        if (pedidos.length === 0) {
+        if (!Array.isArray(pedidos) || pedidos.length === 0) {
+          pedidosActuales = [];
           htmlPedidos = `
             <div class="col-12">
               <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
             </div>`;
+          aplicarScrollHistorial(0);
         } else {
-          pedidos.forEach((pedido, index) => {
-            const pedidoId = pedido.ID ?? pedido.id ?? (pedidos.length - index);
+          const pedidosOrdenados = [...pedidos].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+          const pedidosConNumeros = pedidosOrdenados.map((pedido, idx) => ({
+            ...pedido,
+            numeroHistorial: idx + 1
+          }));
+
+          const pedidosParaMostrar = [...pedidosConNumeros].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+          pedidosActuales = pedidosParaMostrar;
+
+          htmlPedidos = pedidosParaMostrar.map((pedido, index) => {
+            const pedidoNumero = pedido.numeroHistorial ?? (pedidosParaMostrar.length - index);
             const metodoPagoCard = escapeHtml(obtenerMetodoPago(pedido));
 
-            htmlPedidos += `
+            return `
               <div class="col-md-6 col-lg-3 mb-3">
                 <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
                   <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
-                  <h5 class="card-title">Pedido #${pedidoId}</h5>
+                   <h5 class="card-title">Pedido #${pedidoNumero}</h5>
                   <p><strong>Fecha:</strong><br>${new Date(pedido.fecha).toLocaleDateString()}</p>
                   <p><strong>Total:</strong> $${Number(pedido.total).toFixed(2)}</p>
                   <p><strong>Pago:</strong> ${metodoPagoCard}</p>
 
                   <button class="btn btn-outline-warning btn-sm mt-2 ver-detalle-btn" data-index="${index}">Ver detalle</button>
                 </div>
-                </div>
-              </div>
 
-          `;
-          });
+              </div>
+              `;
+          }).join('');
+          aplicarScrollHistorial(pedidosParaMostrar.length);
         }
 
         historialContenedor.innerHTML = htmlPedidos;
@@ -750,36 +791,39 @@ if ($datos_guardados_exitosamente) {
         // Actualizar contenido del modal si está abierto
         const modalEl = document.getElementById('modalDetallePedido');
         if (modalEl.classList.contains('show')) {
-          const idx = modalEl.getAttribute('data-index');
-          const pedido = pedidos[idx];
-          const modalBody = modalEl.querySelector('.modal-body');
+          const pedido = pedidosActuales[idx];
+          if (pedido) {
+            const modalBody = modalEl.querySelector('.modal-body');
+            modalBody.innerHTML = crearHtmlDetalle(pedido);
+          }
           modalBody.innerHTML = crearHtmlDetalle(pedido);
         }
-
-        // Delegación de eventos para los botones "Ver detalle"
-        historialContenedor.addEventListener('click', (e) => {
-          const btn = e.target.closest('.ver-detalle-btn');
-          if (!btn) return;
-
-          const idx = btn.getAttribute('data-index');
-          const pedido = pedidos[idx];
-
-          const modalBody = document.querySelector('#modalDetallePedido .modal-body');
-          const modalTitle = document.querySelector('#modalDetallePedidoLabel');
-          const pedidoId = pedido.ID ?? pedido.id ?? (parseInt(idx) + 1);
-
-          modalTitle.textContent = `Detalle del Pedido #${pedidoId}`;
-          modalBody.innerHTML = crearHtmlDetalle(pedido);
-
-          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-          modalEl.setAttribute('data-index', idx);
-          modal.show();
-        });
 
       } catch (e) {
         console.error('Error al actualizar historial:', e);
       }
     }
+
+    historialContenedor.addEventListener('click', (e) => {
+      const btn = e.target.closest('.ver-detalle-btn');
+      if (!btn) return;
+
+      const idx = parseInt(btn.getAttribute('data-index'), 10);
+      const pedido = pedidosActuales[idx];
+      if (!pedido) return;
+
+      const modalEl = document.getElementById('modalDetallePedido');
+      const modalBody = document.querySelector('#modalDetallePedido .modal-body');
+      const modalTitle = document.querySelector('#modalDetallePedidoLabel');
+      const pedidoNumero = pedido.numeroHistorial ?? (pedidosActuales.length - idx);
+
+      modalTitle.textContent = `Detalle del Pedido #${pedidoNumero}`;
+      modalBody.innerHTML = crearHtmlDetalle(pedido);
+
+      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+      modalEl.setAttribute('data-index', idx);
+      modal.show();
+    });
 
     document.addEventListener('DOMContentLoaded', actualizarHistorial);
     setInterval(actualizarHistorial, 10000);
