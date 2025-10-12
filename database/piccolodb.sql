@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Oct 12, 2025 at 05:08 AM
+-- Generation Time: Oct 12, 2025 at 06:12 AM
 -- Server version: 8.0.43
 -- PHP Version: 8.2.27
 
@@ -29,18 +29,18 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `tbl_banners` (
   `ID` int NOT NULL,
+  `imagen` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
   `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `imagen` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
+  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_banners`
 --
 
-INSERT INTO `tbl_banners` (`ID`, `titulo`, `descripcion`, `link`, `imagen`) VALUES
-(1, 'Piccolo Burgers', '100% cargadas de sabor', '#menu', 'img/BannerBG.jpg');
+INSERT INTO `tbl_banners` (`ID`, `imagen`, `titulo`, `descripcion`, `link`) VALUES
+(1, 'img/banners/banner_68eb46a8e56ca2.97829226.jpg', 'Piccolo Burgers', '100% cargadas de sabor', '#menu');
 
 -- --------------------------------------------------------
 
