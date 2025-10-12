@@ -29,11 +29,6 @@ $publicBaseUrl = piccolo_public_base_url();
 
 <br />
 <div class="card">
-  <div class="card-header d-flex justify-content-between align-items-center">
-    <a class="btn btn-primary" href="crear.php" role="button">Agregar registros</a>
-    <span class="text-muted">Mostrar registros</span>
-  </div>
-
   <div class="card-body">
     <div class="table-responsive">
       <table id="miTabla" class="table table-bordered table-hover table-sm align-middle w-100">
@@ -42,7 +37,6 @@ $publicBaseUrl = piccolo_public_base_url();
             <th>Título</th>
             <th>Descripción</th>
             <th>Enlace</th>
-            <th>Imagen</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -61,16 +55,7 @@ $publicBaseUrl = piccolo_public_base_url();
                     <span class="text-muted">Sin enlace</span>
                   <?php endif; ?>
                 </td>
-                <td class="text-center">
-                  <?php if (!empty($value['imagen'])): ?>
-                    <img src="<?= htmlspecialchars($publicBaseUrl . $value['imagen'], ENT_QUOTES, 'UTF-8') ?>"
-                         alt="Banner"
-                         class="img-fluid rounded"
-                         style="max-height: 80px; object-fit: cover;">
-                  <?php else: ?>
-                    <span class="text-muted">Sin imagen</span>
-                  <?php endif; ?>
-                </td>
+                
                 <td class="text-center">
                   <div class="d-flex justify-content-center gap-1">
                     <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= urlencode($value['ID']) ?>">Editar</a>
@@ -85,7 +70,7 @@ $publicBaseUrl = piccolo_public_base_url();
             <?php endforeach; ?>
           <?php else: ?>
             <tr>
-              <td colspan="5" class="text-center text-muted">No hay banners cargados.</td>
+              <td colspan="4" class="text-center text-muted">No hay banners cargados.</td>
             </tr>
           <?php endif; ?>
         </tbody>
@@ -106,7 +91,7 @@ $publicBaseUrl = piccolo_public_base_url();
       ordering: false,
       language: {
         emptyTable: "No hay registros disponibles",
-        lengthMenu: "Mostrar _MENU_ registros",
+        lengthMenu: "Mostrar registros _MENU_ ",
         search: "Buscar:",
         paginate: {
           first: "Primero",
