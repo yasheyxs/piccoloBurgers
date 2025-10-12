@@ -16,6 +16,7 @@ $sentencia->execute();
 $lista_banners = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 include("../../templates/header.php");
+$publicBaseUrl = piccolo_public_base_url();
 ?>
 
 <br />
@@ -32,12 +33,24 @@ include("../../templates/header.php");
             <th>Título</th>
             <th>Descripción</th>
             <th>Enlace</th>
+            <th>Imagen</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
           <?php foreach ($lista_banners as $value) { ?>
             <tr>
+              <td><?php echo htmlspecialchars($value['ID'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><?php echo htmlspecialchars($value['titulo'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><?php echo htmlspecialchars($value['descripcion'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td><?php echo htmlspecialchars($value['link'], ENT_QUOTES, 'UTF-8'); ?></td>
+              <td>
+                <?php if (!empty($value['imagen'])) { ?>
+                  <img src="<?php echo htmlspecialchars($publicBaseUrl . $value['imagen'], ENT_QUOTES, 'UTF-8'); ?>" alt="Banner" class="img-fluid rounded" style="max-height: 80px; object-fit: cover;">
+                <?php } else { ?>
+                  <span class="text-muted">Sin imagen</span>
+                <?php } ?>
+              </td>
               <td><?php echo $value['titulo']; ?></td>
               <td><?php echo $value['descripcion']; ?></td>
               <td><?php echo $value['link']; ?></td>
