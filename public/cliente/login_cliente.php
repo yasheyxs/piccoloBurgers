@@ -40,6 +40,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
           }
         }
 
+        session_regenerate_id(true);
+        $parametrosCookie = session_get_cookie_params();
+        setcookie(session_name(), session_id(), [
+          'expires' => 0,
+          'path' => $parametrosCookie['path'],
+          'domain' => $parametrosCookie['domain'],
+          'secure' => true,
+          'httponly' => true,
+          'samesite' => 'Strict'
+        ]);
+
 
         $_SESSION["cliente"] = [
           "id" => $cliente["ID"],
@@ -56,7 +67,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         limpiarAvisoEmailObligatorio();
 
-        $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$cliente['nombre']}</strong>!</div>";
+        $nombreSeguro = htmlspecialchars($cliente['nombre'] ?? '', ENT_QUOTES, 'UTF-8');
+        $mensaje = "<div class='alert alert-success'>Inicio de sesión exitoso. ¡Bienvenido/a <strong>{$nombreSeguro}</strong>!</div>";
         $mensaje .= "<script>setTimeout(() => window.location.href = '../index.php', 1500);</script>";
       } else {
         $mensaje = "<div class='alert alert-danger'>Teléfono o contraseña incorrectos.</div>";

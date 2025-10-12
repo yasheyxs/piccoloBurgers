@@ -30,6 +30,16 @@ if ($_POST) {
         }
       }
 
+      session_regenerate_id(true);
+      $parametrosCookie = session_get_cookie_params();
+      setcookie(session_name(), session_id(), [
+        'expires' => 0,
+        'path' => $parametrosCookie['path'],
+        'domain' => $parametrosCookie['domain'],
+        'secure' => true,
+        'httponly' => true,
+        'samesite' => 'Strict'
+      ]);
     
       $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
       $_SESSION["admin_logueado"] = true;

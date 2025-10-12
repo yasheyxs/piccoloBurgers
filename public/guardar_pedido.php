@@ -86,9 +86,34 @@ if (!is_array($carrito) || count($carrito) === 0) {
 }
 
 $total_original = 0;
+$carrito_normalizado = [];
 foreach ($carrito as $item) {
-    $total_original += $item["precio"];
+    if (!isset($item["id"], $item["nombre"], $item["precio"], $item["cantidad"])) {
+        responder_error("Producto inválido: " . json_encode($item));
+    }
+
+    if (!is_numeric($item["precio"]) || !is_numeric($item["cantidad"])) {
+        responder_error("Producto con datos numéricos inválidos: " . json_encode($item));
+    }
+
+    $precio_unitario = (float) $item["precio"];
+    $cantidad = (int) $item["cantidad"];
+
+    if ($cantidad <= 0) {
+        responder_error("La cantidad debe ser mayor a cero para el producto: " . json_encode($item));
+    }
+
+    $total_original += $precio_unitario * $cantidad;
+
+    $carrito_normalizado[] = [
+        "id" => $item["id"],
+        "nombre" => $item["nombre"],
+        "precio" => $precio_unitario,
+        "cantidad" => $cantidad,
+    ];
 }
+
+$carrito = $carrito_normalizado;
 
 $total = $total_original;
 
