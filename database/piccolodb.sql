@@ -31,15 +31,16 @@ CREATE TABLE `tbl_banners` (
   `ID` int NOT NULL,
   `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
+  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `imagen` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tbl_banners`
 --
 
-INSERT INTO `tbl_banners` (`ID`, `titulo`, `descripcion`, `link`) VALUES
-(1, 'Piccolo Burgers', '100% cargadas de sabor', '#menu');
+INSERT INTO `tbl_banners` (`ID`, `titulo`, `descripcion`, `link`, `imagen`) VALUES
+(1, 'Piccolo Burgers', '100% cargadas de sabor', '#menu', 'img/BannerBG.jpg');
 
 -- --------------------------------------------------------
 
