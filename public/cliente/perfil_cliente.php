@@ -621,15 +621,7 @@ if ($datos_guardados_exitosamente) {
     <h2 class="text-center text-white mb-4">
       <i class="fas fa-receipt text-warning me-2"></i>Historial de Pedidos
     </h2>
-    <div class="historial-wrapper mt-3 position-relative">
-      <button type="button" class="historial-nav historial-nav-left" aria-label="Pedidos anteriores">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div id="historial-pedidos" class="pedidos-scroll"></div>
-      <button type="button" class="historial-nav historial-nav-right" aria-label="Pedidos siguientes">
-        <i class="fas fa-chevron-right"></i>
-      </button>
-    </div>
+    <div id="historial-pedidos" class="row justify-content-center"></div>
   </div>
 
   <!-- Modal para mostrar detalles -->
@@ -653,8 +645,6 @@ if ($datos_guardados_exitosamente) {
       </div>
     </div>
   </div>
-
-
 
   <script>
     function escapeHtml(texto) {
@@ -680,95 +670,13 @@ if ($datos_guardados_exitosamente) {
         const estilos = document.createElement('style');
         estilos.id = estiloId;
         estilos.textContent = `
-          .historial-wrapper {
-            position: relative;
-            --historial-horizontal-padding: 3.25rem;
-          }
-
-          #historial-pedidos {
-            display: flex;
-            flex-wrap: nowrap;
-            gap: 1rem;
+          #historial-pedidos.historial-scroll {
+            flex-wrap: nowrap !important;
             overflow-x: auto;
-            padding: 0.75rem var(--historial-horizontal-padding) 1rem;
-            margin: 0;
-            scroll-behavior: smooth;
-            scroll-snap-type: x mandatory;
-            scroll-snap-stop: always;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: none;
-            scroll-padding: 0 var(--historial-horizontal-padding);
           }
 
-           #historial-pedidos::-webkit-scrollbar {
-            display: none;
-          }
-
-          #historial-pedidos > .pedido-item {
+          #historial-pedidos.historial-scroll > div {
             flex: 0 0 auto;
-            width: min(280px, 82vw);
-            scroll-snap-align: start;
-          }
-
-          @media (min-width: 768px) {
-            #historial-pedidos > .pedido-item {
-              width: 260px;
-            }
-          }
-
-          @media (min-width: 992px) {
-            #historial-pedidos > .pedido-item {
-              width: 280px;
-            }
-          }
-
-          .historial-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 2.75rem;
-            height: 2.75rem;
-            border-radius: 50%;
-            border: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(0, 0, 0, 0.6);
-            color: #ffc107;
-            z-index: 2;
-            transition: opacity 0.2s ease, transform 0.2s ease;
-            cursor: pointer;
-            opacity: 0;
-            pointer-events: none;
-          }
-
-          .historial-wrapper.historial-scroll-activo .historial-nav {
-            opacity: 0.85;
-            pointer-events: auto;
-          }
-
-          .historial-nav-left {
-            left: 0.75rem;
-          }
-
-          .historial-nav-right {
-            right: 0.75rem;
-          }
-
-          .historial-nav:disabled {
-            opacity: 0.35 !important;
-            pointer-events: none;
-          }
-
-          .historial-nav i {
-            pointer-events: none;
-          }
-
-          @media (hover: hover) and (pointer: fine) {
-            .historial-wrapper.historial-scroll-activo .historial-nav:hover {
-              opacity: 1;
-              background-color: rgba(0, 0, 0, 0.8);
-            }
           }
         `;
         document.head.appendChild(estilos);
@@ -822,93 +730,13 @@ if ($datos_guardados_exitosamente) {
     `;
     }
 
-    const historialWrapper = document.querySelector('.historial-wrapper');
-    const botonAnteriorHistorial = document.querySelector('.historial-nav-left');
-    const botonSiguienteHistorial = document.querySelector('.historial-nav-right');
-
-    function obtenerPasoScroll() {
-      if (!historialContenedor) {
-        return 0;
+    function aplicarScrollHistorial(cantidadPedidos) {
+      if (cantidadPedidos > 5) {
+        historialContenedor.classList.add('historial-scroll');
+      } else {
+        historialContenedor.classList.remove('historial-scroll');
       }
-      const primerItem = historialContenedor.querySelector('.pedido-item');
-      if (!primerItem) {
-        return historialContenedor.clientWidth;
-      }
-      const estilos = window.getComputedStyle(historialContenedor);
-      const gapTexto = estilos.columnGap || estilos.gap || '0';
-      const gap = parseFloat(gapTexto) || 0;
-      return primerItem.getBoundingClientRect().width + gap;
     }
-
-    function actualizarPaddingCarrusel() {
-      if (!historialContenedor) {
-        return;
-      }
-
-      const primerItem = historialContenedor.querySelector('.pedido-item');
-      const anchoFlecha = botonAnteriorHistorial?.offsetWidth ?? 0;
-      const paddingBase = anchoFlecha ? anchoFlecha + 12 : 16;
-
-      if (!primerItem) {
-        historialContenedor.style.setProperty('--historial-horizontal-padding', `${paddingBase}px`);
-        return;
-      }
-
-      const wrapperWidth = historialWrapper?.clientWidth ?? historialContenedor.clientWidth;
-      const estilos = window.getComputedStyle(historialContenedor);
-      const gapTexto = estilos.columnGap || estilos.gap || '0';
-      const gap = parseFloat(gapTexto) || 0;
-      const cardWidth = primerItem.getBoundingClientRect().width;
-      const totalHijos = historialContenedor.children.length;
-      const capacidadFila = Math.max(Math.floor((wrapperWidth + gap) / (cardWidth + gap)), 1);
-      const itemsConsiderados = Math.min(totalHijos, capacidadFila);
-      const anchoContenido = itemsConsiderados * cardWidth + Math.max(itemsConsiderados - 1, 0) * gap;
-      const espacioLibre = Math.max(wrapperWidth - anchoContenido, 0);
-      const paddingCalculado = Math.max(paddingBase, espacioLibre / 2 + gap / 2);
-
-      historialContenedor.style.setProperty('--historial-horizontal-padding', `${paddingCalculado}px`);
-    }
-
-
-    function actualizarEstadoFlechas() {
-      if (!botonAnteriorHistorial || !botonSiguienteHistorial || !historialWrapper) {
-        return;
-      }
-      const maxScrollLeft = historialContenedor.scrollWidth - historialContenedor.clientWidth;
-      const scrollLeft = historialContenedor.scrollLeft;
-
-      const hayOverflow = maxScrollLeft > 2;
-      historialWrapper.classList.toggle('historial-scroll-activo', hayOverflow);
-
-      if (!hayOverflow) {
-        botonAnteriorHistorial.disabled = true;
-        botonSiguienteHistorial.disabled = true;
-        return;
-      }
-
-      botonAnteriorHistorial.disabled = scrollLeft <= 8;
-      botonSiguienteHistorial.disabled = scrollLeft >= (maxScrollLeft - 8);
-    }
-
-    function aplicarScrollHistorial() {
-      requestAnimationFrame(() => {
-        actualizarPaddingCarrusel();
-        actualizarEstadoFlechas();
-      });
-    }
-
-    function desplazarHistorial(direccion) {
-      const pasoCalculado = obtenerPasoScroll() || historialContenedor.clientWidth;
-      const paso = pasoCalculado > 0 ? pasoCalculado : historialContenedor.clientWidth;
-      historialContenedor.scrollBy({ left: paso * direccion, behavior: 'smooth' });
-    }
-
-    botonAnteriorHistorial?.addEventListener('click', () => desplazarHistorial(-1));
-    botonSiguienteHistorial?.addEventListener('click', () => desplazarHistorial(1));
-    historialContenedor.addEventListener('scroll', () => requestAnimationFrame(actualizarEstadoFlechas), { passive: true });
-    window.addEventListener('resize', aplicarScrollHistorial);
-    actualizarPaddingCarrusel();
-    actualizarEstadoFlechas();
 
     async function actualizarHistorial() {
       try {
@@ -923,7 +751,7 @@ if ($datos_guardados_exitosamente) {
             <div class="col-12">
               <div class="alert alert-info text-center">Aún no realizaste ningún pedido.</div>
             </div>`;
-
+            aplicarScrollHistorial(0);
         } else {
           const pedidosOrdenados = [...pedidos].sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
           const pedidosConNumeros = pedidosOrdenados.map((pedido, idx) => ({
@@ -939,7 +767,7 @@ if ($datos_guardados_exitosamente) {
             const metodoPagoCard = escapeHtml(obtenerMetodoPago(pedido));
 
             return `
-              <div class="pedido-item">
+              <div class="col-md-6 col-lg-3 mb-3">
                 <div class="pedido-card glass-card card h-100 p-3 shadow-sm text-center" data-index="${index}" style="border-radius: 15px;">
                   <i class="fas fa-receipt fa-2x mb-3 text-warning"></i>
                    <h5 class="card-title">Pedido #${pedidoNumero}</h5>
@@ -956,48 +784,40 @@ if ($datos_guardados_exitosamente) {
         }
 
         historialContenedor.innerHTML = htmlPedidos;
-        requestAnimationFrame(() => {
-          actualizarPaddingCarrusel();
-          actualizarEstadoFlechas();
-        });
-        aplicarScrollHistorial();
 
         // Actualizar contenido del modal si está abierto
         const modalEl = document.getElementById('modalDetallePedido');
         if (modalEl.classList.contains('show')) {
-          const pedido = pedidosActuales[idx];
-          if (pedido) {
-            const modalBody = modalEl.querySelector('.modal-body');
-            modalBody.innerHTML = crearHtmlDetalle(pedido);
-          }
+          const idx = modalEl.getAttribute('data-index');
+          const pedido = pedidos[idx];
+          const modalBody = modalEl.querySelector('.modal-body');
           modalBody.innerHTML = crearHtmlDetalle(pedido);
         }
+
+        // Delegación de eventos para los botones "Ver detalle"
+        historialContenedor.addEventListener('click', (e) => {
+          const btn = e.target.closest('.ver-detalle-btn');
+          if (!btn) return;
+
+          const idx = btn.getAttribute('data-index');
+          const pedido = pedidos[idx];
+
+          const modalBody = document.querySelector('#modalDetallePedido .modal-body');
+          const modalTitle = document.querySelector('#modalDetallePedidoLabel');
+          const pedidoId = pedido.ID ?? pedido.id ?? (parseInt(idx) + 1);
+
+          modalTitle.textContent = `Detalle del Pedido #${pedidoId}`;
+          modalBody.innerHTML = crearHtmlDetalle(pedido);
+
+          const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+          modalEl.setAttribute('data-index', idx);
+          modal.show();
+        });
 
       } catch (e) {
         console.error('Error al actualizar historial:', e);
       }
     }
-
-    historialContenedor.addEventListener('click', (e) => {
-      const btn = e.target.closest('.ver-detalle-btn');
-      if (!btn) return;
-
-      const idx = parseInt(btn.getAttribute('data-index'), 10);
-      const pedido = pedidosActuales[idx];
-      if (!pedido) return;
-
-      const modalEl = document.getElementById('modalDetallePedido');
-      const modalBody = document.querySelector('#modalDetallePedido .modal-body');
-      const modalTitle = document.querySelector('#modalDetallePedidoLabel');
-      const pedidoNumero = pedido.numeroHistorial ?? (pedidosActuales.length - idx);
-
-      modalTitle.textContent = `Detalle del Pedido #${pedidoNumero}`;
-      modalBody.innerHTML = crearHtmlDetalle(pedido);
-
-      const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-      modalEl.setAttribute('data-index', idx);
-      modal.show();
-    });
 
     document.addEventListener('DOMContentLoaded', actualizarHistorial);
     setInterval(actualizarHistorial, 10000);
