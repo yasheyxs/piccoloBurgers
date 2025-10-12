@@ -1,6 +1,8 @@
 .hero-banner-image {
   position: relative;
-  background: url('../../img/BannerBG.jpg') center/cover no-repeat;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .section-panel {
