@@ -64,7 +64,7 @@ include("../../templates/header.php");
     <?php } ?>
     <div class="table-responsive">
       <table id="tablaUsuarios" class="table table-bordered table-hover table-sm align-middle w-100">
-        <thead class="table-light">
+        <thead class="table-light"> 
           <tr>
             <th>Usuario</th>
             <th>Correo</th>
