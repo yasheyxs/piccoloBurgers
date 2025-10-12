@@ -513,7 +513,17 @@ function actualizarEstadoBotones() {
 function mostrarMensajeCarritoVacio() {
   const contenedor = document.getElementById("carrito-contenido");
   if (contenedor) {
-    contenedor.innerHTML = "<p class='text-center'>Tu carrito está vacío.</p>";
+    contenedor.innerHTML = `
+      <div class="carrito-empty-message text-center">
+        <div class="carrito-empty-icon">
+          <i class="fas fa-shopping-basket" aria-hidden="true"></i>
+        </div>
+        <p class="carrito-empty-title mb-1">Tu carrito está vacío</p>
+        <p class="carrito-empty-subtitle mb-0">
+          Agregá algo delicioso desde el menú para comenzar tu pedido.
+        </p>
+      </div>
+    `;
   }
 }
 
@@ -636,18 +646,33 @@ function actualizarTotal(
   estadoTotalCarrito.total = total;
 
   const usarPuntosCheckbox = document.getElementById("usarPuntos");
-  const usarPuntos = usarPuntosCheckbox
-    ? Boolean(usarPuntosCheckbox.checked)
-    : Boolean(estadoTotalCarrito.usarPuntos);
+  let usarPuntos = Boolean(estadoTotalCarrito.usarPuntos);
+
+  if (usarPuntosCheckbox) {
+    if (usarPuntosCheckbox.disabled) {
+      if (usarPuntosCheckbox.checked) {
+        usarPuntosCheckbox.checked = false;
+      }
+      usarPuntos = false;
+    } else {
+      usarPuntos = Boolean(usarPuntosCheckbox.checked);
+    }
+  }
   if (estadoTotalCarrito.usarPuntos !== usarPuntos) {
     localStorage.setItem("usar_puntos_activado", usarPuntos ? "1" : "0");
-    estadoTotalCarrito.usarPuntos = usarPuntos;
   }
 
-  const puntosDisponibles = parseInt(
-    document.getElementById("puntosDisponibles")?.value || "0",
-    10
-  );
+  estadoTotalCarrito.usarPuntos = usarPuntos;
+
+  const puntosDisponiblesDato =
+    usarPuntosCheckbox?.dataset?.puntosDisponibles ??
+    document.getElementById("puntosDisponibles")?.value ??
+    "0";
+  const puntosDisponiblesParseado = Number.parseInt(puntosDisponiblesDato, 10);
+  const puntosDisponibles = Number.isNaN(puntosDisponiblesParseado)
+    ? 0
+    : puntosDisponiblesParseado;
+
   let descuento = 0;
 
   document.getElementById("puntos_usados")?.remove();
@@ -655,7 +680,15 @@ function actualizarTotal(
 
   if (usarPuntos && total > 0) {
     const valorPorPunto = 20;
-    const minimoParaCanjear = 50;
+    const minimoParaCanjearDato =
+      usarPuntosCheckbox?.dataset?.minimoPuntos ?? "50";
+    const minimoParaCanjearParseado = Number.parseInt(
+      minimoParaCanjearDato,
+      10
+    );
+    const minimoParaCanjear = Number.isNaN(minimoParaCanjearParseado)
+      ? 50
+      : minimoParaCanjearParseado;
     const maximoDescuento = total * 0.25;
 
     if (puntosDisponibles < minimoParaCanjear) {
@@ -714,7 +747,17 @@ function mostrarConfirmacionCancelar() {
   const productos = obtenerProductosDelEstado();
 
   if (productos.length === 0) {
-    detalleDiv.innerHTML = "<p class='text-muted'>El carrito está vacío.</p>";
+    detalleDiv.innerHTML = `
+      <div class="carrito-empty-message carrito-empty-message--compact text-center">
+        <div class="carrito-empty-icon">
+          <i class="fas fa-shopping-basket" aria-hidden="true"></i>
+        </div>
+        <p class="carrito-empty-title mb-1">Tu carrito está vacío</p>
+        <p class="carrito-empty-subtitle mb-0">
+          Podés seguir explorando el menú antes de cancelar.
+        </p>
+      </div>
+    `;
   } else {
     detalleDiv.innerHTML = `
       <ul class="list-group">
@@ -814,12 +857,43 @@ document.addEventListener("DOMContentLoaded", () => {
   const usarPuntosCheckbox = document.getElementById("usarPuntos");
   const usarPuntosGuardado =
     localStorage.getItem("usar_puntos_activado") === "1";
-  estadoTotalCarrito.usarPuntos = usarPuntosGuardado;
+  let usarPuntosInicial = usarPuntosGuardado;
 
   if (usarPuntosCheckbox) {
-    usarPuntosCheckbox.checked = usarPuntosGuardado;
-    usarPuntosCheckbox.addEventListener("change", actualizarTotal);
+    const minimoPuntosParseado = Number.parseInt(
+      usarPuntosCheckbox.dataset.minimoPuntos || "50",
+      10
+    );
+    const minimoPuntos = Number.isNaN(minimoPuntosParseado)
+      ? 50
+      : minimoPuntosParseado;
+    const puntosDisponiblesParseado = Number.parseInt(
+      usarPuntosCheckbox.dataset.puntosDisponibles ||
+        document.getElementById("puntosDisponibles")?.value ||
+        "0",
+      10
+    );
+    const puntosDisponibles = Number.isNaN(puntosDisponiblesParseado)
+      ? 0
+      : puntosDisponiblesParseado;
+    const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
+    const puntosSuficientes = puntosDisponibles >= minimoPuntos;
+
+    if (!puntosSuficientes) {
+      usarPuntosInicial = false;
+      usarPuntosCheckbox.checked = false;
+      usarPuntosCheckbox.disabled = true;
+      if (wrapper) {
+        wrapper.classList.add("is-disabled");
+      }
+      localStorage.setItem("usar_puntos_activado", "0");
+    } else {
+      usarPuntosCheckbox.checked = usarPuntosGuardado;
+      usarPuntosCheckbox.addEventListener("change", actualizarTotal);
+    }
   }
+
+  estadoTotalCarrito.usarPuntos = usarPuntosInicial;
 
   const cancelarBtn = document.getElementById("btnCancelar");
   if (cancelarBtn) {

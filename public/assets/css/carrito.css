@@ -135,6 +135,112 @@ footer {
   z-index: 1;
 }
 
+.usar-puntos-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-end;
+  margin-left: auto;
+  max-width: 440px;
+  background: linear-gradient(
+      135deg,
+      rgba(250, 195, 12, 0.12),
+      rgba(24, 24, 24, 0.6)
+    )
+    rgba(24, 24, 24, 0.85);
+  border: 1px solid rgba(250, 195, 12, 0.35);
+  border-radius: 16px;
+  padding: 12px 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, opacity 0.3s ease;
+}
+
+.usar-puntos-wrapper .form-check-label {
+  font-weight: 600;
+  color: var(--text-light);
+  letter-spacing: 0.02em;
+}
+
+.usar-puntos-wrapper .form-check-input {
+  width: 1.1rem;
+  height: 1.1rem;
+  cursor: pointer;
+}
+
+.usar-puntos-wrapper .form-check-input:focus {
+  box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+  border-color: rgba(250, 195, 12, 0.65);
+}
+
+.usar-puntos-helper {
+  font-size: 0.85rem;
+  color: rgba(250, 195, 12, 0.85);
+}
+
+.usar-puntos-wrapper.is-disabled {
+  opacity: 0.65;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: none;
+}
+
+.usar-puntos-wrapper.is-disabled .usar-puntos-helper {
+  color: rgba(255, 203, 203, 0.85);
+}
+
+.usar-puntos-wrapper.is-disabled .form-check-input {
+  cursor: not-allowed;
+}
+
+.usar-puntos-wrapper:not(.is-disabled):hover {
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  border-color: rgba(250, 195, 12, 0.55);
+}
+
+.carrito-empty-message {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  border-radius: 24px;
+  background: linear-gradient(
+      140deg,
+      rgba(250, 195, 12, 0.1),
+      rgba(32, 32, 32, 0.85)
+    )
+    rgba(24, 24, 24, 0.9);
+  border: 1px dashed rgba(250, 195, 12, 0.4);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  color: var(--text-light);
+}
+
+.carrito-empty-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(250, 195, 12, 0.12);
+  border: 1px solid rgba(250, 195, 12, 0.35);
+  color: var(--main-gold);
+  font-size: 1.65rem;
+}
+
+.carrito-empty-title {
+  font-family: var(--font-title);
+  font-size: 2rem;
+  letter-spacing: 0.04em;
+}
+
+.carrito-empty-subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.carrito-empty-message--compact {
+  padding: 24px 18px;
+  max-width: 360px;
+}
+
 /* Cards optimizadas */
 .card {
   position: relative;
