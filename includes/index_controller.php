@@ -3,6 +3,7 @@
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/email_requirement.php';
 
+
 if (!function_exists('piccolo_sanitizar_texto_basico')) {
     function piccolo_sanitizar_texto_basico($valor, int $longitudMaxima = 255): string
     {

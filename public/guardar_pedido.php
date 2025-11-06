@@ -1,10 +1,10 @@
 <?php
 ob_start();
 
-
 require_once __DIR__ . '/../admin/bd.php';
 require_once __DIR__ . '/../componentes/validar_telefono.php';
 require_once __DIR__ . '/../includes/reservas_virtuales.php';
+require_once __DIR__ . '/../includes/puntos_config.php';
 
 session_start();
 
@@ -124,6 +124,16 @@ $descuento = 0;
 $puntos_ganados = 0;
 $cliente_id = $_SESSION["cliente"]["id"] ?? null;
 
+$configuracionPuntos = obtenerConfiguracionPuntos($conexion);
+$valor_por_punto_config = max(0.01, (float) ($configuracionPuntos['valor_punto'] ?? 0));
+$minimo_puntos_config = max(0, (int) ($configuracionPuntos['minimo_puntos'] ?? 0));
+$maximo_porcentaje_config = (float) ($configuracionPuntos['maximo_porcentaje'] ?? 0.25);
+if ($maximo_porcentaje_config <= 0) {
+    $maximo_porcentaje_config = 0.25;
+} elseif ($maximo_porcentaje_config > 1) {
+    $maximo_porcentaje_config = 1;
+}
+
 try {
     $conexion->beginTransaction();
 
@@ -152,8 +162,9 @@ try {
 
     // Validar stock antes de registrar el pedido
     if ($usar_puntos && $cliente_id) {
-        $valor_por_punto = 20;
-        $minimo_puntos_para_canjear = 50;
+        $valor_por_punto = $valor_por_punto_config;
+        $minimo_puntos_para_canjear = $minimo_puntos_config;
+        $maximo_porcentaje_canje = $maximo_porcentaje_config;
         $redondear_a_multiplo = 100;
 
         $stmt = $conexion->prepare("SELECT puntos FROM tbl_clientes WHERE ID = ?");
@@ -161,13 +172,17 @@ try {
         $puntos_disponibles = $stmt->fetchColumn();
 
         if ($puntos_disponibles >= $minimo_puntos_para_canjear) {
-            $descuento_max = $total * 0.25;
+            $descuento_max = $total * $maximo_porcentaje_canje;
             $descuento_max_redondeado = floor($descuento_max / $redondear_a_multiplo) * $redondear_a_multiplo;
-            $puntos_posibles = floor($descuento_max_redondeado / $valor_por_punto);
+            $puntos_posibles = $valor_por_punto > 0 ? floor($descuento_max_redondeado / $valor_por_punto) : 0;
             $puntos_usados = min($puntos_disponibles, $puntos_posibles);
 
             if ($puntos_usados > 0) {
                 $descuento = $puntos_usados * $valor_por_punto;
+                if ($descuento > $descuento_max) {
+                    $descuento = $descuento_max;
+                }
+
                 $total -= $descuento;
 
                 $stmt = $conexion->prepare("UPDATE tbl_clientes SET puntos = puntos - ? WHERE ID = ?");
@@ -221,7 +236,8 @@ try {
         "total_original" => number_format($total_original, 2),
         "descuento" => number_format($descuento, 2),
         "total" => number_format($total, 2),
-        "puntos_ganados" => $puntos_ganados
+        "puntos_ganados" => $puntos_ganados,
+        "puntos_usados" => $puntos_usados,
     ]);
     exit;
 } catch (Exception $e) {

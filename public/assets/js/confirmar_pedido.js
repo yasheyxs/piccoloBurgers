@@ -1,9 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const formPedido = document.getElementById('form-pedido');
+document.addEventListener("DOMContentLoaded", () => {
+  const formPedido = document.getElementById("form-pedido");
 
-  const telefonoInput = document.getElementById('telefono');
-  const codigoPaisSelect = document.getElementById('codigo_pais');
-  const telefonoFormateadoTexto = document.getElementById('telefono-formateado');
+  const telefonoInput = document.getElementById("telefono");
+  const codigoPaisSelect = document.getElementById("codigo_pais");
+  const telefonoFormateadoTexto = document.getElementById(
+    "telefono-formateado"
+  );
   const longitudesTelefono = {
     54: [10],
     598: [8, 9],
@@ -16,8 +18,9 @@ document.addEventListener('DOMContentLoaded', () => {
     34: [9],
   };
 
-  const quitarSeparadoresTelefono = (valor) => String(valor ?? '').replace(/[\s()-]/g, '');
-  const limpiarNumero = (valor) => String(valor ?? '').replace(/[^0-9]/g, '');
+  const quitarSeparadoresTelefono = (valor) =>
+    String(valor ?? "").replace(/[\s()-]/g, "");
+  const limpiarNumero = (valor) => String(valor ?? "").replace(/[^0-9]/g, "");
   const obtenerCodigosOrdenados = () =>
     Object.keys(longitudesTelefono).sort((a, b) => b.length - a.length);
 
@@ -28,9 +31,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sinSeparadores = quitarSeparadoresTelefono(valor);
     let normalizado = sinSeparadores;
-    if (normalizado.startsWith('+')) {
+    if (normalizado.startsWith("+")) {
       normalizado = normalizado.slice(1);
-    } else if (normalizado.startsWith('00')) {
+    } else if (normalizado.startsWith("00")) {
       normalizado = normalizado.slice(2);
     }
 
@@ -61,11 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    const codigo = codigoPaisSelect?.value ?? '';
-    const numero = telefonoInput ? limpiarNumero(telefonoInput.value) : '';
+    const codigo = codigoPaisSelect?.value ?? "";
+    const numero = telefonoInput ? limpiarNumero(telefonoInput.value) : "";
 
     if (!codigo || !numero) {
-      telefonoFormateadoTexto.textContent = '';
+      telefonoFormateadoTexto.textContent = "";
       return;
     }
 
@@ -86,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const valorActual = telefonoInput.value;
     if (!valorActual) {
-      telefonoInput.value = '';
+      telefonoInput.value = "";
       return;
     }
 
@@ -102,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const soloNumeros = limpiarNumero(valorActual);
     if (!soloNumeros) {
-      telefonoInput.value = '';
+      telefonoInput.value = "";
       return;
     }
 
@@ -112,11 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (soloNumeros.startsWith(codigo) && Array.isArray(longitudes)) {
         const resto = soloNumeros.slice(codigo.length);
         const coincideLongitud = longitudes.some(
-          (longitudPermitida) => soloNumeros.length === longitudPermitida + codigo.length,
+          (longitudPermitida) =>
+            soloNumeros.length === longitudPermitida + codigo.length
         );
         const maxLongitud = longitudes.length > 0 ? Math.max(...longitudes) : 0;
 
-        if (coincideLongitud || (maxLongitud > 0 && resto.length > maxLongitud)) {
+        if (
+          coincideLongitud ||
+          (maxLongitud > 0 && resto.length > maxLongitud)
+        ) {
           telefonoInput.value = resto.slice(0, maxLongitud);
           return;
         }
@@ -127,12 +134,12 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const limpiarReservasVirtuales = () => {
-    return fetch('api/carrito_actualizar.php', {
-      method: 'POST',
+    return fetch("api/carrito_actualizar.php", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ action: 'clear' }),
+      body: JSON.stringify({ action: "clear" }),
     })
       .then((response) => {
         if (!response.ok) {
@@ -144,20 +151,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (
           data &&
           window.CarritoReservas &&
-          typeof window.CarritoReservas.procesarRespuesta === 'function'
+          typeof window.CarritoReservas.procesarRespuesta === "function"
         ) {
           try {
             window.CarritoReservas.procesarRespuesta(data);
           } catch (error) {
-            console.error('No se pudo procesar la respuesta de reservas:', error);
+            console.error(
+              "No se pudo procesar la respuesta de reservas:",
+              error
+            );
           }
         }
       })
       .catch((error) => {
-        console.error('No se pudieron limpiar las reservas virtuales:', error);
+        console.error("No se pudieron limpiar las reservas virtuales:", error);
       })
       .finally(() => {
-        localStorage.removeItem('carrito');
+        localStorage.removeItem("carrito");
       });
   };
 
@@ -168,10 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const codigoSeleccionado = codigoPaisSelect.value;
     const longitudesPermitidas = longitudesTelefono[codigoSeleccionado];
-    if (Array.isArray(longitudesPermitidas) && longitudesPermitidas.length > 0) {
+    if (
+      Array.isArray(longitudesPermitidas) &&
+      longitudesPermitidas.length > 0
+    ) {
       telefonoInput.maxLength = Math.max(...longitudesPermitidas);
     } else {
-      telefonoInput.removeAttribute('maxLength');
+      telefonoInput.removeAttribute("maxLength");
     }
   };
 
@@ -184,7 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const numero = limpiarNumero(telefonoInput.value);
     const longitudesPermitidas = longitudesTelefono[codigo];
 
-    if (!Array.isArray(longitudesPermitidas) || !longitudesPermitidas.includes(numero.length)) {
+    if (
+      !Array.isArray(longitudesPermitidas) ||
+      !longitudesPermitidas.includes(numero.length)
+    ) {
       return null;
     }
 
@@ -205,8 +221,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    telefonoInput.classList.toggle('is-invalid', !esValido);
-    telefonoInput.setCustomValidity(esValido ? '' : 'Ingresá un número de teléfono válido.');
+    telefonoInput.classList.toggle("is-invalid", !esValido);
+    telefonoInput.setCustomValidity(
+      esValido ? "" : "Ingresá un número de teléfono válido."
+    );
   };
 
   if (telefonoInput) {
@@ -229,20 +247,20 @@ document.addEventListener('DOMContentLoaded', () => {
       }, delay);
     });
 
-    codigoPaisSelect.addEventListener('change', () => {
+    codigoPaisSelect.addEventListener("change", () => {
       actualizarMaxlengthTelefono();
       aplicarAutocompletadoTelefono();
       actualizarTelefonoFormateado();
       marcarTelefonoValido(true);
     });
 
-    telefonoInput.addEventListener('input', () => {
+    telefonoInput.addEventListener("input", () => {
       aplicarAutocompletadoTelefono();
       marcarTelefonoValido(true);
       actualizarTelefonoFormateado();
     });
 
-    telefonoInput.addEventListener('blur', () => {
+    telefonoInput.addEventListener("blur", () => {
       aplicarAutocompletadoTelefono();
       const telefono = obtenerTelefonoFormateado();
       if (!telefono) {
@@ -250,13 +268,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       actualizarTelefonoFormateado();
     });
-    } else if (telefonoFormateadoTexto) {
-    telefonoFormateadoTexto.textContent = '';
+  } else if (telefonoFormateadoTexto) {
+    telefonoFormateadoTexto.textContent = "";
   }
 
-
   if (formPedido) {
-    formPedido.addEventListener('submit', async (e) => {
+    formPedido.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const telefonoNormalizado = obtenerTelefonoFormateado();
@@ -267,9 +284,11 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      const carritoSinAgrupar = JSON.parse(localStorage.getItem('carrito') || '[]');
+      const carritoSinAgrupar = JSON.parse(
+        localStorage.getItem("carrito") || "[]"
+      );
       if (carritoSinAgrupar.length === 0) {
-        alert('Tu carrito está vacío.');
+        alert("Tu carrito está vacío.");
         return;
       }
 
@@ -278,7 +297,9 @@ document.addEventListener('DOMContentLoaded', () => {
       carritoSinAgrupar.forEach((item) => {
         const key = item.id;
         const precioOriginal = Number(item.precio);
-        const precioUnitario = Number.isFinite(precioOriginal) ? precioOriginal : 0;
+        const precioUnitario = Number.isFinite(precioOriginal)
+          ? precioOriginal
+          : 0;
         if (!agrupado[key]) {
           agrupado[key] = {
             id: item.id,
@@ -286,7 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             precio: precioUnitario,
             cantidad: 1,
           };
-        return;
+          return;
         }
         // Si ya existe, solo sumar cantidad y conservar el precio unitario
         agrupado[key].cantidad += 1;
@@ -302,41 +323,42 @@ document.addEventListener('DOMContentLoaded', () => {
       }));
 
       // Validar que el carrito final no esté vacío
-      console.log('✅ Carrito final que se enviará:', carritoFinal);
+      console.log("✅ Carrito final que se enviará:", carritoFinal);
 
       const form = e.target;
       const formData = new FormData(form);
-      formData.set('carrito', JSON.stringify(carritoFinal));
-      formData.set('telefono', telefonoNormalizado.numero);
-      formData.set('codigo_pais', telefonoNormalizado.codigo);
+      formData.set("carrito", JSON.stringify(carritoFinal));
+      formData.set("telefono", telefonoNormalizado.numero);
+      formData.set("codigo_pais", telefonoNormalizado.codigo);
 
-      const usarPuntosCheckbox = localStorage.getItem('usar_puntos_activado') === '1';
-      formData.set('usar_puntos', usarPuntosCheckbox ? '1' : '0');
+      const usarPuntosCheckbox =
+        localStorage.getItem("usar_puntos_activado") === "1";
+      formData.set("usar_puntos", usarPuntosCheckbox ? "1" : "0");
 
-      const response = await fetch('guardar_pedido.php', {
-        method: 'POST',
+      const response = await fetch("guardar_pedido.php", {
+        method: "POST",
         body: formData,
       }); // Enviar datos del formulario al servidor
 
       const texto = await response.text();
-      console.log('Respuesta cruda del servidor:', texto);
+      console.log("Respuesta cruda del servidor:", texto);
       let resultado;
       try {
         // Intentar parsear la respuesta como JSON
         resultado = JSON.parse(texto);
       } catch (error) {
         // Si falla, mostrar error
-        console.error('La respuesta no es JSON válido:', texto);
-        document.getElementById('mensaje').innerHTML =
+        console.error("La respuesta no es JSON válido:", texto);
+        document.getElementById("mensaje").innerHTML =
           '<div class="alert alert-danger">Ocurrió un error al procesar tu pedido. Intentalo de nuevo más tarde.</div>';
         return; // salir si no es JSON
       }
 
       if (resultado.exito) {
         // Construir modal dinámicamente
-        let mensajePago = '';
-        if (formData.get('metodo_pago') === 'MercadoPago') {
-          const esDelivery = formData.get('tipo_entrega') === 'Delivery';
+        let mensajePago = "";
+        if (formData.get("metodo_pago") === "MercadoPago") {
+          const esDelivery = formData.get("tipo_entrega") === "Delivery";
           mensajePago = `
   <div class="p-4 mt-4 rounded" style="background-color: var(--gray-bg); border: 1px solid rgba(255, 255, 255, 0.1);">
     <h5 class="mb-3" style="font-size: 1.6rem; color: var(--main-gold);">
@@ -348,12 +370,16 @@ document.addEventListener('DOMContentLoaded', () => {
       Enviá el comprobante por WhatsApp a:
       <a href="https://wa.me/5493573438947" target="_blank" style="color: var(--main-gold); text-decoration: underline;">+54 9 3573 438947</a>
     </p>
-    ${esDelivery ? `
+    ${
+      esDelivery
+        ? `
       <p class="mt-3" style="color: var(--main-gold); font-size: 1.05rem;">
         💸 El costo del delivery varía entre <strong>$1000</strong> y <strong>$1500</strong> según la zona.
         Envianos un mensaje para confirmar el monto.
       </p>
-    ` : ''}
+    `
+        : ""
+    }
   </div>
 `;
         }
@@ -370,14 +396,35 @@ document.addEventListener('DOMContentLoaded', () => {
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body fs-5 px-4 py-3">
-          <p>🎉 <strong>${resultado.nombre}</strong>, tu pedido está en preparación. 🍔</p>
-          ${parseFloat(resultado.descuento) > 0 ? `
+          <p>🎉 <strong>${
+            resultado.nombre
+          }</strong>, tu pedido está en preparación. 🍔</p>
+          ${
+            parseFloat(resultado.descuento) > 0
+              ? `
             <div class="mb-2">
-              <p class="mb-0">💸 <strong>Total original:</strong> $${resultado.total_original}</p>
-              <p class="mb-0">🔻 <strong>Descuento por puntos:</strong> -$${resultado.descuento}</p>
-            </div>` : ''}
-          <p class="mt-3">💰 <strong>Total a pagar:</strong> $${resultado.total}</p>
-          ${resultado.puntos_ganados > 0 ? `<p>🎁 <strong>Puntos ganados:</strong> ${resultado.puntos_ganados}</p>` : ''}
+              <p class="mb-0">💸 <strong>Total original:</strong> $${
+                resultado.total_original
+              }</p>
+              <p class="mb-0">🔻 <strong>Descuento por puntos:</strong> -$${
+                resultado.descuento
+              }</p>
+              ${
+                Number(resultado.puntos_usados || 0) > 0
+                  ? `<p class="mb-0">🪙 <strong>Puntos utilizados:</strong> ${resultado.puntos_usados}</p>`
+                  : ""
+              }
+            </div>`
+              : ""
+          }
+          <p class="mt-3">💰 <strong>Total a pagar:</strong> $${
+            resultado.total
+          }</p>
+          ${
+            resultado.puntos_ganados > 0
+              ? `<p>🎁 <strong>Puntos ganados:</strong> ${resultado.puntos_ganados}</p>`
+              : ""
+          }
           ${mensajePago}
         </div>
         <div class="modal-footer border-0 px-4 py-3 justify-content-center">
@@ -389,23 +436,25 @@ document.addEventListener('DOMContentLoaded', () => {
 `;
 
         // Insertar modal al body
-        let modalContainer = document.getElementById('modal-container');
+        let modalContainer = document.getElementById("modal-container");
         if (!modalContainer) {
-          modalContainer = document.createElement('div');
-          modalContainer.id = 'modal-container';
+          modalContainer = document.createElement("div");
+          modalContainer.id = "modal-container";
           document.body.appendChild(modalContainer);
         }
         modalContainer.innerHTML = modalHtml;
 
         // Mostrar modal
-        const modal = new bootstrap.Modal(document.getElementById('modalGracias'));
+        const modal = new bootstrap.Modal(
+          document.getElementById("modalGracias")
+        );
         modal.show();
 
         // Limpiar carrito virtual y contador
         limpiarReservasVirtuales().finally(() => {
-          const contador = document.getElementById('contador-carrito');
+          const contador = document.getElementById("contador-carrito");
           if (contador) {
-            contador.textContent = '0';
+            contador.textContent = "0";
           }
         });
 
@@ -414,19 +463,19 @@ document.addEventListener('DOMContentLoaded', () => {
         aplicarAutocompletadoTelefono();
         marcarTelefonoValido(true);
         actualizarTelefonoFormateado();
-        document.getElementById('mensaje').innerHTML = '';
+        document.getElementById("mensaje").innerHTML = "";
       } else {
         // Mostrar error en div mensaje
-        document.getElementById('mensaje').innerHTML = `
+        document.getElementById("mensaje").innerHTML = `
   <div id="mensaje-error" class="alert alert-danger">
-    ${resultado.mensaje || 'Error desconocido'}
+    ${resultado.mensaje || "Error desconocido"}
   </div>
 `;
         if (resultado.scroll) {
           setTimeout(() => {
-            const errorDiv = document.getElementById('mensaje-error');
+            const errorDiv = document.getElementById("mensaje-error");
             if (errorDiv) {
-              errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              errorDiv.scrollIntoView({ behavior: "smooth", block: "center" });
             }
           }, 100);
         }
@@ -435,49 +484,49 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Validar que solo se escriban letras y espacios en el campo nombre
-  const nombreInput = document.getElementById('nombre');
+  const nombreInput = document.getElementById("nombre");
   if (nombreInput) {
-    nombreInput.addEventListener('input', function () {
-      this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, '');
+    nombreInput.addEventListener("input", function () {
+      this.value = this.value.replace(/[^a-zA-ZáéíóúÁÉÍÓÚñÑ\s]/g, "");
     });
   }
 });
 
 // Mostrar/ocultar campo dirección según tipo de entrega
 window.mostrarDireccion = function mostrarDireccion(valor) {
-  const grupoDireccion = document.getElementById('grupo-direccion');
-  const grupoReferencias = document.getElementById('grupo-referencias');
-  const aviso = document.getElementById('aviso-delivery');
+  const grupoDireccion = document.getElementById("grupo-direccion");
+  const grupoReferencias = document.getElementById("grupo-referencias");
+  const aviso = document.getElementById("aviso-delivery");
 
-  if (valor === 'Delivery') {
+  if (valor === "Delivery") {
     // Si es Delivery, mostrar campo dirección y aviso
     if (grupoDireccion) {
-      grupoDireccion.style.display = 'block';
+      grupoDireccion.style.display = "block";
     }
     if (grupoReferencias) {
-      grupoReferencias.style.display = 'block';
+      grupoReferencias.style.display = "block";
     }
     if (aviso) {
-      aviso.style.display = 'block';
+      aviso.style.display = "block";
     }
-    const direccion = document.getElementById('direccion');
+    const direccion = document.getElementById("direccion");
     if (direccion) {
-      direccion.setAttribute('required', 'required');
+      direccion.setAttribute("required", "required");
     }
   } else {
     // Si es Retiro, ocultar campo dirección y aviso
     if (grupoDireccion) {
-      grupoDireccion.style.display = 'none';
+      grupoDireccion.style.display = "none";
     }
     if (grupoReferencias) {
-      grupoReferencias.style.display = 'none';
+      grupoReferencias.style.display = "none";
     }
     if (aviso) {
-      aviso.style.display = 'none';
+      aviso.style.display = "none";
     }
-    const direccion = document.getElementById('direccion');
+    const direccion = document.getElementById("direccion");
     if (direccion) {
-      direccion.removeAttribute('required');
+      direccion.removeAttribute("required");
     }
   }
 };
