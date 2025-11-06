@@ -48,6 +48,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
 
 <!doctype html>
 <html lang="es">
+
 <head>
   <title>Administrador del sitio web</title>
   <meta charset="utf-8">
@@ -90,6 +91,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
+              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/puntos/">Puntos</a></li>
 
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="personasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -149,26 +151,26 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
   <main>
     <section class="container">
 
-<!-- Modal de confirmación de cierre de sesión -->
-<div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content logout-modal">
-      <div class="modal-header">
-        <div class="d-flex align-items-center gap-3">
-          <span class="logout-modal__icon" aria-hidden="true">
-            <i class="fa-solid fa-right-from-bracket"></i>
-          </span>
-          <h5 class="modal-title mb-0" id="modalCerrarSesionLabel">¿Cerrar sesión?</h5>
+      <!-- Modal de confirmación de cierre de sesión -->
+      <div class="modal fade" id="modalCerrarSesion" tabindex="-1" aria-labelledby="modalCerrarSesionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content logout-modal">
+            <div class="modal-header">
+              <div class="d-flex align-items-center gap-3">
+                <span class="logout-modal__icon" aria-hidden="true">
+                  <i class="fa-solid fa-right-from-bracket"></i>
+                </span>
+                <h5 class="modal-title mb-0" id="modalCerrarSesionLabel">¿Cerrar sesión?</h5>
+              </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              ¿Estás seguro de que querés cerrar sesión? Esta acción te desconectará del panel de administración.
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Quedarse</button>
+              <a href="<?php echo $url_base; ?>cerrar.php" class="btn btn-danger">Salir</a>
+            </div>
+          </div>
         </div>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
-      <div class="modal-body">
-        ¿Estás seguro de que querés cerrar sesión? Esta acción te desconectará del panel de administración.
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Quedarse</button>
-        <a href="<?php echo $url_base; ?>cerrar.php" class="btn btn-danger">Salir</a>
-      </div>
-    </div>
-  </div>
-</div>

@@ -5,6 +5,7 @@ const estadoTotalCarrito = {
   total: 0,
   usarPuntos: null,
   disponibilidad: {},
+  puntosUsados: 0,
 };
 
 let timeoutGuardarCarrito = null;
@@ -444,7 +445,9 @@ function actualizarTarjetaProducto(producto) {
   if (unidadesDisponibles === null) {
     delete tarjeta.dataset.unidadesDisponibles;
   } else {
-    tarjeta.dataset.unidadesDisponibles = String(Math.max(0, unidadesDisponibles));
+    tarjeta.dataset.unidadesDisponibles = String(
+      Math.max(0, unidadesDisponibles)
+    );
   }
 
   const cantidadSpan = tarjeta.querySelector(".js-cantidad");
@@ -477,7 +480,6 @@ function actualizarTarjetaProducto(producto) {
       );
     }
   }
-
 }
 
 function eliminarTarjetaProducto(id) {
@@ -501,7 +503,6 @@ function actualizarEstadoBotones() {
   const hayProductos = obtenerCantidadTotalCarrito() > 0;
   const usarPuntosCheckbox = document.getElementById("usarPuntos");
 
-
   if (finalizar) {
     finalizar.disabled = !hayProductos;
   }
@@ -511,8 +512,7 @@ function actualizarEstadoBotones() {
 
   if (usarPuntosCheckbox) {
     const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
-    const habilitadoBase =
-      usarPuntosCheckbox.dataset.habilitadoBase !== "0";
+    const habilitadoBase = usarPuntosCheckbox.dataset.habilitadoBase !== "0";
 
     if (!hayProductos) {
       if (usarPuntosCheckbox.checked) {
@@ -592,7 +592,6 @@ function aumentarCantidad(id) {
     return;
   }
 
-
   const extras = {};
   extras[clave] = entrada.producto;
 
@@ -632,7 +631,7 @@ function eliminarProducto(id) {
   extras[clave] = entrada.producto;
 
   solicitarActualizacionReservas(
-    { action: 'remove', menuId: Number(id) },
+    { action: "remove", menuId: Number(id) },
     extras
   ).catch((error) =>
     manejarErrorReserva(error, "No se pudo eliminar el producto del carrito.")
@@ -689,8 +688,11 @@ function actualizarTotal(
 
   estadoTotalCarrito.usarPuntos = usarPuntos;
 
+  const configuracionFallback = document.getElementById("configuracionPuntos");
+
   const puntosDisponiblesDato =
     usarPuntosCheckbox?.dataset?.puntosDisponibles ??
+    configuracionFallback?.dataset?.puntosDisponibles ??
     document.getElementById("puntosDisponibles")?.value ??
     "0";
   const puntosDisponiblesParseado = Number.parseInt(puntosDisponiblesDato, 10);
@@ -699,14 +701,26 @@ function actualizarTotal(
     : puntosDisponiblesParseado;
 
   let descuento = 0;
+  let puntosAUsar = 0;
 
   document.getElementById("puntos_usados")?.remove();
   document.getElementById("puntos_warning")?.remove();
 
   if (usarPuntos && total > 0) {
-    const valorPorPunto = 20;
+    const valorPorPuntoDato =
+      usarPuntosCheckbox?.dataset?.valorPunto ??
+      configuracionFallback?.dataset?.valorPunto ??
+      "20";
+    const valorPorPuntoParseado = Number.parseFloat(valorPorPuntoDato);
+    const valorPorPunto =
+      !Number.isNaN(valorPorPuntoParseado) && valorPorPuntoParseado > 0
+        ? valorPorPuntoParseado
+        : 20;
+
     const minimoParaCanjearDato =
-      usarPuntosCheckbox?.dataset?.minimoPuntos ?? "50";
+      usarPuntosCheckbox?.dataset?.minimoPuntos ??
+      configuracionFallback?.dataset?.minimoPuntos ??
+      "50";
     const minimoParaCanjearParseado = Number.parseInt(
       minimoParaCanjearDato,
       10
@@ -714,7 +728,18 @@ function actualizarTotal(
     const minimoParaCanjear = Number.isNaN(minimoParaCanjearParseado)
       ? 50
       : minimoParaCanjearParseado;
-    const maximoDescuento = total * 0.25;
+    const maximoPorcentajeDato =
+      usarPuntosCheckbox?.dataset?.maximoPorcentaje ??
+      configuracionFallback?.dataset?.maximoPorcentaje ??
+      "0.25";
+    let maximoPorcentaje = Number.parseFloat(maximoPorcentajeDato);
+    if (!Number.isNaN(maximoPorcentaje) && maximoPorcentaje > 1) {
+      maximoPorcentaje /= 100;
+    }
+    if (Number.isNaN(maximoPorcentaje) || maximoPorcentaje <= 0) {
+      maximoPorcentaje = 0.25;
+    }
+    const maximoDescuento = total * maximoPorcentaje;
 
     if (puntosDisponibles < minimoParaCanjear) {
       totalSpan.insertAdjacentHTML(
@@ -727,15 +752,29 @@ function actualizarTotal(
         '<div id="puntos_warning" class="text-danger">⚠️ El total debe ser al menos $1000 para canjear puntos.</div>'
       );
     } else {
-      const puntosPosibles = Math.floor(maximoDescuento / valorPorPunto);
-      const puntosAUsar = Math.min(puntosDisponibles, puntosPosibles);
-      descuento = puntosAUsar * valorPorPunto;
-      if (descuento > 0) {
+      if (valorPorPunto <= 0) {
+        console.warn(
+          "El valor por punto configurado es inválido. Se ignora el canje."
+        );
+      } else {
+        const puntosPosibles = Math.floor(maximoDescuento / valorPorPunto);
+        puntosAUsar = Math.min(puntosDisponibles, puntosPosibles);
+        descuento = puntosAUsar * valorPorPunto;
+        if (descuento > maximoDescuento) {
+          descuento = maximoDescuento;
+        }
+      }
+
+      if (descuento > 0 && puntosAUsar > 0) {
+        const puntosLabel = puntosAUsar === 1 ? "punto" : "puntos";
         totalSpan.insertAdjacentHTML(
           "afterend",
-          `<div id="puntos_usados" class="text-success">- $${descuento.toFixed(
-            2
-          )} aplicados en puntos</div>`
+          `<div id="puntos_usados" class="text-success fw-semibold d-flex align-items-center justify-content-end gap-2 mt-2">
+            <i class="fa-solid fa-coins"></i>
+            <span>- $${descuento.toFixed(
+              2
+            )} aplicados (${puntosAUsar} ${puntosLabel})</span>
+          </div>`
         );
       }
     }
@@ -744,6 +783,8 @@ function actualizarTotal(
   const totalFinal = Math.max(0, total - descuento);
   totalSpan.textContent = totalFinal.toFixed(2);
   totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
+
+  estadoTotalCarrito.puntosUsados = puntosAUsar;
 
   const finalizarBtn = document.querySelector(
     '#formPedido button[type="submit"]'

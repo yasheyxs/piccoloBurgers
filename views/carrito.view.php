@@ -20,25 +20,40 @@
 
   <main>
     <div class="container contenido-ajustado">
-    <div class="container carrito-panel">
+      <div class="container carrito-panel">
         <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
         <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
         <div id="btnAgregarMas" class="mt-4"></div>
 
-      <div class="d-flex justify-content-center mt-4">
+        <div class="d-flex justify-content-center mt-4">
           <a href="./index.php#menu" class="btn btn-gold-circle" title="Agregar más">
             <i class="fas fa-plus"></i>
           </a>
         </div>
 
-      <div class="text-end mt-4">
+        <div class="text-end mt-4">
           <h4>Total: $<span id="total">0.00</span></h4>
 
-        <?php if (isset($_SESSION["cliente"])):
-          $puntosDisponibles = isset($puntosCliente) ? (int) $puntosCliente : 0;
-          $minimoPuntosParaCanjear = 50;
-          $puedeCanjearPuntos = $puntosDisponibles >= $minimoPuntosParaCanjear;
-        ?>
+          <?php if (isset($_SESSION["cliente"])):
+            $puntosDisponibles = isset($puntosCliente) ? (int) $puntosCliente : 0;
+            $minimoPuntosParaCanjear = isset($minimoPuntosParaCanjear)
+              ? (int) $minimoPuntosParaCanjear
+              : 50;
+            $valorPorPunto = isset($valorPorPunto)
+              ? (float) $valorPorPunto
+              : 20.0;
+            $maximoPorcentajeCanje = isset($maximoPorcentajeCanje)
+              ? (float) $maximoPorcentajeCanje
+              : 0.25;
+            $puedeCanjearPuntos = $puntosDisponibles >= $minimoPuntosParaCanjear;
+
+            $valorPorPuntoTexto = number_format($valorPorPunto, 2, ',', '.');
+            $maximoPorcentajeNumero = $maximoPorcentajeCanje * 100;
+            $maximoPorcentajeTexto = rtrim(rtrim(number_format($maximoPorcentajeNumero, 2, ',', '.'), '0'), ',');
+            if ($maximoPorcentajeTexto === '') {
+              $maximoPorcentajeTexto = '0';
+            }
+          ?>
             <div class="usar-puntos-wrapper mt-3<?= $puedeCanjearPuntos ? '' : ' is-disabled' ?>">
               <div class="form-check d-flex justify-content-end align-items-center gap-2 m-0">
                 <input
@@ -46,22 +61,31 @@
                   type="checkbox"
                   id="usarPuntos"
                   data-minimo-puntos="<?= $minimoPuntosParaCanjear ?>"
+                  data-valor-punto="<?= htmlspecialchars(number_format($valorPorPunto, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>"
+                  data-maximo-porcentaje="<?= htmlspecialchars(number_format($maximoPorcentajeCanje, 4, '.', ''), ENT_QUOTES, 'UTF-8') ?>"
                   data-puntos-disponibles="<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?>"
-                  <?= $puedeCanjearPuntos ? '' : 'disabled' ?>
-                >
+                  <?= $puedeCanjearPuntos ? '' : 'disabled' ?>>
                 <label class="form-check-label mb-0" for="usarPuntos">
                   Usar puntos (<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?> disponibles)
                 </label>
               </div>
               <p class="usar-puntos-helper mb-0 text-end">
-                <?= $puedeCanjearPuntos
-                  ? 'Canjeá hasta el 25% de tu pedido con tus puntos.'
-                  : "Necesitás al menos {$minimoPuntosParaCanjear} puntos para canjear." ?>
+                <?php if ($puedeCanjearPuntos): ?>
+                  Podés canjear hasta el <strong class='text-gold'><?= htmlspecialchars($maximoPorcentajeTexto, ENT_QUOTES, 'UTF-8') ?>%</strong> de tu pedido.
+                <?php else: ?>
+                  Necesitás al menos <?= $minimoPuntosParaCanjear ?> puntos para canjear.
+                <?php endif; ?>
               </p>
               <input type="hidden" id="puntosDisponibles" value="<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?>">
+              <div id="configuracionPuntos"
+                data-minimo-puntos="<?= $minimoPuntosParaCanjear ?>"
+                data-valor-punto="<?= htmlspecialchars(number_format($valorPorPunto, 2, '.', ''), ENT_QUOTES, 'UTF-8') ?>"
+                data-maximo-porcentaje="<?= htmlspecialchars(number_format($maximoPorcentajeCanje, 4, '.', ''), ENT_QUOTES, 'UTF-8') ?>"
+                data-puntos-disponibles="<?= htmlspecialchars((string) $puntosDisponibles, ENT_QUOTES, 'UTF-8') ?>"
+                hidden></div>
             </div>
 
-        <?php endif; ?>
+          <?php endif; ?>
           <div class="d-flex justify-content-end gap-3 mt-4 flex-wrap">
             <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
               <input type="hidden" name="carrito" id="carritoInput">
@@ -73,7 +97,7 @@
         </div>
       </div>
     </div>
-        </main>
+  </main>
 
   <footer class="bg-dark text-light text-center py-3 mt-5">
     <p>&copy; 2025 Piccolo Burgers — Developed by: <strong>Jazmin Abigail Gaido - Mariano Jesús Ceballos - Juan Pablo Medina</strong></p>
