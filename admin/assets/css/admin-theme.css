@@ -101,10 +101,23 @@ body.admin-body a:focus {
   color: var(--admin-link-hover);
 }
 
+body.admin-body header {
+  position: sticky;
+  top: 0;
+  z-index: 1060;
+}
+
 body.admin-body .navbar {
   background-color: var(--admin-nav-bg) !important;
   border-bottom: 1px solid var(--admin-nav-border);
   transition: var(--admin-transition);
+  position: sticky;
+  top: 0;
+  z-index: inherit;
+}
+
+body.admin-body main {
+  padding-top: 1.5rem;
 }
 
 body.admin-body .navbar .navbar-brand,

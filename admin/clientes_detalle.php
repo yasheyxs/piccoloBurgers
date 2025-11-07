@@ -56,12 +56,21 @@ try {
     $stmtMovimientos->bindParam(':id', $clienteId, PDO::PARAM_INT);
     $stmtMovimientos->execute();
     $historialMovimientos = $stmtMovimientos->fetchAll(PDO::FETCH_ASSOC);
+
+    $historialCanjes = array_values(array_filter(
+        $historialMovimientos,
+        static function (array $movimiento): bool {
+            return ($movimiento['tipo'] ?? '') === 'canje';
+        }
+    ));
 } catch (Throwable $error) {
     error_log('No se pudo obtener la información del cliente: ' . $error->getMessage());
     $_SESSION['error_clientes'] = 'Ocurrió un error al cargar la información del cliente.';
     header('Location: clientes.php');
     exit();
 }
+
+$historialCanjes = $historialCanjes ?? [];
 
 include("../admin/templates/header.php");
 ?>
@@ -209,12 +218,70 @@ include("../admin/templates/header.php");
             </div>
         </div>
     </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Premios canjeados</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="tablaHistorialCanjes" class="table table-sm table-hover table-bordered align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Detalle</th>
+                                <th>Puntos utilizados</th>
+                                <th>Saldo restante</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($historialCanjes)) { ?>
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-3">El cliente aún no registró canjes de premios.</td>
+                                </tr>
+                            <?php } else { ?>
+                                <?php foreach ($historialCanjes as $canje) { ?>
+                                    <?php $puntosCanje = abs((int) ($canje['puntos'] ?? 0)); ?>
+                                    <tr>
+                                        <td>
+                                            <?php if (!empty($canje['created_at'])) { ?>
+                                                <?= date('d/m/Y H:i', strtotime($canje['created_at'])); ?>
+                                            <?php } else { ?>
+                                                <span class="text-muted">Sin registro</span>
+                                            <?php } ?>
+                                        </td>
+                                        <td><?= htmlspecialchars($canje['descripcion'] ?? '', ENT_QUOTES, 'UTF-8'); ?></td>
+                                        <td class="fw-semibold text-danger">-<?= number_format($puntosCanje, 0, ',', '.'); ?> pts</td>
+                                        <td><?= number_format((int) ($canje['saldo_resultante'] ?? 0), 0, ',', '.'); ?> pts</td>
+                                    </tr>
+                                <?php } ?>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        initDataTable('#tablaHistorialPedidos');
-        initDataTable('#tablaHistorialPuntos');
+        initDataTable('#tablaHistorialPedidos', {
+            order: [
+                [1, 'desc']
+            ]
+        });
+        initDataTable('#tablaHistorialPuntos', {
+            order: [
+                [0, 'desc']
+            ]
+        });
+        initDataTable('#tablaHistorialCanjes', {
+            order: [
+                [0, 'desc']
+            ]
+        });
     });
 </script>
 
