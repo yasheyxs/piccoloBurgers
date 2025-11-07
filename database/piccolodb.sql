@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.2
+-- version 5.2.3
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Oct 12, 2025 at 06:30 AM
--- Server version: 8.0.43
--- PHP Version: 8.2.27
+-- Generation Time: Nov 07, 2025 at 12:18 AM
+-- Server version: 8.0.44
+-- PHP Version: 8.3.26
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,12 +24,42 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `movimientos_puntos`
+--
+
+CREATE TABLE `movimientos_puntos` (
+  `id` int NOT NULL,
+  `cliente_id` int NOT NULL,
+  `tipo` enum('compra','canje','ajuste') NOT NULL,
+  `descripcion` varchar(255) DEFAULT NULL,
+  `puntos` int NOT NULL,
+  `saldo_resultante` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `premios`
+--
+
+CREATE TABLE `premios` (
+  `id` int NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `descripcion` text,
+  `costo_puntos` int NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_banners`
 --
 
 CREATE TABLE `tbl_banners` (
   `ID` int NOT NULL,
-  `imagen` varchar(255) COLLATE utf8mb4_general_ci DEFAULT NULL,
+  `imagen` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
   `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
   `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
@@ -40,7 +70,7 @@ CREATE TABLE `tbl_banners` (
 --
 
 INSERT INTO `tbl_banners` (`ID`, `imagen`, `titulo`, `descripcion`, `link`) VALUES
-(1, 'img/banners/banner_68eb46a8e56ca2.97829226.jpg', 'Piccolo Burgers', '100% cargadas de sabor', '#menu');
+(1, 'img/banners/banner_690308a16b6b16.41068513.jpg', 'Piccolo Burgers', '100% cargadas de sabor', '#menu');
 
 -- --------------------------------------------------------
 
@@ -72,7 +102,7 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 (6, 'Prueba', '1', 'cliente0006@piccolo-falso.test', '$2y$10$E8RuOLWFLib6fjtM0lX.4.m9orxYcwt016xtZbUxJhpbwnP6dy1.e', '2025-09-04 19:50:00', 0, NULL, NULL),
 (7, 'Prueba', '+541234567890', 'cliente0007@piccolo-falso.test', '$2y$10$Q7P352516qnETmMYuOML3ewRcSrYT7IPPtglMHWAHpf6wIHOuKwZm', '2025-09-05 04:46:49', 0, 'b82d236b117aaa01935b7c8c4ef2780ef2d87d05a6f128031f22fd1fa014afeb', '2025-09-06 09:18:42'),
 (8, 'Uu', '+541231231231', 'cliente0008@piccolo-falso.test', '$2y$10$1BbVcAM0MK.lbk7/O3.xDuOtiy9mftPtMgl879AIul5MA4N/jbsvu', '2025-09-08 23:29:28', 18, NULL, NULL),
-(9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 59, NULL, NULL),
+(9, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 70, NULL, NULL),
 (10, 'Esta es una prueba', '+541234123412', 'cliente0010@piccolo-falso.test', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
 -- --------------------------------------------------------
@@ -186,6 +216,27 @@ INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `canti
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `tbl_configuracion_puntos`
+--
+
+CREATE TABLE `tbl_configuracion_puntos` (
+  `id` int NOT NULL,
+  `minimo_puntos` int NOT NULL,
+  `valor_punto` decimal(10,2) NOT NULL,
+  `maximo_porcentaje` decimal(5,4) NOT NULL,
+  `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `tbl_configuracion_puntos`
+--
+
+INSERT INTO `tbl_configuracion_puntos` (`id`, `minimo_puntos`, `valor_punto`, `maximo_porcentaje`, `actualizado_en`) VALUES
+(1, 50, 20.00, 0.2500, '2025-11-06 23:28:40');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `tbl_materias_primas`
 --
 
@@ -204,40 +255,40 @@ CREATE TABLE `tbl_materias_primas` (
 --
 
 INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, `proveedor_id`, `unidades_por_pack`, `stock_minimo`) VALUES
-(1, 'Tomate', 'kg', 3.44, 20, 1, NULL),
-(2, 'Lechuga', 'kg', 3.45, 0, 1, NULL),
-(3, 'Morrón', 'kg', 2.08, 24, 1, NULL),
-(4, 'Cebolla', 'kg', 2.86, 1, 1, NULL),
-(5, 'Carne molida de cerdo', 'kg', 2.98, 21, 1, NULL),
-(6, 'Carne molida de vaca', 'kg', 1.54, 21, 1, NULL),
-(7, 'Carne de lomo', 'kg', 2.06, 1, 1, NULL),
-(8, 'Pan de lomo', 'unidad', 36.00, 0, 1, NULL),
-(9, 'Pan de hamburguesa', 'unidad', 41.00, 0, 1, NULL),
-(10, 'Mayonesa', 'litro', 4.39, 19, 1, NULL),
+(1, 'Tomate', 'kg', 3.32, 20, 1, NULL),
+(2, 'Lechuga', 'kg', 3.33, 0, 1, NULL),
+(3, 'Morrón', 'kg', 1.99, 24, 1, NULL),
+(4, 'Cebolla', 'kg', 2.76, 1, 1, NULL),
+(5, 'Carne molida de cerdo', 'kg', 2.74, 21, 1, NULL),
+(6, 'Carne molida de vaca', 'kg', 1.04, 21, 1, NULL),
+(7, 'Carne de lomo', 'kg', 1.56, 1, 1, NULL),
+(8, 'Pan de lomo', 'unidad', 31.00, 0, 1, NULL),
+(9, 'Pan de hamburguesa', 'unidad', 38.00, 0, 1, NULL),
+(10, 'Mayonesa', 'litro', 4.25, 19, 1, NULL),
 (11, 'Mostaza', 'litro', 2.75, 1, 1, NULL),
 (12, 'Ketchup', 'litro', 3.65, 1, 1, NULL),
 (13, 'Salsa BBQ', 'litro', 1.06, 1, 1, NULL),
-(14, 'Queso Tybo', 'kg', 1.03, 1, 1, NULL),
-(15, 'Queso Cheddar', 'kg', 2.21, 1, 1, NULL),
+(14, 'Queso Tybo', 'kg', 0.58, 1, 1, NULL),
+(15, 'Queso Cheddar', 'kg', 2.13, 1, 1, NULL),
 (16, 'Queso Cheddar Litro', 'litro', 2.23, 1, 1, NULL),
-(17, 'Jamón cocido', 'kg', 3.36, 1, 1, NULL),
-(18, 'Huevo', 'unidad', 35.00, 0, 1, NULL),
-(19, 'Panceta', 'kg', 1.85, 1, 1, NULL),
-(20, 'Salsa Piccolo', 'litro', 1.73, 1, 1, NULL),
-(21, 'Pepinillos', 'kg', 2.08, 0, 1, NULL),
-(22, 'Bondiola', 'kg', 4.30, 1, 1, NULL),
-(23, 'Cebolla morada', 'kg', 2.19, 1, 1, NULL),
-(24, 'Milanesa Vegetariana', 'unidad', 38.00, 1, 1, NULL),
-(25, 'Milanesa de pollo', 'kg', 50.00, 0, 1, NULL),
+(17, 'Jamón cocido', 'kg', 3.11, 1, 1, NULL),
+(18, 'Huevo', 'unidad', 29.00, 0, 1, NULL),
+(19, 'Panceta', 'kg', 1.70, 1, 1, NULL),
+(20, 'Salsa Piccolo', 'litro', 1.70, 1, 1, NULL),
+(21, 'Pepinillos', 'kg', 2.06, 0, 1, NULL),
+(22, 'Bondiola', 'kg', 4.18, 1, 1, NULL),
+(23, 'Cebolla morada', 'kg', 2.15, 1, 1, NULL),
+(24, 'Milanesa Vegetariana', 'unidad', 37.00, 1, 1, NULL),
+(25, 'Milanesa de pollo', 'kg', 49.88, 0, 1, NULL),
 (26, 'Milanesa de carne', 'kg', 1.66, 1, 1, NULL),
 (27, 'Prepizza', 'unidad', 35.00, 1, 1, NULL),
 (28, 'Aceituna', 'tarro', 4.19, 1, 1, NULL),
-(30, 'Aceite de ajo', 'litro', 1.16, 1, 1, NULL),
-(31, 'Aceite de girasol', 'litro', 3.95, 1, 1, NULL),
+(30, 'Aceite de ajo', 'litro', 1.00, 0, 1, NULL),
+(31, 'Aceite de girasol', 'litro', 0.00, 0, 1, NULL),
 (32, 'Salsa para pizza', 'litro', 3.30, 1, 1, NULL),
 (33, 'Anchoas', 'lata', 2.00, 0, 1, NULL),
 (34, 'Pepperoni', 'kg', 3.65, 1, 1, NULL),
-(35, 'Discos de empanada', 'unidad', 30.00, 1, 1, NULL),
+(35, 'Discos de empanada', 'unidad', 27.00, 1, 1, NULL),
 (101, 'Pepsi (lata)', 'unidad', 31.00, 0, 1, 10.00),
 (102, 'Coca-cola 1.5L', 'unidad', 49.00, 0, 1, 10.00),
 (103, 'Paso de los Toros (lata)', 'unidad', 35.00, 0, 1, 10.00),
@@ -253,12 +304,12 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (113, 'Fanta 1.5L', 'unidad', 30.00, 0, 1, 10.00),
 (114, 'Queso Muzzarella', 'kg', 3.32, 1, 1, 1.00),
 (115, 'Queso Roquefort', 'kg', 4.68, 1, 1, 1.00),
-(116, 'Azúcar', 'kg', 4.41, 1, 1, 1.00),
-(117, 'Milanesa de carne', 'unidad', 33.00, 1, 1, 5.00),
+(116, 'Azúcar', 'kg', 4.39, 1, 1, 1.00),
+(117, 'Milanesa de carne', 'unidad', 32.00, 1, 1, 5.00),
 (118, 'Suprema de pollo', 'unidad', 45.00, 1, 1, 5.00),
 (119, 'Nugget de pollo', 'unidad', 33.00, 1, 1, 10.00),
-(120, 'Papas fritas', 'kg', 6.70, 17, 1, NULL),
-(121, 'Aros de cebolla', 'kg', 7.00, 17, 1, NULL);
+(120, 'Papas fritas', 'kg', 5.50, 17, 1, NULL),
+(121, 'Aros de cebolla', 'kg', 6.85, 17, 1, NULL);
 
 -- --------------------------------------------------------
 
@@ -658,7 +709,7 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (97, 'Uu', '+541231231231', '', '', 13000, '2025-09-08 21:36:25', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
 (98, 'Uu', '+541231231231', '', '', 10000, '2025-09-08 21:37:22', 'Efectivo', 'Retiro', '', 'En preparación', 8, NULL, 'No'),
 (99, 'Uu', '+541231231231', '', '', 3000, '2025-09-09 01:54:10', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 8, NULL, 'No'),
-(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'En camino', NULL, 'Uh', 'Si'),
+(100, 'Alma', '123123123', '', '', 1500, '2025-09-16 15:07:54', 'Efectivo', 'Delivery', '123', 'Cancelado', NULL, 'Uh', 'No'),
 (101, 'Yass', '123', '', 'Sin pepinos', 16100, '2025-10-01 12:15:00', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si'),
 (102, 'Morrón', '543573451913', '', 'Retirar en mostrador', 18500, '2025-10-02 19:45:00', 'Tarjeta', 'Retiro', '', 'Listo', 5, NULL, 'Si'),
 (103, 'Juana', '123', '', 'Entrega puerta', 23100, '2025-10-03 13:20:00', 'MercadoPago', 'Delivery', 'Barrio Centro', 'En preparación', NULL, 'Portón verde', 'No'),
@@ -671,7 +722,10 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (110, 'Juana', '123', '', 'Retira hermano', 18000, '2025-10-12 11:40:00', 'Tarjeta', 'Retiro', '', 'Listo', NULL, NULL, 'Si'),
 (111, 'Prueba', '1', '', 'Cena amigos', 23100, '2025-10-13 19:25:00', 'MercadoPago', 'Delivery', 'Zona Norte', 'En camino', 6, NULL, 'No'),
 (112, 'Yass', '123', '', 'Postre aparte', 20000, '2025-10-14 22:10:00', 'Tarjeta', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'Si'),
-(113, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 88500, '2025-10-12 04:38:49', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No');
+(113, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 88500, '2025-10-12 04:38:49', 'Efectivo', 'Retiro', '', 'Listo', 9, NULL, 'Si'),
+(114, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 8920, '2025-10-30 07:01:19', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 9, NULL, 'Si'),
+(115, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 36000, '2025-11-06 22:55:47', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No'),
+(116, 'Cliente', '+541234512345', 'jazabigailgaido@gmail.com', '', 62000, '2025-11-06 22:56:07', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No');
 
 -- --------------------------------------------------------
 
@@ -787,7 +841,14 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (169, 113, 32, 'Monstruosa', 12000, 1),
 (170, 113, 51, 'Lomo de bondiola', 13000, 1),
 (171, 113, 55, 'Lomo de pollo', 10000, 1),
-(172, 113, 56, 'Sándwich de milanesa', 11000, 1);
+(172, 113, 56, 'Sándwich de milanesa', 11000, 1),
+(173, 114, 19, 'Aros de cebolla', 5600, 1),
+(174, 114, 41, 'Empanada dulce x1', 1500, 1),
+(175, 114, 47, 'Empanada de jamón y queso x1', 1500, 2),
+(176, 115, 62, 'Stella', 4500, 8),
+(177, 116, 23, 'Lomo Piccolo', 13000, 1),
+(178, 116, 51, 'Lomo de bondiola', 13000, 3),
+(179, 116, 55, 'Lomo de pollo', 10000, 1);
 
 -- --------------------------------------------------------
 
@@ -837,7 +898,12 @@ CREATE TABLE `tbl_reservas_virtuales` (
 INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
 (18, 'hln2oi1c76hheid1fe5c910blt', 47, 1, '2025-10-03 01:33:06'),
 (32, 'ac04105cd58ef5b107c344b939f6fc81', 38, 2, '2025-10-12 06:22:49'),
-(33, 'ac04105cd58ef5b107c344b939f6fc81', 39, 1, '2025-10-12 06:22:51');
+(33, 'ac04105cd58ef5b107c344b939f6fc81', 39, 1, '2025-10-12 06:22:51'),
+(51, '1fbf01389eb46fe6374912382b0da009', 41, 1, '2025-10-30 06:45:16'),
+(52, '1fbf01389eb46fe6374912382b0da009', 47, 1, '2025-10-30 06:45:17'),
+(73, 'a74457849e75423e9a509e4693f3b4ac', 37, 1, '2025-11-06 22:56:42'),
+(74, 'a74457849e75423e9a509e4693f3b4ac', 26, 1, '2025-11-06 22:56:43'),
+(75, 'a74457849e75423e9a509e4693f3b4ac', 27, 1, '2025-11-06 22:56:43');
 
 -- --------------------------------------------------------
 
@@ -894,15 +960,28 @@ INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset
 CREATE TABLE `vw_stock_materias_primas` (
 `ID` int
 ,`nombre` varchar(50)
-,`unidad_medida` varchar(50)
 ,`stock_pack` decimal(10,2)
-,`unidades_por_pack` int
 ,`stock_unidades_estimado` decimal(20,2)
+,`unidad_medida` varchar(50)
+,`unidades_por_pack` int
 );
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `movimientos_puntos`
+--
+ALTER TABLE `movimientos_puntos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `cliente_id` (`cliente_id`);
+
+--
+-- Indexes for table `premios`
+--
+ALTER TABLE `premios`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `tbl_banners`
@@ -935,6 +1014,12 @@ ALTER TABLE `tbl_compras`
 --
 ALTER TABLE `tbl_compras_detalle`
   ADD PRIMARY KEY (`ID`);
+
+--
+-- Indexes for table `tbl_configuracion_puntos`
+--
+ALTER TABLE `tbl_configuracion_puntos`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `tbl_materias_primas`
@@ -1003,6 +1088,18 @@ ALTER TABLE `tbl_usuarios`
 --
 
 --
+-- AUTO_INCREMENT for table `movimientos_puntos`
+--
+ALTER TABLE `movimientos_puntos`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `premios`
+--
+ALTER TABLE `premios`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `tbl_banners`
 --
 ALTER TABLE `tbl_banners`
@@ -1054,13 +1151,13 @@ ALTER TABLE `tbl_menu_materias_primas`
 -- AUTO_INCREMENT for table `tbl_pedidos`
 --
 ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=114;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
 
 --
 -- AUTO_INCREMENT for table `tbl_pedidos_detalle`
 --
 ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
 
 --
 -- AUTO_INCREMENT for table `tbl_proveedores`
@@ -1072,7 +1169,7 @@ ALTER TABLE `tbl_proveedores`
 -- AUTO_INCREMENT for table `tbl_reservas_virtuales`
 --
 ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=51;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
 
 --
 -- AUTO_INCREMENT for table `tbl_testimonios`
@@ -1098,6 +1195,12 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `movimientos_puntos`
+--
+ALTER TABLE `movimientos_puntos`
+  ADD CONSTRAINT `movimientos_puntos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `tbl_clientes` (`ID`);
 
 --
 -- Constraints for table `tbl_menu_materias_primas`
