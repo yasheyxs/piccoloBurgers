@@ -51,6 +51,22 @@
   });
 </script>
 
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const autoDismissAlerts = document.querySelectorAll('.alert-auto-dismiss');
+
+    autoDismissAlerts.forEach(function(alertEl) {
+      setTimeout(function() {
+        if (!alertEl.classList.contains('show')) {
+          return;
+        }
+        const alertInstance = bootstrap.Alert.getOrCreateInstance(alertEl);
+        alertInstance.close();
+      }, 3000);
+    });
+  });
+</script>
+
 </body>
 
 </html>

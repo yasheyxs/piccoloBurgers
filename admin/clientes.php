@@ -77,7 +77,7 @@ include("../admin/templates/header.php");
   </div>
   <div class="card-body">
     <?php if ($mensajeClientes) { ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <div class="alert alert-success alert-soft-success alert-auto-dismiss alert-dismissible fade show" role="alert">
         <?php echo htmlspecialchars($mensajeClientes, ENT_QUOTES, 'UTF-8'); ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
       </div>
