@@ -7,6 +7,26 @@
   const menuDisponible = Array.isArray(data.menu) ? data.menu : [];
   const premiosDisponibles = Array.isArray(data.premios) ? data.premios : [];
 
+  const reservasEndpoint =
+    typeof data.reservas_endpoint === "string" && data.reservas_endpoint
+      ? data.reservas_endpoint
+      : "../public/api/carrito_actualizar.php";
+
+  const disponibilidadEndpoint =
+    typeof data.disponibilidad_endpoint === "string" &&
+    data.disponibilidad_endpoint
+      ? data.disponibilidad_endpoint
+      : "../public/api/disponibilidad_menu.php";
+
+  const productosPorId = new Map(
+    menuDisponible
+      .map((item) => {
+        const id = Number(item.id);
+        return Number.isInteger(id) && id > 0 ? [id, item] : null;
+      })
+      .filter(Boolean)
+  );
+
   const elementos = {
     modoRadios: document.querySelectorAll('input[name="modoCanje"]'),
     panelDescuento: document.getElementById("modoDescuentoPanel"),
@@ -105,6 +125,8 @@
       valorPunto: Number(config.valor_punto) || 0,
     },
     puntosEditadosManualmente: false,
+    disponibilidadProductos: new Map(),
+    sincronizandoReservas: false,
   };
 
   const valoresConfig = {
@@ -154,6 +176,235 @@
     } catch (_error) {
       const numero = Number(valor) || 0;
       return Math.round(numero).toString();
+    }
+  }
+
+  function obtenerProductoPorId(menuId) {
+    const id = Number(menuId);
+    if (!Number.isInteger(id) || id <= 0) {
+      return null;
+    }
+
+    return productosPorId.get(id) || null;
+  }
+
+  function actualizarDisponibilidadMapa(disponibilidad = {}) {
+    if (!disponibilidad || typeof disponibilidad !== "object") {
+      return;
+    }
+
+    Object.values(disponibilidad).forEach((entrada) => {
+      if (!entrada) {
+        return;
+      }
+
+      const id = Number(
+        entrada.menu_id ?? entrada.id ?? entrada.menuId ?? entrada.producto_id
+      );
+
+      if (!Number.isInteger(id) || id <= 0) {
+        return;
+      }
+
+      const unidades = Number(
+        entrada.unidades_disponibles ??
+          entrada.disponibles ??
+          entrada.disponible
+      );
+
+      if (Number.isFinite(unidades)) {
+        state.disponibilidadProductos.set(
+          id,
+          Math.max(0, Math.floor(unidades))
+        );
+      }
+    });
+  }
+
+  function obtenerDisponibilidadRestante(menuId) {
+    const id = Number(menuId);
+    if (!Number.isInteger(id) || id <= 0) {
+      return null;
+    }
+
+    const valor = state.disponibilidadProductos.get(id);
+    return Number.isFinite(valor) ? valor : null;
+  }
+
+  function actualizarBotonesDisponibilidad() {
+    if (elementos.listadoProductos) {
+      elementos.listadoProductos
+        .querySelectorAll("button[data-menu-id]")
+        .forEach((boton) => {
+          const id = Number(boton.dataset.menuId);
+          const disponibles = obtenerDisponibilidadRestante(id);
+          const hayDisponibilidad =
+            disponibles === null ? true : disponibles > 0;
+
+          boton.disabled = !hayDisponibilidad;
+
+          if (hayDisponibilidad) {
+            boton.classList.add("btn-outline-primary");
+            boton.classList.remove("btn-outline-secondary");
+            boton.textContent = "Agregar";
+          } else {
+            boton.classList.remove("btn-outline-primary");
+            boton.classList.add("btn-outline-secondary");
+            boton.textContent = "Sin stock";
+          }
+        });
+    }
+
+    elementos.tablaProductos
+      ?.querySelectorAll("tr[data-producto-id]")
+      .forEach((fila) => {
+        const id = Number(fila.dataset.productoId);
+        const disponibles = obtenerDisponibilidadRestante(id);
+        const puedeAgregar = disponibles === null ? true : disponibles > 0;
+        const botonIncrementar = fila.querySelector(
+          'button[data-accion="incrementar"]'
+        );
+
+        if (botonIncrementar) {
+          botonIncrementar.disabled = !puedeAgregar;
+        }
+      });
+  }
+
+  async function actualizarDisponibilidadDesdeServidor(menuIds = null) {
+    const idsEntrada = Array.isArray(menuIds) ? menuIds : null;
+    const ids =
+      idsEntrada && idsEntrada.length > 0
+        ? idsEntrada
+        : menuDisponible
+            .map((item) => Number(item.id))
+            .filter((id) => Number.isInteger(id) && id > 0);
+
+    if (!disponibilidadEndpoint || ids.length === 0) {
+      return;
+    }
+
+    try {
+      const respuesta = await fetch(disponibilidadEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ menuIds: ids }),
+      });
+
+      let datos;
+      try {
+        datos = await respuesta.json();
+      } catch (_error) {
+        throw new Error(
+          "No se pudo interpretar la respuesta de disponibilidad."
+        );
+      }
+
+      if (!respuesta.ok || !datos?.exito) {
+        throw new Error(
+          datos?.mensaje || "No se pudo obtener la disponibilidad actual."
+        );
+      }
+
+      actualizarDisponibilidadMapa(datos.disponibilidad || {});
+      actualizarBotonesDisponibilidad();
+    } catch (error) {
+      console.error("No se pudo actualizar la disponibilidad:", error);
+    }
+  }
+
+  function aplicarReservasDesdeServidor(reservas, disponibilidad) {
+    state.seleccionProductos.clear();
+
+    const entradas = Array.isArray(reservas)
+      ? reservas
+      : Object.values(reservas || {});
+
+    entradas.forEach((entrada) => {
+      if (!entrada) {
+        return;
+      }
+
+      const id = Number(entrada.menu_id ?? entrada.id ?? entrada.menuId);
+      const cantidad = Number(entrada.cantidad ?? entrada.qty);
+
+      if (
+        !Number.isInteger(id) ||
+        id <= 0 ||
+        !Number.isFinite(cantidad) ||
+        cantidad <= 0
+      ) {
+        return;
+      }
+
+      const producto = obtenerProductoPorId(id);
+      if (!producto) {
+        return;
+      }
+
+      state.seleccionProductos.set(id, {
+        id,
+        nombre: producto.nombre,
+        precio: Number(producto.precio) || 0,
+        cantidad: Math.max(0, Math.floor(cantidad)),
+      });
+    });
+
+    actualizarDisponibilidadMapa(disponibilidad || {});
+    actualizarTablaSeleccion();
+    actualizarBotonesDisponibilidad();
+  }
+
+  async function solicitarAccionReservas(payload) {
+    if (!reservasEndpoint) {
+      throw new Error("No se configuró el servicio de reservas.");
+    }
+
+    state.sincronizandoReservas = true;
+
+    try {
+      const respuesta = await fetch(reservasEndpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      let datos;
+      try {
+        datos = await respuesta.json();
+      } catch (_error) {
+        throw new Error("No se pudo interpretar la respuesta del servidor.");
+      }
+
+      if (!respuesta.ok || !datos?.exito) {
+        throw new Error(
+          datos?.mensaje || "No se pudo actualizar la reserva seleccionada."
+        );
+      }
+
+      aplicarReservasDesdeServidor(
+        datos.reservas || {},
+        datos.disponibilidad || {}
+      );
+
+      return datos;
+    } catch (error) {
+      throw error;
+    } finally {
+      state.sincronizandoReservas = false;
+    }
+  }
+
+  async function inicializarReservas() {
+    try {
+      await solicitarAccionReservas({ accion: "limpiar" });
+    } catch (error) {
+      console.error("No se pudieron inicializar las reservas:", error);
+      await actualizarDisponibilidadDesdeServidor();
     }
   }
 
@@ -272,58 +523,68 @@
     });
 
     elementos.listadoProductos.appendChild(fragmento);
+    actualizarBotonesDisponibilidad();
   }
 
-  function agregarProducto(menuId) {
+  async function agregarProducto(menuId) {
     const id = Number(menuId);
     if (!Number.isInteger(id) || id <= 0) {
-      return;
+      return false;
     }
 
-    const producto = menuDisponible.find((item) => Number(item.id) === id);
-    if (!producto) {
+    try {
+      await solicitarAccionReservas({ accion: "agregar", menuId: id });
+      mostrarAlerta("", "");
+      return true;
+    } catch (error) {
       mostrarAlerta(
         "warning",
-        "El producto seleccionado ya no está disponible."
+        error.message || "No se pudo agregar el producto seleccionado."
       );
-      return;
+      await actualizarDisponibilidadDesdeServidor([id]);
+      return false;
     }
-
-    const actual = state.seleccionProductos.get(id) || {
-      id,
-      nombre: producto.nombre,
-      precio: Number(producto.precio) || 0,
-      cantidad: 0,
-    };
-
-    actual.cantidad += 1;
-    state.seleccionProductos.set(id, actual);
-
-    actualizarTablaSeleccion();
   }
 
-  function eliminarProducto(menuId) {
+  async function eliminarProducto(menuId) {
     const id = Number(menuId);
-    state.seleccionProductos.delete(id);
-    actualizarTablaSeleccion();
+    if (!Number.isInteger(id) || id <= 0) {
+      return false;
+    }
+
+    try {
+      await solicitarAccionReservas({ accion: "eliminar", menuId: id });
+      mostrarAlerta("", "");
+      return true;
+    } catch (error) {
+      mostrarAlerta(
+        "warning",
+        error.message || "No se pudo quitar el producto seleccionado."
+      );
+      await actualizarDisponibilidadDesdeServidor([id]);
+      return false;
+    }
   }
 
-  function ajustarCantidad(menuId, delta) {
+  async function ajustarCantidad(menuId, delta) {
     const id = Number(menuId);
-    const registro = state.seleccionProductos.get(id);
-    if (!registro) {
-      return;
+    if (!Number.isInteger(id) || id <= 0 || delta === 0) {
+      return false;
     }
 
-    const nuevaCantidad = registro.cantidad + delta;
-    if (nuevaCantidad <= 0) {
-      state.seleccionProductos.delete(id);
-    } else {
-      registro.cantidad = nuevaCantidad;
-      state.seleccionProductos.set(id, registro);
+    const accion = delta > 0 ? "agregar" : "restar";
+    try {
+      await solicitarAccionReservas({ accion, menuId: id });
+      mostrarAlerta("", "");
+      return true;
+    } catch (error) {
+      mostrarAlerta(
+        "warning",
+        error.message || "No se pudo actualizar la cantidad del producto."
+      );
+      await actualizarDisponibilidadDesdeServidor([id]);
+      return false;
     }
-
-    actualizarTablaSeleccion();
   }
 
   function crearFilaProducto({ id, nombre, precio, cantidad }) {
@@ -384,6 +645,7 @@
         maximoPuntosPermitidos: 0,
       };
       actualizarResumenDescuento();
+      actualizarBotonesDisponibilidad();
       return;
     }
 
@@ -394,6 +656,7 @@
 
     elementos.tablaProductos.appendChild(fragmento);
     actualizarResumenDescuento();
+    actualizarBotonesDisponibilidad();
   }
 
   function calcularResumenDescuento() {
@@ -508,6 +771,8 @@
       );
     }
 
+    const valorManualActual = obtenerPuntosIngresados();
+
     establecerPuntosIngresados(resumen.puntosIngresados);
 
     if (elementos.textoAyudaPuntos) {
@@ -540,11 +805,14 @@
       }
     }
 
-    const mostrarMensajeMinimo =
+    const ingresoManualPuntos =
+      state.puntosEditadosManualmente && valorManualActual > 0;
+    const mostrarAlertaMinimo =
       resumen.faltaMinimo || resumen.maximoInferiorAlMinimo;
+    const bloquearPorMinimo = ingresoManualPuntos && mostrarAlertaMinimo;
 
     if (elementos.alertaMinimoPuntos) {
-      if (mostrarMensajeMinimo) {
+      if (mostrarAlertaMinimo) {
         const texto = resumen.faltaMinimo
           ? "El cliente aún no tiene puntos disponibles para realizar un canje por descuento. Todavía puede canjear premios."
           : "El monto del pedido no permite alcanzar el mínimo de puntos para aplicar un descuento.";
@@ -561,7 +829,8 @@
 
     const puedeEditarPuntos =
       state.seleccionProductos.size > 0 &&
-      !mostrarMensajeMinimo &&
+      !resumen.faltaMinimo &&
+      !resumen.maximoInferiorAlMinimo &&
       resumen.maximoPuntosPermitidos > 0;
 
     if (elementos.inputPuntosPersonalizados) {
@@ -579,19 +848,43 @@
       const hayProductos = state.seleccionProductos.size > 0;
       const puedeRegistrar =
         hayProductos &&
-        resumen.puntosAplicados >= resumen.minimoRequerido &&
-        resumen.descuento > 0 &&
         !resumen.errorPuntos &&
-        !mostrarMensajeMinimo;
+        !bloquearPorMinimo &&
+        !state.sincronizandoReservas;
       elementos.btnRegistrarVenta.disabled = !puedeRegistrar;
     }
   }
 
-  function vaciarSeleccionProductos() {
-    state.seleccionProductos.clear();
-    state.puntosEditadosManualmente = false;
-    establecerPuntosIngresados(0);
-    actualizarTablaSeleccion();
+  async function vaciarSeleccionProductos({ mostrarMensajes = true } = {}) {
+    if (state.seleccionProductos.size === 0) {
+      state.puntosEditadosManualmente = false;
+      establecerPuntosIngresados(0);
+      actualizarTablaSeleccion();
+      return;
+    }
+
+    try {
+      await solicitarAccionReservas({ accion: "limpiar" });
+      if (mostrarMensajes) {
+        mostrarAlerta("", "");
+      }
+    } catch (error) {
+      if (mostrarMensajes) {
+        mostrarAlerta(
+          "warning",
+          error.message || "No se pudo vaciar la selección de productos."
+        );
+      } else {
+        console.error("No se pudo vaciar la selección de productos:", error);
+      }
+      await actualizarDisponibilidadDesdeServidor();
+    } finally {
+      state.puntosEditadosManualmente = false;
+      establecerPuntosIngresados(0);
+      if (state.seleccionProductos.size === 0) {
+        actualizarTablaSeleccion();
+      }
+    }
   }
 
   function seleccionarMaximoPuntos() {
@@ -659,37 +952,6 @@
 
     if (esValido && state.resumenDescuento.errorPuntos) {
       mostrarAlerta("warning", state.resumenDescuento.errorPuntos);
-      esValido = false;
-    }
-
-    if (esValido && state.resumenDescuento.faltaMinimo) {
-      mostrarAlerta(
-        "warning",
-        "El cliente aún no tiene puntos suficientes para aplicar un descuento."
-      );
-      esValido = false;
-    }
-
-    if (esValido && state.resumenDescuento.maximoInferiorAlMinimo) {
-      mostrarAlerta(
-        "warning",
-        "El pedido actual no permite alcanzar el mínimo de puntos para el canje."
-      );
-      esValido = false;
-    }
-
-    if (
-      esValido &&
-      (state.resumenDescuento.puntosAplicados <= 0 ||
-        state.resumenDescuento.puntosAplicados <
-          Math.max(1, state.resumenDescuento.minimoRequerido))
-    ) {
-      mostrarAlerta(
-        "warning",
-        `Ingresá al menos ${formatearEntero(
-          state.resumenDescuento.minimoRequerido
-        )} puntos para registrar el descuento.`
-      );
       esValido = false;
     }
 
@@ -830,11 +1092,6 @@
       nota: elementos.textareaNota?.value || "",
     };
 
-    if (state.resumenDescuento.totalParcial <= 0) {
-      mostrarAlerta("warning", "El total de la venta debe ser mayor a cero.");
-      return;
-    }
-
     if (elementos.btnRegistrarVenta) {
       elementos.btnRegistrarVenta.disabled = true;
       elementos.btnRegistrarVenta.innerHTML =
@@ -868,7 +1125,7 @@
 
       mostrarModalResumenVenta(resumen);
 
-      vaciarSeleccionProductos();
+      await vaciarSeleccionProductos({ mostrarMensajes: false });
       state.puntosEditadosManualmente = false;
 
       if (elementos.selectMetodoPago) {
@@ -893,17 +1150,9 @@
       mostrarAlerta("danger", error.message || "Ocurrió un error inesperado.");
     } finally {
       if (elementos.btnRegistrarVenta) {
-        const puedeRegistrar =
-          state.seleccionProductos.size > 0 &&
-          state.resumenDescuento.puntosAplicados >=
-            state.resumenDescuento.minimoRequerido &&
-          state.resumenDescuento.descuento > 0 &&
-          !state.resumenDescuento.errorPuntos &&
-          !state.resumenDescuento.faltaMinimo &&
-          !state.resumenDescuento.maximoInferiorAlMinimo;
-        elementos.btnRegistrarVenta.disabled = !puedeRegistrar;
         elementos.btnRegistrarVenta.innerHTML =
           '<i class="fa-solid fa-cash-register me-1" aria-hidden="true"></i> Registrar venta con descuento';
+        actualizarResumenDescuento();
       }
     }
   }
@@ -1147,14 +1396,24 @@
     }
   }
 
-  function manejarClickProductos(evento) {
+  async function manejarClickProductos(evento) {
     const boton = evento.target.closest("button");
     if (!boton) {
       return;
     }
 
     if (boton.dataset.menuId) {
-      agregarProducto(boton.dataset.menuId);
+      evento.preventDefault();
+      const menuId = boton.dataset.menuId;
+      boton.disabled = true;
+      try {
+        await agregarProducto(menuId);
+      } finally {
+        if (document.body.contains(boton)) {
+          boton.disabled = false;
+        }
+        actualizarBotonesDisponibilidad();
+      }
       return;
     }
 
@@ -1166,18 +1425,25 @@
     const menuId = fila.dataset.productoId;
     const accion = boton.dataset.accion;
 
-    switch (accion) {
-      case "decrementar":
-        ajustarCantidad(menuId, -1);
-        break;
-      case "incrementar":
-        ajustarCantidad(menuId, 1);
-        break;
-      case "eliminar":
-        eliminarProducto(menuId);
-        break;
-      default:
-        break;
+    if (!accion) {
+      return;
+    }
+
+    boton.disabled = true;
+
+    try {
+      if (accion === "decrementar") {
+        await ajustarCantidad(menuId, -1);
+      } else if (accion === "incrementar") {
+        await ajustarCantidad(menuId, 1);
+      } else if (accion === "eliminar") {
+        await eliminarProducto(menuId);
+      }
+    } finally {
+      if (document.body.contains(boton)) {
+        boton.disabled = false;
+      }
+      actualizarBotonesDisponibilidad();
     }
   }
 
@@ -1227,7 +1493,19 @@
     );
     elementos.tablaProductos?.addEventListener("click", manejarClickProductos);
 
-    elementos.btnVaciar?.addEventListener("click", vaciarSeleccionProductos);
+    elementos.btnVaciar?.addEventListener("click", async (evento) => {
+      evento.preventDefault();
+      if (!elementos.btnVaciar) {
+        return;
+      }
+
+      elementos.btnVaciar.disabled = true;
+      try {
+        await vaciarSeleccionProductos();
+      } finally {
+        elementos.btnVaciar.disabled = false;
+      }
+    });
 
     elementos.inputPuntosPersonalizados?.addEventListener("input", () => {
       state.puntosEditadosManualmente = true;
@@ -1249,7 +1527,7 @@
     elementos.btnConfirmarPremios?.addEventListener("click", confirmarPremios);
   }
 
-  function iniciar() {
+  async function iniciar() {
     renderizarProductos();
     actualizarTablaSeleccion();
     renderizarPremios();
@@ -1267,7 +1545,13 @@
 
     actualizarResumenDescuento();
     inicializarEventos();
+    await inicializarReservas();
+    await actualizarDisponibilidadDesdeServidor();
   }
 
-  document.addEventListener("DOMContentLoaded", iniciar);
+  document.addEventListener("DOMContentLoaded", () => {
+    iniciar().catch((error) => {
+      console.error("No se pudo inicializar la sección de canje:", error);
+    });
+  });
 })();

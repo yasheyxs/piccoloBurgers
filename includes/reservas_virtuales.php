@@ -2,6 +2,17 @@
 
 declare(strict_types=1);
 
+function piccolo_reservas_iniciar_transaccion(PDO $conexion): bool
+{
+    if ($conexion->inTransaction()) {
+        return false;
+    }
+
+    $conexion->beginTransaction();
+
+    return true;
+}
+
 /**
  * Gestiona las reservas virtuales de insumos asociadas al carrito del cliente.
  */
@@ -96,116 +107,12 @@ function establecerReservaProducto(PDO $conexion, string $sessionId, int $menuId
 {
     $cantidadObjetivo = max(0, $cantidadObjetivo);
 
-    $conexion->beginTransaction();
+    $manejaTransaccion = piccolo_reservas_iniciar_transaccion($conexion);
 
-    $stmt = $conexion->prepare('SELECT cantidad FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ? FOR UPDATE');
-    $stmt->execute([$sessionId, $menuId]);
-    $cantidadActual = (int) ($stmt->fetchColumn() ?: 0);
-
-    $delta = $cantidadObjetivo - $cantidadActual;
-    if ($delta > 0) {
-        verificarDisponibilidadParaDelta($conexion, $menuId, $delta);
-    }
-
-    if ($cantidadObjetivo === 0) {
-        $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
-        $stmtEliminar->execute([$sessionId, $menuId]);
-    } else {
-        $stmtUpsert = $conexion->prepare('
-            INSERT INTO tbl_reservas_virtuales (session_id, menu_id, cantidad, actualizado_en)
-            VALUES (?, ?, ?, NOW())
-            ON DUPLICATE KEY UPDATE cantidad = VALUES(cantidad), actualizado_en = VALUES(actualizado_en)
-        ');
-        $stmtUpsert->execute([$sessionId, $menuId, $cantidadObjetivo]);
-    }
-
-    $conexion->commit();
-
-    return [
-        'reservas' => obtenerReservasPorSesion($conexion, $sessionId),
-    ];
-}
-
-function actualizarReservaProducto(PDO $conexion, string $sessionId, int $menuId, int $delta): array
-{
-    if ($delta === 0) {
-        return [
-            'reservas' => obtenerReservasPorSesion($conexion, $sessionId),
-        ];
-    }
-
-    $conexion->beginTransaction();
-
-    $stmt = $conexion->prepare('SELECT cantidad FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ? FOR UPDATE');
-    $stmt->execute([$sessionId, $menuId]);
-    $cantidadActual = (int) ($stmt->fetchColumn() ?: 0);
-
-    if ($delta > 0) {
-        verificarDisponibilidadParaDelta($conexion, $menuId, $delta);
-    }
-
-    if ($delta < 0) {
-        $delta = -min($cantidadActual, abs($delta));
-    }
-
-    $cantidadNueva = $cantidadActual + $delta;
-
-    if ($cantidadNueva <= 0) {
-        $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
-        $stmtEliminar->execute([$sessionId, $menuId]);
-    } else {
-        $stmtUpsert = $conexion->prepare('
-            INSERT INTO tbl_reservas_virtuales (session_id, menu_id, cantidad, actualizado_en)
-            VALUES (?, ?, ?, NOW())
-            ON DUPLICATE KEY UPDATE cantidad = VALUES(cantidad), actualizado_en = VALUES(actualizado_en)
-        ');
-        $stmtUpsert->execute([$sessionId, $menuId, $cantidadNueva]);
-    }
-
-    $conexion->commit();
-
-    return [
-        'reservas' => obtenerReservasPorSesion($conexion, $sessionId),
-    ];
-}
-
-function sincronizarReservas(PDO $conexion, string $sessionId, array $items): array
-{
-    $normalizado = [];
-    foreach ($items as $item) {
-        if (!is_array($item)) {
-            continue;
-        }
-        $menuId = isset($item['id']) ? (int) $item['id'] : (int) ($item['menu_id'] ?? 0);
-        if ($menuId <= 0) {
-            continue;
-        }
-        $normalizado[$menuId] = normalizarCantidadSolicitada($item['cantidad'] ?? $item['qty'] ?? 0);
-    }
-
-    $conexion->beginTransaction();
-
-    $stmt = $conexion->prepare('SELECT menu_id, cantidad FROM tbl_reservas_virtuales WHERE session_id = ? FOR UPDATE');
-    $stmt->execute([$sessionId]);
-    $actuales = [];
-    while ($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        $actuales[(int) $fila['menu_id']] = (int) $fila['cantidad'];
-    }
-
-    foreach ($actuales as $menuId => $cantidadActual) {
-        $cantidadObjetivo = $normalizado[$menuId] ?? 0;
-        if ($cantidadObjetivo === 0) {
-            $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
-            $stmtEliminar->execute([$sessionId, $menuId]);
-        }
-    }
-
-    foreach ($normalizado as $menuId => $cantidadObjetivo) {
-        $cantidadObjetivo = max(0, $cantidadObjetivo);
-        $cantidadActual = $actuales[$menuId] ?? 0;
-        if ($cantidadObjetivo === $cantidadActual) {
-            continue;
-        }
+    try {
+        $stmt = $conexion->prepare('SELECT cantidad FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ? FOR UPDATE');
+        $stmt->execute([$sessionId, $menuId]);
+        $cantidadActual = (int) ($stmt->fetchColumn() ?: 0);
 
         $delta = $cantidadObjetivo - $cantidadActual;
         if ($delta > 0) {
@@ -223,13 +130,155 @@ function sincronizarReservas(PDO $conexion, string $sessionId, array $items): ar
             ');
             $stmtUpsert->execute([$sessionId, $menuId, $cantidadObjetivo]);
         }
+
+        $reservas = obtenerReservasPorSesion($conexion, $sessionId);
+
+        if ($manejaTransaccion) {
+            $conexion->commit();
+        }
+
+        return [
+            'reservas' => $reservas,
+        ];
+    } catch (Throwable $exception) {
+        if ($manejaTransaccion && $conexion->inTransaction()) {
+            $conexion->rollBack();
+        }
+
+        throw $exception;
+    }
+}
+
+function actualizarReservaProducto(PDO $conexion, string $sessionId, int $menuId, int $delta): array
+{
+    if ($delta === 0) {
+        return [
+            'reservas' => obtenerReservasPorSesion($conexion, $sessionId),
+        ];
     }
 
-    $conexion->commit();
+    $manejaTransaccion = piccolo_reservas_iniciar_transaccion($conexion);
 
-    return [
-        'reservas' => obtenerReservasPorSesion($conexion, $sessionId),
-    ];
+    try {
+        $stmt = $conexion->prepare('SELECT cantidad FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ? FOR UPDATE');
+        $stmt->execute([$sessionId, $menuId]);
+        $cantidadActual = (int) ($stmt->fetchColumn() ?: 0);
+
+        if ($delta > 0) {
+            verificarDisponibilidadParaDelta($conexion, $menuId, $delta);
+        }
+
+        if ($delta < 0) {
+            $delta = -min($cantidadActual, abs($delta));
+        }
+
+        $cantidadNueva = $cantidadActual + $delta;
+
+        if ($cantidadNueva <= 0) {
+            $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
+            $stmtEliminar->execute([$sessionId, $menuId]);
+        } else {
+            $stmtUpsert = $conexion->prepare('
+                INSERT INTO tbl_reservas_virtuales (session_id, menu_id, cantidad, actualizado_en)
+                VALUES (?, ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE cantidad = VALUES(cantidad), actualizado_en = VALUES(actualizado_en)
+            ');
+            $stmtUpsert->execute([$sessionId, $menuId, $cantidadNueva]);
+        }
+
+        $reservas = obtenerReservasPorSesion($conexion, $sessionId);
+
+        if ($manejaTransaccion) {
+            $conexion->commit();
+        }
+
+        return [
+            'reservas' => $reservas,
+        ];
+    } catch (Throwable $exception) {
+        if ($manejaTransaccion && $conexion->inTransaction()) {
+            $conexion->rollBack();
+        }
+
+        throw $exception;
+    }
+}
+
+function sincronizarReservas(PDO $conexion, string $sessionId, array $items): array
+{
+    $normalizado = [];
+    foreach ($items as $item) {
+        if (!is_array($item)) {
+            continue;
+        }
+        $menuId = isset($item['id']) ? (int) $item['id'] : (int) ($item['menu_id'] ?? 0);
+        if ($menuId <= 0) {
+            continue;
+        }
+        $normalizado[$menuId] = normalizarCantidadSolicitada($item['cantidad'] ?? $item['qty'] ?? 0);
+    }
+
+    $manejaTransaccion = piccolo_reservas_iniciar_transaccion($conexion);
+
+    try {
+        $stmt = $conexion->prepare('SELECT menu_id, cantidad FROM tbl_reservas_virtuales WHERE session_id = ? FOR UPDATE');
+        $stmt->execute([$sessionId]);
+        $actuales = [];
+        while ($fila = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $actuales[(int) $fila['menu_id']] = (int) $fila['cantidad'];
+        }
+
+
+        foreach ($actuales as $menuId => $cantidadActual) {
+            $cantidadObjetivo = $normalizado[$menuId] ?? 0;
+            if ($cantidadObjetivo === 0) {
+                $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
+                $stmtEliminar->execute([$sessionId, $menuId]);
+            }
+        }
+
+        foreach ($normalizado as $menuId => $cantidadObjetivo) {
+            $cantidadObjetivo = max(0, $cantidadObjetivo);
+            $cantidadActual = $actuales[$menuId] ?? 0;
+            if ($cantidadObjetivo === $cantidadActual) {
+                continue;
+            }
+
+            $delta = $cantidadObjetivo - $cantidadActual;
+            if ($delta > 0) {
+                verificarDisponibilidadParaDelta($conexion, $menuId, $delta);
+            }
+
+            if ($cantidadObjetivo === 0) {
+                $stmtEliminar = $conexion->prepare('DELETE FROM tbl_reservas_virtuales WHERE session_id = ? AND menu_id = ?');
+                $stmtEliminar->execute([$sessionId, $menuId]);
+            } else {
+                $stmtUpsert = $conexion->prepare('
+                    INSERT INTO tbl_reservas_virtuales (session_id, menu_id, cantidad, actualizado_en)
+                    VALUES (?, ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE cantidad = VALUES(cantidad), actualizado_en = VALUES(actualizado_en)
+                ');
+                $stmtUpsert->execute([$sessionId, $menuId, $cantidadObjetivo]);
+            }
+        }
+
+        $reservas = obtenerReservasPorSesion($conexion, $sessionId);
+
+        if ($manejaTransaccion) {
+            $conexion->commit();
+        }
+
+
+        return [
+            'reservas' => $reservas,
+        ];
+    } catch (Throwable $exception) {
+        if ($manejaTransaccion && $conexion->inTransaction()) {
+            $conexion->rollBack();
+        }
+
+        throw $exception;
+    }
 }
 
 function limpiarReservasSesion(PDO $conexion, string $sessionId): array

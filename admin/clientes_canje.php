@@ -204,10 +204,6 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
             ];
         }
 
-        if ($totalOriginal <= 0) {
-            throw new InvalidArgumentException('El total de la venta debe ser mayor a cero.');
-        }
-
         $maximoDescuento = $maximoPorcentajeCanje > 0 ? $totalOriginal * $maximoPorcentajeCanje : 0.0;
         if ($maximoDescuento > $totalOriginal) {
             $maximoDescuento = $totalOriginal;
@@ -973,6 +969,8 @@ include __DIR__ . '/templates/header.php';
                                         'valor_punto' => (float) ($configuracionPuntos['valor_punto'] ?? 0),
                                         'maximo_porcentaje' => (float) ($configuracionPuntos['maximo_porcentaje'] ?? 0),
                                     ],
+                                    'reservas_endpoint' => piccolo_public_base_url() . 'api/carrito_actualizar.php',
+                                    'disponibilidad_endpoint' => piccolo_public_base_url() . 'api/disponibilidad_menu.php',
                                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                                 ?>;
 </script>
