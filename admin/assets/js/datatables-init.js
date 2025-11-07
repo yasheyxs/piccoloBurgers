@@ -1,5 +1,45 @@
 (function (global) {
-  'use strict';
+  "use strict";
+
+  var jq = global.jQuery;
+
+  if (jq && jq.fn && jq.fn.dataTable && jq.fn.dataTable.ext) {
+    var previousErrMode = jq.fn.dataTable.ext.errMode;
+
+    if (previousErrMode !== "none") {
+      jq.fn.dataTable.ext.errMode = function (settings, techNote, message) {
+        var text = typeof message === "string" ? message : "";
+        var normalized = text.toLowerCase();
+
+        if (
+          normalized.indexOf("no hay datos disponibles") !== -1 ||
+          normalized.indexOf("no data available") !== -1
+        ) {
+          if (
+            global.console &&
+            typeof global.console.info === "function" &&
+            text
+          ) {
+            global.console.info("DataTables: " + text);
+          }
+          return;
+        }
+
+        if (typeof previousErrMode === "function") {
+          previousErrMode(settings, techNote, message);
+          return;
+        }
+
+        if (
+          global.console &&
+          typeof global.console.warn === "function" &&
+          text
+        ) {
+          global.console.warn("Aviso de DataTables: " + text);
+        }
+      };
+    }
+  }
 
   var defaultOptions = {
     paging: true,
@@ -23,20 +63,22 @@
         first: "Primero",
         last: "Último",
         next: "Siguiente",
-        previous: "Anterior"
+        previous: "Anterior",
       },
       aria: {
         sortAscending: ": activar para ordenar la columna ascendente",
-        sortDescending: ": activar para ordenar la columna descendente"
-      }
-    }
+        sortDescending: ": activar para ordenar la columna descendente",
+      },
+    },
   };
 
   function initDataTable(selector, options) {
     var $ = global.jQuery;
     if (!$ || !$.fn || !$.fn.DataTable) {
-      if (global.console && typeof global.console.warn === 'function') {
-        console.warn('initDataTable requiere que jQuery y DataTables estén cargados.');
+      if (global.console && typeof global.console.warn === "function") {
+        console.warn(
+          "initDataTable requiere que jQuery y DataTables estén cargados."
+        );
       }
       return null;
     }

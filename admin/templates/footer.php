@@ -22,7 +22,15 @@
 
     $('table').each(function() {
       const $tabla = $(this);
+
       if ($tabla.data('no-datatable') === true || $tabla.is('[data-no-datatable]')) {
+        return;
+      }
+
+      const tieneEncabezado = $tabla.children('thead').length > 0;
+      const tieneCuerpo = $tabla.children('tbody').length > 0;
+
+      if (!tieneEncabezado || !tieneCuerpo) {
         return;
       }
 
