@@ -3,7 +3,8 @@ include("../admin/bd.php");
 include("../admin/templates/header.php");
 
 // Consultar pedidos "En preparación" y "En camino"
-$sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado IN ('En preparación', 'En camino') ORDER BY fecha DESC");
+$sentencia = $conexion->prepare("SELECT * FROM tbl_pedidos WHERE estado IN ('En preparación', 'En camino') ORDER BY fecha ASC");
+
 $sentencia->execute();
 $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 ?>
