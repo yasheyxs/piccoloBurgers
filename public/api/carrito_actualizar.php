@@ -73,7 +73,25 @@ try {
 
     $reservas = $resultado['reservas'] ?? [];
     $ids = array_map(static fn($item) => $item['menu_id'] ?? null, $reservas);
-    $ids = array_filter($ids, static fn($id) => $id !== null);
+    if ($menuId > 0) {
+        $ids[] = $menuId;
+    }
+
+    if (isset($payload['items']) && is_array($payload['items'])) {
+        foreach ($payload['items'] as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+
+            $ids[] = $item['menu_id'] ?? $item['menuId'] ?? $item['id'] ?? null;
+        }
+    }
+
+    $ids = array_filter(
+        array_map(static fn($id) => $id !== null ? (int) $id : null, $ids),
+        static fn($id) => $id !== null && $id > 0
+    );
+    $ids = array_values(array_unique($ids));
     $disponibilidad = obtenerDisponibilidadMenu($conexion, $ids);
 
     echo json_encode([
