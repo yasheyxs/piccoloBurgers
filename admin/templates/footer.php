@@ -15,10 +15,19 @@
 <script src="<?php echo $url_base; ?>assets/js/theme-toggle.js"></script>
 
 <script>
-  $(document).ready(function () {
-    $('table').each(function () {
+  $(document).ready(function() {
+    if (typeof $.fn.DataTable !== 'function') {
+      return;
+    }
+
+    $('table').each(function() {
+      const $tabla = $(this);
+      if ($tabla.data('no-datatable') === true || $tabla.is('[data-no-datatable]')) {
+        return;
+      }
+
       if (!$.fn.DataTable.isDataTable(this)) {
-        $(this).DataTable({
+        $tabla.DataTable({
           pageLength: 3,
           lengthMenu: [
             [3, 10, 25, 50],
@@ -34,9 +43,9 @@
 </script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', function() {
     const dropdownElements = document.querySelectorAll('[data-bs-toggle="dropdown"]');
-    dropdownElements.forEach(function (dropdownToggleEl) {
+    dropdownElements.forEach(function(dropdownToggleEl) {
       new bootstrap.Dropdown(dropdownToggleEl);
     });
   });
