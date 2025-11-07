@@ -85,13 +85,35 @@ if ($maximoPorcentajeFormulario === '') {
     $maximoPorcentajeFormulario = '0';
 }
 
-$ultimaActualizacion = null;
+$ultimaActualizacionTexto = null;
+$ultimaActualizacionIso = null;
+$ultimaActualizacionZona = null;
+$ultimaActualizacionTitulo = null;
+
 if (!empty($configuracionActual['actualizado_en'])) {
+    $dbTimezoneId = getenv('DB_TIMEZONE') ?: 'UTC';
+    $appTimezoneId = getenv('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
+
     try {
-        $fecha = new DateTime($configuracionActual['actualizado_en']);
-        $ultimaActualizacion = $fecha->format('d/m/Y H:i');
+        $dbTimezone = new DateTimeZone($dbTimezoneId);
     } catch (Exception $e) {
-        $ultimaActualizacion = $configuracionActual['actualizado_en'];
+        $dbTimezone = new DateTimeZone('UTC');
+    }
+    try {
+        $appTimezone = new DateTimeZone($appTimezoneId);
+    } catch (Exception $e) {
+        $appTimezone = $dbTimezone;
+    }
+
+    try {
+        $fechaOriginal = new DateTimeImmutable($configuracionActual['actualizado_en'], $dbTimezone);
+        $fechaConvertida = $fechaOriginal->setTimezone($appTimezone);
+        $ultimaActualizacionTexto = $fechaConvertida->format('d/m/Y H:i');
+        $ultimaActualizacionIso = $fechaConvertida->format(DateTimeInterface::ATOM);
+        $ultimaActualizacionZona = $fechaConvertida->format('T');
+        $ultimaActualizacionTitulo = 'Actualizado el ' . $fechaConvertida->format('d/m/Y H:i') . ' hs' . ($ultimaActualizacionZona ? ' (' . $ultimaActualizacionZona . ')' : '');
+    } catch (Exception $e) {
+        $ultimaActualizacionTexto = $configuracionActual['actualizado_en'];
     }
 }
 
@@ -110,12 +132,25 @@ include __DIR__ . '/../../templates/header.php';
             </p>
         </div>
         <div class="d-flex flex-column align-items-lg-end gap-2">
-            <div class="badge rounded-pill bg-light text-muted border shadow-sm px-3 py-2">
-                <i class="fa-solid fa-clock me-2 text-warning"></i>
-                Última actualización:
-                <strong class="text-dark">
-                    <?= $ultimaActualizacion ? htmlspecialchars($ultimaActualizacion, ENT_QUOTES, 'UTF-8') : 'Sin registros' ?>
-                </strong>
+            <div class="last-update-badge shadow-sm px-3 py-2">
+                <span class="last-update-icon" aria-hidden="true">
+                    <i class="fa-solid fa-clock text-warning"></i>
+                </span>
+                <div class="d-flex flex-column text-lg-end">
+                    <span class="last-update-label">Última actualización</span>
+                    <?php if ($ultimaActualizacionTexto): ?>
+                        <time
+                            class="last-update-value fw-semibold"
+                            datetime="<?= htmlspecialchars($ultimaActualizacionIso ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                            data-last-update="<?= htmlspecialchars($ultimaActualizacionIso ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                            title="<?= htmlspecialchars($ultimaActualizacionTitulo ?? '', ENT_QUOTES, 'UTF-8') ?>">
+                            <?= htmlspecialchars($ultimaActualizacionTexto, ENT_QUOTES, 'UTF-8') ?>
+                        </time>
+                        <span class="last-update-relative" data-last-update-relative></span>
+                    <?php else: ?>
+                        <span class="last-update-value fw-semibold">Sin registros</span>
+                    <?php endif; ?>
+                </div>
             </div>
         </div>
     </div>
@@ -150,7 +185,7 @@ include __DIR__ . '/../../templates/header.php';
             </p>
         </div>
         <div class="card-body">
-            <form method="post" class="row g-4">
+            <form method="post" class="row g-4" data-puntos-config-form>
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 
                 <div class="col-12 col-lg-4">
@@ -169,6 +204,7 @@ include __DIR__ . '/../../templates/header.php';
                             min="0"
                             step="1"
                             value="<?= htmlspecialchars((string) $minimoPuntosActual, ENT_QUOTES, 'UTF-8') ?>"
+                            data-default-value="<?= htmlspecialchars((string) $minimoPuntosActual, ENT_QUOTES, 'UTF-8') ?>"
                             required>
                     </div>
                     <div class="form-text">
@@ -191,7 +227,7 @@ include __DIR__ . '/../../templates/header.php';
                             name="valor_punto"
                             min="0.01"
                             step="0.01"
-                            value="<?= htmlspecialchars($valorPuntoFormulario, ENT_QUOTES, 'UTF-8') ?>"
+                            data-default-value="<?= htmlspecialchars($valorPuntoFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             required>
                     </div>
                     <div class="form-text">
@@ -215,7 +251,7 @@ include __DIR__ . '/../../templates/header.php';
                             min="1"
                             max="100"
                             step="0.1"
-                            value="<?= htmlspecialchars($maximoPorcentajeFormulario, ENT_QUOTES, 'UTF-8') ?>"
+                            data-default-value="<?= htmlspecialchars($maximoPorcentajeFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             required>
 
                     </div>
@@ -225,9 +261,9 @@ include __DIR__ . '/../../templates/header.php';
                 </div>
 
                 <div class="col-12 d-flex justify-content-end gap-2">
-                    <a href="<?= htmlspecialchars($_SERVER['REQUEST_URI'] ?? 'index.php', ENT_QUOTES, 'UTF-8') ?>" class="btn btn-outline-secondary">
-                        <i class="fa-solid fa-rotate-left me-2"></i>Restablecer
-                    </a>
+                    <button type="button" class="btn btn-outline-secondary" id="restablecerParametros">
+                        <i class="fa-solid fa-rotate-left me-2"></i>Ver datos actuales
+                    </button>
                     <button type="submit" class="btn btn-warning text-dark shadow-sm">
                         <i class="fa-solid fa-floppy-disk me-2"></i>Guardar cambios
                     </button>
@@ -235,6 +271,96 @@ include __DIR__ . '/../../templates/header.php';
             </form>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const formulario = document.querySelector('[data-puntos-config-form]');
+            const restablecerBtn = document.getElementById('restablecerParametros');
+
+            if (formulario && restablecerBtn) {
+                restablecerBtn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    formulario.reset();
+                    formulario.querySelectorAll('[data-default-value]').forEach(function(input) {
+                        const defaultValue = input.getAttribute('data-default-value');
+                        if (defaultValue !== null) {
+                            input.value = defaultValue;
+                        }
+                    });
+                    formulario.dispatchEvent(new Event('piccolo:form-restablecido'));
+                });
+            }
+
+            const lastUpdateElement = document.querySelector('[data-last-update]');
+            const relativeTarget = document.querySelector('[data-last-update-relative]');
+
+            function textoRelativoParaDiferencia(diffMs) {
+                if (!Number.isFinite(diffMs)) {
+                    return '';
+                }
+
+                const esFuturo = diffMs < 0;
+                const absMs = Math.abs(diffMs);
+                const segundos = Math.floor(absMs / 1000);
+                if (segundos < 60) {
+                    return esFuturo ? 'En instantes' : 'Hace instantes';
+                }
+
+                const minutos = Math.floor(segundos / 60);
+                if (minutos < 60) {
+                    return esFuturo ?
+                        `En ${minutos} minuto${minutos === 1 ? '' : 's'}` :
+                        `Hace ${minutos} minuto${minutos === 1 ? '' : 's'}`;
+                }
+
+                const horas = Math.floor(minutos / 60);
+                if (horas < 24) {
+                    return esFuturo ?
+                        `En ${horas} hora${horas === 1 ? '' : 's'}` :
+                        `Hace ${horas} hora${horas === 1 ? '' : 's'}`;
+                }
+
+                const dias = Math.floor(horas / 24);
+                return esFuturo ?
+                    `En ${dias} día${dias === 1 ? '' : 's'}` :
+                    `Hace ${dias} día${dias === 1 ? '' : 's'}`;
+            }
+
+            function actualizarTiempoRelativo() {
+                if (!lastUpdateElement || !relativeTarget) {
+                    return;
+                }
+
+                const iso = lastUpdateElement.getAttribute('data-last-update');
+                if (!iso) {
+                    relativeTarget.textContent = '';
+                    return;
+                }
+
+                const fecha = new Date(iso);
+                if (Number.isNaN(fecha.getTime())) {
+                    relativeTarget.textContent = '';
+                    return;
+                }
+
+                try {
+                    const formatter = new Intl.DateTimeFormat('es-AR', {
+                        dateStyle: 'full',
+                        timeStyle: 'short'
+                    });
+                    lastUpdateElement.setAttribute('title', formatter.format(fecha));
+                } catch (error) {
+                    // Si Intl no está disponible, dejamos el título provisto por el servidor.
+                }
+
+                const ahora = new Date();
+                const diffMs = ahora.getTime() - fecha.getTime();
+                relativeTarget.textContent = textoRelativoParaDiferencia(diffMs);
+            }
+
+            actualizarTiempoRelativo();
+            setInterval(actualizarTiempoRelativo, 60000);
+        });
+    </script>
 </div>
 
 <?php include __DIR__ . '/../../templates/footer.php'; ?>
