@@ -535,6 +535,167 @@ function actualizarEstadoBotones() {
   }
 }
 
+function recalcularDisponibilidadPuntos() {
+  const usarPuntosCheckbox = document.getElementById("usarPuntos");
+  if (!usarPuntosCheckbox) {
+    return null;
+  }
+
+  const puntosDisponiblesDato =
+    usarPuntosCheckbox.dataset.puntosDisponibles ??
+    document.getElementById("puntosDisponibles")?.value ??
+    "0";
+  const puntosDisponiblesParseado = Number.parseInt(puntosDisponiblesDato, 10);
+  const puntosDisponibles = Number.isNaN(puntosDisponiblesParseado)
+    ? 0
+    : puntosDisponiblesParseado;
+
+  const minimoParseado = Number.parseInt(
+    usarPuntosCheckbox.dataset.minimoPuntos ?? "50",
+    10
+  );
+  const minimo = Number.isNaN(minimoParseado) ? 50 : minimoParseado;
+
+  const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
+  const puntosSuficientes = puntosDisponibles >= minimo;
+
+  usarPuntosCheckbox.dataset.habilitadoBase = puntosSuficientes ? "1" : "0";
+
+  if (!puntosSuficientes) {
+    if (usarPuntosCheckbox.checked) {
+      usarPuntosCheckbox.checked = false;
+      estadoTotalCarrito.usarPuntos = false;
+    }
+    usarPuntosCheckbox.disabled = true;
+    if (wrapper) {
+      wrapper.classList.add("is-disabled");
+    }
+    localStorage.setItem("usar_puntos_activado", "0");
+  } else {
+    usarPuntosCheckbox.disabled = false;
+    if (wrapper) {
+      wrapper.classList.remove("is-disabled");
+    }
+  }
+
+  return {
+    minimo,
+    puntosDisponibles,
+    puntosSuficientes,
+  };
+}
+
+function normalizarMaximoPorcentaje(valor) {
+  const numero = Number.parseFloat(valor);
+  if (Number.isNaN(numero) || numero <= 0) {
+    return null;
+  }
+
+  if (numero > 1) {
+    return numero / 100;
+  }
+
+  return numero;
+}
+
+function formatearPorcentajeParaMostrar(valorDecimal) {
+  if (!Number.isFinite(valorDecimal)) {
+    return null;
+  }
+
+  const porcentaje = valorDecimal * 100;
+
+  try {
+    return new Intl.NumberFormat("es-AR", {
+      minimumFractionDigits: porcentaje % 1 === 0 ? 0 : 2,
+      maximumFractionDigits: porcentaje % 1 === 0 ? 0 : 2,
+    }).format(porcentaje);
+  } catch (error) {
+    const precision = porcentaje % 1 === 0 ? 0 : 2;
+    return porcentaje.toFixed(precision);
+  }
+}
+
+function sincronizarConfiguracionPuntos() {
+  return fetch("api/configuracion_puntos.php", {
+    credentials: "same-origin",
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      if (
+        !data ||
+        typeof data !== "object" ||
+        !data.exito ||
+        typeof data.configuracion !== "object"
+      ) {
+        return null;
+      }
+
+      const configuracion = data.configuracion;
+      const minimo = Number.parseInt(configuracion.minimoPuntos, 10);
+      const valor = Number.parseFloat(configuracion.valorPunto);
+      const maximoDecimal = normalizarMaximoPorcentaje(
+        configuracion.maximoPorcentaje
+      );
+
+      const wrapper = document.getElementById("configuracionPuntos");
+      if (wrapper) {
+        if (!Number.isNaN(minimo)) {
+          wrapper.dataset.minimoPuntos = String(minimo);
+        }
+        if (!Number.isNaN(valor)) {
+          wrapper.dataset.valorPunto = valor.toFixed(2);
+        }
+        if (Number.isFinite(maximoDecimal)) {
+          wrapper.dataset.maximoPorcentaje = String(maximoDecimal);
+        }
+      }
+
+      const usarPuntosCheckbox = document.getElementById("usarPuntos");
+      if (usarPuntosCheckbox) {
+        if (!Number.isNaN(minimo)) {
+          usarPuntosCheckbox.dataset.minimoPuntos = String(minimo);
+        }
+        if (!Number.isNaN(valor)) {
+          usarPuntosCheckbox.dataset.valorPunto = valor.toFixed(2);
+        }
+        if (Number.isFinite(maximoDecimal)) {
+          usarPuntosCheckbox.dataset.maximoPorcentaje = String(maximoDecimal);
+        }
+      }
+
+      const helperStrong = document.querySelector(".usar-puntos-helper strong");
+      if (helperStrong && Number.isFinite(maximoDecimal)) {
+        const porcentajeTexto = formatearPorcentajeParaMostrar(maximoDecimal);
+        if (porcentajeTexto) {
+          helperStrong.textContent = `${porcentajeTexto}%`;
+        }
+      }
+
+      recalcularDisponibilidadPuntos();
+      document.dispatchEvent(
+        new CustomEvent("carrito:puntos-config-actualizada", {
+          detail: configuracion,
+        })
+      );
+      actualizarTotal();
+
+      return configuracion;
+    })
+    .catch((error) => {
+      console.error(
+        "No se pudo sincronizar la configuración de puntos:",
+        error
+      );
+      return null;
+    });
+}
+
 function mostrarMensajeCarritoVacio() {
   const contenedor = document.getElementById("carrito-contenido");
   if (contenedor) {
@@ -926,38 +1087,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let usarPuntosInicial = usarPuntosGuardado;
 
   if (usarPuntosCheckbox) {
-    const minimoPuntosParseado = Number.parseInt(
-      usarPuntosCheckbox.dataset.minimoPuntos || "50",
-      10
-    );
-    const minimoPuntos = Number.isNaN(minimoPuntosParseado)
-      ? 50
-      : minimoPuntosParseado;
-    const puntosDisponiblesParseado = Number.parseInt(
-      usarPuntosCheckbox.dataset.puntosDisponibles ||
-        document.getElementById("puntosDisponibles")?.value ||
-        "0",
-      10
-    );
-    const puntosDisponibles = Number.isNaN(puntosDisponiblesParseado)
-      ? 0
-      : puntosDisponiblesParseado;
-    const wrapper = usarPuntosCheckbox.closest(".usar-puntos-wrapper");
-    const puntosSuficientes = puntosDisponibles >= minimoPuntos;
-    usarPuntosCheckbox.dataset.habilitadoBase = puntosSuficientes ? "1" : "0";
-
-    if (!puntosSuficientes) {
+    const disponibilidadInicial = recalcularDisponibilidadPuntos();
+    if (disponibilidadInicial && !disponibilidadInicial.puntosSuficientes) {
       usarPuntosInicial = false;
-      usarPuntosCheckbox.checked = false;
-      usarPuntosCheckbox.disabled = true;
-      if (wrapper) {
-        wrapper.classList.add("is-disabled");
-      }
-      localStorage.setItem("usar_puntos_activado", "0");
     } else {
       usarPuntosCheckbox.checked = usarPuntosGuardado;
-      usarPuntosCheckbox.addEventListener("change", actualizarTotal);
     }
+    usarPuntosCheckbox.addEventListener("change", actualizarTotal);
   }
 
   estadoTotalCarrito.usarPuntos = usarPuntosInicial;
@@ -977,15 +1113,30 @@ document.addEventListener("DOMContentLoaded", () => {
     formPedido.addEventListener("submit", prepararEnvioPedido);
   }
 
-  sincronizarReservasIniciales()
-    .catch(() => {})
-    .finally(() => {
-      const totalFinal = cargarCarrito();
-      const totalSpan = document.getElementById("total");
-      if (totalSpan && Number.isFinite(totalFinal)) {
-        totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
-      }
-      actualizarContador();
-      ajustarPaddingContenido();
-    });
+  const tareasIniciales = [
+    sincronizarConfiguracionPuntos(),
+    sincronizarReservasIniciales(),
+  ];
+
+  const promesasNormalizadas = tareasIniciales.map((promesa) => {
+    if (promesa && typeof promesa.then === "function") {
+      return promesa.catch(() => null);
+    }
+    return Promise.resolve(null);
+  });
+
+  const sincronizacionPromesa =
+    typeof Promise.allSettled === "function"
+      ? Promise.allSettled(promesasNormalizadas)
+      : Promise.all(promesasNormalizadas);
+
+  sincronizacionPromesa.finally(() => {
+    const totalFinal = cargarCarrito();
+    const totalSpan = document.getElementById("total");
+    if (totalSpan && Number.isFinite(totalFinal)) {
+      totalSpan.dataset.totalFinal = totalFinal.toFixed(2);
+    }
+    actualizarContador();
+    ajustarPaddingContenido();
+  });
 });

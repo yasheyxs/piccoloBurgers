@@ -39,7 +39,8 @@ body.admin-body {
   --admin-btn-secondary-text: #f8fafc;
   --admin-btn-outline-surface: rgba(15, 23, 42, 0.05);
   --admin-btn-outline-border: rgba(15, 23, 42, 0.2);
-  --admin-transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  --admin-transition: color 0.25s ease, background-color 0.25s ease,
+    border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 body.admin-body.admin-dark {
@@ -122,6 +123,51 @@ body.admin-body .navbar .dropdown-menu {
   background-color: var(--admin-dropdown-bg);
   border-color: var(--admin-border);
   box-shadow: var(--admin-shadow);
+}
+
+.last-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  background-color: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  box-shadow: var(--admin-shadow);
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark .last-update-badge {
+  background-color: rgba(28, 32, 41, 0.9);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+.last-update-badge .last-update-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--admin-muted);
+}
+
+.last-update-badge .last-update-value {
+  font-size: 0.95rem;
+  color: var(--admin-text);
+}
+
+.last-update-badge .last-update-zone {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--admin-muted);
+}
+
+body.admin-body.admin-dark .last-update-badge .last-update-zone {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.last-update-badge .last-update-relative {
+  font-size: 0.75rem;
+  color: var(--admin-muted);
+  margin-top: 0.25rem;
 }
 
 body.admin-body:not(.delivery-panel) main .container,
@@ -240,11 +286,14 @@ body.admin-body .dataTables_wrapper .dataTables_length select option {
   color: #212529;
 }
 
-body.admin-body.admin-dark .dataTables_wrapper .dataTables_length select option {
+body.admin-body.admin-dark
+  .dataTables_wrapper
+  .dataTables_length
+  select
+  option {
   color: #f1f3f5;
   background-color: #0f1115;
 }
-
 
 body.admin-body.admin-dark:not(.delivery-panel) .form-control:focus,
 body.admin-body.admin-dark:not(.delivery-panel) .form-select:focus,
@@ -306,7 +355,6 @@ body.admin-body .btn-danger {
   color: var(--admin-btn-danger-text);
 }
 body.admin-body .btn-danger:hover,
-
 body.admin-body .btn-danger:focus {
   background-color: var(--admin-btn-danger-hover);
   border-color: var(--admin-btn-danger-hover);
@@ -471,7 +519,11 @@ body.admin-body .sales-panel-cta {
   padding: 0.95rem 2.8rem;
   font-size: 1.05rem;
   border-radius: calc(var(--admin-btn-radius) + 0.2rem);
-  background: linear-gradient(135deg, var(--admin-btn-primary-bg), var(--admin-btn-primary-hover));
+  background: linear-gradient(
+    135deg,
+    var(--admin-btn-primary-bg),
+    var(--admin-btn-primary-hover)
+  );
   border-color: transparent;
   color: var(--admin-btn-primary-text);
   box-shadow: 0 18px 36px rgba(29, 78, 216, 0.25);
@@ -483,7 +535,12 @@ body.admin-body .sales-panel-cta::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transform: translateX(-100%);
   transition: transform 0.45s ease;
   z-index: 0;
@@ -510,7 +567,11 @@ body.admin-body .sales-panel-cta i {
 }
 
 body.admin-body.admin-dark .sales-panel-cta {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.95), rgba(29, 78, 216, 0.95));
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.95),
+    rgba(29, 78, 216, 0.95)
+  );
   box-shadow: 0 22px 42px rgba(15, 23, 42, 0.55);
   color: #f8fafc;
 }
