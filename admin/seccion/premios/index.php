@@ -80,7 +80,11 @@ include __DIR__ . '/../../templates/header.php';
     </div>
 
     <?php if (!empty($mensaje)): ?>
-        <div class="alert alert-<?= htmlspecialchars($tipoMensaje ?: 'info', ENT_QUOTES, 'UTF-8'); ?> alert-dismissible fade show" role="alert">
+        <?php
+        $tipoAlerta = $tipoMensaje ?: 'info';
+        $clasesExtras = $tipoAlerta === 'success' ? ' alert-soft-success alert-auto-dismiss' : '';
+        ?>
+        <div class="alert alert-<?= htmlspecialchars($tipoAlerta, ENT_QUOTES, 'UTF-8'); ?> alert-dismissible fade show<?= htmlspecialchars($clasesExtras, ENT_QUOTES, 'UTF-8'); ?>" role="alert">
             <?= htmlspecialchars($mensaje, ENT_QUOTES, 'UTF-8'); ?>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
         </div>

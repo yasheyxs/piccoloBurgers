@@ -1,5 +1,7 @@
 <?php
 include("../admin/bd.php");
+require_once __DIR__ . '/helpers/telefonos.php';
+require_once __DIR__ . '/../componentes/validar_telefono.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -8,9 +10,12 @@ if (session_status() === PHP_SESSION_NONE) {
 $errores = [];
 
 $nombre = '';
-$telefono = '';
 $email = '';
 $puntos = 0;
+
+$catalogoTelefonos = obtenerCatalogoTelefonos();
+$codigoPais = array_key_first($catalogoTelefonos) ?: '54';
+$numeroTelefono = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tokenSesion = $_SESSION['csrf_token'] ?? '';
@@ -22,8 +27,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $nombre = trim((string) ($_POST['nombre'] ?? ''));
-    $telefono = trim((string) ($_POST['telefono'] ?? ''));
     $email = trim((string) ($_POST['email'] ?? ''));
+    $codigoPaisInput = normalizarCodigoTelefono((string) ($_POST['codigo_pais'] ?? $codigoPais));
+    if (isset($catalogoTelefonos[$codigoPaisInput])) {
+        $codigoPais = $codigoPaisInput;
+    } else {
+        $errores[] = 'Seleccioná un código de país válido.';
+    }
+
+    $telefonoSinFiltrar = trim((string) ($_POST['telefono'] ?? ''));
+    $numeroTelefono = preg_replace('/[^\d]/', '', $telefonoSinFiltrar);
     $puntosInput = trim((string) ($_POST['puntos'] ?? '0'));
 
     if ($nombre === '') {
@@ -34,13 +47,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = 'Ingresá un correo electrónico válido.';
     }
 
-    if ($telefono === '') {
-        $errores[] = 'El teléfono es obligatorio.';
+    $telefonoNormalizado = validarTelefono($codigoPais, $telefonoSinFiltrar);
+    if ($telefonoNormalizado === false) {
+        $errores[] = 'Ingresá un número de teléfono válido.';
     }
 
     $puntosValidados = filter_var($puntosInput, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
     if ($puntosValidados === false) {
         $errores[] = 'Ingresá un valor de puntos válido (0 o más).';
+    }
+
+    if ($email !== '') {
+        $stmtVerificarEmail = $conexion->prepare('SELECT COUNT(*) FROM tbl_clientes WHERE email = :email');
+        $stmtVerificarEmail->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmtVerificarEmail->execute();
+        if ((int) $stmtVerificarEmail->fetchColumn() > 0) {
+            $errores[] = 'Ya existe un cliente registrado con ese correo electrónico.';
+        }
+    }
+
+    if ($telefonoNormalizado !== false) {
+        $stmtVerificarTelefono = $conexion->prepare('SELECT COUNT(*) FROM tbl_clientes WHERE telefono = :telefono');
+        $stmtVerificarTelefono->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
+        $stmtVerificarTelefono->execute();
+        if ((int) $stmtVerificarTelefono->fetchColumn() > 0) {
+            $errores[] = 'Ya existe un cliente registrado con ese número de teléfono.';
+        }
     }
 
     if (empty($errores)) {
@@ -52,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmtInsertar = $conexion->prepare('INSERT INTO tbl_clientes (nombre, telefono, email, password, fecha_registro, puntos) VALUES (:nombre, :telefono, :email, :password, :fecha_registro, :puntos)');
             $stmtInsertar->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-            $stmtInsertar->bindParam(':telefono', $telefono, PDO::PARAM_STR);
+            $stmtInsertar->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
             $stmtInsertar->bindParam(':email', $email, PDO::PARAM_STR);
             $stmtInsertar->bindParam(':password', $passwordGenerica, PDO::PARAM_STR);
             $stmtInsertar->bindParam(':fecha_registro', $fechaRegistro, PDO::PARAM_STR);
@@ -84,12 +116,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             error_log('No se pudo crear el cliente: ' . $error->getMessage());
-
-            if ($error instanceof PDOException && (int) $error->errorInfo[1] === 1062) {
-                $errores[] = 'Ya existe un cliente registrado con ese correo electrónico.';
-            } else {
-                $errores[] = 'Ocurrió un error al crear el cliente. Intentá nuevamente.';
-            }
+            $errores[] = 'Ocurrió un error al crear el cliente. Intentá nuevamente.';
         }
     }
 
@@ -126,7 +153,18 @@ include("../admin/templates/header.php");
             </div>
             <div class="col-md-6">
                 <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" class="form-control" id="telefono" name="telefono" value="<?= htmlspecialchars($telefono, ENT_QUOTES, 'UTF-8'); ?>" required>
+                <div class="input-group">
+                    <label class="input-group-text" for="codigo_pais">Cód.</label>
+                    <select class="form-select" id="codigo_pais" name="codigo_pais" required style="max-width: 100px;">
+
+                        <?php foreach ($catalogoTelefonos as $codigo => $datos) { ?>
+                            <option value="<?= htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8'); ?>" <?= $codigo === $codigoPais ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($datos['bandera'] . ' +' . $codigo . ' ' . $datos['pais'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" value="<?= htmlspecialchars($numeroTelefono, ENT_QUOTES, 'UTF-8'); ?>" required inputmode="numeric" autocomplete="tel" placeholder="Ej: 3511234567">
+                </div>
             </div>
             <div class="col-md-6">
                 <label for="email" class="form-label">Correo electrónico</label>
@@ -137,7 +175,7 @@ include("../admin/templates/header.php");
                 <input type="number" min="0" class="form-control" id="puntos" name="puntos" value="<?= htmlspecialchars((string) $puntos, ENT_QUOTES, 'UTF-8'); ?>" required>
             </div>
             <div class="col-12">
-                <div class="alert alert-info" role="alert">
+                <div class="alert alert-info alert-soft-info" role="alert">
                     El cliente se creará con la contraseña genérica <span class="fw-semibold">12345</span>. Recordale que la cambie cuanto antes.
                 </div>
             </div>
@@ -151,5 +189,36 @@ include("../admin/templates/header.php");
         </form>
     </div>
 </div>
+
+<script>
+    (function() {
+        const codigoSelect = document.getElementById('codigo_pais');
+        const telefonoInput = document.getElementById('telefono');
+        const longitudes = <?= json_encode(array_map(fn($datos) => $datos['longitudes'], $catalogoTelefonos), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+
+        if (!codigoSelect || !telefonoInput) {
+            return;
+        }
+
+        function aplicarLongitudMaxima() {
+            const codigo = codigoSelect.value;
+            const longitudesPermitidas = longitudes[codigo];
+
+            if (Array.isArray(longitudesPermitidas) && longitudesPermitidas.length > 0) {
+                const maximo = Math.max.apply(null, longitudesPermitidas);
+                telefonoInput.maxLength = Number.isFinite(maximo) ? maximo : 15;
+            } else {
+                telefonoInput.removeAttribute('maxLength');
+            }
+        }
+
+        codigoSelect.addEventListener('change', aplicarLongitudMaxima);
+        telefonoInput.addEventListener('input', () => {
+            telefonoInput.value = telefonoInput.value.replace(/[^\d]/g, '');
+        });
+
+        aplicarLongitudMaxima();
+    })();
+</script>
 
 <?php include("../admin/templates/footer.php"); ?>

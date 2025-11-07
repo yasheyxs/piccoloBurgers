@@ -1366,6 +1366,85 @@
       fragmento.appendChild(crearTarjetaPremio(premio));
     });
     elementos.listadoPremios.appendChild(fragmento);
+    actualizarDisponibilidadBotonesPremios();
+  }
+
+  function actualizarDisponibilidadBotonesPremios(puntosUsadosCalculados) {
+    if (!elementos.listadoPremios) {
+      return;
+    }
+
+    const puntosUsados = Number.isFinite(puntosUsadosCalculados)
+      ? puntosUsadosCalculados
+      : Array.from(state.seleccionPremios.entries()).reduce(
+          (total, [id, cantidad]) => {
+            const premioRelacionado = premiosDisponibles.find(
+              (item) => Number(item.id) === Number(id)
+            );
+            if (!premioRelacionado) {
+              return total;
+            }
+            const costoUnidad = Number(premioRelacionado.costo_puntos) || 0;
+            return total + costoUnidad * cantidad;
+          },
+          0
+        );
+
+    elementos.listadoPremios
+      .querySelectorAll("[data-premio-id]")
+      .forEach((tarjeta) => {
+        const premioId = tarjeta.dataset.premioId;
+        if (!premioId) {
+          return;
+        }
+
+        const premio = premiosDisponibles.find(
+          (item) => Number(item.id) === Number(premioId)
+        );
+        if (!premio) {
+          return;
+        }
+
+        const costo = Number(premio.costo_puntos) || 0;
+        const cantidadActual = state.seleccionPremios.get(premioId) || 0;
+
+        const botonIncrementar = tarjeta.querySelector(
+          'button[data-accion="incrementar"]'
+        );
+        const botonDecrementar = tarjeta.querySelector(
+          'button[data-accion="decrementar"]'
+        );
+        const puedeAgregar =
+          costo <= 0 || puntosUsados + costo <= state.puntosDisponibles;
+        const puedeRestar = cantidadActual > 0;
+
+        if (botonIncrementar) {
+          botonIncrementar.disabled = !puedeAgregar;
+          if (!puedeAgregar) {
+            botonIncrementar.classList.add("disabled");
+            botonIncrementar.setAttribute("aria-disabled", "true");
+            botonIncrementar.setAttribute("title", "Puntos insuficientes");
+          } else {
+            botonIncrementar.classList.remove("disabled");
+            botonIncrementar.removeAttribute("aria-disabled");
+            botonIncrementar.removeAttribute("title");
+          }
+        }
+
+        if (botonDecrementar) {
+          botonDecrementar.disabled = !puedeRestar;
+          if (!puedeRestar) {
+            botonDecrementar.setAttribute("aria-disabled", "true");
+          } else {
+            botonDecrementar.removeAttribute("aria-disabled");
+          }
+        }
+
+        const indicador = tarjeta.querySelector('[data-role="cantidad"]');
+        if (indicador) {
+          indicador.textContent = String(cantidadActual);
+        }
+      });
   }
 
   function actualizarResumenPremios() {
@@ -1396,6 +1475,8 @@
     if (elementos.btnConfirmarPremios) {
       elementos.btnConfirmarPremios.disabled = puntosUsados <= 0;
     }
+
+    actualizarDisponibilidadBotonesPremios(puntosUsados);
 
     return puntosUsados;
   }
@@ -1430,7 +1511,7 @@
     const nuevoTotal = totalSinEste + costo * nuevoValor;
 
     if (nuevoTotal > state.puntosDisponibles) {
-      mostrarAlerta("warning", "No podés exceder los puntos disponibles.");
+      actualizarDisponibilidadBotonesPremios(puntosActuales);
       return;
     }
 

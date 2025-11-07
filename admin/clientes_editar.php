@@ -1,5 +1,7 @@
 <?php
 include("../admin/bd.php");
+require_once __DIR__ . '/helpers/telefonos.php';
+require_once __DIR__ . '/../componentes/validar_telefono.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -32,6 +34,11 @@ try {
 
 $errores = [];
 
+$catalogoTelefonos = obtenerCatalogoTelefonos();
+$telefonosFormulario = dividirTelefonoEnCodigoYNumero($cliente['telefono'] ?? '');
+$codigoPais = $telefonosFormulario['codigo'];
+$numeroTelefono = $telefonosFormulario['numero'];
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tokenSesion = $_SESSION['csrf_token'] ?? '';
     $tokenRecibido = $_POST['csrf_token'] ?? '';
@@ -42,9 +49,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $nombre = trim((string) ($_POST['nombre'] ?? ''));
-    $telefono = trim((string) ($_POST['telefono'] ?? ''));
     $email = trim((string) ($_POST['email'] ?? ''));
     $puntosInput = trim((string) ($_POST['puntos'] ?? ''));
+    $codigoPaisInput = normalizarCodigoTelefono((string) ($_POST['codigo_pais'] ?? $codigoPais));
+
+    if (isset($catalogoTelefonos[$codigoPaisInput])) {
+        $codigoPais = $codigoPaisInput;
+    } else {
+        $errores[] = 'Seleccioná un código de país válido.';
+    }
+
+    $telefonoSinFiltrar = trim((string) ($_POST['telefono'] ?? ''));
+    $numeroTelefono = preg_replace('/[^\d]/', '', $telefonoSinFiltrar);
 
     if ($nombre === '') {
         $errores[] = 'El nombre es obligatorio.';
@@ -54,13 +70,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errores[] = 'Ingresá un correo electrónico válido.';
     }
 
-    if ($telefono === '') {
-        $errores[] = 'El teléfono es obligatorio.';
+    $telefonoNormalizado = validarTelefono($codigoPais, $telefonoSinFiltrar);
+    if ($telefonoNormalizado === false) {
+        $errores[] = 'Ingresá un número de teléfono válido.';
     }
 
     $puntosValidados = filter_var($puntosInput, FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
     if ($puntosValidados === false) {
         $errores[] = 'Ingresá un valor de puntos válido (0 o más).';
+    }
+
+    if ($email !== '') {
+        $stmtVerificarEmail = $conexion->prepare('SELECT COUNT(*) FROM tbl_clientes WHERE email = :email AND ID <> :id');
+        $stmtVerificarEmail->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmtVerificarEmail->bindParam(':id', $clienteId, PDO::PARAM_INT);
+        $stmtVerificarEmail->execute();
+        if ((int) $stmtVerificarEmail->fetchColumn() > 0) {
+            $errores[] = 'Ya existe un cliente registrado con ese correo electrónico.';
+        }
+    }
+
+    if ($telefonoNormalizado !== false) {
+        $stmtVerificarTelefono = $conexion->prepare('SELECT COUNT(*) FROM tbl_clientes WHERE telefono = :telefono AND ID <> :id');
+        $stmtVerificarTelefono->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
+        $stmtVerificarTelefono->bindParam(':id', $clienteId, PDO::PARAM_INT);
+        $stmtVerificarTelefono->execute();
+        if ((int) $stmtVerificarTelefono->fetchColumn() > 0) {
+            $errores[] = 'Ya existe un cliente registrado con ese número de teléfono.';
+        }
     }
 
     if (empty($errores)) {
@@ -69,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $stmtActualizar = $conexion->prepare('UPDATE tbl_clientes SET nombre = :nombre, telefono = :telefono, email = :email, puntos = :puntos WHERE ID = :id');
             $stmtActualizar->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-            $stmtActualizar->bindParam(':telefono', $telefono, PDO::PARAM_STR);
+            $stmtActualizar->bindParam(':telefono', $telefonoNormalizado, PDO::PARAM_STR);
             $stmtActualizar->bindParam(':email', $email, PDO::PARAM_STR);
             $stmtActualizar->bindParam(':puntos', $puntosValidados, PDO::PARAM_INT);
             $stmtActualizar->bindParam(':id', $clienteId, PDO::PARAM_INT);
@@ -105,9 +142,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Actualizar los valores en memoria para repoblar el formulario
     $cliente['nombre'] = $nombre;
-    $cliente['telefono'] = $telefono;
+    if ($telefonoNormalizado !== false) {
+        $cliente['telefono'] = $telefonoNormalizado;
+    }
     $cliente['email'] = $email;
     $cliente['puntos'] = $puntosValidados !== false ? $puntosValidados : $cliente['puntos'];
+}
+
+$telefonosFormulario = dividirTelefonoEnCodigoYNumero($cliente['telefono'] ?? '');
+if (empty($errores)) {
+    $codigoPais = $telefonosFormulario['codigo'];
+    $numeroTelefono = $telefonosFormulario['numero'];
 }
 
 include("../admin/templates/header.php");
@@ -140,7 +185,18 @@ include("../admin/templates/header.php");
             </div>
             <div class="col-md-6">
                 <label for="telefono" class="form-label">Teléfono</label>
-                <input type="text" class="form-control" id="telefono" name="telefono" value="<?= htmlspecialchars($cliente['telefono'] ?? '', ENT_QUOTES, 'UTF-8'); ?>" required>
+                <div class="input-group">
+                    <label class="input-group-text" for="codigo_pais">Cód.</label>
+                    <select class="form-select" id="codigo_pais" name="codigo_pais" required style="max-width: 100px;">
+
+                        <?php foreach ($catalogoTelefonos as $codigo => $datos) { ?>
+                            <option value="<?= htmlspecialchars($codigo, ENT_QUOTES, 'UTF-8'); ?>" <?= $codigo === $codigoPais ? 'selected' : ''; ?>>
+                                <?= htmlspecialchars($datos['bandera'] . ' +' . $codigo . ' ' . $datos['pais'], ENT_QUOTES, 'UTF-8'); ?>
+                            </option>
+                        <?php } ?>
+                    </select>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" value="<?= htmlspecialchars($numeroTelefono, ENT_QUOTES, 'UTF-8'); ?>" required inputmode="numeric" autocomplete="tel" placeholder="Ej: 3511234567">
+                </div>
             </div>
             <div class="col-md-6">
                 <label for="email" class="form-label">Correo electrónico</label>
@@ -160,5 +216,36 @@ include("../admin/templates/header.php");
         </form>
     </div>
 </div>
+
+<script>
+    (function() {
+        const codigoSelect = document.getElementById('codigo_pais');
+        const telefonoInput = document.getElementById('telefono');
+        const longitudes = <?= json_encode(array_map(fn($datos) => $datos['longitudes'], $catalogoTelefonos), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?>;
+
+        if (!codigoSelect || !telefonoInput) {
+            return;
+        }
+
+        function aplicarLongitudMaxima() {
+            const codigo = codigoSelect.value;
+            const longitudesPermitidas = longitudes[codigo];
+
+            if (Array.isArray(longitudesPermitidas) && longitudesPermitidas.length > 0) {
+                const maximo = Math.max.apply(null, longitudesPermitidas);
+                telefonoInput.maxLength = Number.isFinite(maximo) ? maximo : 15;
+            } else {
+                telefonoInput.removeAttribute('maxLength');
+            }
+        }
+
+        codigoSelect.addEventListener('change', aplicarLongitudMaxima);
+        telefonoInput.addEventListener('input', () => {
+            telefonoInput.value = telefonoInput.value.replace(/[^\d]/g, '');
+        });
+
+        aplicarLongitudMaxima();
+    })();
+</script>
 
 <?php include("../admin/templates/footer.php"); ?>
