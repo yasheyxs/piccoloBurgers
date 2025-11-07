@@ -120,8 +120,8 @@ include("../admin/templates/header.php");
                 <?php } ?>
               </td>
 
-              <td>
-                <div class="d-flex gap-2 flex-wrap">
+              <td class="text-center">
+                <div class="d-flex gap-2 flex-wrap justify-content-center">
                   <a class="btn btn-outline-primary btn-sm" href="clientes_detalle.php?id=<?= $clienteId ?>" title="Ver detalles" aria-label="Ver detalles">
                     <i class="fa-solid fa-eye"></i>
                   </a>
@@ -152,7 +152,20 @@ include("../admin/templates/header.php");
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    initDataTable('#tablaClientes');
+    initDataTable('#tablaClientes', {
+      autoWidth: false,
+      columnDefs: [{
+          targets: [0, 2, 3, 4, 5],
+          width: '18%'
+        },
+        {
+          targets: 5,
+          orderable: false,
+          searchable: false,
+          className: 'text-center'
+        }
+      ]
+    });
   });
 </script>
 

@@ -94,6 +94,23 @@
     modalResumenPedidoId: document.getElementById("resumenVentaPedidoId"),
     modalResumenMetodoPago: document.getElementById("resumenVentaMetodoPago"),
     modalResumenTipoEntrega: document.getElementById("resumenVentaTipoEntrega"),
+    modalCanjePremios: document.getElementById("modalCanjePremios"),
+    modalCanjePremiosMensaje: document.getElementById(
+      "modalCanjePremiosMensaje"
+    ),
+    modalCanjePremiosDetalle: document.getElementById(
+      "modalCanjePremiosDetalle"
+    ),
+    modalCanjePremiosPuntosUsados: document.getElementById(
+      "modalCanjePremiosPuntosUsados"
+    ),
+    modalCanjePremiosPuntosRestantes: document.getElementById(
+      "modalCanjePremiosPuntosRestantes"
+    ),
+    modalCanjePremiosFecha: document.getElementById("modalCanjePremiosFecha"),
+    modalCanjePremiosDescripcion: document.getElementById(
+      "modalCanjePremiosDescripcion"
+    ),
   };
 
   const formatoMoneda = new Intl.NumberFormat("es-AR", {
@@ -136,6 +153,7 @@
   };
 
   let modalResumenInstance = null;
+  let modalCanjePremiosInstance = null;
 
   function mostrarAlerta(tipo, mensaje) {
     if (!elementos.contenedorAlertas) {
@@ -176,6 +194,26 @@
     } catch (_error) {
       const numero = Number(valor) || 0;
       return Math.round(numero).toString();
+    }
+  }
+
+  function formatearFechaCompleta(valor) {
+    if (!valor) {
+      return new Date().toLocaleString("es-AR");
+    }
+
+    const fecha = new Date(valor);
+    if (Number.isNaN(fecha.getTime())) {
+      return new Date().toLocaleString("es-AR");
+    }
+
+    try {
+      return fecha.toLocaleString("es-AR", {
+        dateStyle: "short",
+        timeStyle: "short",
+      });
+    } catch (_error) {
+      return fecha.toLocaleString("es-AR");
     }
   }
 
@@ -1068,6 +1106,93 @@
     modalResumenInstance.show();
   }
 
+  function mostrarModalCanjePremios(resumen = {}, mensaje = "") {
+    if (!modalCanjePremiosInstance || !elementos.modalCanjePremios) {
+      return;
+    }
+
+    if (elementos.modalCanjePremiosMensaje) {
+      elementos.modalCanjePremiosMensaje.textContent =
+        mensaje || "El canje de premios se registró correctamente.";
+    }
+
+    const detalle = Array.isArray(resumen.detalle) ? resumen.detalle : [];
+    if (elementos.modalCanjePremiosDetalle) {
+      elementos.modalCanjePremiosDetalle.innerHTML = "";
+
+      if (detalle.length === 0) {
+        const filaVacia = document.createElement("tr");
+        filaVacia.className = "text-muted";
+        filaVacia.innerHTML =
+          '<td colspan="4" class="text-center py-3">Sin información disponible.</td>';
+        elementos.modalCanjePremiosDetalle.appendChild(filaVacia);
+      } else {
+        const fragmento = document.createDocumentFragment();
+        detalle.forEach((item) => {
+          const fila = document.createElement("tr");
+
+          const premio = document.createElement("td");
+          premio.textContent = item.nombre || "Premio";
+
+          const cantidad = document.createElement("td");
+          cantidad.className = "text-end";
+          cantidad.textContent = formatearEntero(item.cantidad || 0);
+
+          const costo = document.createElement("td");
+          costo.className = "text-end";
+          costo.textContent = `${formatearEntero(item.costo_puntos || 0)} pts`;
+
+          const total = document.createElement("td");
+          total.className = "text-end";
+          total.textContent = `${formatearEntero(item.total_puntos || 0)} pts`;
+
+          fila.append(premio, cantidad, costo, total);
+          fragmento.appendChild(fila);
+        });
+        elementos.modalCanjePremiosDetalle.appendChild(fragmento);
+      }
+    }
+
+    const puntosUsados = Math.max(
+      0,
+      Number.isFinite(Number(resumen.puntos_usados))
+        ? Number(resumen.puntos_usados)
+        : 0
+    );
+    const puntosRestantes = Math.max(
+      0,
+      Number.isFinite(Number(resumen.puntos_actuales))
+        ? Number(resumen.puntos_actuales)
+        : Number(resumen.puntos_restantes) || 0
+    );
+
+    if (elementos.modalCanjePremiosPuntosUsados) {
+      elementos.modalCanjePremiosPuntosUsados.textContent = `${formatearEntero(
+        puntosUsados
+      )} pts`;
+    }
+
+    if (elementos.modalCanjePremiosPuntosRestantes) {
+      elementos.modalCanjePremiosPuntosRestantes.textContent = `${formatearEntero(
+        puntosRestantes
+      )} pts`;
+    }
+
+    if (elementos.modalCanjePremiosFecha) {
+      elementos.modalCanjePremiosFecha.textContent = formatearFechaCompleta(
+        resumen.fecha
+      );
+    }
+
+    if (elementos.modalCanjePremiosDescripcion) {
+      elementos.modalCanjePremiosDescripcion.textContent =
+        resumen.descripcion ||
+        "Canje registrado en el sistema de fidelización.";
+    }
+
+    modalCanjePremiosInstance.show();
+  }
+
   async function registrarVenta() {
     if (!validarFormularioVenta()) {
       return;
@@ -1368,15 +1493,16 @@
         );
       }
 
-      mostrarAlerta(
-        "success",
-        datos.mensaje || "El canje de premios se registró correctamente."
-      );
-
       const resumen = datos.resumen || {};
       if (Number.isFinite(Number(resumen.puntos_actuales))) {
         actualizarPuntosDisponibles(Number(resumen.puntos_actuales));
       }
+
+      mostrarAlerta("info", "");
+      mostrarModalCanjePremios(
+        resumen,
+        datos.mensaje || "El canje de premios se registró correctamente."
+      );
 
       state.seleccionPremios.clear();
       elementos.listadoPremios
@@ -1540,6 +1666,16 @@
     ) {
       modalResumenInstance = bootstrap.Modal.getOrCreateInstance(
         elementos.modalResumen
+      );
+    }
+
+    if (
+      elementos.modalCanjePremios &&
+      typeof bootstrap !== "undefined" &&
+      typeof bootstrap.Modal !== "undefined"
+    ) {
+      modalCanjePremiosInstance = bootstrap.Modal.getOrCreateInstance(
+        elementos.modalCanjePremios
       );
     }
 

@@ -437,6 +437,7 @@ function canjearPremios(PDO $conexion, array $payload): array
 
         $totalPuntos = 0;
         $descripcionDetalle = [];
+        $detalleCanje = [];
 
         foreach ($premiosDisponibles as $premio) {
             $premioId = (int) ($premio['id'] ?? 0);
@@ -449,6 +450,13 @@ function canjearPremios(PDO $conexion, array $payload): array
 
             $totalPuntos += $costo * $cantidad;
             $descripcionDetalle[] = sprintf('%dx %s', $cantidad, (string) ($premio['nombre'] ?? 'Premio'));
+            $detalleCanje[] = [
+                'id' => $premioId,
+                'nombre' => (string) ($premio['nombre'] ?? 'Premio'),
+                'cantidad' => $cantidad,
+                'costo_puntos' => $costo,
+                'total_puntos' => $costo * $cantidad,
+            ];
         }
 
         if ($totalPuntos <= 0) {
@@ -488,7 +496,11 @@ function canjearPremios(PDO $conexion, array $payload): array
         return [
             'mensaje' => 'El canje de premios se registró correctamente.',
             'puntos_actuales' => $puntosFinales,
+            'puntos_restantes' => $puntosFinales,
             'puntos_usados' => $totalPuntos,
+            'detalle' => $detalleCanje,
+            'descripcion' => $descripcion,
+            'fecha' => date('c'),
         ];
     } catch (Throwable $error) {
         if ($conexion->inTransaction()) {
@@ -943,6 +955,58 @@ include __DIR__ . '/templates/header.php';
                             <p class="mb-1"><strong>Pedido #</strong> <span id="resumenVentaPedidoId">-</span></p>
                             <p class="mb-1"><strong>Método de pago:</strong> <span id="resumenVentaMetodoPago">-</span></p>
                             <p class="mb-0"><strong>Tipo de entrega:</strong> <span id="resumenVentaTipoEntrega">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalCanjePremios" tabindex="-1" aria-labelledby="modalCanjePremiosLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h2 class="modal-title h5" id="modalCanjePremiosLabel">Canje de premios registrado</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p id="modalCanjePremiosMensaje" class="text-muted">El canje se registró correctamente.</p>
+                <div class="table-responsive mb-4">
+                    <table class="table table-sm align-middle" data-no-datatable>
+                        <thead class="admin-table-head">
+                            <tr>
+                                <th scope="col">Premio</th>
+                                <th scope="col" class="text-end">Cantidad</th>
+                                <th scope="col" class="text-end">Costo (pts)</th>
+                                <th scope="col" class="text-end">Total (pts)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalCanjePremiosDetalle">
+                            <tr class="text-muted">
+                                <td colspan="4" class="text-center py-3">Sin información disponible.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row gy-3">
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <h3 class="h6 mb-3">Resumen de puntos</h3>
+                            <ul class="list-unstyled mb-0 small">
+                                <li class="d-flex justify-content-between mb-2"><span>Puntos utilizados</span><strong id="modalCanjePremiosPuntosUsados">0 pts</strong></li>
+                                <li class="d-flex justify-content-between"><span>Puntos restantes</span><strong id="modalCanjePremiosPuntosRestantes">0 pts</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <div class="border rounded-3 p-3 h-100">
+                            <h3 class="h6 mb-3">Detalles del canje</h3>
+                            <p class="mb-2 small text-muted">Registrado el <span id="modalCanjePremiosFecha">-</span></p>
+                            <p class="mb-0 small" id="modalCanjePremiosDescripcion"></p>
                         </div>
                     </div>
                 </div>

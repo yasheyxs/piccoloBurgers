@@ -119,7 +119,10 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    initDataTable('#tabla-pedidos');
+    initDataTable('#tabla-pedidos', {
+      order: [],
+      ordering: false
+    });
   });
 
   const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';

@@ -37,3 +37,18 @@
     gap: 0.5rem;
   }
 }
+
+#tablaClientes_wrapper {
+  margin-bottom: 30px;
+}
+
+@media (min-width: 768px) {
+  #tablaClientes_wrapper table.dataTable {
+    table-layout: fixed;
+  }
+
+  #tablaClientes_wrapper table.dataTable th:not(:nth-child(2)),
+  #tablaClientes_wrapper table.dataTable td:not(:nth-child(2)) {
+    width: 18%;
+  }
+}
