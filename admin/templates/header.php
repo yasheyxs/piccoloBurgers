@@ -85,11 +85,18 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
             <?php if ($rol === "admin") { ?>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/banners/">Banner</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="landingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Landing
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="landingDropdown">
+                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/banners/">Banner</a></li>
+                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a></li>
+                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
+                </ul>
+              </li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/puntos/">Puntos</a></li>
 

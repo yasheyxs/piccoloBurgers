@@ -131,12 +131,12 @@ include __DIR__ . '/../../templates/header.php';
                 Ajustá los parámetros que definen cómo tus clientes canjean y aprovechan sus puntos de fidelidad.
             </p>
         </div>
-        <div class="d-flex flex-column align-items-lg-end gap-2">
+        <div class="d-flex flex-column align-items-center align-items-lg-end gap-2">
             <div class="last-update-badge shadow-sm px-3 py-2">
                 <span class="last-update-icon" aria-hidden="true">
                     <i class="fa-solid fa-clock text-warning"></i>
                 </span>
-                <div class="d-flex flex-column text-lg-end">
+                <div class="d-flex flex-column align-items-center text-center">
                     <span class="last-update-label">Última actualización</span>
                     <?php if ($ultimaActualizacionTexto): ?>
                         <time
@@ -227,6 +227,7 @@ include __DIR__ . '/../../templates/header.php';
                             name="valor_punto"
                             min="0.01"
                             step="0.01"
+                            value="<?= htmlspecialchars($valorPuntoFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             data-default-value="<?= htmlspecialchars($valorPuntoFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             required>
                     </div>
@@ -251,6 +252,7 @@ include __DIR__ . '/../../templates/header.php';
                             min="1"
                             max="100"
                             step="0.1"
+                            value="<?= htmlspecialchars($maximoPorcentajeFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             data-default-value="<?= htmlspecialchars($maximoPorcentajeFormulario, ENT_QUOTES, 'UTF-8') ?>"
                             required>
 
