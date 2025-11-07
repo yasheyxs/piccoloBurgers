@@ -99,6 +99,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
               <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/puntos/">Puntos</a></li>
+              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/premios/">Premios</a></li>
 
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="personasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
