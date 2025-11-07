@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/bd.php';
 require_once __DIR__ . '/../includes/puntos_config.php';
+require_once __DIR__ . '/../includes/reservas_virtuales.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -217,50 +218,29 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
             $maximoPuntosPermitidos = 0;
         }
 
-        $tipoUso = isset($payload['tipo_uso_puntos']) && is_string($payload['tipo_uso_puntos'])
-            ? $payload['tipo_uso_puntos']
-            : 'todos';
-
-        $puntosSolicitados = 0;
-        if ($tipoUso === 'personalizado') {
-            $puntosSolicitados = isset($payload['puntos_personalizados']) ? (int) $payload['puntos_personalizados'] : 0;
+        $puntosSolicitados = isset($payload['puntos_utilizados']) ? (int) $payload['puntos_utilizados'] : 0;
+        if ($puntosSolicitados < 0) {
+            throw new InvalidArgumentException('Ingresá una cantidad de puntos válida.');
         }
 
-        $puntosPorAplicar = 0;
+        if ($puntosSolicitados > $puntosDisponibles) {
+            throw new InvalidArgumentException('No hay suficientes puntos disponibles para el canje solicitado.');
+        }
+
+        if ($puntosSolicitados > $maximoPuntosPermitidos) {
+            throw new InvalidArgumentException('Superaste el máximo de puntos permitidos para esta venta.');
+        }
+
+        if ($puntosSolicitados > 0 && $puntosSolicitados < $minimoPuntosCanje) {
+            throw new InvalidArgumentException(sprintf('El mínimo de puntos para canjear es de %d.', $minimoPuntosCanje));
+        }
+
         $puedeCanjear = $totalOriginal > 0 && $maximoPuntosPermitidos > 0 && $puntosDisponibles >= $minimoPuntosCanje;
-
-        if ($tipoUso === 'personalizado') {
-            if ($puntosSolicitados < 0) {
-                throw new InvalidArgumentException('Ingresá una cantidad de puntos válida.');
-            }
-
-            if ($puntosSolicitados > 0 && $puntosSolicitados < $minimoPuntosCanje) {
-                throw new InvalidArgumentException(sprintf('El mínimo de puntos para canjear es de %d.', $minimoPuntosCanje));
-            }
-
-            if ($puntosSolicitados > $puntosDisponibles) {
-                throw new InvalidArgumentException('No hay suficientes puntos disponibles para el canje solicitado.');
-            }
-
-            if ($puntosSolicitados > $maximoPuntosPermitidos) {
-                throw new InvalidArgumentException('Superaste el máximo de puntos permitidos para esta venta.');
-            }
-
-            if ($puedeCanjear) {
-                $puntosPorAplicar = $puntosSolicitados;
-            }
-        } else {
-            if ($puedeCanjear) {
-                $puntosPorAplicar = min($puntosDisponibles, $maximoPuntosPermitidos);
-                if ($puntosPorAplicar > 0 && $puntosPorAplicar < $minimoPuntosCanje) {
-                    $puntosPorAplicar = 0;
-                }
-            }
-        }
-
-        if ($tipoUso === 'personalizado' && $puntosSolicitados > 0 && $puntosPorAplicar === 0) {
+        if ($puntosSolicitados > 0 && !$puedeCanjear) {
             throw new InvalidArgumentException('No se pudo aplicar el canje de puntos con los parámetros actuales.');
         }
+
+        $puntosPorAplicar = $puedeCanjear ? $puntosSolicitados : 0;
 
         $descuento = $puntosPorAplicar * $valorPorPunto;
         if ($descuento > $maximoDescuento) {
@@ -278,25 +258,18 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
             throw new InvalidArgumentException('Los puntos disponibles no son suficientes para completar el canje.');
         }
 
-        $stmtInsumos = $conexion->prepare('SELECT mp.cantidad AS requerido, mat.cantidad AS stock_actual FROM tbl_menu_materias_primas mp INNER JOIN tbl_materias_primas mat ON mat.ID = mp.materia_prima_id WHERE mp.menu_id = ?');
+        $itemsParaReservar = array_map(static function (array $linea): array {
+            return [
+                'id' => $linea['id'],
+                'cantidad' => $linea['cantidad'],
+            ];
+        }, $detalleVenta);
 
-        foreach ($detalleVenta as $linea) {
-            $stmtInsumos->execute([$linea['id']]);
-            $insumos = $stmtInsumos->fetchAll(PDO::FETCH_ASSOC);
-
-            foreach ($insumos as $insumo) {
-                $requerido = (float) ($insumo['requerido'] ?? 0);
-                $stockActual = (float) ($insumo['stock_actual'] ?? 0);
-
-                if ($requerido <= 0) {
-                    continue;
-                }
-
-                $consumo = $requerido * $linea['cantidad'];
-                if ($stockActual + 1e-6 < $consumo) {
-                    throw new InvalidArgumentException('No hay stock suficiente para completar la venta.');
-                }
-            }
+        $sessionId = obtenerIdSesionActual();
+        try {
+            sincronizarReservas($conexion, $sessionId, $itemsParaReservar);
+        } catch (RuntimeException $error) {
+            throw new InvalidArgumentException($error->getMessage());
         }
 
         $notaFinal = $nota;
@@ -368,6 +341,12 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
 
         $conexion->commit();
 
+        try {
+            limpiarReservasSesion($conexion, $sessionId);
+        } catch (Throwable $cleanupError) {
+            error_log('No se pudieron limpiar las reservas virtuales tras registrar la venta: ' . $cleanupError->getMessage());
+        }
+
         return [
             'mensaje' => 'La venta con descuento se registró correctamente.',
             'pedido_id' => $pedidoId,
@@ -377,10 +356,19 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
             'descuento' => $descuento,
             'total_final' => $totalFinal,
             'puntos_actuales' => $puntosFinales,
+            'items' => $detalleVenta,
+            'metodo_pago' => $metodoPago,
+            'tipo_entrega' => $tipoEntrega,
         ];
     } catch (Throwable $error) {
         if ($conexion->inTransaction()) {
             $conexion->rollBack();
+        }
+
+        try {
+            limpiarReservasSesion($conexion, $sessionId);
+        } catch (Throwable $cleanupError) {
+            error_log('No se pudieron limpiar las reservas virtuales tras un error de venta: ' . $cleanupError->getMessage());
         }
 
         throw $error;
@@ -711,7 +699,7 @@ include __DIR__ . '/templates/header.php';
                     </dl>
                 </div>
                 <div class="col-12 col-md-6">
-                    <div class="bg-light border rounded-3 p-3 h-100">
+                    <div class="admin-surface-panel rounded-3 p-3 h-100">
                         <h2 class="h6 mb-2">Parámetros del sistema de puntos</h2>
                         <ul class="list-unstyled mb-0 small">
                             <li><strong>Mínimo para canjear:</strong> <?= number_format((int) ($configuracionPuntos['minimo_puntos'] ?? 0), 0, ',', '.'); ?> pts</li>
@@ -725,10 +713,10 @@ include __DIR__ . '/templates/header.php';
     </div>
 
     <div class="card shadow-sm">
-        <div class="card-header bg-white border-bottom-0">
+        <div class="card-header admin-card-header border-bottom-0">
             <div class="d-flex flex-wrap align-items-center gap-3">
                 <h2 class="h5 mb-0">Opciones de canje</h2>
-                <div class="btn-group" role="group" aria-label="Modo de canje">
+                <div class="btn-group modo-canje-toggle" role="group" aria-label="Modo de canje">
                     <input type="radio" class="btn-check" name="modoCanje" id="modoDescuento" value="descuento" checked>
                     <label class="btn btn-outline-primary" for="modoDescuento">
                         <i class="fa-solid fa-tags me-1" aria-hidden="true"></i>
@@ -748,7 +736,7 @@ include __DIR__ . '/templates/header.php';
             <div id="modoDescuentoPanel" class="modo-canje-panel">
                 <div class="row g-4">
                     <div class="col-12 col-lg-7">
-                        <div class="bg-light border rounded-3 p-3 mb-3">
+                        <div class="modo-canje-filtros rounded-3 p-3 mb-3">
                             <div class="row g-3 align-items-end">
                                 <div class="col-12 col-md-6">
                                     <label for="filtroNombre" class="form-label">Buscar producto</label>
@@ -784,7 +772,7 @@ include __DIR__ . '/templates/header.php';
 
                                 <div class="table-responsive mb-3">
                                     <table class="table table-sm align-middle mb-0" data-no-datatable>
-                                        <thead class="table-light">
+                                        <thead class="admin-table-head">
                                             <tr>
                                                 <th scope="col">Producto</th>
                                                 <th scope="col" class="text-center">Cant.</th>
@@ -805,6 +793,10 @@ include __DIR__ . '/templates/header.php';
                                         <span>Total parcial</span>
                                         <strong id="resumenTotalParcial">$0,00</strong>
                                     </div>
+                                    <div class="d-flex justify-content-between mb-2" id="filaPuntosAplicados">
+                                        <span>Puntos aplicados</span>
+                                        <strong id="resumenPuntosAplicados">0 pts ($0,00)</strong>
+                                    </div>
                                     <div class="d-flex justify-content-between mb-2 text-success">
                                         <span>Descuento por puntos</span>
                                         <strong id="resumenDescuento">-$0,00</strong>
@@ -813,30 +805,20 @@ include __DIR__ . '/templates/header.php';
                                         <span>Total a cobrar</span>
                                         <strong id="resumenTotalFinal">$0,00</strong>
                                     </div>
+                                    <div id="alertaMinimoPuntos" class="alert alert-warning d-none" role="alert">
+                                        <i class="fa-solid fa-circle-info me-2" aria-hidden="true"></i>
+                                        <span id="alertaMinimoPuntosTexto">El cliente aún no tiene puntos disponibles para realizar un canje por descuento. Todavía puede canjear premios.</span>
+                                    </div>
 
                                     <div class="mb-3">
                                         <h4 class="h6">Aplicar puntos</h4>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="usoPuntos" id="radioPuntosTodos" value="todos" checked>
-                                            <label class="form-check-label" for="radioPuntosTodos">
-                                                Usar la mayor cantidad posible
-                                            </label>
+                                        <label for="inputPuntosPersonalizados" class="form-label small mb-1">Cantidad de puntos a usar</label>
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control" id="inputPuntosPersonalizados" min="0" step="1" value="0" inputmode="numeric">
+                                            <button class="btn btn-outline-secondary" type="button" id="btnMaximoPuntos">Máximo</button>
                                         </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="usoPuntos" id="radioPuntosPersonalizados" value="personalizado">
-                                            <label class="form-check-label" for="radioPuntosPersonalizados">
-                                                Usar una cantidad personalizada
-                                            </label>
-                                        </div>
-                                        <div class="mt-2">
-                                            <label for="inputPuntosPersonalizados" class="form-label small mb-1">Cantidad de puntos a usar</label>
-                                            <div class="input-group input-group-sm">
-                                                <input type="number" class="form-control" id="inputPuntosPersonalizados" min="0" step="1" value="0" disabled>
-                                                <button class="btn btn-outline-secondary" type="button" id="btnMaximoPuntos">Máximo</button>
-                                            </div>
-                                            <div class="form-text" id="ayudaPuntos">Disponible: <?= number_format($clientePuntos, 0, ',', '.'); ?> pts</div>
-                                            <div class="invalid-feedback d-none" id="errorPuntosPersonalizados"></div>
-                                        </div>
+                                        <div class="form-text" id="ayudaPuntos">Disponible: <?= number_format($clientePuntos, 0, ',', '.'); ?> pts</div>
+                                        <div class="invalid-feedback d-none" id="errorPuntosPersonalizados"></div>
                                     </div>
 
                                     <div class="mb-3">
@@ -917,6 +899,60 @@ include __DIR__ . '/templates/header.php';
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="resumenVentaModal" tabindex="-1" aria-labelledby="resumenVentaModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h2 class="modal-title h5" id="resumenVentaModalLabel">Venta registrada</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-4">El pedido fue enviado al panel de cocina y los puntos se actualizaron para el cliente.</p>
+                <div class="row gy-4">
+                    <div class="col-12 col-lg-7">
+                        <h3 class="h6 mb-3">Detalle del pedido</h3>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle mb-0" data-no-datatable>
+                                <thead class="admin-table-head">
+                                    <tr>
+                                        <th scope="col">Producto</th>
+                                        <th scope="col" class="text-end">Cantidad</th>
+                                        <th scope="col" class="text-end">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="resumenVentaProductos">
+                                    <tr class="text-muted">
+                                        <td colspan="3" class="text-center py-3">Sin productos.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-5">
+                        <h3 class="h6 mb-3">Resumen del canje</h3>
+                        <ul class="list-unstyled small mb-0">
+                            <li class="d-flex justify-content-between mb-2"><span>Total original</span><strong id="resumenVentaTotalOriginal">$0,00</strong></li>
+                            <li class="d-flex justify-content-between mb-2"><span>Puntos aplicados</span><strong id="resumenVentaPuntosUsados">0 pts</strong></li>
+                            <li class="d-flex justify-content-between mb-2"><span>Descuento</span><strong id="resumenVentaDescuento">-$0,00</strong></li>
+                            <li class="d-flex justify-content-between mb-2"><span>Total final</span><strong id="resumenVentaTotalFinal">$0,00</strong></li>
+                            <li class="d-flex justify-content-between mb-2"><span>Puntos ganados</span><strong id="resumenVentaPuntosGanados">0 pts</strong></li>
+                            <li class="d-flex justify-content-between mb-0"><span>Puntos actuales del cliente</span><strong id="resumenVentaPuntosActuales">0 pts</strong></li>
+                        </ul>
+                        <div class="mt-3 border-top pt-3 small">
+                            <p class="mb-1"><strong>Pedido #</strong> <span id="resumenVentaPedidoId">-</span></p>
+                            <p class="mb-1"><strong>Método de pago:</strong> <span id="resumenVentaMetodoPago">-</span></p>
+                            <p class="mb-0"><strong>Tipo de entrega:</strong> <span id="resumenVentaTipoEntrega">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Entendido</button>
             </div>
         </div>
     </div>

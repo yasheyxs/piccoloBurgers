@@ -21,12 +21,10 @@
     btnVaciar: document.getElementById("btnVaciarSeleccion"),
 
     resumenTotalParcial: document.getElementById("resumenTotalParcial"),
+    resumenPuntosAplicados: document.getElementById("resumenPuntosAplicados"),
     resumenDescuento: document.getElementById("resumenDescuento"),
     resumenTotalFinal: document.getElementById("resumenTotalFinal"),
-    radioPuntosTodos: document.getElementById("radioPuntosTodos"),
-    radioPuntosPersonalizados: document.getElementById(
-      "radioPuntosPersonalizados"
-    ),
+
     inputPuntosPersonalizados: document.getElementById(
       "inputPuntosPersonalizados"
     ),
@@ -35,6 +33,9 @@
     errorPuntosPersonalizados: document.getElementById(
       "errorPuntosPersonalizados"
     ),
+    alertaMinimoPuntos: document.getElementById("alertaMinimoPuntos"),
+    alertaMinimoPuntosTexto: document.getElementById("alertaMinimoPuntosTexto"),
+    filaPuntosAplicados: document.getElementById("filaPuntosAplicados"),
 
     selectMetodoPago: document.getElementById("selectMetodoPago"),
     selectTipoEntrega: document.getElementById("selectTipoEntrega"),
@@ -53,6 +54,26 @@
     ),
     puntosUsadosPremios: document.getElementById("premiosPuntosUsados"),
     btnConfirmarPremios: document.getElementById("btnConfirmarPremios"),
+
+    modalResumen: document.getElementById("resumenVentaModal"),
+    modalResumenProductos: document.getElementById("resumenVentaProductos"),
+    modalResumenTotalOriginal: document.getElementById(
+      "resumenVentaTotalOriginal"
+    ),
+    modalResumenPuntosUsados: document.getElementById(
+      "resumenVentaPuntosUsados"
+    ),
+    modalResumenDescuento: document.getElementById("resumenVentaDescuento"),
+    modalResumenTotalFinal: document.getElementById("resumenVentaTotalFinal"),
+    modalResumenPuntosGanados: document.getElementById(
+      "resumenVentaPuntosGanados"
+    ),
+    modalResumenPuntosActuales: document.getElementById(
+      "resumenVentaPuntosActuales"
+    ),
+    modalResumenPedidoId: document.getElementById("resumenVentaPedidoId"),
+    modalResumenMetodoPago: document.getElementById("resumenVentaMetodoPago"),
+    modalResumenTipoEntrega: document.getElementById("resumenVentaTipoEntrega"),
   };
 
   const formatoMoneda = new Intl.NumberFormat("es-AR", {
@@ -73,11 +94,17 @@
     seleccionPremios: new Map(),
     resumenDescuento: {
       totalParcial: 0,
+      puntosIngresados: 0,
       puntosAplicados: 0,
       descuento: 0,
       totalFinal: 0,
       maximoPuntosPermitidos: 0,
+      faltaMinimo: false,
+      maximoInferiorAlMinimo: false,
+      minimoRequerido: Number(config.minimo_puntos) || 0,
+      valorPunto: Number(config.valor_punto) || 0,
     },
+    puntosEditadosManualmente: false,
   };
 
   const valoresConfig = {
@@ -85,6 +112,8 @@
     valorPunto: Number(config.valor_punto) || 0,
     maximoPorcentaje: Number(config.maximo_porcentaje) || 0,
   };
+
+  let modalResumenInstance = null;
 
   function mostrarAlerta(tipo, mensaje) {
     if (!elementos.contenedorAlertas) {
@@ -128,6 +157,32 @@
     }
   }
 
+  function obtenerPuntosIngresados() {
+    if (!elementos.inputPuntosPersonalizados) {
+      return 0;
+    }
+
+    const valor = Number(elementos.inputPuntosPersonalizados.value);
+    if (!Number.isFinite(valor)) {
+      return 0;
+    }
+
+    return Math.max(0, Math.floor(valor));
+  }
+
+  function establecerPuntosIngresados(valor) {
+    if (!elementos.inputPuntosPersonalizados) {
+      return;
+    }
+
+    const actual = Number(elementos.inputPuntosPersonalizados.value);
+    if (Number.isFinite(actual) && actual === valor) {
+      return;
+    }
+
+    elementos.inputPuntosPersonalizados.value = String(valor);
+  }
+
   function crearTarjetaProducto(producto) {
     const col = document.createElement("div");
     col.className = "col-12 col-sm-6 col-xl-4";
@@ -135,13 +190,12 @@
     const card = document.createElement("div");
     card.className = "card h-100 shadow-sm";
 
-    if (producto.imagen) {
-      const imagen = document.createElement("img");
-      imagen.src = producto.imagen;
-      imagen.alt = `Imagen de ${producto.nombre}`;
-      imagen.className = "card-img-top";
-      card.appendChild(imagen);
-    }
+    const placeholder = document.createElement("div");
+    placeholder.className =
+      "canje-producto-placeholder d-flex align-items-center justify-content-center";
+    placeholder.innerHTML =
+      '<i class="fa-solid fa-burger fa-2x" aria-hidden="true"></i>';
+    card.appendChild(placeholder);
 
     const cuerpo = document.createElement("div");
     cuerpo.className = "card-body d-flex flex-column";
@@ -365,44 +419,44 @@
       Math.min(maximoPuntosPorVenta, state.puntosDisponibles)
     );
 
-    let puntosSolicitados = 0;
-    const usaPersonalizado = elementos.radioPuntosPersonalizados?.checked;
-    let error = "";
+    const sinMinimoDisponible = state.puntosDisponibles < minimoPuntos;
+    const maximoInferiorAlMinimo =
+      maximoPermitido > 0 && maximoPermitido < minimoPuntos && totalParcial > 0;
 
-    if (usaPersonalizado) {
-      puntosSolicitados = Number(
-        elementos.inputPuntosPersonalizados?.value || 0
-      );
-      if (!Number.isFinite(puntosSolicitados) || puntosSolicitados < 0) {
-        puntosSolicitados = 0;
-      }
+    let puntosIngresados = state.puntosEditadosManualmente
+      ? obtenerPuntosIngresados()
+      : maximoPermitido;
 
-      if (puntosSolicitados > state.puntosDisponibles) {
-        error = "No podés usar más puntos de los disponibles.";
-      } else if (puntosSolicitados > maximoPermitido) {
-        error = "Superás el máximo permitido para esta venta.";
-      } else if (puntosSolicitados > 0 && puntosSolicitados < minimoPuntos) {
-        error = `Debés ingresar al menos ${formatearEntero(
-          minimoPuntos
-        )} puntos.`;
-      }
+    if (!Number.isFinite(puntosIngresados) || puntosIngresados < 0) {
+      puntosIngresados = 0;
     }
 
-    let puntosAplicados = 0;
-    if (
+    if (puntosIngresados > maximoPermitido) {
+      puntosIngresados = maximoPermitido;
+    }
+
+    const puedeCanjear =
       totalParcial > 0 &&
       maximoPermitido > 0 &&
-      state.puntosDisponibles >= minimoPuntos
-    ) {
-      if (usaPersonalizado && !error) {
-        puntosAplicados = puntosSolicitados;
-      } else if (!usaPersonalizado) {
-        puntosAplicados = maximoPermitido;
-        if (puntosAplicados > 0 && puntosAplicados < minimoPuntos) {
-          puntosAplicados = 0;
-        }
-      }
+      !sinMinimoDisponible &&
+      !maximoInferiorAlMinimo;
+
+    if (!state.puntosEditadosManualmente && puedeCanjear) {
+      puntosIngresados = maximoPermitido;
     }
+
+    let error = "";
+    if (puntosIngresados > 0 && puntosIngresados < minimoPuntos) {
+      error = `Debés ingresar al menos ${formatearEntero(
+        minimoPuntos
+      )} puntos.`;
+    }
+
+    if (!puedeCanjear) {
+      puntosIngresados = 0;
+    }
+
+    const puntosAplicados = !error && puedeCanjear ? puntosIngresados : 0;
 
     const descuento = Math.min(
       maximoDescuentoPesos,
@@ -413,11 +467,16 @@
 
     return {
       totalParcial,
+      puntosIngresados,
       puntosAplicados,
       descuento,
       totalFinal,
       maximoPuntosPermitidos: maximoPermitido,
       errorPuntos: error,
+      faltaMinimo: sinMinimoDisponible,
+      maximoInferiorAlMinimo,
+      minimoRequerido: minimoPuntos,
+      valorPunto,
     };
   }
 
@@ -429,6 +488,12 @@
       elementos.resumenTotalParcial.textContent = formatearMoneda(
         resumen.totalParcial
       );
+    }
+
+    if (elementos.resumenPuntosAplicados) {
+      const textoPuntos = `${formatearEntero(resumen.puntosAplicados)} pts`;
+      const textoMoneda = formatearMoneda(resumen.descuento);
+      elementos.resumenPuntosAplicados.textContent = `${textoPuntos} (${textoMoneda})`;
     }
 
     if (elementos.resumenDescuento) {
@@ -443,6 +508,8 @@
       );
     }
 
+    establecerPuntosIngresados(resumen.puntosIngresados);
+
     if (elementos.textoAyudaPuntos) {
       const partes = [
         `Disponible: ${formatearEntero(state.puntosDisponibles)} pts`,
@@ -452,6 +519,11 @@
           `Máximo por venta: ${formatearEntero(
             resumen.maximoPuntosPermitidos
           )} pts`
+        );
+      }
+      if (resumen.minimoRequerido > 0) {
+        partes.push(
+          `Mínimo para canjear: ${formatearEntero(resumen.minimoRequerido)} pts`
         );
       }
       elementos.textoAyudaPuntos.textContent = partes.join(" · ");
@@ -468,36 +540,63 @@
       }
     }
 
+    const mostrarMensajeMinimo =
+      resumen.faltaMinimo || resumen.maximoInferiorAlMinimo;
+
+    if (elementos.alertaMinimoPuntos) {
+      if (mostrarMensajeMinimo) {
+        const texto = resumen.faltaMinimo
+          ? "El cliente aún no tiene puntos disponibles para realizar un canje por descuento. Todavía puede canjear premios."
+          : "El monto del pedido no permite alcanzar el mínimo de puntos para aplicar un descuento.";
+        if (elementos.alertaMinimoPuntosTexto) {
+          elementos.alertaMinimoPuntosTexto.textContent = texto;
+        } else {
+          elementos.alertaMinimoPuntos.innerText = texto;
+        }
+        elementos.alertaMinimoPuntos.classList.remove("d-none");
+      } else {
+        elementos.alertaMinimoPuntos.classList.add("d-none");
+      }
+    }
+
+    const puedeEditarPuntos =
+      state.seleccionProductos.size > 0 &&
+      !mostrarMensajeMinimo &&
+      resumen.maximoPuntosPermitidos > 0;
+
+    if (elementos.inputPuntosPersonalizados) {
+      elementos.inputPuntosPersonalizados.disabled = !puedeEditarPuntos;
+      if (!puedeEditarPuntos) {
+        elementos.inputPuntosPersonalizados.classList.remove("is-invalid");
+      }
+    }
+
+    if (elementos.btnMaximoPuntos) {
+      elementos.btnMaximoPuntos.disabled = !puedeEditarPuntos;
+    }
+
     if (elementos.btnRegistrarVenta) {
       const hayProductos = state.seleccionProductos.size > 0;
-      elementos.btnRegistrarVenta.disabled = !hayProductos;
+      const puedeRegistrar =
+        hayProductos &&
+        resumen.puntosAplicados >= resumen.minimoRequerido &&
+        resumen.descuento > 0 &&
+        !resumen.errorPuntos &&
+        !mostrarMensajeMinimo;
+      elementos.btnRegistrarVenta.disabled = !puedeRegistrar;
     }
   }
 
   function vaciarSeleccionProductos() {
     state.seleccionProductos.clear();
+    state.puntosEditadosManualmente = false;
+    establecerPuntosIngresados(0);
     actualizarTablaSeleccion();
-  }
-
-  function sincronizarCamposPuntos() {
-    if (!elementos.inputPuntosPersonalizados) {
-      return;
-    }
-
-    const habilitado = !!elementos.radioPuntosPersonalizados?.checked;
-    elementos.inputPuntosPersonalizados.disabled = !habilitado;
-    if (!habilitado) {
-      elementos.inputPuntosPersonalizados.value = "0";
-    }
-
-    actualizarResumenDescuento();
   }
 
   function seleccionarMaximoPuntos() {
     const maximo = state.resumenDescuento.maximoPuntosPermitidos || 0;
-    if (elementos.inputPuntosPersonalizados) {
-      elementos.inputPuntosPersonalizados.value = String(maximo);
-    }
+    establecerPuntosIngresados(maximo);
     actualizarResumenDescuento();
   }
 
@@ -550,14 +649,46 @@
       elementos.inputDireccion.classList.remove("is-invalid");
     }
 
-    if (state.resumenDescuento.errorPuntos) {
-      esValido = false;
-    }
-
     if (state.seleccionProductos.size === 0) {
       mostrarAlerta(
         "warning",
         "Agregá al menos un producto para registrar la venta."
+      );
+      esValido = false;
+    }
+
+    if (esValido && state.resumenDescuento.errorPuntos) {
+      mostrarAlerta("warning", state.resumenDescuento.errorPuntos);
+      esValido = false;
+    }
+
+    if (esValido && state.resumenDescuento.faltaMinimo) {
+      mostrarAlerta(
+        "warning",
+        "El cliente aún no tiene puntos suficientes para aplicar un descuento."
+      );
+      esValido = false;
+    }
+
+    if (esValido && state.resumenDescuento.maximoInferiorAlMinimo) {
+      mostrarAlerta(
+        "warning",
+        "El pedido actual no permite alcanzar el mínimo de puntos para el canje."
+      );
+      esValido = false;
+    }
+
+    if (
+      esValido &&
+      (state.resumenDescuento.puntosAplicados <= 0 ||
+        state.resumenDescuento.puntosAplicados <
+          Math.max(1, state.resumenDescuento.minimoRequerido))
+    ) {
+      mostrarAlerta(
+        "warning",
+        `Ingresá al menos ${formatearEntero(
+          state.resumenDescuento.minimoRequerido
+        )} puntos para registrar el descuento.`
       );
       esValido = false;
     }
@@ -581,6 +712,100 @@
     actualizarResumenPremios();
   }
 
+  function mostrarModalResumenVenta(resumen = {}) {
+    if (!modalResumenInstance || !elementos.modalResumen) {
+      return;
+    }
+
+    const items = Array.isArray(resumen.items) ? resumen.items : [];
+    if (elementos.modalResumenProductos) {
+      elementos.modalResumenProductos.innerHTML = "";
+      if (items.length === 0) {
+        const fila = document.createElement("tr");
+        fila.className = "text-muted";
+        fila.innerHTML =
+          '<td colspan="3" class="text-center py-3">Sin productos.</td>';
+        elementos.modalResumenProductos.appendChild(fila);
+      } else {
+        const fragmento = document.createDocumentFragment();
+        items.forEach((item) => {
+          const fila = document.createElement("tr");
+
+          const nombre = document.createElement("td");
+          nombre.textContent = item.nombre || "Producto";
+
+          const cantidad = document.createElement("td");
+          cantidad.className = "text-end";
+          cantidad.textContent = formatearEntero(item.cantidad || 0);
+
+          const subtotal = document.createElement("td");
+          subtotal.className = "text-end";
+          const precio = Number(item.precio) || 0;
+          const unidades = Number(item.cantidad) || 0;
+          subtotal.textContent = formatearMoneda(precio * unidades);
+
+          fila.append(nombre, cantidad, subtotal);
+          fragmento.appendChild(fila);
+        });
+        elementos.modalResumenProductos.appendChild(fragmento);
+      }
+    }
+
+    const totalOriginal = Number(resumen.total_original) || 0;
+    const puntosUsados = Number(resumen.puntos_usados) || 0;
+    const descuento =
+      Number(resumen.descuento) || puntosUsados * valoresConfig.valorPunto;
+    const totalFinal =
+      Number(resumen.total_final) || Math.max(0, totalOriginal - descuento);
+    const puntosGanados = Number(resumen.puntos_ganados) || 0;
+    const puntosActuales =
+      Number(resumen.puntos_actuales) || state.puntosDisponibles;
+
+    if (elementos.modalResumenTotalOriginal) {
+      elementos.modalResumenTotalOriginal.textContent =
+        formatearMoneda(totalOriginal);
+    }
+    if (elementos.modalResumenPuntosUsados) {
+      elementos.modalResumenPuntosUsados.textContent = `${formatearEntero(
+        puntosUsados
+      )} pts`;
+    }
+    if (elementos.modalResumenDescuento) {
+      elementos.modalResumenDescuento.textContent = `-${formatearMoneda(
+        descuento
+      )}`;
+    }
+    if (elementos.modalResumenTotalFinal) {
+      elementos.modalResumenTotalFinal.textContent =
+        formatearMoneda(totalFinal);
+    }
+    if (elementos.modalResumenPuntosGanados) {
+      elementos.modalResumenPuntosGanados.textContent = `${formatearEntero(
+        puntosGanados
+      )} pts`;
+    }
+    if (elementos.modalResumenPuntosActuales) {
+      elementos.modalResumenPuntosActuales.textContent = `${formatearEntero(
+        puntosActuales
+      )} pts`;
+    }
+    if (elementos.modalResumenPedidoId) {
+      const pedidoId = resumen.pedido_id;
+      elementos.modalResumenPedidoId.textContent = pedidoId
+        ? `#${pedidoId}`
+        : "-";
+    }
+    if (elementos.modalResumenMetodoPago) {
+      elementos.modalResumenMetodoPago.textContent = resumen.metodo_pago || "-";
+    }
+    if (elementos.modalResumenTipoEntrega) {
+      elementos.modalResumenTipoEntrega.textContent =
+        resumen.tipo_entrega || "-";
+    }
+
+    modalResumenInstance.show();
+  }
+
   async function registrarVenta() {
     if (!validarFormularioVenta()) {
       return;
@@ -591,12 +816,7 @@
       csrf_token: data.csrf_token || "",
       clienteId: cliente.id,
       items: recolectarProductosSeleccionados(),
-      tipo_uso_puntos: elementos.radioPuntosPersonalizados?.checked
-        ? "personalizado"
-        : "todos",
-      puntos_personalizados: elementos.radioPuntosPersonalizados?.checked
-        ? Number(elementos.inputPuntosPersonalizados?.value || 0)
-        : 0,
+      puntos_utilizados: state.resumenDescuento.puntosAplicados || 0,
       metodo_pago: elementos.selectMetodoPago?.value || "",
       tipo_entrega: elementos.selectTipoEntrega?.value || "",
       direccion:
@@ -639,32 +859,49 @@
         throw new Error(datos.mensaje || "No se pudo registrar la venta.");
       }
 
-      mostrarAlerta(
-        "success",
-        datos.mensaje || "La venta se registró correctamente."
-      );
+      mostrarAlerta("", "");
 
       const resumen = datos.resumen || {};
       if (Number.isFinite(Number(resumen.puntos_actuales))) {
         actualizarPuntosDisponibles(Number(resumen.puntos_actuales));
       }
 
+      mostrarModalResumenVenta(resumen);
+
       vaciarSeleccionProductos();
-      elementos.selectMetodoPago.value = "";
-      elementos.selectTipoEntrega.value = "";
-      elementos.inputDireccion.value = "";
-      elementos.inputReferencias.value = "";
-      elementos.textareaNota.value = "";
-      elementos.inputPuntosPersonalizados.value = "0";
-      elementos.radioPuntosTodos.checked = true;
+      state.puntosEditadosManualmente = false;
+
+      if (elementos.selectMetodoPago) {
+        elementos.selectMetodoPago.value = "";
+      }
+      if (elementos.selectTipoEntrega) {
+        elementos.selectTipoEntrega.value = "";
+      }
+      if (elementos.inputDireccion) {
+        elementos.inputDireccion.value = "";
+      }
+      if (elementos.inputReferencias) {
+        elementos.inputReferencias.value = "";
+      }
+      if (elementos.textareaNota) {
+        elementos.textareaNota.value = "";
+      }
+
       toggleCamposDelivery();
-      sincronizarCamposPuntos();
+      actualizarResumenDescuento();
     } catch (error) {
       mostrarAlerta("danger", error.message || "Ocurrió un error inesperado.");
     } finally {
       if (elementos.btnRegistrarVenta) {
-        elementos.btnRegistrarVenta.disabled =
-          state.seleccionProductos.size === 0;
+        const puedeRegistrar =
+          state.seleccionProductos.size > 0 &&
+          state.resumenDescuento.puntosAplicados >=
+            state.resumenDescuento.minimoRequerido &&
+          state.resumenDescuento.descuento > 0 &&
+          !state.resumenDescuento.errorPuntos &&
+          !state.resumenDescuento.faltaMinimo &&
+          !state.resumenDescuento.maximoInferiorAlMinimo;
+        elementos.btnRegistrarVenta.disabled = !puedeRegistrar;
         elementos.btnRegistrarVenta.innerHTML =
           '<i class="fa-solid fa-cash-register me-1" aria-hidden="true"></i> Registrar venta con descuento';
       }
@@ -688,8 +925,9 @@
     } else {
       const placeholder = document.createElement("div");
       placeholder.className =
-        "d-flex align-items-center justify-content-center bg-light border-bottom py-4 text-muted";
-      placeholder.innerHTML = '<i class="fa-solid fa-gift fa-2x"></i>';
+        "canje-premio-placeholder d-flex align-items-center justify-content-center";
+      placeholder.innerHTML =
+        '<i class="fa-solid fa-gift fa-2x" aria-hidden="true"></i>';
       card.appendChild(placeholder);
     }
 
@@ -991,22 +1229,14 @@
 
     elementos.btnVaciar?.addEventListener("click", vaciarSeleccionProductos);
 
-    elementos.radioPuntosTodos?.addEventListener(
-      "change",
-      sincronizarCamposPuntos
-    );
-    elementos.radioPuntosPersonalizados?.addEventListener(
-      "change",
-      sincronizarCamposPuntos
-    );
-    elementos.inputPuntosPersonalizados?.addEventListener(
-      "input",
-      actualizarResumenDescuento
-    );
-    elementos.btnMaximoPuntos?.addEventListener(
-      "click",
-      seleccionarMaximoPuntos
-    );
+    elementos.inputPuntosPersonalizados?.addEventListener("input", () => {
+      state.puntosEditadosManualmente = true;
+      actualizarResumenDescuento();
+    });
+    elementos.btnMaximoPuntos?.addEventListener("click", () => {
+      state.puntosEditadosManualmente = true;
+      seleccionarMaximoPuntos();
+    });
 
     elementos.selectTipoEntrega?.addEventListener(
       "change",
@@ -1025,7 +1255,17 @@
     renderizarPremios();
     actualizarResumenPremios();
     toggleCamposDelivery();
-    sincronizarCamposPuntos();
+    if (
+      elementos.modalResumen &&
+      typeof bootstrap !== "undefined" &&
+      typeof bootstrap.Modal !== "undefined"
+    ) {
+      modalResumenInstance = bootstrap.Modal.getOrCreateInstance(
+        elementos.modalResumen
+      );
+    }
+
+    actualizarResumenDescuento();
     inicializarEventos();
   }
 

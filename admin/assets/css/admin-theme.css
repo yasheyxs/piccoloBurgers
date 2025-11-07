@@ -160,6 +160,79 @@ body.admin-body.admin-dark .last-update-badge {
   color: var(--admin-muted);
 }
 
+.admin-surface-panel {
+  background-color: var(--admin-surface-alt);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+}
+
+.admin-card-header {
+  background-color: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  transition: var(--admin-transition);
+}
+
+.modo-canje-filtros {
+  background-color: var(--admin-surface-alt);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+}
+
+.admin-table-head {
+  background-color: var(--admin-surface-alt) !important;
+  color: var(--admin-text) !important;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table-head th {
+  border-bottom: none;
+}
+
+.modo-canje-toggle .btn {
+  border-radius: var(--admin-btn-radius);
+  transition: var(--admin-transition);
+}
+
+.modo-canje-toggle .btn-outline-primary {
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  background-color: transparent;
+}
+
+body.admin-body.admin-dark .modo-canje-toggle .btn-outline-primary {
+  border-color: var(--admin-btn-outline-border);
+}
+
+.modo-canje-toggle .btn-check:checked + .btn {
+  background-color: var(--admin-btn-primary-bg);
+  color: var(--admin-btn-primary-text);
+  border-color: var(--admin-btn-primary-bg);
+  box-shadow: none;
+}
+
+.modo-canje-toggle .btn-outline-primary:hover,
+.modo-canje-toggle .btn-outline-primary:focus {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--admin-btn-primary-bg);
+  border-color: var(--admin-btn-primary-bg);
+}
+
+.canje-producto-placeholder,
+.canje-premio-placeholder {
+  background-color: var(--admin-surface-alt);
+  color: var(--admin-muted);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 2.5rem 0;
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark .canje-producto-placeholder,
+body.admin-body.admin-dark .canje-premio-placeholder {
+  color: var(--admin-text);
+}
+
 body.admin-body.admin-dark .last-update-badge .last-update-zone {
   color: rgba(226, 232, 240, 0.75);
 }
