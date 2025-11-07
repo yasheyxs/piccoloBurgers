@@ -3,6 +3,7 @@
   margin-bottom: 1rem;
 }
 
+/* Ajustes para pantallas pequeñas */
 @media (max-width: 576px) {
   .dataTables_wrapper .dataTables_filter,
   .dataTables_wrapper .dataTables_length {
@@ -29,6 +30,7 @@
   }
 }
 
+/* Ajustes para pantallas medianas o grandes */
 @media (min-width: 576px) {
   .dataTables_length label {
     display: flex;
@@ -38,17 +40,37 @@
   }
 }
 
+/* Separación inferior para que no choque con el borde */
 #tablaClientes_wrapper {
   margin-bottom: 30px;
 }
 
+/* --- Corrección principal --- */
 @media (min-width: 768px) {
   #tablaClientes_wrapper table.dataTable {
-    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
   }
 
-  #tablaClientes_wrapper table.dataTable th:not(:nth-child(2)),
-  #tablaClientes_wrapper table.dataTable td:not(:nth-child(2)) {
-    width: 18%;
+  /* Eliminar el table-layout: fixed que deformaba el alto y el ancho */
+  /* Dejar que DataTables calcule automáticamente los anchos */
+  #tablaClientes_wrapper table.dataTable th,
+  #tablaClientes_wrapper table.dataTable td {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    vertical-align: middle;
+  }
+
+  /* Si querés mantener proporciones similares, podés hacerlo así (más seguro): */
+  #tablaClientes_wrapper table.dataTable th:first-child,
+  #tablaClientes_wrapper table.dataTable td:first-child {
+    width: 10%;
+  }
+
+  #tablaClientes_wrapper table.dataTable th:last-child,
+  #tablaClientes_wrapper table.dataTable td:last-child {
+    width: 12%;
+    text-align: center;
   }
 }
