@@ -1,3 +1,7 @@
+<?php
+$lista_banners = isset($lista_banners) && is_array($lista_banners) ? $lista_banners : [];
+$lista_testimonios = isset($lista_testimonios) && is_array($lista_testimonios) ? $lista_testimonios : [];
+?>
 <!doctype html>
 <html lang="en">
 
