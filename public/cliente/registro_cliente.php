@@ -1,8 +1,8 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../admin/bd.php';
-require_once __DIR__ . '/../../componentes/validar_telefono.php';
-require_once __DIR__ . '/../../componentes/password_utils.php';
+require_once __DIR__ . '/../../shared/security/validar_telefono.php';
+require_once __DIR__ . '/../../shared/security/password_utils.php';
 
 $mensaje = "";
 $nombre = '';

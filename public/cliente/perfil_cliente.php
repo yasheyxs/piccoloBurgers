@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../../admin/bd.php';
-require_once __DIR__ . '/../../componentes/validar_telefono.php';
-require_once __DIR__ . '/../../componentes/password_utils.php';
+require_once __DIR__ . '/../../shared/security/validar_telefono.php';
+require_once __DIR__ . '/../../shared/security/password_utils.php';
 require_once __DIR__ . '/../../includes/email_requirement.php';
 
 session_start();
@@ -363,7 +363,7 @@ if ($datos_guardados_exitosamente) {
   $navAuthLink = 'login_cliente.php';
   $navProfileLink = 'perfil_cliente.php';
   $navLogoutLink = 'logout_cliente.php';
-  include __DIR__ . '/../../views/partials/navbar.php';
+  include __DIR__ . '/../views/partials/navbar.php';
   ?>
 
   <div class="container mt-5 pt-5">
@@ -838,11 +838,14 @@ if (modalTitle) {
   </script>
 
 
-  <?php include __DIR__ . '/../../componentes/whatsapp_button.php'; ?>
+  <?php include __DIR__ . '/../components/whatsapp_button.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  <?php include __DIR__ . '/../../componentes/carrito_button.php'; ?>
+  <?php
+  $carritoButtonHref = '../carrito.php';
+  include __DIR__ . '/../components/carrito_button.php';
+  ?>
 
   <?php if (isset($_SESSION['toast'])): ?>
     <div class="toast-container position-fixed bottom-0 end-0 p-3 z-3">
