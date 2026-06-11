@@ -19,7 +19,7 @@ if (empty($_SESSION['admin_usuario'])) {
 
 require_once __DIR__ . '/bd.php';
 
-require_once __DIR__ . '/../includes/estado_pago_helpers.php';
+require_once __DIR__ . '/../app/Services/estado_pago_helpers.php';
 
 try {
     $sentencia = $conexion->prepare('SELECT rol FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1');

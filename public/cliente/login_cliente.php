@@ -1,9 +1,9 @@
 <?php
 session_start();
 require_once __DIR__ . '/../../admin/bd.php';
-require_once __DIR__ . '/../../shared/security/validar_telefono.php';
-require_once __DIR__ . '/../../includes/email_requirement.php';
-require_once __DIR__ . '/../../shared/security/password_utils.php';
+require_once __DIR__ . '/../../app/Services/Security/validar_telefono.php';
+require_once __DIR__ . '/../../app/Services/email_requirement.php';
+require_once __DIR__ . '/../../app/Services/Security/password_utils.php';
 
 $mensaje = "";
 $codigo = '54';

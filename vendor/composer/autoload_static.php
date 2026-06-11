@@ -6,6 +6,10 @@ namespace Composer\Autoload;
 
 class ComposerStaticInitac2d307f4ed514763a8119f3523066bb
 {
+    public static $files = array (
+        '7d7f1ce3bd72163fb71f0d30a6bd28a5' => __DIR__ . '/../..' . '/app/Core/helpers.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'Z' => 
         array (
@@ -21,6 +25,7 @@ class ComposerStaticInitac2d307f4ed514763a8119f3523066bb
             'Psr\\SimpleCache\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'Piccolo\\' => 8,
             'PhpOffice\\PhpSpreadsheet\\' => 25,
             'PHPMailer\\PHPMailer\\' => 20,
         ),
@@ -69,6 +74,10 @@ class ComposerStaticInitac2d307f4ed514763a8119f3523066bb
         'Psr\\Http\\Client\\' => 
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
+        ),
+        'Piccolo\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/app',
         ),
         'PhpOffice\\PhpSpreadsheet\\' => 
         array (

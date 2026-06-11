@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/../../bd.php';
+require_once __DIR__ . '/../../../app/Services/premios_schema.php';
 
 verificarRol('admin');
+asegurarTablaPremios($conexion);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
@@ -93,7 +95,7 @@ include __DIR__ . '/../../templates/header.php';
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="tablaPremios" class="table table-hover align-middle w-100">
+                <table id="tablaPremios" class="table table-hover align-middle w-100" data-no-datatable>
                     <thead class="table-light">
                         <tr>
                             <th scope="col">Nombre</th>
@@ -164,11 +166,13 @@ include __DIR__ . '/../../templates/header.php';
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        initDataTable('#tablaPremios', {
-            order: [
-                [3, 'desc']
-            ]
-        });
+        <?php if (!empty($premios)): ?>
+            initDataTable('#tablaPremios', {
+                order: [
+                    [3, 'desc']
+                ]
+            });
+        <?php endif; ?>
     });
 </script>
 

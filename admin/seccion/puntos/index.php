@@ -1,6 +1,6 @@
 <?php
 require_once __DIR__ . '/../../bd.php';
-require_once __DIR__ . '/../../../includes/puntos_config.php';
+require_once __DIR__ . '/../../../app/Services/puntos_config.php';
 
 verificarRol('admin');
 

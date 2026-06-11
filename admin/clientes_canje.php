@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/bd.php';
-require_once __DIR__ . '/../includes/puntos_config.php';
-require_once __DIR__ . '/../includes/reservas_virtuales.php';
+require_once __DIR__ . '/../app/Services/puntos_config.php';
+require_once __DIR__ . '/../app/Services/reservas_virtuales.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

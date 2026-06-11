@@ -1,2 +1,3 @@
 <?php
-require __DIR__ . '/../public/views/carrito.view.php';
+require_once __DIR__ . '/../app/Core/bootstrap.php';
+require PICCOLO_FRONTEND_CUSTOMER . '/views/carrito.view.php';

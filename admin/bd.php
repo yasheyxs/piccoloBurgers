@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../app/Core/bootstrap.php';
+
 if (!function_exists('piccolo_finalizar_por_error_bd')) {
     function piccolo_finalizar_por_error_bd(string $mensajeLog, string $mensajeUsuario = 'Error de conexión a la base de datos'): void
     {
@@ -21,7 +23,7 @@ if (!function_exists('piccolo_finalizar_por_error_bd')) {
     }
 }
 
-$requiredEnv = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD'];
+$requiredEnv = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER'];
 $configuracion = [];
 
 foreach ($requiredEnv as $variable) {
@@ -35,13 +37,17 @@ foreach ($requiredEnv as $variable) {
     $configuracion[$variable] = $valor;
 }
 
+$passwordEnv = getenv('MYSQL_PASSWORD');
+$configuracion['MYSQL_PASSWORD'] = $passwordEnv === false ? '' : $passwordEnv;
+
 $servidor    = $configuracion['MYSQL_HOST'];
 $baseDatos   = $configuracion['MYSQL_DATABASE'];
 $usuario     = $configuracion['MYSQL_USER'];
 $contrasenia = $configuracion['MYSQL_PASSWORD'];
+$puerto      = getenv('MYSQL_PORT') ?: '3306';
 
 try {
-    $dsn = "mysql:host={$servidor};dbname={$baseDatos};charset=utf8mb4";
+    $dsn = "mysql:host={$servidor};port={$puerto};dbname={$baseDatos};charset=utf8mb4";
     $opciones = [
         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

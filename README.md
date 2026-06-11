@@ -129,3 +129,23 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 🧪 **Prototipo avanzado** – Funcional y demostrativo, preparado para integrarse con pasarelas de pago y módulos de delivery externos.
 
 ---------------
+## Arquitectura actual
+
+La aplicacion esta organizada como PHP tradicional con separacion progresiva entre backend y frontend:
+
+- `app/`: backend, bootstrap, controladores, services y repositories.
+- `frontend/customer/`: vistas y componentes del sitio publico.
+- `frontend/backoffice/`: templates del panel administrativo.
+- `public/`: webroot recomendado y entrypoints del cliente.
+- `admin/`: entrypoints del backoffice.
+- `includes/`, `views/`, `componentes/` y `shared/`: compatibilidad temporal para rutas/includes antiguos.
+
+URLs recomendadas en produccion:
+
+- Cliente: `/`
+- Backoffice: `/admin/`
+
+Compatibilidad local XAMPP:
+
+- Cliente: `/piccoloBurgers/public/`
+- Backoffice: `/piccoloBurgers/admin/`

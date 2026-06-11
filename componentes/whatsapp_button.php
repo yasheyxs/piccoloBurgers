@@ -1,2 +1,3 @@
 <?php
-require __DIR__ . '/../public/components/whatsapp_button.php';
+require_once __DIR__ . '/../app/Core/bootstrap.php';
+require PICCOLO_FRONTEND_CUSTOMER . '/components/whatsapp_button.php';

@@ -1,10 +1,2 @@
 <?php
-
-function requireConnection(PDO $conn = null): PDO
-{
-    if ($conn === null) {
-        throw new RuntimeException('No se encontró la conexión a la base de datos.');
-    }
-
-    return $conn;
-}
+require_once __DIR__ . '/../app/Core/bootstrap.php';

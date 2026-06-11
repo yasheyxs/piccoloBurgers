@@ -3,7 +3,7 @@ session_start();
 if ($_POST) {
   include("bd.php");
   require_once __DIR__ . '/helpers/url.php';
-  require_once __DIR__ . '/../shared/security/password_utils.php';
+  require_once __DIR__ . '/../app/Services/Security/password_utils.php';
 
   $usuario  = trim($_POST["usuario"] ?? "");
   $password = $_POST["password"] ?? "";

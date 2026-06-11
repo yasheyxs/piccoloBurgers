@@ -28,7 +28,7 @@ $metricasVentas = [
 ];
 
 if ($esAdminAutenticado) {
-  $variablesRequeridas = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER', 'MYSQL_PASSWORD'];
+  $variablesRequeridas = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER'];
   $configuracionDisponible = array_reduce($variablesRequeridas, function ($estado, $variable) {
     if (!$estado) {
       return false;

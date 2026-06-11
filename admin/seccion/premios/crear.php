@@ -1,7 +1,9 @@
 <?php
 require_once __DIR__ . '/../../bd.php';
+require_once __DIR__ . '/../../../app/Services/premios_schema.php';
 
 verificarRol('admin');
+asegurarTablaPremios($conexion);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();

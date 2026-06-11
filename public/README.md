@@ -6,7 +6,7 @@ Esta carpeta contiene las rutas web que usan los clientes.
 - `cliente/` contiene login, registro, perfil e historial del cliente.
 - `api/` contiene endpoints AJAX usados por el carrito y la disponibilidad.
 - `assets/` e `img/` contienen recursos publicos servidos por el navegador.
-- `views/` contiene las vistas PHP del sitio publico.
-- `components/` contiene componentes visuales del sitio publico.
+- `views/` y `components/` son puentes de compatibilidad.
+- Las vistas y componentes reales viven en `../frontend/customer`.
 
 Las URLs existentes siguen entrando por `/public/...`.

@@ -19,7 +19,7 @@ RUN chown -R www-data:www-data /var/www/html
 # Instalar Composer y dependencias PHP
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
-RUN composer install --no-dev --optimize-autoloader || true
+RUN composer install --no-dev --optimize-autoloader
 
 # Exponer puerto
 EXPOSE 8080
