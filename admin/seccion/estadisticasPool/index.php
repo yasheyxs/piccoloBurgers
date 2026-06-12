@@ -5,32 +5,7 @@ require_once __DIR__ . '/../../../app/Services/pool_schema.php';
 verificarRol('admin');
 asegurarTablaPoolTurnos($conexion);
 
-function poolStatsValidarFecha(string $fecha): bool
-{
-    return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha) !== false;
-}
-
-function poolStatsDuracion(?int $minutos): string
-{
-    if ($minutos === null) {
-        return 'En curso';
-    }
-
-    $horas = intdiv($minutos, 60);
-    $resto = $minutos % 60;
-    return $horas > 0 ? $horas . ' h ' . $resto . ' min' : $resto . ' min';
-}
-
-$fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
-
-if (!poolStatsValidarFecha($fecha_inicio)) {
-    $fecha_inicio = date('Y-m-01');
-}
-
-if (!poolStatsValidarFecha($fecha_fin)) {
-    $fecha_fin = date('Y-m-d');
-}
+[$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
 
 $jornadas = poolListarJornadas($conexion, $fecha_inicio, $fecha_fin);
 $resumen = poolResumenGeneral($jornadas);
@@ -136,7 +111,7 @@ include __DIR__ . '/../../templates/header.php';
           <div class="col-md-3"><strong>Apertura:</strong><br><?= htmlspecialchars(date('d/m/Y H:i', strtotime($jornadaSeleccionada['fecha_apertura'])), ENT_QUOTES, 'UTF-8'); ?></div>
           <div class="col-md-3"><strong>Cierre:</strong><br><?= $jornadaSeleccionada['fecha_cierre'] ? htmlspecialchars(date('d/m/Y H:i', strtotime($jornadaSeleccionada['fecha_cierre'])), ENT_QUOTES, 'UTF-8') : 'En curso'; ?></div>
           <div class="col-md-2"><strong>Estado:</strong><br><?= htmlspecialchars(ucfirst($jornadaSeleccionada['estado']), ENT_QUOTES, 'UTF-8'); ?></div>
-          <div class="col-md-2"><strong>Duracion:</strong><br><?= htmlspecialchars(poolStatsDuracion($jornadaSeleccionada['duracion_minutos']), ENT_QUOTES, 'UTF-8'); ?></div>
+          <div class="col-md-2"><strong>Duracion:</strong><br><?= htmlspecialchars(poolFormatearDuracion($jornadaSeleccionada['duracion_minutos']), ENT_QUOTES, 'UTF-8'); ?></div>
           <div class="col-md-2"><strong>Atendidos:</strong><br><?= (int) $jornadaSeleccionada['jugadores_atendidos']; ?></div>
           <div class="col-md-2"><strong>Valor vendido:</strong><br>$<?= number_format((float) $jornadaSeleccionada['monto_vendido_total'], 2, ',', '.'); ?></div>
         </div>
@@ -217,7 +192,7 @@ include __DIR__ . '/../../templates/header.php';
                 <td><?= (int) $jornada['total_pendientes']; ?></td>
                 <td><?= (int) $jornada['jugadores_atendidos']; ?></td>
                 <td><?= (int) $jornada['turnos_completados']; ?></td>
-                <td><?= htmlspecialchars(poolStatsDuracion($jornada['duracion_minutos']), ENT_QUOTES, 'UTF-8'); ?></td>
+                <td><?= htmlspecialchars(poolFormatearDuracion($jornada['duracion_minutos']), ENT_QUOTES, 'UTF-8'); ?></td>
               </tr>
             <?php endforeach; ?>
           </tbody>

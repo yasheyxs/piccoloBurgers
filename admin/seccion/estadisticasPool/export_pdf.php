@@ -9,22 +9,6 @@ use Dompdf\Options;
 verificarRol('admin');
 asegurarTablaPoolTurnos($conexion);
 
-function poolPdfValidarFecha(string $fecha): bool
-{
-    return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha) !== false;
-}
-
-function poolPdfDuracion(?int $minutos): string
-{
-    if ($minutos === null) {
-        return 'En curso';
-    }
-
-    $horas = intdiv($minutos, 60);
-    $resto = $minutos % 60;
-    return $horas > 0 ? $horas . ' h ' . $resto . ' min' : $resto . ' min';
-}
-
 function poolPdfBarChart(array $resumen): string
 {
     $vendidasAzul = (int) $resumen['vendidas_azul'];
@@ -115,16 +99,7 @@ function poolPdfMoneyChart(array $resumen): string
     return $svg;
 }
 
-$fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
-
-if (!poolPdfValidarFecha($fecha_inicio)) {
-    $fecha_inicio = date('Y-m-01');
-}
-
-if (!poolPdfValidarFecha($fecha_fin)) {
-    $fecha_fin = date('Y-m-d');
-}
+[$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
 
 $jornadas = poolListarJornadas($conexion, $fecha_inicio, $fecha_fin);
 $resumen = poolResumenGeneral($jornadas);
@@ -190,7 +165,7 @@ foreach ($jornadas as $jornada) {
       <td>' . (int) $jornada['total_pendientes'] . '</td>
       <td>' . (int) $jornada['jugadores_atendidos'] . '</td>
       <td>' . (int) $jornada['turnos_completados'] . '</td>
-      <td>' . htmlspecialchars(poolPdfDuracion($jornada['duracion_minutos'])) . '</td>
+      <td>' . htmlspecialchars(poolFormatearDuracion($jornada['duracion_minutos'])) . '</td>
     </tr>';
 }
 

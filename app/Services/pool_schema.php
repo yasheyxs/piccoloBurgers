@@ -174,6 +174,45 @@ if (!function_exists('poolFechaDbAFechaApp')) {
     }
 }
 
+if (!function_exists('poolValidarFechaFiltro')) {
+    function poolValidarFechaFiltro(string $fecha): bool
+    {
+        return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha) !== false;
+    }
+}
+
+if (!function_exists('poolRangoFechasDesdeParametros')) {
+    function poolRangoFechasDesdeParametros(array $parametros): array
+    {
+        $fechaInicio = (string) ($parametros['fecha_inicio'] ?? date('Y-m-01'));
+        $fechaFin = (string) ($parametros['fecha_fin'] ?? date('Y-m-d'));
+
+        if (!poolValidarFechaFiltro($fechaInicio)) {
+            $fechaInicio = date('Y-m-01');
+        }
+
+        if (!poolValidarFechaFiltro($fechaFin)) {
+            $fechaFin = date('Y-m-d');
+        }
+
+        return [$fechaInicio, $fechaFin];
+    }
+}
+
+if (!function_exists('poolFormatearDuracion')) {
+    function poolFormatearDuracion(?int $minutos): string
+    {
+        if ($minutos === null) {
+            return 'En curso';
+        }
+
+        $horas = intdiv($minutos, 60);
+        $resto = $minutos % 60;
+
+        return $horas > 0 ? $horas . ' h ' . $resto . ' min' : $resto . ' min';
+    }
+}
+
 if (!function_exists('poolJornadaActiva')) {
     function poolJornadaActiva(PDO $conexion): ?array
     {
@@ -444,11 +483,11 @@ if (!function_exists('poolListarJornadas')) {
 
                 $duracionStmt = $conexion->prepare(
                     "SELECT GREATEST(
-            0,
-            TIMESTAMPDIFF(MINUTE, fecha_apertura, COALESCE(fecha_cierre, NOW()))
-        )
-        FROM pool_jornadas
-        WHERE id = :id"
+                         0,
+                         TIMESTAMPDIFF(MINUTE, fecha_apertura, COALESCE(fecha_cierre, NOW()))
+                     )
+                     FROM pool_jornadas
+                     WHERE id = :id"
                 );
 
                 $duracionStmt->execute([':id' => (int) $jornada['id']]);

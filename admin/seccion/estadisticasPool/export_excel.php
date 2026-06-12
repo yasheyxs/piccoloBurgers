@@ -11,21 +11,7 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 verificarRol('admin');
 asegurarTablaPoolTurnos($conexion);
 
-function poolExportValidarFecha(string $fecha): bool
-{
-    return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha) !== false;
-}
-
-$fecha_inicio = $_GET['fecha_inicio'] ?? date('Y-m-01');
-$fecha_fin = $_GET['fecha_fin'] ?? date('Y-m-d');
-
-if (!poolExportValidarFecha($fecha_inicio)) {
-    $fecha_inicio = date('Y-m-01');
-}
-
-if (!poolExportValidarFecha($fecha_fin)) {
-    $fecha_fin = date('Y-m-d');
-}
+[$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
 
 $jornadas = poolListarJornadas($conexion, $fecha_inicio, $fecha_fin);
 $resumen = poolResumenGeneral($jornadas);
