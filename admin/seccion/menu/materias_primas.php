@@ -114,7 +114,7 @@ include("../../templates/header.php");
 
 <form method="POST">
   <div class="mb-3">
-    <button type="button" class="btn btn-outline-primary" onclick="mostrarBuscador()">➕ Agregar insumo</button>
+    <button type="button" class="btn btn-outline-primary" onclick="mostrarBuscador()"><i class="fa-solid fa-plus me-2" aria-hidden="true"></i>Agregar insumo</button>
     <div id="buscadorInsumo" class="mt-2" style="display:none;">
       <input type="text" id="inputBuscar" class="form-control" placeholder="Buscar materia prima...">
       <ul id="sugerencias" class="list-group mt-1"></ul>
@@ -130,7 +130,7 @@ include("../../templates/header.php");
         <th>Cantidad por unidad</th>
         <th>Stock Actual</th>
         <th>Estado</th>
-        <th title="Eliminar insumo">🗑️</th>
+        <th title="Eliminar insumo"><i class="fa-solid fa-trash" aria-hidden="true"></i></th>
       </tr>
     </thead>
     <tbody>
@@ -140,7 +140,7 @@ include("../../templates/header.php");
             $id = $insumo['ID'];
             $requerido = $insumo['requerido'] ?? '';
             $estado = ($requerido > 0 && $insumo['stock_actual'] < $requerido) ? 'estado-low' : 'estado-ok';
-            $estado_texto = ($estado === 'estado-low') ? '❌ Bajo' : '✅ OK';
+            $estado_texto = ($estado === 'estado-low') ? 'Bajo' : 'OK';
           ?>
           <tr>
             <td><?= htmlspecialchars($insumo['nombre']) ?></td>
@@ -149,7 +149,7 @@ include("../../templates/header.php");
             <td><?= number_format($insumo['stock_actual'], 2) ?></td>
             <td class="<?= $estado ?>"><?= $estado_texto ?></td>
             <td class="text-center">
-              <button type="submit" name="eliminar[]" value="<?= $id ?>" class="btn btn-outline-danger btn-sm btn-delete" title="Eliminar insumo">✖</button>
+              <button type="submit" name="eliminar[]" value="<?= $id ?>" class="btn btn-outline-danger btn-sm btn-delete" title="Eliminar insumo"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
             </td>
           </tr>
         <?php endforeach; ?>

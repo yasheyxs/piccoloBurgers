@@ -323,7 +323,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }));
 
       // Validar que el carrito final no esté vacío
-      console.log("✅ Carrito final que se enviará:", carritoFinal);
+      console.log("Carrito final que se enviará:", carritoFinal);
 
       const form = e.target;
       const formData = new FormData(form);
@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
           mensajePago = `
   <div class="p-4 mt-4 rounded" style="background-color: var(--gray-bg); border: 1px solid rgba(255, 255, 255, 0.1);">
     <h5 class="mb-3" style="font-size: 1.6rem; color: var(--main-gold);">
-      📲 Pagá por Mercado Pago
+      <i class="fa-solid fa-mobile-screen-button me-2" aria-hidden="true"></i>Pagá por Mercado Pago
     </h5>
     <p class="mb-2" style="font-size: 1.1rem;"><strong>Alias:</strong> piccolovdr</p>
     <p class="mb-2" style="font-size: 1.1rem;"><strong>Nombre del titular:</strong> Mario Alberto Gaido</p>
@@ -374,7 +374,7 @@ document.addEventListener("DOMContentLoaded", () => {
       esDelivery
         ? `
       <p class="mt-3" style="color: var(--main-gold); font-size: 1.05rem;">
-        💸 El costo del delivery varía entre <strong>$1000</strong> y <strong>$1500</strong> según la zona.
+        <i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i>El costo del delivery varía entre <strong>$1000</strong> y <strong>$1500</strong> según la zona.
         Envianos un mensaje para confirmar el monto.
       </p>
     `
@@ -396,33 +396,33 @@ document.addEventListener("DOMContentLoaded", () => {
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
         </div>
         <div class="modal-body fs-5 px-4 py-3">
-          <p>🎉 <strong>${
+          <p><i class="fa-solid fa-circle-check text-success me-2" aria-hidden="true"></i><strong>${
             resultado.nombre
-          }</strong>, tu pedido está en preparación. 🍔</p>
+          }</strong>, tu pedido está en preparación.</p>
           ${
             parseFloat(resultado.descuento) > 0
               ? `
             <div class="mb-2">
-              <p class="mb-0">💸 <strong>Total original:</strong> $${
+              <p class="mb-0"><i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i><strong>Total original:</strong> $${
                 resultado.total_original
               }</p>
-              <p class="mb-0">🔻 <strong>Descuento por puntos:</strong> -$${
+              <p class="mb-0"><i class="fa-solid fa-arrow-down me-2" aria-hidden="true"></i><strong>Descuento por puntos:</strong> -$${
                 resultado.descuento
               }</p>
               ${
                 Number(resultado.puntos_usados || 0) > 0
-                  ? `<p class="mb-0">🪙 <strong>Puntos utilizados:</strong> ${resultado.puntos_usados}</p>`
+                  ? `<p class="mb-0"><i class="fa-solid fa-coins me-2" aria-hidden="true"></i><strong>Puntos utilizados:</strong> ${resultado.puntos_usados}</p>`
                   : ""
               }
             </div>`
               : ""
           }
-          <p class="mt-3">💰 <strong>Total a pagar:</strong> $${
+          <p class="mt-3"><i class="fa-solid fa-cash-register me-2" aria-hidden="true"></i><strong>Total a pagar:</strong> $${
             resultado.total
           }</p>
           ${
             resultado.puntos_ganados > 0
-              ? `<p>🎁 <strong>Puntos ganados:</strong> ${resultado.puntos_ganados}</p>`
+              ? `<p><i class="fa-solid fa-gift me-2" aria-hidden="true"></i><strong>Puntos ganados:</strong> ${resultado.puntos_ganados}</p>`
               : ""
           }
           ${mensajePago}

@@ -905,12 +905,12 @@ function actualizarTotal(
     if (puntosDisponibles < minimoParaCanjear) {
       totalSpan.insertAdjacentHTML(
         "afterend",
-        `<div id="puntos_warning" class="text-danger">⚠️ Necesitás al menos ${minimoParaCanjear} puntos para canjear.</div>`
+        `<div id="puntos_warning" class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1" aria-hidden="true"></i>Necesitás al menos ${minimoParaCanjear} puntos para canjear.</div>`
       );
     } else if (total < 1000) {
       totalSpan.insertAdjacentHTML(
         "afterend",
-        '<div id="puntos_warning" class="text-danger">⚠️ El total debe ser al menos $1000 para canjear puntos.</div>'
+        '<div id="puntos_warning" class="text-danger"><i class="fa-solid fa-triangle-exclamation me-1" aria-hidden="true"></i>El total debe ser al menos $1000 para canjear puntos.</div>'
       );
     } else {
       if (valorPorPunto <= 0) {
@@ -1051,7 +1051,7 @@ function prepararEnvioPedido(event) {
   );
 
   if (hayIncompletos) {
-    console.error("⚠️ Hay productos incompletos:", carritoFinal);
+    console.error("Hay productos incompletos:", carritoFinal);
     alert(
       "Error: uno de los productos del carrito no tiene toda la información necesaria."
     );
@@ -1064,7 +1064,7 @@ function prepararEnvioPedido(event) {
     carritoInput.value = JSON.stringify(carritoFinal);
   }
 
-  console.log("✅ Carrito que se enviará:", carritoFinal);
+  console.log("Carrito que se enviará:", carritoFinal);
 }
 
 function ajustarPaddingContenido() {

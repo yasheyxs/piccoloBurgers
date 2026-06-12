@@ -229,7 +229,7 @@ $valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
             <i class="fas fa-receipt me-2"></i>
             ¿Está pago?: <span class="<?= $estadoPagoClase ?>" data-estado-pago><?= $estadoPagoTexto ?></span>
           </p>
-          <p class="fw-semibold mb-2">🛍️ Productos:</p>
+          <p class="fw-semibold mb-2"><i class="fa-solid fa-bag-shopping me-2" aria-hidden="true"></i>Productos:</p>
           <ul class="mb-3">
             <?php if (count($productos) > 0): ?>
               <?php foreach ($productos as $producto): ?>
@@ -239,7 +239,7 @@ $valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
               <li class="text-muted">Sin productos</li>
             <?php endif; ?>
           </ul>
-          <p class="mb-0"><strong>📌 Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
+          <p class="mb-0"><strong><i class="fa-solid fa-thumbtack me-2" aria-hidden="true"></i>Referencias:</strong> <?= htmlspecialchars($referencias) ?: 'Sin referencias' ?></p>
           <div class="mt-4">
             <button class="btn btn-gold w-100" data-id="<?= $pedido['ID'] ?>" data-action="entregado">Entregado</button>
           </div>
@@ -302,7 +302,7 @@ $valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
   }
 
   function obtenerTextoEstadoPago(estado) {
-    return estado === 'Si' ? 'Sí ✅' : 'No ❌';
+    return estado === 'Si' ? 'Sí' : 'No';
   }
 
   function obtenerClaseEstadoPago(estado) {
@@ -438,11 +438,11 @@ $valorPagoNegativo = piccolo_resolver_valor_pago($conexion, 'No') ?? 'No';
         <i class="fas fa-receipt me-2"></i>
         ¿Está pago?: <span class="${obtenerClaseEstadoPago(estadoPago)}" data-estado-pago>${obtenerTextoEstadoPago(estadoPago)}</span>
       </p>
-      <p class="fw-semibold mb-2">🛍️ Productos:</p>
+      <p class="fw-semibold mb-2"><i class="fa-solid fa-bag-shopping me-2" aria-hidden="true"></i>Productos:</p>
       <ul class="mb-3">
         ${productosHtml}
       </ul>
-        <p class="mb-0"><strong>📌 Referencias:</strong> ${referenciasHtml}</p>
+        <p class="mb-0"><strong><i class="fa-solid fa-thumbtack me-2" aria-hidden="true"></i>Referencias:</strong> ${referenciasHtml}</p>
         <div class="mt-4">
           <button class="btn btn-gold w-100" data-id="${escapeHtml(pedidoId)}" data-action="entregado">Entregado</button>
         </div>

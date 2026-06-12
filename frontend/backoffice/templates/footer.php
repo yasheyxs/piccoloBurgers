@@ -62,16 +62,32 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const autoDismissAlerts = document.querySelectorAll('.alert-auto-dismiss');
+    const autoDismissAlerts = document.querySelectorAll('.alert');
 
     autoDismissAlerts.forEach(function(alertEl) {
+      if (!alertEl.querySelector('.btn-close')) {
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'btn-close';
+        closeButton.setAttribute('aria-label', 'Cerrar');
+        closeButton.addEventListener('click', function() {
+          alertEl.classList.add('d-none');
+        });
+        alertEl.classList.add('alert-dismissible');
+        alertEl.appendChild(closeButton);
+      }
+
       setTimeout(function() {
-        if (!alertEl.classList.contains('show')) {
+        if (alertEl.classList.contains('d-none')) {
           return;
         }
-        const alertInstance = bootstrap.Alert.getOrCreateInstance(alertEl);
-        alertInstance.close();
-      }, 3000);
+        if (alertEl.classList.contains('fade') || alertEl.classList.contains('show')) {
+          const alertInstance = bootstrap.Alert.getOrCreateInstance(alertEl);
+          alertInstance.close();
+          return;
+        }
+        alertEl.classList.add('d-none');
+      }, 5000);
     });
   });
 </script>

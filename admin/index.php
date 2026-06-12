@@ -41,6 +41,7 @@ if ($esAdminAutenticado) {
   if ($configuracionDisponible) {
     try {
       require_once __DIR__ . '/bd.php';
+      require_once __DIR__ . '/../app/Services/pool_schema.php';
 
       $fechaInicio = date('Y-m-01');
       $fechaFin = date('Y-m-d 23:59:59');
@@ -52,7 +53,9 @@ if ($esAdminAutenticado) {
       $stmt->bindParam(':inicio', $fechaInicio);
       $stmt->bindParam(':fin', $fechaFin);
       $stmt->execute();
-      $metricasVentas['total_ventas'] = (float)($stmt->fetchColumn() ?? 0);
+      $totalVentasTradicionales = (float)($stmt->fetchColumn() ?? 0);
+      $totalVentasFichas = poolMontoVendidoEntreFechas($conexion, $fechaInicio, $fechaFin);
+      $metricasVentas['total_ventas'] = $totalVentasTradicionales + $totalVentasFichas;
 
       $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
           FROM tbl_pedidos p
@@ -99,56 +102,54 @@ if ($esAdminAutenticado) {
     justify-content: center;
     height: 120px;
     border-radius: 12px;
-    color: #fff;
+    color: var(--admin-btn-primary-text);
     font-weight: bold;
     font-size: 1rem;
     text-align: center;
-    border: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--admin-border);
+    transition: var(--admin-transition);
+    box-shadow: none;
   }
 
-  .quick-action span {
+  .quick-action i {
     font-size: 2rem;
     margin-bottom: 0.5rem;
   }
 
-  /* Efecto hover */
   .quick-action:hover {
-    transform: translateY(-5px) scale(1.05);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
-    filter: brightness(1.1);
+    filter: brightness(0.95);
   }
 
-  /* Colores  */
   .btn-add {
-    background: linear-gradient(135deg, #ff6a00, #ee0979);
+    background: var(--admin-btn-primary-bg);
   }
 
   .btn-provider {
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
+    background: var(--admin-btn-info-bg);
   }
 
   .btn-user {
-    background: linear-gradient(135deg, #00b09b, #96c93d);
+    background: var(--admin-btn-success-bg);
   }
 
   .btn-report {
-    background: linear-gradient(135deg, #f7971e, #ffd200);
-    color: #222;
+    background: var(--admin-btn-warning-bg);
+    color: var(--admin-btn-warning-text);
   }
 
   .btn-roles {
-    background: linear-gradient(135deg, #ff416c, #ff4b2b);
+    background: var(--admin-btn-danger-bg);
+  }
+
+  .btn-pool {
+    background: var(--admin-btn-secondary-bg);
   }
 
   .welcome-box {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(235, 239, 244, 0.76));
+    background: var(--admin-surface);
     border-radius: 20px;
     padding: 3rem;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
     text-align: center;
     margin-bottom: 2rem;
@@ -162,10 +163,7 @@ if ($esAdminAutenticado) {
   .welcome-box h2 {
     font-size: 2rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #ff6a00, #ee0979);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--admin-text);
     margin-bottom: 1rem;
   }
 
@@ -184,7 +182,7 @@ if ($esAdminAutenticado) {
   }
 
   body.admin-dark .welcome-box {
-    background: linear-gradient(135deg, rgba(30, 34, 44, 0.95), rgba(18, 21, 28, 0.92));
+    background: var(--admin-surface);
     box-shadow: 0 12px 35px rgba(4, 6, 10, 0.55);
   }
 
@@ -219,43 +217,42 @@ if ($esAdminAutenticado) {
 <div class="row align-items-md-stretch">
   <div class="col-md-12">
     <div class="welcome-box">
-      <h2>Bienvenidx, administrador <?php echo $_SESSION["admin_usuario"]; ?> 👋</h2>
+      <h2>Bienvenidx, administrador <?php echo $_SESSION["admin_usuario"]; ?></h2>
       <p>Este es tu centro de control: desde acá podés editar el menú, revisar comentarios, administrar usuarios, controlar ventas y compras, y supervisar los paneles de cocina y delivery.</p>
-      <p class="text-muted">Usá el menú superior para explorar tus herramientas. Cada cambio impacta directamente en la experiencia de tus clientes, ¡así que hacelo brillar ✨!</p>
+      <p class="text-muted">Usá el menú superior para explorar tus herramientas. Cada cambio impacta directamente en la experiencia de tus clientes.</p>
     </div>
   </div>
 </div>
 
 
-<!-- 🔹 Sección de Acciones Rápidas -->
 <div class="container my-5">
-  <h3 class="mb-4 text-center">⚡ Acciones rápidas</h3>
+  <h3 class="mb-4 text-center"><i class="fa-solid fa-bolt me-2" aria-hidden="true"></i>Acciones rápidas</h3>
   <?php if ($esAdminAutenticado) { ?>
     <div class="row g-4 justify-content-center">
 
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-add w-100" type="button">
-          <span>➕</span>
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
           Agregar producto
         </button>
       </div>
 
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-provider w-100" type="button">
-          <span>📋</span>
+          <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
           Crear proveedor
         </button>
       </div>
 
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-user w-100" type="button">
-          <span>👤</span>
+          <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Invitar usuario
         </button>
       </div>
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-report w-100" type="button">
-          <span>📑</span>
+          <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
           Generar PDF
         </button>
       </div>
@@ -263,8 +260,15 @@ if ($esAdminAutenticado) {
 
       <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-roles w-100" type="button">
-          <span>🔑</span>
+          <i class="fa-solid fa-key" aria-hidden="true"></i>
           Acceso a roles
+        </button>
+      </div>
+
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-pool w-100" type="button">
+          <i class="fa-solid fa-circle-dot" aria-hidden="true"></i>
+          Fichas
         </button>
       </div>
 
@@ -332,7 +336,8 @@ if ($esAdminAutenticado) {
             <div class="metric-icon text-success">
               <i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
             </div>
-            <h5 class="card-title">Total de ventas</h5>
+          <h5 class="card-title">Total de ventas</h5>
+            <p class="text-muted small mb-2">Pedidos + venta de fichas</p>
             <p class="display-6 fw-bold text-success mb-0">
               $<?= number_format($metricasVentas['total_ventas'], 2); ?>
             </p>
@@ -399,6 +404,10 @@ if ($esAdminAutenticado) {
       {
         selector: '.btn-user',
         path: 'seccion/usuarios/crear.php'
+      },
+      {
+        selector: '.btn-pool',
+        path: 'seccion/pool/'
       }
     ];
 

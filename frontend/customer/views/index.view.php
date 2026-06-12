@@ -149,7 +149,7 @@ $lista_testimonios = isset($lista_testimonios) && is_array($lista_testimonios) ?
             <strong>descuentos exclusivos</strong> en tus próximas compras.
             <br><br>
             Cuanto más pedís,
-            <strong class="text-gold">más ahorrás</strong> 🍔✨
+            <strong class="text-gold">más ahorrás</strong>
           </p>
         </div>
       </div>
@@ -209,7 +209,7 @@ $lista_testimonios = isset($lista_testimonios) && is_array($lista_testimonios) ?
           <p class="lead text-justify section-description section-description-lg">
             Encontranos fácilmente en nuestro local en <strong class="text-gold">Villa del Rosario</strong>, Córdoba.
             <br><br>
-            Estamos ubicados en <strong>25 de Mayo 1295</strong>, a pasos del centro. Acercate a disfrutar nuestras hamburguesas artesanales en un ambiente cálido y moderno 🍔✨
+            Estamos ubicados en <strong>25 de Mayo 1295</strong>, a pasos del centro. Acercate a disfrutar nuestras hamburguesas artesanales en un ambiente cálido y moderno.
           </p>
         </div>
 
@@ -271,9 +271,9 @@ $lista_testimonios = isset($lista_testimonios) && is_array($lista_testimonios) ?
         <!-- Info principal -->
         <div class="col-md-4 mb-4">
           <h4 class="fw-bold mb-3 text-gold">Piccolo Burgers VDR</h4>
-          <p>🍔 100% cargadas de sabor</p>
-          <p>📍 25 de Mayo 1295</p>
-          <p>🍽️ Servicio a mesa y Take Away</p>
+          <p><i class="fa-solid fa-burger me-2" aria-hidden="true"></i>100% cargadas de sabor</p>
+          <p><i class="fa-solid fa-location-dot me-2" aria-hidden="true"></i>25 de Mayo 1295</p>
+          <p><i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>Servicio a mesa y Take Away</p>
         </div>
 
         <!-- Horarios -->

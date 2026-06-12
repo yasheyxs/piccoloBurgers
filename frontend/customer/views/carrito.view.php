@@ -21,7 +21,7 @@
   <main>
     <div class="container contenido-ajustado">
       <div class="container carrito-panel">
-        <h2 class="mb-4 text-center">🛒 Tu Carrito</h2>
+        <h2 class="mb-4 text-center"><i class="fa-solid fa-cart-shopping me-2" aria-hidden="true"></i>Tu Carrito</h2>
         <div id="carrito-contenido" class="row row-cols-2 row-cols-md-4 g-4"></div>
         <div id="btnAgregarMas" class="mt-4"></div>
 
@@ -90,7 +90,7 @@
             <form id="formPedido" action="confirmar_pedido.php" method="post" class="m-0">
               <input type="hidden" name="carrito" id="carritoInput">
               <input type="hidden" name="usar_puntos" id="usarPuntosInput" value="0">
-              <button type="submit" class="btn btn-gold" id="btnFinalizar">🧾 Finalizar Pedido</button>
+              <button type="submit" class="btn btn-gold" id="btnFinalizar"><i class="fa-solid fa-receipt me-2" aria-hidden="true"></i>Finalizar Pedido</button>
             </form>
             <button class="btn btn-outline-danger-rounded" id="btnCancelar">Cancelar Pedido</button>
           </div>

@@ -149,7 +149,7 @@ include("../../templates/header.php");
         <input type="number" step="0.01" min="0.01" class="form-control" name="materias[${materiaIndex}][precio]" placeholder="Precio unitario" required>
       </div>
       <div class="col-md-1 d-flex align-items-center">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.row').remove()">✕</button>
+        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.row').remove()" aria-label="Eliminar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
       </div>
     `;
 

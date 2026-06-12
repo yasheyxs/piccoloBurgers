@@ -375,7 +375,7 @@ if ($datos_guardados_exitosamente) {
         </div>
       </div>
     <?php endif; ?>
-    <h2 class="mb-4 text-center">👤 Información del Cliente</h2>
+    <h2 class="mb-4 text-center"><i class="fa-solid fa-user me-2" aria-hidden="true"></i>Información del Cliente</h2>
     <div class="card glass-card p-4 mb-5" style="max-width: 600px; margin: 0 auto; border-radius: 15px;">
 
       <div class="row mb-3 align-items-center info-item">
@@ -427,7 +427,7 @@ if ($datos_guardados_exitosamente) {
 
       <div class="text-center mt-3">
         <button type="button" class="btn btn-outline-light btn-lg fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditarCliente" style="border-radius: 50px;">
-          ✏️ Editar mis datos
+          <i class="fa-solid fa-pen-to-square me-2" aria-hidden="true"></i>Editar mis datos
         </button>
       </div>
 
@@ -690,16 +690,16 @@ if ($datos_guardados_exitosamente) {
       let estadoHtml = '';
       switch (pedido.estado) {
         case 'Cancelado':
-          estadoHtml = `<span class="text-danger">Cancelado ❌ - Esperamos poder servirte mejor en el futuro.</span>`;
+          estadoHtml = `<span class="text-danger"><i class="fa-solid fa-circle-xmark me-1" aria-hidden="true"></i>Cancelado - Esperamos poder servirte mejor en el futuro.</span>`;
           break;
         case 'Listo':
-          estadoHtml = `<span class="text-success">Listo ✅</span>`;
+          estadoHtml = `<span class="text-success"><i class="fa-solid fa-circle-check me-1" aria-hidden="true"></i>Listo</span>`;
           break;
         case 'En preparación':
           estadoHtml = `<span class="text-warning">En preparación ⏳</span>`;
           break;
         case 'En camino':
-          estadoHtml = `<span class="text-info">En camino 🚚</span>`;
+          estadoHtml = `<span class="text-info"><i class="fa-solid fa-truck me-1" aria-hidden="true"></i>En camino</span>`;
           break;
         default:
           estadoHtml = pedido.estado;

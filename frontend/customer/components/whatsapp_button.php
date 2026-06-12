@@ -1,6 +1,6 @@
 <?php
 $whatsappNumero = "5493573438947"; 
-$whatsappMensaje = urlencode("¡Hola! Me gustaría hacer un pedido 🍔✨");
+$whatsappMensaje = urlencode("¡Hola! Me gustaría hacer un pedido");
 ?>
 
 <a href="https://wa.me/<?php echo $whatsappNumero; ?>?text=<?php echo $whatsappMensaje; ?>" 

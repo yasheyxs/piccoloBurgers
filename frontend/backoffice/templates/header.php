@@ -70,6 +70,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
   <script src="<?php echo $url_base; ?>assets/js/datatables-init.js"></script>
+  <script src="<?php echo $url_base; ?>assets/js/feedback.js"></script>
 </head>
 
 <body class="<?php echo htmlspecialchars($bodyClassAttribute, ENT_QUOTES, 'UTF-8'); ?>">
@@ -133,6 +134,21 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
                   <?php } ?>
                   <?php if ($rol === "admin" || $rol === "delivery") { ?>
                     <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
+                  <?php } ?>
+                </ul>
+              </li>
+            <?php } ?>
+
+            <?php if (in_array($rol, ["admin", "empleado"], true)) { ?>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="poolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Pools
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="poolsDropdown">
+                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/pool/">Fichas</a></li>
+                  <?php if ($rol === "admin") { ?>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/estadisticasPool/">Estadísticas de Pool</a></li>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/poolParametros/">Parámetros</a></li>
                   <?php } ?>
                 </ul>
               </li>

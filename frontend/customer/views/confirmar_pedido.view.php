@@ -20,15 +20,15 @@
 
   <?php
 $codigosPais = [
-    '54' => ['etiqueta' => '🇦🇷 +54', 'longitudes' => [10]],
-    '598' => ['etiqueta' => '🇺🇾 +598', 'longitudes' => [8, 9]],
-    '55' => ['etiqueta' => '🇧🇷 +55', 'longitudes' => [10, 11]],
-    '56' => ['etiqueta' => '🇨🇱 +56', 'longitudes' => [9]],
-    '595' => ['etiqueta' => '🇵🇾 +595', 'longitudes' => [9]],
-    '591' => ['etiqueta' => '🇧🇴 +591', 'longitudes' => [8]],
-    '51' => ['etiqueta' => '🇵🇪 +51', 'longitudes' => [9]],
-    '1' => ['etiqueta' => '🇺🇸 +1', 'longitudes' => [10]],
-    '34' => ['etiqueta' => '🇪🇸 +34', 'longitudes' => [9]],
+    '54' => ['etiqueta' => 'Argentina +54', 'longitudes' => [10]],
+    '598' => ['etiqueta' => 'Uruguay +598', 'longitudes' => [8, 9]],
+    '55' => ['etiqueta' => 'Brasil +55', 'longitudes' => [10, 11]],
+    '56' => ['etiqueta' => 'Chile +56', 'longitudes' => [9]],
+    '595' => ['etiqueta' => 'Paraguay +595', 'longitudes' => [9]],
+    '591' => ['etiqueta' => 'Bolivia +591', 'longitudes' => [8]],
+    '51' => ['etiqueta' => 'Peru +51', 'longitudes' => [9]],
+    '1' => ['etiqueta' => 'Estados Unidos +1', 'longitudes' => [10]],
+    '34' => ['etiqueta' => 'España +34', 'longitudes' => [9]],
   ];
 
   $telefonoCodigo = '54';
@@ -109,13 +109,13 @@ $codigosPais = [
       <div class="mb-4">
         <label class="form-label d-block mb-3 fw-bold fs-5">Método de pago:</label>
 
-<input type="radio" class="form-check-input" id="pago_efectivo" name="metodo_pago" value="Efectivo" required checked>        <label class="radio-card" for="pago_efectivo">💵 Efectivo</label>
+<input type="radio" class="form-check-input" id="pago_efectivo" name="metodo_pago" value="Efectivo" required checked>        <label class="radio-card" for="pago_efectivo"><i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i>Efectivo</label>
 
         <input type="radio" class="form-check-input" id="pago_tarjeta" name="metodo_pago" value="Tarjeta">
-        <label class="radio-card" for="pago_tarjeta">💳 Tarjeta</label>
+        <label class="radio-card" for="pago_tarjeta"><i class="fa-solid fa-credit-card me-2" aria-hidden="true"></i>Tarjeta</label>
 
         <input type="radio" class="form-check-input" id="pago_mp" name="metodo_pago" value="MercadoPago">
-        <label class="radio-card" for="pago_mp">📱 Mercado Pago</label>
+        <label class="radio-card" for="pago_mp"><i class="fa-solid fa-mobile-screen-button me-2" aria-hidden="true"></i>Mercado Pago</label>
       </div>
 
       <div class="mb-4">
@@ -123,14 +123,14 @@ $codigosPais = [
 
         <input type="radio" class="form-check-input" id="entrega_retiro" name="tipo_entrega" value="Retiro" required checked
           onchange="mostrarDireccion(this.value)">
-        <label class="radio-card" for="entrega_retiro">🏪 Retiro en el local</label>
+        <label class="radio-card" for="entrega_retiro"><i class="fa-solid fa-store me-2" aria-hidden="true"></i>Retiro en el local</label>
 
         <input type="radio" class="form-check-input" id="entrega_delivery" name="tipo_entrega" value="Delivery"
           onchange="mostrarDireccion(this.value)">
-        <label class="radio-card" for="entrega_delivery">🏍️ Delivery</label>
+        <label class="radio-card" for="entrega_delivery"><i class="fa-solid fa-motorcycle me-2" aria-hidden="true"></i>Delivery</label>
 
         <div class="alert alert-warning mt-3" id="aviso-delivery" style="display: none; font-size: 1rem;">
-          🚨 El servicio de delivery tiene un costo adicional de entre <strong>$1000</strong> y <strong>$1500</strong>,
+          <i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>El servicio de delivery tiene un costo adicional de entre <strong>$1000</strong> y <strong>$1500</strong>,
           dependiendo de la zona.
         </div>
       </div>

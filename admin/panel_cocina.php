@@ -97,7 +97,7 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
                 <td>
                   <div class="d-flex flex-wrap justify-content-center gap-1 align-items-center">
                     <?php if ($pedido['estado'] === 'En camino' && $pedido['tipo_entrega'] === 'Delivery'): ?>
-                      <span class="camion-icono">🚚</span>
+                      <span class="camion-icono"><i class="fa-solid fa-truck" aria-hidden="true"></i></span>
                     <?php endif; ?>
                     <?php if ($mostrarBotonListo): ?>
                       <button class="btn btn-success btn-sm btn-estado" data-estado="Listo" data-id="<?= $pedido['ID'] ?>">Listo</button>
@@ -161,12 +161,12 @@ $pedidos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
           fila.remove();
         }
 
-        // Insertar ícono 🚚 en la columna de acciones
+        // Insertar icono de delivery en la columna de acciones
         const celdaAcciones = fila.cells[8];
         if (celdaAcciones && !celdaAcciones.querySelector('.camion-icono')) {
           const icono = document.createElement('span');
           icono.className = 'camion-icono';
-          icono.textContent = '🚚';
+          icono.innerHTML = '<i class="fa-solid fa-truck" aria-hidden="true"></i>';
           const contenedorBotones = celdaAcciones.querySelector('.d-flex');
           if (contenedorBotones) {
             contenedorBotones.insertBefore(icono, contenedorBotones.firstChild);
