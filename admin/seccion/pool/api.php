@@ -1,12 +1,15 @@
 <?php
 require_once __DIR__ . '/../../bd.php';
 require_once __DIR__ . '/../../../app/Services/pool_schema.php';
+require_once __DIR__ . '/../../../app/Services/Security/password_utils.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
 header('Content-Type: application/json');
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
 
 function poolResponder(array $payload, int $status = 200): void
 {
@@ -49,11 +52,31 @@ function poolJornadaActivaObligatoria(PDO $conexion): array
     return $jornada;
 }
 
+function poolOcultarInformacionSensible(array $estado): array
+{
+    foreach (['azul', 'rojo'] as $pool) {
+        if (!isset($estado['pools'][$pool]['stats'])) {
+            continue;
+        }
+
+        $estado['pools'][$pool]['stats']['vendidas'] = null;
+        $estado['pools'][$pool]['stats']['consumidas'] = null;
+        $estado['pools'][$pool]['stats']['montoVendido'] = null;
+    }
+
+    return $estado;
+}
+
+function poolEstadoPublico(PDO $conexion): array
+{
+    return poolOcultarInformacionSensible(poolObtenerEstado($conexion));
+}
+
 poolValidarAcceso();
 asegurarTablaPoolTurnos($conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    poolResponder(['exito' => true, 'estado' => poolObtenerEstado($conexion)]);
+    poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -67,6 +90,31 @@ $accion = (string) ($payload['accion'] ?? '');
 
 try {
     switch ($accion) {
+        case 'validar_privacidad':
+            $password = (string) ($payload['password'] ?? '');
+            $usuarioSesion = (string) ($_SESSION['admin_usuario'] ?? '');
+
+            if ($password === '' || $usuarioSesion === '') {
+                poolResponder(['exito' => false, 'mensaje' => 'Ingresa tu contraseña para continuar.'], 422);
+            }
+
+            $usuarioStmt = $conexion->prepare(
+                'SELECT password FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1'
+            );
+            $usuarioStmt->execute([':usuario' => $usuarioSesion]);
+            $hashAlmacenado = (string) ($usuarioStmt->fetchColumn() ?: '');
+
+            if (!passwordCoincideConHash($password, $hashAlmacenado)) {
+                poolResponder(['exito' => false, 'mensaje' => 'La contraseña es incorrecta.'], 401);
+            }
+
+            poolResponder([
+                'exito' => true,
+                'privacidadAutorizada' => true,
+                'estado' => poolObtenerEstado($conexion),
+            ]);
+            break;
+
         case 'abrir_jornada':
             poolAbrirJornada($conexion);
             break;
@@ -253,7 +301,7 @@ try {
             poolResponder(['exito' => false, 'mensaje' => 'Accion no reconocida.'], 422);
     }
 
-    poolResponder(['exito' => true, 'estado' => poolObtenerEstado($conexion)]);
+    poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
 } catch (Throwable $error) {
     if ($conexion->inTransaction()) {
         $conexion->rollBack();

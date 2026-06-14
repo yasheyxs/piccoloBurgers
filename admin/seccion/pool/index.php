@@ -117,6 +117,19 @@ include __DIR__ . '/../../templates/header.php';
     font-weight: 800;
   }
 
+  .pool-privacy-toggle {
+    min-width: 46px;
+  }
+
+  .pool-stat__value--hidden {
+    color: var(--admin-muted);
+    letter-spacing: 0.08em;
+  }
+
+  .pool-privacy-feedback {
+    min-height: 1.5rem;
+  }
+
   .pool-fast-form {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 92px 124px;
@@ -278,10 +291,40 @@ include __DIR__ . '/../../templates/header.php';
       <span class="badge text-bg-secondary fs-6">Jornada <?= htmlspecialchars(date('d/m/Y'), ENT_QUOTES, 'UTF-8'); ?></span>
       <span class="badge text-bg-warning fs-6">Ficha $<?= htmlspecialchars(number_format((float) $configuracionPool['valor_ficha'], 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></span>
       <span class="badge text-bg-info fs-6">Máx. <?= (int) $configuracionPool['max_fichas_por_registro']; ?> por registro</span>
+      <button class="btn btn-outline-secondary pool-privacy-toggle" type="button" data-privacy-toggle
+        title="Mostrar informacion sensible" aria-label="Mostrar informacion sensible" aria-pressed="false">
+        <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
+      </button>
     </div>
   </div>
 
   <div id="poolAlert" class="alert d-none" role="alert"></div>
+
+  <div class="modal fade" id="poolPrivacyModal" tabindex="-1" aria-labelledby="poolPrivacyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form data-privacy-form>
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="poolPrivacyModalLabel">Mostrar informacion sensible</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted mb-3">Ingresa la contrasena de tu usuario para ver los totales vendidos y consumidos.</p>
+            <label class="form-label" for="poolPrivacyPassword">Contrasena</label>
+            <input class="form-control" id="poolPrivacyPassword" name="password" type="password"
+              autocomplete="current-password" required>
+            <div class="pool-privacy-feedback text-danger small mt-2" data-privacy-feedback role="alert"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-privacy-submit>
+              <i class="fa-solid fa-eye me-1" aria-hidden="true"></i> Mostrar
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 
   <div class="pool-jornada-card d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
     <div>
@@ -316,10 +359,10 @@ include __DIR__ . '/../../templates/header.php';
         </div>
 
         <div class="pool-stats">
-          <div class="pool-stat"><span class="pool-stat__label">Vendidas</span><span class="pool-stat__value" data-stat="vendidas">0</span></div>
-          <div class="pool-stat"><span class="pool-stat__label">Consumidas</span><span class="pool-stat__value" data-stat="consumidas">0</span></div>
+          <div class="pool-stat"><span class="pool-stat__label">Vendidas</span><span class="pool-stat__value pool-stat__value--hidden" data-stat="vendidas">****</span></div>
+          <div class="pool-stat"><span class="pool-stat__label">Consumidas</span><span class="pool-stat__value pool-stat__value--hidden" data-stat="consumidas">****</span></div>
           <div class="pool-stat"><span class="pool-stat__label">Pendientes</span><span class="pool-stat__value" data-stat="pendientes">0</span></div>
-          <div class="pool-stat"><span class="pool-stat__label">Vendido $</span><span class="pool-stat__value" data-stat="montoVendido">0</span></div>
+          <div class="pool-stat"><span class="pool-stat__label">Vendido $</span><span class="pool-stat__value pool-stat__value--hidden" data-stat="montoVendido">****</span></div>
         </div>
 
         <form class="pool-fast-form" data-add-form>
@@ -343,7 +386,13 @@ include __DIR__ . '/../../templates/header.php';
 
   const apiUrl = shell.dataset.apiUrl;
   const csrf = shell.dataset.csrf;
+  const sensitiveStats = new Set(['vendidas', 'consumidas', 'montoVendido']);
+  const privacyToggle = shell.querySelector('[data-privacy-toggle]');
+  const privacyForm = shell.querySelector('[data-privacy-form]');
+  const privacyPassword = shell.querySelector('#poolPrivacyPassword');
+  const privacyFeedback = shell.querySelector('[data-privacy-feedback]');
   let draggedId = null;
+  let sensitiveVisible = false;
 
   function showAlert(message, type = 'danger') {
     const alert = document.getElementById('poolAlert');
@@ -368,6 +417,25 @@ include __DIR__ . '/../../templates/header.php';
     return html;
   }
 
+  function setSensitiveVisible(visible) {
+    sensitiveVisible = visible;
+
+    shell.querySelectorAll('[data-stat]').forEach((element) => {
+      if (!sensitiveStats.has(element.dataset.stat) || visible) return;
+      element.textContent = '****';
+      element.classList.add('pool-stat__value--hidden');
+    });
+
+    if (!privacyToggle) return;
+    const label = visible ? 'Ocultar informacion sensible' : 'Mostrar informacion sensible';
+    privacyToggle.title = label;
+    privacyToggle.setAttribute('aria-label', label);
+    privacyToggle.setAttribute('aria-pressed', visible ? 'true' : 'false');
+    privacyToggle.innerHTML = visible
+      ? '<i class="fa-solid fa-eye" aria-hidden="true"></i>'
+      : '<i class="fa-solid fa-eye-slash" aria-hidden="true"></i>';
+  }
+
   function renderPool(pool, payload) {
     const panel = shell.querySelector(`[data-pool="${pool}"]`);
     if (!panel) return;
@@ -375,7 +443,16 @@ include __DIR__ . '/../../templates/header.php';
     const stats = payload.stats || {};
     ['vendidas', 'consumidas', 'pendientes', 'montoVendido'].forEach((key) => {
       const el = panel.querySelector(`[data-stat="${key}"]`);
-      if (el) el.textContent = key === 'montoVendido' ? formatMoney(stats[key] ?? 0) : (stats[key] ?? 0);
+      if (!el) return;
+
+      if (sensitiveStats.has(key) && (!sensitiveVisible || stats[key] === null || stats[key] === undefined)) {
+        el.textContent = '****';
+        el.classList.add('pool-stat__value--hidden');
+        return;
+      }
+
+      el.classList.remove('pool-stat__value--hidden');
+      el.textContent = key === 'montoVendido' ? formatMoney(stats[key] ?? 0) : (stats[key] ?? 0);
     });
 
     const queue = panel.querySelector('[data-queue]');
@@ -456,6 +533,13 @@ include __DIR__ . '/../../templates/header.php';
     }
 
     if (!data.exito) throw new Error(data.mensaje || 'No se pudo completar la operacion.');
+
+    if (data.privacidadAutorizada === true) {
+      setSensitiveVisible(true);
+    } else if (sensitiveVisible && data.estado) {
+      setSensitiveVisible(false);
+    }
+
     renderState(data.estado);
     return data;
   }
@@ -503,6 +587,48 @@ include __DIR__ . '/../../templates/header.php';
     if (Number.isNaN(parsed.getTime())) return value;
     return parsed.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
   }
+
+  privacyToggle?.addEventListener('click', () => {
+    if (sensitiveVisible) {
+      setSensitiveVisible(false);
+      return;
+    }
+
+    privacyFeedback.textContent = '';
+    privacyPassword.value = '';
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('poolPrivacyModal')).show();
+  });
+
+  document.getElementById('poolPrivacyModal')?.addEventListener('shown.bs.modal', () => {
+    privacyPassword?.focus();
+  });
+
+  document.getElementById('poolPrivacyModal')?.addEventListener('hidden.bs.modal', () => {
+    privacyForm?.reset();
+    privacyFeedback.textContent = '';
+  });
+
+  privacyForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const submitButton = privacyForm.querySelector('[data-privacy-submit]');
+    privacyFeedback.textContent = '';
+    submitButton.disabled = true;
+
+    try {
+      await request({
+        accion: 'validar_privacidad',
+        password: privacyPassword.value,
+      });
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('poolPrivacyModal')).hide();
+      privacyForm.reset();
+    } catch (error) {
+      setSensitiveVisible(false);
+      privacyFeedback.textContent = error.message;
+      privacyPassword.select();
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
 
   shell.addEventListener('click', async (event) => {
     const button = event.target.closest('[data-jornada-action]');
