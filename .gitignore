@@ -1,0 +1,22 @@
+# Variables de entorno y credenciales (nunca subir)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Archivos comprimidos y backups (pueden contener .env o datos reales)
+*.rar
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.bak
+*.dump
+
+# Logs y temporales
+*.log
+.DS_Store
+Thumbs.db

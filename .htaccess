@@ -1,0 +1,14 @@
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteRule ^$ public/ [R=302,L]
+
+  RewriteRule ^(\.env|\.git|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$ - [F,L,NC]
+  RewriteRule ^(app|config|database|frontend|includes|shared|vendor)(/|$) - [F,L,NC]
+</IfModule>
+
+<FilesMatch "^(\.env|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$">
+  Require all denied
+</FilesMatch>

@@ -1,0 +1,851 @@
+body.admin-body {
+  --admin-bg: #f5f7fb;
+  --admin-surface: #ffffff;
+  --admin-surface-alt: #f1f3f5;
+  --admin-text: #212529;
+  --admin-input-placeholder: rgba(33, 37, 41, 0.6);
+  --admin-border: rgba(0, 0, 0, 0.12);
+  --admin-muted: #6c757d;
+  --admin-link: #0d6efd;
+  --admin-link-hover: #0a58ca;
+  --admin-nav-bg: #f8f9fa;
+  --admin-nav-border: rgba(0, 0, 0, 0.08);
+  --admin-dropdown-bg: #ffffff;
+  --admin-dropdown-hover: #f1f3f5;
+  --admin-input-bg: #ffffff;
+  --admin-input-text: #212529;
+  --admin-input-border: rgba(0, 0, 0, 0.2);
+  --admin-table-stripe: #f8f9fc;
+  --admin-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --admin-btn-radius: 0.65rem;
+  --admin-btn-font-weight: 600;
+  --admin-btn-primary-bg: #1d4ed8;
+  --admin-btn-primary-hover: #1e3a8a;
+  --admin-btn-primary-text: #ffffff;
+  --admin-btn-success-bg: #15803d;
+  --admin-btn-success-hover: #166534;
+  --admin-btn-success-text: #f8fafc;
+  --admin-btn-danger-bg: #b91c1c;
+  --admin-btn-danger-hover: #991b1b;
+  --admin-btn-danger-text: #f8fafc;
+  --admin-btn-info-bg: #0ea5e9;
+  --admin-btn-info-hover: #0284c7;
+  --admin-btn-info-text: #f0f9ff;
+  --admin-btn-warning-bg: #b45309;
+  --admin-btn-warning-hover: #92400e;
+  --admin-btn-warning-text: #ffffff;
+  --admin-btn-secondary-bg: #475569;
+  --admin-btn-secondary-hover: #334155;
+  --admin-btn-secondary-text: #f8fafc;
+  --admin-btn-outline-surface: rgba(15, 23, 42, 0.05);
+  --admin-btn-outline-border: rgba(15, 23, 42, 0.2);
+  --admin-transition: color 0.25s ease, background-color 0.25s ease,
+    border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+body.admin-body.admin-dark {
+  --admin-bg: #0f1115;
+  --admin-surface: #191c24;
+  --admin-surface-alt: #1f222c;
+  --admin-text: #e4e6eb;
+  --admin-input-placeholder: rgba(228, 230, 235, 0.55);
+  --admin-border: rgba(255, 255, 255, 0.08);
+  --admin-muted: #a5adba;
+  --admin-link: #7ab0ff;
+  --admin-link-hover: #9bc2ff;
+  --admin-nav-bg: #14171f;
+  --admin-nav-border: rgba(255, 255, 255, 0.08);
+  --admin-dropdown-bg: #1c2029;
+  --admin-dropdown-hover: #222633;
+  --admin-input-bg: #1c2029;
+  --admin-input-text: #f1f3f5;
+  --admin-input-border: rgba(122, 160, 255, 0.45);
+  --admin-table-stripe: rgba(122, 176, 255, 0.08);
+  --admin-shadow: 0 12px 32px rgba(6, 8, 12, 0.6);
+  --admin-btn-primary-bg: #2563eb;
+  --admin-btn-primary-hover: #1d4ed8;
+  --admin-btn-primary-text: #f8fafc;
+  --admin-btn-success-bg: #22c55e;
+  --admin-btn-success-hover: #16a34a;
+  --admin-btn-success-text: #062814;
+  --admin-btn-danger-bg: #dc2626;
+  --admin-btn-danger-hover: #b91c1c;
+  --admin-btn-danger-text: #f8fafc;
+  --admin-btn-info-bg: #38bdf8;
+  --admin-btn-info-hover: #0ea5e9;
+  --admin-btn-info-text: #0f172a;
+  --admin-btn-warning-bg: #f59e0b;
+  --admin-btn-warning-hover: #d97706;
+  --admin-btn-warning-text: #1f2937;
+  --admin-btn-secondary-bg: #64748b;
+  --admin-btn-secondary-hover: #475569;
+  --admin-btn-secondary-text: #f8fafc;
+  --admin-btn-outline-surface: rgba(148, 163, 184, 0.18);
+  --admin-btn-outline-border: rgba(148, 163, 184, 0.45);
+}
+
+body.admin-body {
+  background-color: var(--admin-bg);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+  min-height: 100vh;
+  --admin-navbar-height: 4rem;
+  --admin-navbar-offset: calc(var(--admin-navbar-height) + 1.5rem);
+}
+
+.alert-soft-success {
+  background-color: rgba(21, 128, 61, 0.18);
+  border-color: rgba(21, 128, 61, 0.28);
+  color: #0f5132;
+}
+
+.alert-soft-info {
+  background-color: rgba(14, 165, 233, 0.18);
+  border-color: rgba(14, 165, 233, 0.32);
+  color: #055160;
+}
+
+.alert-soft-success .btn-close,
+.alert-soft-info .btn-close {
+  filter: brightness(0.75);
+}
+
+body.admin-body.admin-dark .alert-soft-success {
+  background-color: rgba(34, 197, 94, 0.18);
+  border-color: rgba(34, 197, 94, 0.38);
+  color: #bbf7d0;
+}
+
+body.admin-body.admin-dark .alert-soft-info {
+  background-color: rgba(56, 189, 248, 0.18);
+  border-color: rgba(56, 189, 248, 0.38);
+  color: #bae6fd;
+}
+
+body.admin-body a {
+  color: var(--admin-link);
+  transition: color 0.2s ease;
+}
+
+body.admin-body a:hover,
+body.admin-body a:focus {
+  color: var(--admin-link-hover);
+}
+
+body.admin-body header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1060;
+  width: 100%;
+  background-color: var(--admin-nav-bg);
+  box-shadow: var(--admin-shadow);
+}
+
+body.admin-body .navbar {
+  background-color: var(--admin-nav-bg) !important;
+  border-bottom: 1px solid var(--admin-nav-border);
+  transition: var(--admin-transition);
+  position: relative;
+  z-index: 1;
+  min-height: var(--admin-navbar-height);
+}
+
+body.admin-body main {
+  padding-top: var(--admin-navbar-offset);
+}
+
+body.admin-body .navbar .navbar-brand,
+body.admin-body .navbar .nav-link,
+body.admin-body .navbar .dropdown-item {
+  color: var(--admin-text) !important;
+}
+
+body.admin-body .navbar .dropdown-item:hover,
+body.admin-body .navbar .dropdown-item:focus {
+  background-color: var(--admin-dropdown-hover);
+  color: var(--admin-text) !important;
+}
+
+body.admin-body .navbar .dropdown-menu {
+  background-color: var(--admin-dropdown-bg);
+  border-color: var(--admin-border);
+  box-shadow: var(--admin-shadow);
+}
+
+@media (max-width: 991.98px) {
+  body.admin-body {
+    --admin-navbar-height: 4.75rem;
+    --admin-navbar-offset: calc(var(--admin-navbar-height) + 1.5rem);
+  }
+
+  body.admin-body .navbar-collapse {
+    padding-bottom: 0.75rem;
+  }
+}
+
+.last-update-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 999px;
+  background-color: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  box-shadow: var(--admin-shadow);
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark .last-update-badge {
+  background-color: rgba(28, 32, 41, 0.9);
+  border-color: rgba(148, 163, 184, 0.45);
+}
+
+.last-update-badge .last-update-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--admin-muted);
+}
+
+.last-update-badge .last-update-value {
+  font-size: 0.95rem;
+  color: var(--admin-text);
+}
+
+.last-update-badge .last-update-zone {
+  margin-left: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--admin-muted);
+}
+
+.admin-surface-panel {
+  background-color: var(--admin-surface-alt);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+}
+
+.admin-card-header {
+  background-color: var(--admin-surface);
+  border-bottom: 1px solid var(--admin-border);
+  transition: var(--admin-transition);
+}
+
+.modo-canje-filtros {
+  background-color: var(--admin-surface-alt);
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text);
+  transition: var(--admin-transition);
+}
+
+.admin-table-head {
+  background-color: var(--admin-surface-alt) !important;
+  color: var(--admin-text) !important;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-table-head th {
+  border-bottom: none;
+}
+
+.modo-canje-toggle .btn {
+  border-radius: var(--admin-btn-radius);
+  transition: var(--admin-transition);
+}
+
+.modo-canje-toggle .btn-outline-primary {
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  background-color: transparent;
+}
+
+body.admin-body.admin-dark .modo-canje-toggle .btn-outline-primary {
+  border-color: var(--admin-btn-outline-border);
+}
+
+.modo-canje-toggle .btn-check:checked + .btn {
+  background-color: var(--admin-btn-primary-bg);
+  color: var(--admin-btn-primary-text);
+  border-color: var(--admin-btn-primary-bg);
+  box-shadow: none;
+}
+
+.modo-canje-toggle .btn-outline-primary:hover,
+.modo-canje-toggle .btn-outline-primary:focus {
+  background-color: rgba(37, 99, 235, 0.12);
+  color: var(--admin-btn-primary-bg);
+  border-color: var(--admin-btn-primary-bg);
+}
+
+.canje-producto-placeholder,
+.canje-premio-placeholder {
+  background-color: var(--admin-surface-alt);
+  color: var(--admin-muted);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 2.5rem 0;
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark .canje-producto-placeholder,
+body.admin-body.admin-dark .canje-premio-placeholder {
+  color: var(--admin-text);
+}
+
+body.admin-body.admin-dark .last-update-badge .last-update-zone {
+  color: rgba(226, 232, 240, 0.75);
+}
+
+.last-update-badge .last-update-relative {
+  font-size: 0.75rem;
+  color: var(--admin-muted);
+  margin-top: 0.25rem;
+}
+
+body.admin-body:not(.delivery-panel) main .container,
+body.admin-body:not(.delivery-panel) main .container-fluid,
+body.admin-body:not(.delivery-panel) main .row > [class*="col"] {
+  transition: var(--admin-transition);
+}
+
+body.admin-body:not(.delivery-panel) .card,
+body.admin-body:not(.delivery-panel) .list-group-item,
+body.admin-body:not(.delivery-panel) .accordion-item,
+body.admin-body:not(.delivery-panel) .modal-content,
+body.admin-body:not(.delivery-panel) .dropdown-menu,
+body.admin-body:not(.delivery-panel) .toast,
+body.admin-body:not(.delivery-panel) .offcanvas,
+body.admin-body:not(.delivery-panel) .table,
+body.admin-body:not(.delivery-panel) .form-control,
+body.admin-body:not(.delivery-panel) .form-select,
+body.admin-body:not(.delivery-panel) .input-group-text,
+body.admin-body:not(.delivery-panel) .pagination .page-link,
+body.admin-body:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body:not(.delivery-panel) .btn-outline-primary,
+body.admin-body:not(.delivery-panel) .btn-outline-danger,
+body.admin-body:not(.delivery-panel) .btn-outline-success,
+body.admin-body:not(.delivery-panel) .btn-outline-warning {
+  background-color: var(--admin-surface);
+  color: var(--admin-text);
+  border-color: var(--admin-border);
+  box-shadow: none;
+  transition: var(--admin-transition);
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .card,
+body.admin-body.admin-dark:not(.delivery-panel) .list-group-item,
+body.admin-body.admin-dark:not(.delivery-panel) .accordion-item,
+body.admin-body.admin-dark:not(.delivery-panel) .modal-content,
+body.admin-body.admin-dark:not(.delivery-panel) .dropdown-menu,
+body.admin-body.admin-dark:not(.delivery-panel) .toast,
+body.admin-body.admin-dark:not(.delivery-panel) .offcanvas,
+body.admin-body.admin-dark:not(.delivery-panel) .form-control,
+body.admin-body.admin-dark:not(.delivery-panel) .form-select,
+body.admin-body.admin-dark:not(.delivery-panel) .input-group-text,
+body.admin-body.admin-dark:not(.delivery-panel) .pagination .page-link,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-primary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-danger,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-success,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-warning {
+  box-shadow: var(--admin-shadow);
+}
+
+body.admin-body:not(.delivery-panel) .table thead,
+body.admin-body:not(.delivery-panel) .table th {
+  background-color: var(--admin-surface-alt);
+  color: var(--admin-text);
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr {
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr:nth-of-type(odd) {
+  background-color: var(--admin-table-stripe);
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr:hover {
+  background-color: rgba(15, 23, 42, 0.05);
+  color: var(--admin-text);
+}
+
+body.admin-body:not(.delivery-panel) .table tbody tr:hover > * {
+  color: inherit;
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .table tbody tr:hover {
+  background-color: rgba(96, 165, 250, 0.18);
+  color: #f8fbff;
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .table tbody tr:hover > * {
+  color: inherit;
+}
+
+body.admin-body:not(.delivery-panel) .form-control,
+body.admin-body:not(.delivery-panel) .form-select,
+body.admin-body:not(.delivery-panel) .form-check-input,
+body.admin-body:not(.delivery-panel) .input-group-text {
+  background-color: var(--admin-input-bg);
+  color: var(--admin-input-text);
+  border-color: var(--admin-input-border);
+}
+
+body.admin-body .form-label,
+body.admin-body .form-check-label,
+body.admin-body .form-text,
+body.admin-body .dataTables_wrapper .dataTables_length label,
+body.admin-body .dataTables_wrapper .dataTables_filter label {
+  color: var(--admin-text);
+}
+
+body.admin-body .form-control::placeholder,
+body.admin-body .form-select::placeholder,
+body.admin-body .dataTables_wrapper .dataTables_filter input::placeholder {
+  color: var(--admin-input-placeholder);
+}
+
+body.admin-body .dataTables_wrapper .dataTables_filter input,
+body.admin-body .dataTables_wrapper .dataTables_length select {
+  background-color: var(--admin-input-bg);
+  color: var(--admin-input-text);
+  border-color: var(--admin-input-border);
+  transition: var(--admin-transition);
+}
+
+body.admin-body .dataTables_wrapper .dataTables_length select option {
+  color: #212529;
+}
+
+body.admin-body.admin-dark
+  .dataTables_wrapper
+  .dataTables_length
+  select
+  option {
+  color: #f1f3f5;
+  background-color: #0f1115;
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .form-control:focus,
+body.admin-body.admin-dark:not(.delivery-panel) .form-select:focus,
+body.admin-body.admin-dark:not(.delivery-panel) .form-check-input:focus {
+  box-shadow: 0 0 0 0.25rem rgba(122, 176, 255, 0.25);
+}
+
+body.admin-body .btn {
+  border-radius: var(--admin-btn-radius);
+  font-weight: var(--admin-btn-font-weight);
+  letter-spacing: 0.01em;
+  transition: var(--admin-transition), transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.admin-body .btn:focus-visible {
+  outline: 3px solid rgba(59, 130, 246, 0.35);
+  outline-offset: 2px;
+}
+
+body.admin-body .btn:hover,
+body.admin-body .btn:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+}
+
+body.admin-body.admin-dark .btn:hover,
+body.admin-body.admin-dark .btn:focus {
+  box-shadow: 0 14px 30px rgba(8, 11, 19, 0.35);
+}
+
+body.admin-body .btn-primary {
+  background-color: var(--admin-btn-primary-bg);
+  border-color: var(--admin-btn-primary-bg);
+  color: var(--admin-btn-primary-text);
+}
+
+body.admin-body .btn-primary:hover,
+body.admin-body .btn-primary:focus {
+  background-color: var(--admin-btn-primary-hover);
+  border-color: var(--admin-btn-primary-hover);
+  color: var(--admin-btn-primary-text);
+}
+
+body.admin-body .btn-success {
+  background-color: var(--admin-btn-success-bg);
+  border-color: var(--admin-btn-success-bg);
+  color: var(--admin-btn-success-text);
+}
+body.admin-body .btn-success:hover,
+body.admin-body .btn-success:focus {
+  background-color: var(--admin-btn-success-hover);
+  border-color: var(--admin-btn-success-hover);
+  color: var(--admin-btn-success-text);
+}
+
+body.admin-body .btn-danger {
+  background-color: var(--admin-btn-danger-bg);
+  border-color: var(--admin-btn-danger-bg);
+  color: var(--admin-btn-danger-text);
+}
+body.admin-body .btn-danger:hover,
+body.admin-body .btn-danger:focus {
+  background-color: var(--admin-btn-danger-hover);
+  border-color: var(--admin-btn-danger-hover);
+  color: var(--admin-btn-danger-text);
+}
+
+body.admin-body .btn-info {
+  background-color: var(--admin-btn-info-bg);
+  border-color: var(--admin-btn-info-bg);
+  color: var(--admin-btn-info-text);
+}
+
+body.admin-body .btn-info:hover,
+body.admin-body .btn-info:focus {
+  background-color: var(--admin-btn-info-hover);
+  border-color: var(--admin-btn-info-hover);
+  color: var(--admin-btn-info-text);
+}
+
+body.admin-body .btn-warning {
+  background-color: var(--admin-btn-warning-bg);
+  border-color: var(--admin-btn-warning-bg);
+  color: var(--admin-btn-warning-text);
+}
+
+body.admin-body .btn-warning:hover,
+body.admin-body .btn-warning:focus {
+  background-color: var(--admin-btn-warning-hover);
+  border-color: var(--admin-btn-warning-hover);
+  color: var(--admin-btn-warning-text);
+}
+
+body.admin-body .btn-secondary {
+  background-color: var(--admin-btn-secondary-bg);
+  border-color: var(--admin-btn-secondary-bg);
+  color: var(--admin-btn-secondary-text);
+}
+
+body.admin-body .btn-secondary:hover,
+body.admin-body .btn-secondary:focus {
+  background-color: var(--admin-btn-secondary-hover);
+  border-color: var(--admin-btn-secondary-hover);
+  color: var(--admin-btn-secondary-text);
+}
+
+body.admin-body .btn-outline-primary {
+  color: var(--admin-btn-primary-bg);
+  border-color: var(--admin-btn-primary-bg);
+  background-color: var(--admin-btn-outline-surface);
+}
+
+body.admin-body .btn-outline-primary:hover,
+body.admin-body .btn-outline-primary:focus {
+  background-color: var(--admin-btn-primary-bg);
+  border-color: var(--admin-btn-primary-bg);
+  color: var(--admin-btn-primary-text);
+}
+
+body.admin-body .btn-outline-success {
+  color: var(--admin-btn-success-bg);
+  border-color: var(--admin-btn-success-bg);
+  background-color: var(--admin-btn-outline-surface);
+}
+
+body.admin-body .btn-outline-success:hover,
+body.admin-body .btn-outline-success:focus {
+  background-color: var(--admin-btn-success-bg);
+  border-color: var(--admin-btn-success-bg);
+  color: var(--admin-btn-success-text);
+}
+
+body.admin-body .btn-outline-danger {
+  color: var(--admin-btn-danger-bg);
+  border-color: var(--admin-btn-danger-bg);
+  background-color: var(--admin-btn-outline-surface);
+}
+
+body.admin-body .btn-outline-danger:hover,
+body.admin-body .btn-outline-danger:focus {
+  background-color: var(--admin-btn-danger-bg);
+  border-color: var(--admin-btn-danger-bg);
+  color: var(--admin-btn-danger-text);
+}
+
+body.admin-body .btn-outline-warning {
+  color: var(--admin-btn-warning-bg);
+  border-color: var(--admin-btn-warning-bg);
+  background-color: var(--admin-btn-outline-surface);
+}
+
+body.admin-body .btn-outline-warning:hover,
+body.admin-body .btn-outline-warning:focus {
+  background-color: var(--admin-btn-warning-bg);
+  border-color: var(--admin-btn-warning-bg);
+  color: var(--admin-btn-warning-text);
+}
+
+body.admin-body .btn-outline-secondary {
+  color: var(--admin-btn-secondary-bg);
+  border-color: var(--admin-btn-secondary-bg);
+  background-color: var(--admin-btn-outline-surface);
+}
+
+body.admin-body .btn-outline-secondary:hover,
+body.admin-body .btn-outline-secondary:focus {
+  background-color: var(--admin-btn-secondary-bg);
+  border-color: var(--admin-btn-secondary-bg);
+  color: var(--admin-btn-secondary-text);
+}
+
+body.admin-body.admin-dark .btn-outline-primary,
+body.admin-body.admin-dark .btn-outline-success,
+body.admin-body.admin-dark .btn-outline-danger,
+body.admin-body.admin-dark .btn-outline-warning,
+body.admin-body.admin-dark .btn-outline-secondary {
+  background-color: var(--admin-btn-outline-surface);
+  border-color: var(--admin-btn-outline-border);
+  color: var(--admin-text);
+}
+
+body.admin-body.admin-dark .btn-outline-primary:hover,
+body.admin-body.admin-dark .btn-outline-primary:focus {
+  color: var(--admin-btn-primary-text);
+  border-color: var(--admin-btn-primary-hover);
+  background-color: var(--admin-btn-primary-hover);
+}
+
+body.admin-body.admin-dark .btn-outline-success:hover,
+body.admin-body.admin-dark .btn-outline-success:focus {
+  color: var(--admin-btn-success-text);
+  border-color: var(--admin-btn-success-hover);
+  background-color: var(--admin-btn-success-hover);
+}
+
+body.admin-body.admin-dark .btn-outline-danger:hover,
+body.admin-body.admin-dark .btn-outline-danger:focus {
+  color: var(--admin-btn-danger-text);
+  border-color: var(--admin-btn-danger-hover);
+  background-color: var(--admin-btn-danger-hover);
+}
+
+body.admin-body.admin-dark .btn-outline-warning:hover,
+body.admin-body.admin-dark .btn-outline-warning:focus {
+  color: var(--admin-btn-warning-text);
+  border-color: var(--admin-btn-warning-hover);
+  background-color: var(--admin-btn-warning-hover);
+}
+
+body.admin-body.admin-dark .btn-outline-secondary:hover,
+body.admin-body.admin-dark .btn-outline-secondary:focus {
+  color: var(--admin-btn-secondary-text);
+  border-color: var(--admin-btn-secondary-hover);
+  background-color: var(--admin-btn-secondary-hover);
+}
+
+body.admin-body .sales-panel-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.95rem 2.8rem;
+  font-size: 1.05rem;
+  border-radius: calc(var(--admin-btn-radius) + 0.2rem);
+  background: linear-gradient(
+    135deg,
+    var(--admin-btn-primary-bg),
+    var(--admin-btn-primary-hover)
+  );
+  border-color: transparent;
+  color: var(--admin-btn-primary-text);
+  box-shadow: 0 18px 36px rgba(29, 78, 216, 0.25);
+  overflow: hidden;
+  z-index: 0;
+}
+
+body.admin-body .sales-panel-cta::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transform: translateX(-100%);
+  transition: transform 0.45s ease;
+  z-index: 0;
+}
+
+body.admin-body .sales-panel-cta:hover,
+body.admin-body .sales-panel-cta:focus {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 0 22px 40px rgba(29, 78, 216, 0.3);
+}
+
+body.admin-body .sales-panel-cta:hover::after,
+body.admin-body .sales-panel-cta:focus::after {
+  transform: translateX(100%);
+}
+
+body.admin-body .sales-panel-cta > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.admin-body .sales-panel-cta i {
+  font-size: 1.2rem;
+}
+
+body.admin-body.admin-dark .sales-panel-cta {
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.95),
+    rgba(29, 78, 216, 0.95)
+  );
+  box-shadow: 0 22px 42px rgba(15, 23, 42, 0.55);
+  color: #f8fafc;
+}
+
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-secondary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-primary,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-danger,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-success,
+body.admin-body.admin-dark:not(.delivery-panel) .btn-outline-warning {
+  color: var(--admin-text);
+}
+
+body.admin-body .modal-backdrop.show {
+  opacity: 0.55;
+}
+
+body.admin-body .badge {
+  transition: var(--admin-transition);
+}
+
+body.admin-body .table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: inherit;
+}
+
+body.admin-body .text-muted {
+  color: var(--admin-muted) !important;
+}
+
+body.admin-body .theme-toggle {
+  border-radius: 999px;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  transition: var(--admin-transition);
+}
+
+body.admin-body .theme-toggle i {
+  transition: transform 0.2s ease;
+}
+
+body.admin-body .theme-toggle:hover i {
+  transform: scale(1.1);
+}
+
+body.admin-body .theme-toggle.btn-outline-secondary {
+  border-color: var(--admin-btn-outline-border);
+  background-color: var(--admin-btn-outline-surface);
+  color: var(--admin-text);
+  box-shadow: none;
+}
+
+body.admin-body .logout-modal {
+  background-color: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow);
+  color: var(--admin-text);
+}
+
+body.admin-body .logout-modal .modal-header {
+  background-color: var(--admin-surface-alt);
+  border-bottom: 1px solid var(--admin-border);
+  color: inherit;
+  gap: 1rem;
+}
+
+body.admin-body .logout-modal__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background-color: rgba(220, 38, 38, 0.12);
+  color: var(--admin-btn-danger-bg);
+  font-size: 1.35rem;
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.25);
+}
+
+body.admin-body.admin-dark .logout-modal__icon {
+  background-color: rgba(220, 38, 38, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.35);
+}
+
+body.admin-body .logout-modal .modal-body {
+  color: inherit;
+}
+
+body.admin-body .logout-modal .modal-footer {
+  border-top: 1px solid var(--admin-border);
+  gap: 0.75rem;
+}
+
+body.admin-body .logout-modal .btn-close {
+  opacity: 0.65;
+  transition: var(--admin-transition);
+}
+
+body.admin-body .logout-modal .btn-close:hover,
+body.admin-body .logout-modal .btn-close:focus {
+  opacity: 1;
+}
+
+body.admin-body.admin-dark .logout-modal .btn-close {
+  filter: invert(1) brightness(1.2);
+}
+
+@media (max-width: 575.98px) {
+  body.admin-body .logout-modal .modal-footer {
+    flex-direction: column;
+  }
+}
+
+body.admin-body .theme-toggle.btn-outline-secondary:hover,
+body.admin-body .theme-toggle.btn-outline-secondary:focus {
+  background-color: rgba(15, 23, 42, 0.08);
+  background-color: rgba(122, 176, 255, 0.12);
+  color: var(--admin-text);
+}
+
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:hover,
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:focus {
+  background-color: rgba(122, 176, 255, 0.2);
+  color: #f8fafc;
+  color: var(--admin-link);
+}
+
+body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:hover {
+  background-color: rgba(122, 176, 255, 0.15);
+}
+
+@media (max-width: 991.98px) {
+  body.admin-body .navbar .nav-item.theme-toggle-wrapper {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  body.admin-body .theme-toggle {
+    width: 38px;
+    height: 38px;
+  }
+}
