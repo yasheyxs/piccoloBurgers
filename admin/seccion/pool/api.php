@@ -7,7 +7,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
     session_start();
 }
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 header('Pragma: no-cache');
 
@@ -31,7 +31,7 @@ function poolValidarCsrf(): void
     $tokenSesion = $_SESSION['csrf_token'] ?? '';
     $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
     if ($tokenSesion === '' || !hash_equals((string) $tokenSesion, (string) $token)) {
-        poolResponder(['exito' => false, 'mensaje' => 'Token CSRF invalido.'], 403);
+        poolResponder(['exito' => false, 'mensaje' => 'Token CSRF inválido.'], 403);
     }
 }
 
@@ -46,7 +46,7 @@ function poolJornadaActivaObligatoria(PDO $conexion): array
 {
     $jornada = poolJornadaActiva($conexion);
     if (!$jornada) {
-        poolResponder(['exito' => false, 'mensaje' => 'Abri una jornada antes de operar.'], 409);
+        poolResponder(['exito' => false, 'mensaje' => 'Abrí una jornada antes de operar.'], 409);
     }
 
     return $jornada;
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    poolResponder(['exito' => false, 'mensaje' => 'Metodo no permitido.'], 405);
+    poolResponder(['exito' => false, 'mensaje' => 'Método no permitido.'], 405);
 }
 
 poolValidarCsrf();
@@ -134,11 +134,11 @@ try {
             $valorFicha = (float) $configuracion['valor_ficha'];
 
             if ($nombre === '') {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa un nombre o identificacion.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Ingresa un nombre o identificación.'], 422);
             }
 
             if ($fichas < 1 || $fichas > 99) {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa una cantidad de fichas valida.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Ingresa una cantidad de fichas válida.'], 422);
             }
 
             $conexion->beginTransaction();
@@ -165,13 +165,46 @@ try {
             $conexion->commit();
             break;
 
+        case 'renombrar':
+            $jornada = poolJornadaActivaObligatoria($conexion);
+            $jornadaId = (int) $jornada['id'];
+            $id = (int) ($payload['id'] ?? 0);
+            $nombre = trim((string) ($payload['nombre'] ?? ''));
+            $largoNombre = function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') : strlen($nombre);
+
+            if ($id <= 0) {
+                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
+            }
+
+            if ($nombre === '') {
+                poolResponder(['exito' => false, 'mensaje' => 'Ingresa un nombre o identificación.'], 422);
+            }
+
+            if ($largoNombre > 120) {
+                poolResponder(['exito' => false, 'mensaje' => 'El nombre no puede superar 120 caracteres.'], 422);
+            }
+
+            $stmt = $conexion->prepare(
+                'UPDATE pool_turnos SET nombre = :nombre WHERE id = :id AND jornada_id = :jornada_id'
+            );
+            $stmt->execute([
+                ':nombre' => $nombre,
+                ':id' => $id,
+                ':jornada_id' => $jornadaId,
+            ]);
+
+            if ($stmt->rowCount() === 0) {
+                poolResponder(['exito' => false, 'mensaje' => 'No encontramos ese turno en la jornada activa.'], 404);
+            }
+            break;
+
         case 'consumir':
         case 'revertir':
             $jornada = poolJornadaActivaObligatoria($conexion);
             $jornadaId = (int) $jornada['id'];
             $id = (int) ($payload['id'] ?? 0);
             if ($id <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno invalido.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
             }
 
             $turnoStmt = $conexion->prepare(
@@ -188,7 +221,7 @@ try {
             $fichasConsumidas = (int) $turno['fichas_consumidas'];
 
             if ($accion === 'consumir' && $fichasConsumidas >= $fichasTotal) {
-                poolResponder(['exito' => false, 'mensaje' => 'Este turno ya alcanzo la cantidad maxima de fichas permitidas.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Este turno ya alcanzó la cantidad máxima de fichas permitidas.'], 422);
             }
 
             if ($accion === 'revertir' && $fichasConsumidas <= 0) {
@@ -211,7 +244,7 @@ try {
             $id = (int) ($payload['id'] ?? 0);
             $poolDestino = poolNormalizar((string) ($payload['poolDestino'] ?? 'azul'));
             if ($id <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno invalido.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
             }
 
             $ordenDestino = poolSiguienteOrden($conexion, $poolDestino, $jornadaId);
@@ -232,7 +265,7 @@ try {
             $id = (int) ($payload['id'] ?? 0);
             $direccion = (string) ($payload['direccion'] ?? '');
             if ($id <= 0 || !in_array($direccion, ['arriba', 'abajo'], true)) {
-                poolResponder(['exito' => false, 'mensaje' => 'Movimiento invalido.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Movimiento inválido.'], 422);
             }
 
             $actualStmt = $conexion->prepare(
@@ -276,7 +309,7 @@ try {
             $pool = poolNormalizar((string) ($payload['pool'] ?? 'azul'));
             $ids = $payload['ids'] ?? [];
             if (!is_array($ids)) {
-                poolResponder(['exito' => false, 'mensaje' => 'Orden invalido.'], 422);
+                poolResponder(['exito' => false, 'mensaje' => 'Orden inválido.'], 422);
             }
 
             $conexion->beginTransaction();
@@ -298,7 +331,7 @@ try {
             break;
 
         default:
-            poolResponder(['exito' => false, 'mensaje' => 'Accion no reconocida.'], 422);
+            poolResponder(['exito' => false, 'mensaje' => 'Acción no reconocida.'], 422);
     }
 
     poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
@@ -311,5 +344,5 @@ try {
         poolResponder(['exito' => false, 'mensaje' => $error->getMessage()], 409);
     }
 
-    poolResponder(['exito' => false, 'mensaje' => 'No se pudo completar la operacion.'], 500);
+    poolResponder(['exito' => false, 'mensaje' => 'No se pudo completar la operación.'], 500);
 }

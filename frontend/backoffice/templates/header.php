@@ -152,6 +152,18 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
                   <?php } ?>
                 </ul>
               </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="bebidasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  Bebidas
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="bebidasDropdown">
+                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/bebidas/">Gestión</a></li>
+                  <?php if ($rol === "admin") { ?>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/estadisticasBebidas/">Estadísticas</a></li>
+                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/bebidasParametros/">Parámetros</a></li>
+                  <?php } ?>
+                </ul>
+              </li>
             <?php } ?>
           </ul>
 

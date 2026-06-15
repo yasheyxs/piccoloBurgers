@@ -1,6 +1,7 @@
 <?php
 require("../../bd.php");
 require_once __DIR__ . '/../../../app/Services/pool_schema.php';
+require_once __DIR__ . '/../../../app/Services/bebidas_schema.php';
 require_once __DIR__ . '/../../../vendor/autoload.php';
 use Dompdf\Dompdf;
 use Dompdf\Options;
@@ -28,7 +29,8 @@ $stmt->bindParam(':fin', $fecha_fin);
 $stmt->execute();
 $total_ventas_tradicionales = (float) ($stmt->fetch(PDO::FETCH_ASSOC)['total_ventas'] ?? 0);
 $total_ventas_fichas = poolMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
-$total_ventas = $total_ventas_tradicionales + $total_ventas_fichas;
+$total_ventas_bebidas = bebidaMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
+$total_ventas = $total_ventas_tradicionales + $total_ventas_fichas + $total_ventas_bebidas;
 
 // Total de pedidos
 $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
@@ -152,7 +154,7 @@ td { padding: 6px; text-align: left; }
   <div class="metric" style="width:48%;">
     <h3>Total Ventas</h3>
     <p>$'.number_format($total_ventas,2).'</p>
-    <small>Pedidos: $'.number_format($total_ventas_tradicionales,2).' | Fichas: $'.number_format($total_ventas_fichas,2).'</small>
+    <small>Pedidos: $'.number_format($total_ventas_tradicionales,2).' | Fichas: $'.number_format($total_ventas_fichas,2).' | Bebidas: $'.number_format($total_ventas_bebidas,2).'</small>
   </div>
   <div class="metric" style="width:48%;">
     <h3>Total Pedidos</h3>

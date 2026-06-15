@@ -1,6 +1,7 @@
 <?php
 include("../../bd.php");
 require_once __DIR__ . '/../../../app/Services/pool_schema.php';
+require_once __DIR__ . '/../../../app/Services/bebidas_schema.php';
 
 // Validación de fechas
 function validarFecha($fecha) {
@@ -34,7 +35,8 @@ try {
   $stmt->execute();
   $total_ventas_tradicionales = (float) ($stmt->fetch(PDO::FETCH_ASSOC)['total_ventas'] ?? 0);
   $total_ventas_fichas = poolMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
-  $total_ventas = $total_ventas_tradicionales + $total_ventas_fichas;
+  $total_ventas_bebidas = bebidaMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
+  $total_ventas = $total_ventas_tradicionales + $total_ventas_fichas + $total_ventas_bebidas;
 
   // Cantidad de pedidos
   $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
@@ -162,7 +164,7 @@ include("../../templates/header.php");
         <div class="card-body text-center">
           <i class="fa-solid fa-sack-dollar fa-2x text-success mb-2"></i>
           <h5 class="card-title">Total de Ventas</h5>
-          <small class="text-muted d-block mb-1">Pedidos + fichas</small>
+          <small class="text-muted d-block mb-1">Pedidos + fichas + bebidas</small>
           <p class="fs-4 fw-bold text-success">$<?= number_format($total_ventas, 2) ?></p>
         </div>
       </div>

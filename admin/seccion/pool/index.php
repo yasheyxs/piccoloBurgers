@@ -169,6 +169,21 @@ include __DIR__ . '/../../templates/header.php';
     word-break: break-word;
   }
 
+  .pool-turn__name[data-inline-name] {
+    border-radius: 0.35rem;
+    cursor: text;
+    margin: -0.08rem -0.15rem;
+    outline: none;
+    padding: 0.08rem 0.15rem;
+  }
+
+  .pool-turn__name[data-inline-name]:hover,
+  .pool-turn__name[data-inline-name]:focus,
+  .pool-turn__name--editing {
+    background: var(--admin-surface-alt);
+    box-shadow: inset 0 0 0 1px var(--admin-border);
+  }
+
   .pool-turn__meta {
     color: var(--admin-muted);
     font-size: 0.82rem;
@@ -243,15 +258,15 @@ include __DIR__ . '/../../templates/header.php';
   }
 
   .pool-action--consume {
-    background: var(--admin-btn-danger-bg);
-    border-color: var(--admin-btn-danger-bg);
-    color: var(--admin-btn-danger-text);
-  }
-
-  .pool-action--restore {
     background: var(--admin-btn-success-bg);
     border-color: var(--admin-btn-success-bg);
     color: var(--admin-btn-success-text);
+  }
+
+  .pool-action--restore {
+    background: var(--admin-btn-danger-bg);
+    border-color: var(--admin-btn-danger-bg);
+    color: var(--admin-btn-danger-text);
   }
 
   .pool-empty {
@@ -291,8 +306,12 @@ include __DIR__ . '/../../templates/header.php';
       <span class="badge text-bg-secondary fs-6">Jornada <?= htmlspecialchars(date('d/m/Y'), ENT_QUOTES, 'UTF-8'); ?></span>
       <span class="badge text-bg-warning fs-6">Ficha $<?= htmlspecialchars(number_format((float) $configuracionPool['valor_ficha'], 2, ',', '.'), ENT_QUOTES, 'UTF-8'); ?></span>
       <span class="badge text-bg-info fs-6">Máx. <?= (int) $configuracionPool['max_fichas_por_registro']; ?> por registro</span>
+      <a class="btn btn-outline-secondary pool-privacy-toggle" href="../poolParametros/"
+        title="Parámetros de POOLS" aria-label="Parámetros de POOLS">
+        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
+      </a>
       <button class="btn btn-outline-secondary pool-privacy-toggle" type="button" data-privacy-toggle
-        title="Mostrar informacion sensible" aria-label="Mostrar informacion sensible" aria-pressed="false">
+        title="Mostrar información sensible" aria-label="Mostrar información sensible" aria-pressed="false">
         <i class="fa-solid fa-eye-slash" aria-hidden="true"></i>
       </button>
     </div>
@@ -305,12 +324,12 @@ include __DIR__ . '/../../templates/header.php';
       <div class="modal-content">
         <form data-privacy-form>
           <div class="modal-header">
-            <h2 class="modal-title fs-5" id="poolPrivacyModalLabel">Mostrar informacion sensible</h2>
+            <h2 class="modal-title fs-5" id="poolPrivacyModalLabel">Mostrar información sensible</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
-            <p class="text-muted mb-3">Ingresa la contrasena de tu usuario para ver los totales vendidos y consumidos.</p>
-            <label class="form-label" for="poolPrivacyPassword">Contrasena</label>
+            <p class="text-muted mb-3">Ingresa la contraseña de tu usuario para ver los totales vendidos y consumidos.</p>
+            <label class="form-label" for="poolPrivacyPassword">Contraseña</label>
             <input class="form-control" id="poolPrivacyPassword" name="password" type="password"
               autocomplete="current-password" required>
             <div class="pool-privacy-feedback text-danger small mt-2" data-privacy-feedback role="alert"></div>
@@ -402,7 +421,7 @@ include __DIR__ . '/../../templates/header.php';
     }
 
     alert.className = `alert alert-${type}`;
-    alert.textContent = message || 'Ocurrio un problema inesperado. Intentalo nuevamente.';
+    alert.textContent = message || 'Ocurrió un problema inesperado. Inténtalo nuevamente.';
     alert.classList.remove('d-none');
     if (type !== 'danger') {
       setTimeout(() => alert.classList.add('d-none'), 3500);
@@ -427,7 +446,7 @@ include __DIR__ . '/../../templates/header.php';
     });
 
     if (!privacyToggle) return;
-    const label = visible ? 'Ocultar informacion sensible' : 'Mostrar informacion sensible';
+    const label = visible ? 'Ocultar información sensible' : 'Mostrar información sensible';
     privacyToggle.title = label;
     privacyToggle.setAttribute('aria-label', label);
     privacyToggle.setAttribute('aria-pressed', visible ? 'true' : 'false');
@@ -472,14 +491,14 @@ include __DIR__ . '/../../templates/header.php';
       node.dataset.id = turn.id;
       node.innerHTML = `
         <div>
-          <div class="pool-turn__name">${escapeHtml(turn.nombre)}</div>
+          <div class="pool-turn__name" data-inline-name tabindex="0" title="Click para editar nombre">${escapeHtml(turn.nombre)}</div>
           <div class="pool-turn__meta">Turno ${index + 1} · ${turn.fichas_total - turn.fichas_consumidas}/${turn.fichas_total} pendientes</div>
           <div class="pool-chips">${chipHtml(turn.fichas_total, turn.fichas_consumidas)}</div>
         </div>
         <div class="pool-actions">
           <div class="pool-actions__chips">
-            <button class="btn btn-sm pool-action pool-action--consume" data-action="consumir" title="Consumir ficha" aria-label="Consumir ficha"><i class="fa-solid fa-minus"></i></button>
-            <button class="btn btn-sm pool-action pool-action--restore" data-action="revertir" title="Revertir ficha" aria-label="Revertir ficha"><i class="fa-solid fa-plus"></i></button>
+            <button class="btn btn-sm pool-action pool-action--consume" data-action="consumir" title="Consumir ficha" aria-label="Consumir ficha"><i class="fa-solid fa-plus"></i></button>
+            <button class="btn btn-sm pool-action pool-action--restore" data-action="revertir" title="Revertir ficha" aria-label="Revertir ficha"><i class="fa-solid fa-minus"></i></button>
           </div>
           <div class="pool-actions__order">
             <button class="btn btn-outline-secondary btn-sm pool-action" data-action="arriba" title="Subir" aria-label="Subir turno"><i class="fa-solid fa-arrow-up"></i></button>
@@ -522,17 +541,17 @@ include __DIR__ . '/../../templates/header.php';
     try {
       response = await fetch(apiUrl, options);
     } catch (error) {
-      throw new Error('No pudimos conectar con el servidor. Verifica tu conexion e intentalo nuevamente.');
+      throw new Error('No pudimos conectar con el servidor. Verifica tu conexión e inténtalo nuevamente.');
     }
 
     let data;
     try {
       data = await response.json();
     } catch (error) {
-      throw new Error('Ocurrio un problema inesperado. Intentalo nuevamente.');
+      throw new Error('Ocurrió un problema inesperado. Inténtalo nuevamente.');
     }
 
-    if (!data.exito) throw new Error(data.mensaje || 'No se pudo completar la operacion.');
+    if (!data.exito) throw new Error(data.mensaje || 'No se pudo completar la operación.');
 
     if (data.privacidadAutorizada === true) {
       setSensitiveVisible(true);
@@ -588,6 +607,63 @@ include __DIR__ . '/../../templates/header.php';
     return parsed.toLocaleString('es-AR', { dateStyle: 'short', timeStyle: 'short' });
   }
 
+  function selectEditableText(element) {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+  }
+
+  function startInlineNameEdit(element) {
+    if (element.isContentEditable || element.dataset.saving === 'true') return;
+
+    const turn = element.closest('.pool-turn');
+    element.dataset.previousName = element.textContent.trim();
+    element.contentEditable = 'true';
+    element.classList.add('pool-turn__name--editing');
+    if (turn) {
+      element.dataset.wasDraggable = turn.draggable ? '1' : '0';
+      turn.draggable = false;
+    }
+    element.focus();
+    selectEditableText(element);
+  }
+
+  async function finishInlineNameEdit(element, save = true) {
+    if (!element.isContentEditable || element.dataset.saving === 'true') return;
+
+    const turn = element.closest('.pool-turn');
+    const previous = element.dataset.previousName || '';
+    const next = element.textContent.trim();
+    element.contentEditable = 'false';
+    element.classList.remove('pool-turn__name--editing');
+    if (turn && element.dataset.wasDraggable === '1') {
+      turn.draggable = true;
+    }
+    delete element.dataset.wasDraggable;
+
+    if (!save || next === '' || next === previous) {
+      element.textContent = previous;
+      return;
+    }
+
+    element.dataset.saving = 'true';
+    try {
+      await request({
+        accion: 'renombrar',
+        id: Number(turn?.dataset.id || 0),
+        nombre: next,
+      });
+    } catch (error) {
+      element.textContent = previous;
+      showAlert(error.message);
+    } finally {
+      delete element.dataset.saving;
+      delete element.dataset.previousName;
+    }
+  }
+
   privacyToggle?.addEventListener('click', () => {
     if (sensitiveVisible) {
       setSensitiveVisible(false);
@@ -628,6 +704,42 @@ include __DIR__ . '/../../templates/header.php';
     } finally {
       submitButton.disabled = false;
     }
+  });
+
+  shell.addEventListener('click', (event) => {
+    const editableName = event.target.closest('[data-inline-name]');
+    if (!editableName) return;
+    startInlineNameEdit(editableName);
+  });
+
+  shell.addEventListener('keydown', (event) => {
+    const editableName = event.target.closest('[data-inline-name]');
+    if (!editableName) return;
+
+    if (!editableName.isContentEditable && (event.key === 'Enter' || event.key === 'F2')) {
+      event.preventDefault();
+      startInlineNameEdit(editableName);
+      return;
+    }
+
+    if (!editableName.isContentEditable) return;
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      editableName.blur();
+      return;
+    }
+
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      finishInlineNameEdit(editableName, false);
+    }
+  });
+
+  shell.addEventListener('focusout', (event) => {
+    const editableName = event.target.closest('[data-inline-name]');
+    if (!editableName) return;
+    finishInlineNameEdit(editableName, true);
   });
 
   shell.addEventListener('click', async (event) => {

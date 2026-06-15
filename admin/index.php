@@ -42,6 +42,7 @@ if ($esAdminAutenticado) {
     try {
       require_once __DIR__ . '/bd.php';
       require_once __DIR__ . '/../app/Services/pool_schema.php';
+      require_once __DIR__ . '/../app/Services/bebidas_schema.php';
 
       $fechaInicio = date('Y-m-01');
       $fechaFin = date('Y-m-d 23:59:59');
@@ -55,7 +56,8 @@ if ($esAdminAutenticado) {
       $stmt->execute();
       $totalVentasTradicionales = (float)($stmt->fetchColumn() ?? 0);
       $totalVentasFichas = poolMontoVendidoEntreFechas($conexion, $fechaInicio, $fechaFin);
-      $metricasVentas['total_ventas'] = $totalVentasTradicionales + $totalVentasFichas;
+      $totalVentasBebidas = bebidaMontoVendidoEntreFechas($conexion, $fechaInicio, $fechaFin);
+      $metricasVentas['total_ventas'] = $totalVentasTradicionales + $totalVentasFichas + $totalVentasBebidas;
 
       $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos
           FROM tbl_pedidos p
@@ -124,10 +126,6 @@ if ($esAdminAutenticado) {
     background: var(--admin-btn-primary-bg);
   }
 
-  .btn-provider {
-    background: var(--admin-btn-info-bg);
-  }
-
   .btn-user {
     background: var(--admin-btn-success-bg);
   }
@@ -143,6 +141,10 @@ if ($esAdminAutenticado) {
 
   .btn-pool {
     background: var(--admin-btn-secondary-bg);
+  }
+
+  .btn-drinks {
+    background: var(--admin-btn-info-bg);
   }
 
   .welcome-box {
@@ -238,13 +240,6 @@ if ($esAdminAutenticado) {
       </div>
 
       <div class="col-md-3 col-lg-2">
-        <button class="quick-action btn-provider w-100" type="button">
-          <i class="fa-solid fa-clipboard-list" aria-hidden="true"></i>
-          Crear proveedor
-        </button>
-      </div>
-
-      <div class="col-md-3 col-lg-2">
         <button class="quick-action btn-user w-100" type="button">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Invitar usuario
@@ -272,6 +267,12 @@ if ($esAdminAutenticado) {
         </button>
       </div>
 
+      <div class="col-md-3 col-lg-2">
+        <button class="quick-action btn-drinks w-100" type="button">
+          <i class="fa-solid fa-glass-water" aria-hidden="true"></i>
+          Bebidas
+        </button>
+      </div>
 
 
     </div>
@@ -337,7 +338,7 @@ if ($esAdminAutenticado) {
               <i class="fa-solid fa-sack-dollar" aria-hidden="true"></i>
             </div>
           <h5 class="card-title">Total de ventas</h5>
-            <p class="text-muted small mb-2">Pedidos + venta de fichas</p>
+            <p class="text-muted small mb-2">Pedidos + fichas + bebidas</p>
             <p class="display-6 fw-bold text-success mb-0">
               $<?= number_format($metricasVentas['total_ventas'], 2); ?>
             </p>
@@ -398,16 +399,16 @@ if ($esAdminAutenticado) {
         path: 'seccion/menu/crear.php'
       },
       {
-        selector: '.btn-provider',
-        path: 'seccion/proveedores/crear.php'
-      },
-      {
         selector: '.btn-user',
         path: 'seccion/usuarios/crear.php'
       },
       {
         selector: '.btn-pool',
         path: 'seccion/pool/'
+      },
+      {
+        selector: '.btn-drinks',
+        path: 'seccion/bebidas/'
       }
     ];
 

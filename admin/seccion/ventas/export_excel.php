@@ -1,6 +1,7 @@
 <?php
 require("../../bd.php");
 require_once __DIR__ . '/../../../app/Services/pool_schema.php';
+require_once __DIR__ . '/../../../app/Services/bebidas_schema.php';
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -27,7 +28,8 @@ $stmt = $conexion->prepare("SELECT SUM(pd.precio * pd.cantidad) AS total_ventas
 $stmt->execute([':inicio' => $fecha_inicio, ':fin' => $fecha_fin]);
 $total_ventas_tradicionales = (float) ($stmt->fetch(PDO::FETCH_ASSOC)['total_ventas'] ?? 0);
 $total_ventas_fichas = poolMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
-$total_ventas = $total_ventas_tradicionales + $total_ventas_fichas;
+$total_ventas_bebidas = bebidaMontoVendidoEntreFechas($conexion, $fecha_inicio, $fecha_fin);
+$total_ventas = $total_ventas_tradicionales + $total_ventas_fichas + $total_ventas_bebidas;
 
 $stmt = $conexion->prepare("SELECT COUNT(*) AS total_pedidos FROM tbl_pedidos WHERE fecha BETWEEN :inicio AND :fin");
 $stmt->execute([':inicio' => $fecha_inicio, ':fin' => $fecha_fin]);
@@ -63,6 +65,7 @@ $metricas = [
     ['Total Ventas', $total_ventas],
     ['Ventas tradicionales', $total_ventas_tradicionales],
     ['Venta de fichas', $total_ventas_fichas],
+    ['Venta de bebidas', $total_ventas_bebidas],
     ['Total Pedidos', $total_pedidos],
     ['Producto Mas Vendido', ($producto_mas_vendido['nombre'] ?? 'N/A') . ' (' . ($producto_mas_vendido['total_vendido'] ?? 0) . ')'],
 ];
