@@ -1,170 +1,151 @@
-Piccolo Burgers 🍔✨
+# Piccolo Burgers 🍔
 
-👥 **Usuarios de prueba**
+Sistema web para una hamburguesería: un **sitio de pedidos online** con programa de puntos para los clientes y un **panel de administración** para gestionar el día a día del local, desde el menú y el stock hasta la cocina, el delivery y los reportes.
 
-* 👤 **Usuario:** Cliente (📱 teléfono `0000825022`, código +54) | 🔑 **Clave:** Cliente1! – Perfil pensado para simular la experiencia completa de un comensal fidelizado.
-* 👤 **Usuario:** Usuario | 🔑 **Clave:** Usuario1! – Rol administrativo con todos los permisos habilitados para gestión diaria.
-* 👤 **Usuario:** Delivery | 🔑 **Clave:** Delivery1! – Rol de reparto: solo ve el panel de delivery.
+![PHP](https://img.shields.io/badge/PHP-8.2+-777BB4?logo=php&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES2020-F7DF1E?logo=javascript&logoColor=black)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
+![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white)
 
----------------
+![Inicio del sitio](docs/capturas/inicio.png)
 
-📖 **Descripción**
-Piccolo Burgers es un sistema web completo pensado para optimizar tanto la experiencia de los **clientes** como la **gestión interna** de un restaurante de comida rápida.
-Combina un **sitio público** de alto impacto visual con un **panel administrativo** robusto que centraliza el catálogo, los pedidos y la relación con los clientes. La plataforma fue diseñada para pequeños y medianos negocios gastronómicos que necesitan vender en línea, ofrecer programas de fidelidad y disponer de métricas accionables sin depender de múltiples herramientas.
+---
 
+## Funcionalidades
 
-  <img width="1835" height="814" alt="image" src="https://github.com/user-attachments/assets/7b501577-a378-4fce-9680-8c07317c5675" />
+### Para los clientes
 
----------------
+- **Menú online** con búsqueda inteligente (por ejemplo, "gaseosa" muestra las bebidas), filtro por categoría y stock disponible en tiempo real.
+- **Carrito que reserva el stock** mientras el cliente arma su pedido, así dos personas no compran el último producto al mismo tiempo.
+- **Pedido online** con retiro en el local o delivery y elección del medio de pago.
+- **Programa de puntos:** cada compra suma puntos, que se canjean como descuento en los pedidos siguientes.
+- **Cuenta del cliente:** registro, perfil editable, historial de pedidos con su estado y recuperación de contraseña por email.
+- **Formulario de contacto**, testimonios y ubicación del local.
 
-✨ **Características principales**
+| Menú con búsqueda y filtros | Carrito con stock reservado |
+|---|---|
+| ![Menú del sitio](docs/capturas/menu.png) | ![Carrito](docs/capturas/carrito.png) |
 
-🔹 **Sitio público (clientes)**
+### Para el local (panel de administración)
 
-* 📝 **Registro** e inicio de sesión de clientes con verificación por correo electrónico.
-* 🍟 **Visualización del menú** con categorías, combos destacados y filtros por tipo de producto.
-* ⭐ **Acumulación de puntos de fidelidad**, canje de recompensas y consulta de historial de compras.
-* 💳 **Checkout guiado** con cálculo de totales y envío automático de confirmaciones vía email.
-* 👤 **Perfil de usuario**, testimonios, reseñas y horarios de atención totalmente administrables.
+- **Pedidos en tiempo real:** panel de cocina con los pedidos en preparación y panel de delivery con los envíos y su ubicación en el mapa.
+- **Menú y stock:** productos con foto y precio, materias primas, insumos que usa cada producto, proveedores y compras. La disponibilidad del menú se calcula según los insumos en stock.
+- **Clientes y fidelización:** ficha de cada cliente, canje de puntos por descuentos o premios, y configuración del valor de los puntos.
+- **Pool y bebidas:** turnos de las mesas de pool, venta de fichas y jarras por jornada, con cierre de caja y estadísticas.
+- **Reportes:** ventas y estadísticas con gráficos, exportables a PDF y Excel.
+- **Contenido del sitio:** banners, testimonios y mensajes de contacto.
+- **Usuarios con roles** (administración, empleado y delivery): cada uno ve solo lo que necesita para su trabajo.
 
+| Inicio del panel | Reporte de ventas |
+|---|---|
+| ![Panel de administración](docs/capturas/panel.png) | ![Reporte de ventas](docs/capturas/ventas.png) |
 
-  <img width="1842" height="826" alt="image" src="https://github.com/user-attachments/assets/d8883206-8405-4486-ab52-06807ba35957" />
-  
-  <img width="1858" height="825" alt="image" src="https://github.com/user-attachments/assets/c328f2fb-8ce9-48d6-953a-08f9ba06b5a5" />
+---
 
+## Arquitectura
 
-
-🔹 **Panel de administración**
-
-* 📦 **Gestión de productos**: agregar, editar o eliminar artículos del menú con fotos, precios y estado.
-* 👥 **Administración de usuarios** con niveles de permiso para recepcionistas, gerentes y marketing.
-* 🖼️ **Cambio de banners**, control de promociones y publicación de testimonios destacados.
-* 💬 **Revisión de comentarios** y moderación de reseñas antes de mostrarlas en el sitio público.
-* ⏱️ **Monitorización de pedidos en tiempo real** con estados (En preparación, Listo, Cancelado) y registro de tiempos promedio.
-* 📈 **Reportes automáticos** en PDF/Excel sobre ventas, pedidos y desempeño de productos.
-
-
-  <img width="1863" height="493" alt="image" src="https://github.com/user-attachments/assets/aa595fb4-e0fb-444d-ba89-717a0d161d17" />
-  
-  <img width="1848" height="716" alt="image" src="https://github.com/user-attachments/assets/956a857f-8460-4a7e-aedd-51b1f71a0e58" />
-
-
----------------
-
-🛠️ **Tecnologías empleadas**
-
-* 💻 **PHP 8.1** (aplicación principal siguiendo arquitectura MVC ligera)
-* 🎨 **HTML5 / CSS3 / Bootstrap 5** para la capa de presentación adaptable a móviles.
-* ⚙️ **JavaScript (ES6)** y **AJAX** para interacciones dinámicas sin recargar la página.
-* 🗄️ **MySQL 8** (base de datos relacional optimizada con índices por producto y cliente).
-* 📦 **Composer** (gestión de dependencias):
-
-  * 📑 dompdf/dompdf (generación de tickets y reportes en PDF)
-  * 📊 phpoffice/phpspreadsheet (exportaciones a Excel)
-  * 📧 phpmailer/phpmailer (envío de notificaciones y recuperaciones de contraseña)
-
----------------
-
-📋 **Requisitos previos**
-
-* 🖥️ **PHP:** 8.1 o superior con extensiones mysqli, intl y mbstring activas.
-* 🗄️ **MySQL:** 8.0 o superior.
-* 🌐 **Apache:** 2.4 o superior con mod_rewrite habilitado.
-* 📦 **Composer:** 2.x
-
-💡 Se recomienda instalar **XAMPP** o **Laragon** que incluyan Apache, PHP y MySQL.
-
----------------
-
-🚀 **Instalación en otra PC**
-1️⃣ Instalar XAMPP (o similar con Apache, PHP y MySQL).
-2️⃣ Clonar o descargar el repositorio:
-   ```bash
-   git clone https://github.com/<usuario>/piccoloBurgers.git
-   ```
-3️⃣ Instalar dependencias (desde la carpeta `backend/`):
-   ```bash
-   cd backend
-   composer install
-   ```
-4️⃣ Mover el proyecto a la ruta del servidor web:
-
-* 🪟 Windows: `C:\xampp\htdocs\piccoloBurgers`
-* 🐧 Linux/Mac: `/opt/lampp/htdocs/piccoloBurgers`
-
-5️⃣ Crear base de datos en MySQL:
-* Iniciar Apache y MySQL.
-* Acceder a [http://localhost/phpmyadmin](http://localhost/phpmyadmin) y crear base de datos **piccolodb**.
-* Importar **backend/database/piccolodb.sql**.
-
-6️⃣ Configurar credenciales y ajustes:
-* Copiar `backend/.env.example` como `backend/.env.local` y completar MySQL (`MYSQL_*`) y correo (`MAILER_*`).
-* `backend/config/config.php` – modo desarrollo; `backend/config/mailer.php` – configuración de PHPMailer.
-
-7️⃣ Acceder al sitio:
-* 🌍 Sitio: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
-* 🔐 Admin: [http://localhost/piccoloBurgers/backend/public/admin/](http://localhost/piccoloBurgers/backend/public/admin/)
-
-🐳 **Con Docker** (desde la raíz del proyecto):
-
-```bash
-docker compose up -d --build
-```
-
-* 🌍 Sitio: [http://localhost:8080/](http://localhost:8080/)
-* 🔐 Admin: [http://localhost:8080/admin/](http://localhost:8080/admin/)
-* 🗄️ phpMyAdmin: [http://localhost:8081/](http://localhost:8081/)
-
----------------
-
-📖 **Uso básico**
-
-* 👤 **Clientes:** registrarse o iniciar sesión, navegar el menú, añadir productos al carrito y confirmar el pedido.
-* 👨‍💼 **Administradores:** gestionar productos, usuarios y pedidos en /admin, generar reportes y actualizar promociones.
-
-
-  <img width="915" height="740" alt="image" src="https://github.com/user-attachments/assets/f48f8585-0f4f-4ecb-8deb-3a96bf66c465" />
-
-
----------------
-
-🌐 **Consideraciones para despliegue**
-
-* 🔑 Actualizar credenciales de base de datos en servidores remotos y variables de entorno sensibles.
-* ✍️ Verificar permisos de escritura en directorios de PDFs, exports y carga de imágenes.
-* 🔄 Mantener dependencias al día con `composer update` y programar respaldos automáticos.
-* 🧾 Configurar certificados SSL y dominio personalizado para una experiencia de compra segura.
-
----------------
-
-📌 **Estado del proyecto**
-🧪 **Prototipo avanzado** – Funcional y demostrativo, preparado para integrarse con pasarelas de pago y módulos de delivery externos.
-
----------------
-## Arquitectura actual
-
-El proyecto está dividido en dos partes que se pueden desplegar por separado:
+El sistema está dividido en dos partes independientes, que se pueden publicar por separado:
 
 ```
-piccoloBurgers/
-├── frontend/            sitio de clientes: HTML, CSS y JavaScript, sin PHP ni base de datos
-│   ├── public/          las páginas del sitio
-│   └── Dockerfile       servidor Nginx que también reenvía la API y el panel al backend
-├── backend/             API, panel de administración, lógica de negocio y base de datos
-│   ├── public/          lo único accesible desde el navegador: api/v1, admin/ e img/
-│   ├── src/             código PHP: API, panel y reglas de negocio
-│   ├── views/admin/     plantillas del panel
-│   └── ...              config/, database/, tests/, Dockerfile
-├── docs/                documentación de la API y del proceso de reestructuración
-└── docker-compose.yml   levanta frontend, backend, MySQL y phpMyAdmin
-```
-
-```
-Navegador ──▶ frontend (Nginx) ──▶ páginas del sitio
+Navegador ──▶ frontend (Nginx) ──▶ sitio de clientes (HTML, CSS y JavaScript)
                      │
                      └── /api, /admin, /img ──▶ backend (PHP + Apache) ──▶ MySQL
 ```
 
-- El **frontend** obtiene todos los datos de la **API JSON** del backend (`/api/v1`), documentada en [`docs/API.md`](docs/API.md).
-- El **backend** también sirve el **panel de administración** en `/admin/`.
-- Cada carpeta tiene su propio README con los detalles.
+- **Frontend** (`frontend/`): el sitio de clientes es una aplicación estática que obtiene todos los datos de la API. No necesita PHP ni acceso a la base de datos.
+- **Backend** (`backend/`): una **API REST en JSON** (`/api/v1`) con el menú, el carrito, los pedidos y las cuentas de clientes, más el panel de administración. Solo la carpeta `public/` es accesible desde el navegador.
+- **Docker Compose** levanta todo con un comando: el frontend en Nginx, que también reenvía la API y el panel al backend, y el backend en Apache con MySQL.
+
+La API está documentada con ejemplos en [`docs/API.md`](docs/API.md).
+
+## Tecnologías
+
+| Parte | Tecnologías |
+|---|---|
+| Frontend | HTML5, CSS3, JavaScript con módulos nativos, Bootstrap 5, Nginx |
+| Backend | PHP 8.2+, API REST propia, Apache, Composer |
+| Base de datos | MySQL 8 |
+| Librerías | Dompdf (PDF), PhpSpreadsheet (Excel), PHPMailer (emails), Chart.js y DataTables (panel) |
+| Infraestructura | Docker y Docker Compose |
+
+## Seguridad
+
+- **Permisos por rol en el servidor:** cada pantalla del panel verifica el rol desde una única tabla de permisos; lo que no está permitido explícitamente solo lo ve un administrador.
+- **Protección CSRF** en todos los formularios y acciones del panel, y en la API (solo acepta JSON).
+- **Contraseñas con bcrypt**, límite de intentos de inicio de sesión y cierre de sesión por inactividad.
+- **Precios calculados en el servidor:** el total de un pedido nunca depende de lo que envía el navegador.
+- **Cabeceras de seguridad** (Content-Security-Policy, X-Frame-Options, etc.) y configuración sensible fuera del código, en variables de entorno.
+
+---
+
+## Probarlo
+
+### Con Docker (recomendado)
+
+```bash
+git clone https://github.com/yasheyxs/piccoloBurgers.git
+cd piccoloBurgers
+cp backend/.env.example backend/.env    # completar usuario y contraseña de MySQL
+docker compose up -d --build
+```
+
+| | Dirección |
+|---|---|
+| Sitio | http://localhost:8080 |
+| Panel de administración | http://localhost:8080/admin/ |
+| phpMyAdmin | http://localhost:8081 |
+
+La base de datos se crea sola con datos de ejemplo la primera vez.
+
+### Con XAMPP
+
+1. Copiar el proyecto en `C:\xampp\htdocs\piccoloBurgers` (o `/opt/lampp/htdocs/piccoloBurgers`).
+2. Crear la base `piccolodb` e importar `backend/database/piccolodb.sql`.
+3. Copiar `backend/.env.example` como `backend/.env.local` y completar los datos de MySQL (con XAMPP, `MYSQL_HOST=127.0.0.1`).
+4. Entrar a http://localhost/piccoloBurgers/ (sitio) y http://localhost/piccoloBurgers/backend/public/admin/ (panel).
+
+Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd` y `zip`, MySQL 8 y Apache con `mod_rewrite`.
+
+### Usuarios de prueba
+
+| Dónde | Usuario | Contraseña | Rol |
+|---|---|---|---|
+| Sitio | Teléfono `0000825022` (código +54) | `Cliente1!` | Cliente con puntos acumulados |
+| Panel | `Usuario` | `Usuario1!` | Administración: acceso completo |
+| Panel | `Delivery` | `Delivery1!` | Delivery: solo el panel de envíos |
+
+### Pruebas automáticas
+
+```bash
+php backend/tests/ApiTest.php http://localhost:8080/api/v1
+PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
+php backend/tests/ValidarTelefonoTest.php
+```
+
+- `ApiTest` recorre la API como un cliente: menú, carrito, registro, pedido, historial y sesión.
+- `PanelPermisosTest` entra al panel con cada rol y verifica a qué secciones puede acceder.
+
+---
+
+## Estructura del repositorio
+
+```
+piccoloBurgers/
+├── frontend/              sitio de clientes
+│   ├── public/            páginas, estilos, scripts e imágenes
+│   └── Dockerfile         imagen de Nginx
+├── backend/
+│   ├── public/            lo único expuesto: api/v1, admin/ e img/
+│   ├── src/               API, panel y reglas de negocio
+│   ├── views/admin/       plantillas del panel
+│   ├── config/            configuración y permisos del panel
+│   ├── database/          base de datos de ejemplo
+│   ├── tests/             pruebas automáticas
+│   └── Dockerfile         imagen de PHP + Apache
+├── docs/API.md            documentación de la API
+└── docker-compose.yml     entorno completo
+```
+
+Cada parte tiene su propio README con más detalles: [`frontend/`](frontend/README.md) y [`backend/`](backend/README.md).
