@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../componentes/validar_telefono.php';
+require_once __DIR__ . '/../app/Services/Security/validar_telefono.php';
 
 function assertCondition(bool $condition, string $message): void
 {
