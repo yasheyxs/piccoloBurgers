@@ -57,6 +57,7 @@ $router->post('/cuenta/registro', [$cuenta, 'registrar']);
 $router->post('/cuenta/login', [$cuenta, 'iniciarSesion']);
 $router->post('/cuenta/logout', [$cuenta, 'cerrarSesion']);
 $router->get('/cuenta', [$cuenta, 'ver']);
+$router->get('/cuenta/sesion', [$cuenta, 'sesion']);
 $router->put('/cuenta', [$cuenta, 'actualizar']);
 $router->put('/cuenta/password', [$cuenta, 'cambiarPassword']);
 $router->post('/cuenta/recuperar', [$cuenta, 'recuperar']);

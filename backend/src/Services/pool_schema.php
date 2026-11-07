@@ -161,8 +161,8 @@ if (!function_exists('poolFechaDbAFechaApp')) {
             return null;
         }
 
-        $dbTimezoneId = getenv('DB_TIMEZONE') ?: getenv('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
-        $appTimezoneId = getenv('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
+        $dbTimezoneId = piccolo_env('DB_TIMEZONE') ?: piccolo_env('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
+        $appTimezoneId = piccolo_env('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
 
         try {
             $dbTimezone = new DateTimeZone($dbTimezoneId);

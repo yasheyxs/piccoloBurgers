@@ -36,7 +36,7 @@ final class Cors
     /** @return string[] */
     private static function origenesPermitidos(): array
     {
-        $valor = (string) (getenv('FRONTEND_URL') ?: '');
+        $valor = (string) (piccolo_env('FRONTEND_URL') ?: '');
 
         return array_values(array_filter(array_map(
             static fn($origen) => rtrim(trim($origen), '/'),

@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Confirmar Pedido - Piccolo Burgers</title>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/custom.css">
+  <link rel="stylesheet" href="assets/css/confirmar_pedido.css">
+  <link rel="stylesheet" href="assets/css/componentes.css">
+</head>
+
+<body>
+
+  <main class="container mt-5">
+    <div class="d-flex justify-content-end mb-3">
+      <a class="btn btn-gold" href="carrito.html"><i class="fas fa-chevron-left" aria-hidden="true"></i> Volver</a>
+    </div>
+    <h2 class="mb-4 text-center">Confirmar Pedido</h2>
+
+    <p class="estado-vacio" id="cargando">
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>Cargando tu pedido...
+    </p>
+
+    <div class="estado-vacio" id="carrito-vacio" hidden>
+      <p class="fs-5 mb-3"><i class="fas fa-shopping-basket me-2" aria-hidden="true"></i>Tu carrito está vacío.</p>
+      <a href="index.html#menu" class="btn btn-gold">Ver el menú</a>
+    </div>
+
+    <section class="resumen-pedido mb-4" id="resumen-pedido" aria-labelledby="resumen-titulo" hidden>
+      <h3 class="form-label fs-5" id="resumen-titulo">Tu pedido</h3>
+      <ul class="list-group mb-2" id="resumen-productos"></ul>
+      <div class="text-end" id="resumen-totales"></div>
+    </section>
+
+    <form id="form-pedido" hidden>
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre completo:</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" required maxlength="120" autocomplete="name">
+      </div>
+
+      <div class="mb-3">
+        <label for="telefono" class="form-label">Teléfono (obligatorio):</label>
+        <div class="telefono-group">
+          <select class="form-control" id="codigo_pais" name="codigoPais" required aria-label="Código de país">
+            <option value="54" title="Argentina" selected>🇦🇷 +54</option>
+            <option value="598" title="Uruguay">🇺🇾 +598</option>
+            <option value="55" title="Brasil">🇧🇷 +55</option>
+            <option value="56" title="Chile">🇨🇱 +56</option>
+            <option value="595" title="Paraguay">🇵🇾 +595</option>
+            <option value="591" title="Bolivia">🇧🇴 +591</option>
+            <option value="51" title="Perú">🇵🇪 +51</option>
+            <option value="1" title="Estados Unidos">🇺🇸 +1</option>
+            <option value="34" title="España">🇪🇸 +34</option>
+          </select>
+          <input type="tel" class="form-control" id="telefono" name="telefono" required inputmode="numeric"
+            autocomplete="tel-national" placeholder="Ej: 3511234567">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email:</label>
+        <input type="email" class="form-control" id="email" name="email" maxlength="160" autocomplete="email">
+      </div>
+
+      <div class="mb-3">
+        <label for="nota" class="form-label">Nota para el pedido:</label>
+        <textarea class="form-control" id="nota" name="nota" rows="3" maxlength="500"></textarea>
+      </div>
+
+      <fieldset class="mb-4">
+        <legend class="form-label d-block mb-3 fw-bold fs-5">Método de pago:</legend>
+
+        <input type="radio" class="form-check-input" id="pago_efectivo" name="metodoPago" value="Efectivo" required checked>
+        <label class="radio-card" for="pago_efectivo"><i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i>Efectivo</label>
+
+        <input type="radio" class="form-check-input" id="pago_tarjeta" name="metodoPago" value="Tarjeta">
+        <label class="radio-card" for="pago_tarjeta"><i class="fa-solid fa-credit-card me-2" aria-hidden="true"></i>Tarjeta</label>
+
+        <input type="radio" class="form-check-input" id="pago_mp" name="metodoPago" value="MercadoPago">
+        <label class="radio-card" for="pago_mp"><i class="fa-solid fa-mobile-screen-button me-2" aria-hidden="true"></i>Mercado Pago</label>
+      </fieldset>
+
+      <fieldset class="mb-4">
+        <legend class="form-label d-block mb-3 fw-bold fs-5">Tipo de entrega:</legend>
+
+        <input type="radio" class="form-check-input" id="entrega_retiro" name="tipoEntrega" value="Retiro" required checked>
+        <label class="radio-card" for="entrega_retiro"><i class="fa-solid fa-store me-2" aria-hidden="true"></i>Retiro en el local</label>
+
+        <input type="radio" class="form-check-input" id="entrega_delivery" name="tipoEntrega" value="Delivery">
+        <label class="radio-card" for="entrega_delivery"><i class="fa-solid fa-motorcycle me-2" aria-hidden="true"></i>Delivery</label>
+
+        <div class="alert alert-warning mt-3 aviso-delivery" id="aviso-delivery" hidden>
+          <i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>El servicio de delivery tiene un costo adicional de entre
+          <strong>$1000</strong> y <strong>$1500</strong>, dependiendo de la zona.
+        </div>
+      </fieldset>
+
+      <div class="mb-3" id="grupo-direccion" hidden>
+        <label for="direccion" class="form-label">Dirección:</label>
+        <input type="text" class="form-control" id="direccion" name="direccion" maxlength="255" autocomplete="street-address">
+      </div>
+
+      <div class="mb-3" id="grupo-referencias" hidden>
+        <label for="referencias" class="form-label">Referencias (opcional):</label>
+        <input type="text" class="form-control" id="referencias" name="referencias" maxlength="255"
+          placeholder="Frente al parque, puerta negra, piso 2">
+      </div>
+
+      <div data-mensaje hidden role="alert"></div>
+
+      <button type="submit" class="btn btn-gold w-100" id="btn-enviar">Enviar Pedido</button>
+    </form>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="assets/js/pages/confirmar-pedido.js"></script>
+</body>
+
+</html>

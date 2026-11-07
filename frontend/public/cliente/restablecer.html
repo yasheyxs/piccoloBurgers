@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nueva contraseña - Piccolo Burgers</title>
+  <meta name="description" content="Creá una nueva contraseña para tu cuenta de Piccolo Burgers.">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+
+<body data-raiz="../">
+
+  <main class="auth">
+    <div class="auth-imagen" aria-hidden="true"></div>
+
+    <div class="auth-panel">
+      <div class="auth-form">
+        <h1>Nueva contraseña</h1>
+
+        <!-- Resultado final: enlace inválido, vencido o contraseña actualizada -->
+        <div id="estado" class="text-center" aria-live="polite" hidden>
+          <div id="estado-mensaje" class="alert" role="status"></div>
+          <a id="estado-enlace" class="btn btn-gold mt-2" href="login.html"></a>
+        </div>
+
+        <form id="form-restablecer" novalidate>
+          <p class="auth-intro">Elegí una contraseña nueva para tu cuenta.</p>
+
+          <div data-mensaje aria-live="polite" hidden></div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Nueva contraseña:</label>
+            <div class="input-group">
+              <input type="password" id="password" name="password" class="form-control" autocomplete="new-password"
+                aria-describedby="requisitos-password" required>
+              <button type="button" class="btn btn-ver-password" data-ver-password="password" aria-label="Mostrar contraseña" aria-pressed="false">
+                <i class="fas fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+            <ul id="requisitos-password" class="requisitos-password">
+              <li data-requisito="largo">Al menos 8 caracteres</li>
+              <li data-requisito="mayuscula">Una mayúscula</li>
+              <li data-requisito="minuscula">Una minúscula</li>
+              <li data-requisito="numero">Un número</li>
+              <li data-requisito="simbolo">Un símbolo (por ejemplo ! # $ %)</li>
+            </ul>
+          </div>
+
+          <div class="mb-3">
+            <label for="confirmar" class="form-label">Confirmar contraseña:</label>
+            <div class="input-group">
+              <input type="password" id="confirmar" name="confirmar" class="form-control" autocomplete="new-password" required>
+              <button type="button" class="btn btn-ver-password" data-ver-password="confirmar" aria-label="Mostrar contraseña" aria-pressed="false">
+                <i class="fas fa-eye" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-gold mt-3">Actualizar contraseña</button>
+        </form>
+
+        <div class="auth-enlaces">
+          <a href="../index.html" class="btn btn-volver">← Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../assets/js/pages/restablecer.js"></script>
+</body>
+
+</html>

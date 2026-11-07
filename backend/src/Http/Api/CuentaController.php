@@ -99,6 +99,18 @@ final class CuentaController
         Respuesta::ok(null);
     }
 
+    /** GET /cuenta/sesion — el cliente con sesión iniciada, o null (sin error) si no hay sesión. */
+    public function sesion(Peticion $peticion): void
+    {
+        $sesion = Sesion::cliente();
+        if ($sesion === null) {
+            Respuesta::ok(null);
+            return;
+        }
+
+        $this->ver($peticion);
+    }
+
     /** GET /cuenta */
     public function ver(Peticion $peticion): void
     {
@@ -258,7 +270,7 @@ final class CuentaController
     private function enviarCorreoRecuperacion(string $email, string $nombre, string $token): void
     {
         // Mientras no exista la pantalla en el frontend, el enlace usa la del sitio actual.
-        $base = (string) (getenv('RESET_PASSWORD_URL') ?: \piccolo_admin_base_url() . 'password/reset_password.php');
+        $base = (string) (piccolo_env('RESET_PASSWORD_URL') ?: \piccolo_admin_base_url() . 'password/reset_password.php');
         $enlace = $base . (str_contains($base, '?') ? '&' : '?') . http_build_query(['token' => $token, 'tipo' => 'cliente']);
 
         try {

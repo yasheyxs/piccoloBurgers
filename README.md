@@ -143,11 +143,11 @@ piccoloBurgers/
 │   ├── src/     código PHP: arranque, controladores y reglas de negocio
 │   ├── views/   plantillas del sitio y del panel
 │   └── ...      config/, database/, tests/, Dockerfile, docker-compose.yml
-├── frontend/    futuro sitio de clientes independiente (HTML, CSS y JS)
+├── frontend/    sitio de clientes independiente (HTML, CSS y JS) que usa la API del backend
 └── docs/        documentación y plan de reestructuración
 ```
 
-Cada carpeta tiene su propio README. Hoy el sitio de clientes todavía se genera desde PHP dentro de `backend/`; el paso a `frontend/` está planificado en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).
+Cada carpeta tiene su propio README. El sitio de clientes nuevo vive en `frontend/` (con XAMPP: [http://localhost/piccoloBurgers/frontend/public/](http://localhost/piccoloBurgers/frontend/public/)); la versión anterior en PHP dentro de `backend/` sigue funcionando hasta terminar la migración planificada en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).
 
 El backend ya expone una **API JSON** (`/api/v1`) con el menú, el carrito, los pedidos y la cuenta del cliente, que es la que va a usar el nuevo frontend. Está documentada en [`docs/API.md`](docs/API.md).
 

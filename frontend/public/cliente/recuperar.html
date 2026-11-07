@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recuperar contraseña - Piccolo Burgers</title>
+  <meta name="description" content="Pedí un enlace para crear una nueva contraseña de tu cuenta de Piccolo Burgers.">
+  <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <link rel="stylesheet" href="../assets/css/auth.css">
+</head>
+
+<body data-raiz="../">
+
+  <main class="auth">
+    <div class="auth-imagen" aria-hidden="true"></div>
+
+    <div class="auth-panel">
+      <form id="form-recuperar" class="auth-form" novalidate>
+        <h1>Recuperar contraseña</h1>
+
+        <div data-mensaje aria-live="polite" hidden></div>
+
+        <div class="mb-3">
+          <label for="email" class="form-label">Correo electrónico registrado:</label>
+          <input type="email" id="email" name="email" class="form-control" placeholder="ejemplo@correo.com"
+            maxlength="160" autocomplete="email" aria-describedby="ayuda-email" required>
+          <div id="ayuda-email" class="form-text">
+            Te vamos a enviar un enlace a este correo para que puedas crear una nueva contraseña.
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-gold mt-3">Enviar enlace de recuperación</button>
+
+        <div class="auth-enlaces">
+          <p><a href="login.html">Volver al login</a></p>
+          <a href="../index.html" class="btn btn-volver">← Volver al inicio</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../assets/js/pages/recuperar.js"></script>
+</body>
+
+</html>

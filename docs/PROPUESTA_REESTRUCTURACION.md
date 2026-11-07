@@ -2,7 +2,9 @@
 
 > Objetivo: dejar el proyecto organizado en **dos carpetas principales, `frontend/` y `backend/`**, que se puedan **desplegar por separado**, que sean fáciles de navegar y **sin romper funcionalidades** durante la migración.
 
-**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fase 2 ✅ · Fases 3 y 4 pendientes.
+**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fase 2 ✅ · Fase 3 ✅ · Fase 4 pendiente.
+
+En la Fase 3 el frontend quedó como HTML, CSS y JavaScript con módulos nativos del navegador (sin paso de compilación), y el carrito pasó a guardarse en el servidor en lugar del navegador. Las páginas viejas en PHP siguen funcionando hasta la Fase 4.
 
 En la Fase 2 la API quedó con una única entrada (`backend/public/api/v1/index.php`) y rutas limpias como `GET /api/v1/menu`, en lugar de un archivo PHP por endpoint. La documentación está en [`API.md`](API.md).
 

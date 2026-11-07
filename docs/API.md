@@ -136,7 +136,8 @@ Historial de pedidos del cliente, del más nuevo al más viejo, con `estado`, `p
 | `POST /cuenta/registro` | `nombre, codigoPais, telefono, email, password, confirmar` | Crea la cuenta y deja la sesión iniciada |
 | `POST /cuenta/login` | `codigoPais, telefono, password` | Inicia sesión |
 | `POST /cuenta/logout` | `{}` | Cierra sesión |
-| `GET /cuenta` | | Datos del cliente con sesión iniciada |
+| `GET /cuenta` | | Datos del cliente con sesión iniciada (401 si no hay sesión) |
+| `GET /cuenta/sesion` | | Igual que el anterior, pero sin sesión devuelve `null` en lugar de un error. Útil para saber si mostrar "Iniciar sesión" |
 | `PUT /cuenta` | `nombre, codigoPais, telefono, email` | Actualiza los datos |
 | `PUT /cuenta/password` | `actual, nueva, confirmar` | Cambia la contraseña |
 | `POST /cuenta/recuperar` | `email` | Envía por mail un enlace para crear una nueva contraseña (vence en 30 minutos) |

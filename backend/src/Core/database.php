@@ -51,8 +51,8 @@ $requiredEnv = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER'];
 $configuracion = [];
 
 foreach ($requiredEnv as $variable) {
-    $valor = getenv($variable);
-    if ($valor === false || $valor === '') {
+    $valor = piccolo_env($variable);
+    if ($valor === null || $valor === '') {
         piccolo_finalizar_por_error_bd(
             'Configuración de base de datos incompleta. Falta la variable de entorno ' . $variable,
             'Error de configuración de la base de datos'
@@ -61,14 +61,14 @@ foreach ($requiredEnv as $variable) {
     $configuracion[$variable] = $valor;
 }
 
-$passwordEnv = getenv('MYSQL_PASSWORD');
-$configuracion['MYSQL_PASSWORD'] = $passwordEnv === false ? '' : $passwordEnv;
+$passwordEnv = piccolo_env('MYSQL_PASSWORD');
+$configuracion['MYSQL_PASSWORD'] = $passwordEnv ?? '';
 
 $servidor    = $configuracion['MYSQL_HOST'];
 $baseDatos   = $configuracion['MYSQL_DATABASE'];
 $usuario     = $configuracion['MYSQL_USER'];
 $contrasenia = $configuracion['MYSQL_PASSWORD'];
-$puerto      = getenv('MYSQL_PORT') ?: '3306';
+$puerto      = piccolo_env('MYSQL_PORT') ?: '3306';
 
 try {
     $dsn = "mysql:host={$servidor};port={$puerto};dbname={$baseDatos};charset=utf8mb4";

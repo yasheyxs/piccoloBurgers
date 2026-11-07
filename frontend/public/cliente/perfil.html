@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mi perfil - Piccolo Burgers</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="../img/favicon.svg" type="image/svg+xml">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/custom.css">
+  <link rel="stylesheet" href="../assets/css/componentes.css">
+  <link rel="stylesheet" href="../assets/css/perfil.css">
+</head>
+
+<body data-raiz="../">
+
+  <main class="container mt-5 pt-4 pb-5">
+    <div id="perfil-error" class="alert alert-danger" role="alert" hidden></div>
+
+    <div id="aviso-email" class="alert alert-warning text-dark fw-semibold" role="alert" hidden>
+      <i class="fa-solid fa-triangle-exclamation me-2" aria-hidden="true"></i>
+      Tu cuenta todavía no tiene un email. Agregalo para recibir avisos de tus pedidos y poder recuperar tu contraseña.
+      <div class="mt-2 fw-normal">
+        <button type="button" class="btn btn-dark btn-sm me-2" data-bs-toggle="modal" data-bs-target="#modalEditarCliente">Agregar email</button>
+        Si no querés actualizarlo ahora, podés
+        <a href="#" class="alert-link" data-bs-toggle="modal" data-bs-target="#logoutModal">cerrar sesión</a>.
+      </div>
+    </div>
+
+    <section aria-labelledby="titulo-perfil">
+      <h2 id="titulo-perfil" class="mb-4 text-center perfil-titulo">
+        <i class="fa-solid fa-user me-2" aria-hidden="true"></i>Información del cliente
+      </h2>
+
+      <div class="card glass-card perfil-card p-4 mb-5">
+        <div class="row align-items-center perfil-dato">
+          <div class="col-3 text-center"><i class="fas fa-user fa-2x" aria-hidden="true"></i></div>
+          <div class="col-9">
+            <div class="perfil-dato-etiqueta fw-semibold text-uppercase small">Nombre</div>
+            <div class="perfil-dato-valor fs-5" id="dato-nombre"><span class="placeholder col-6"></span></div>
+          </div>
+        </div>
+
+        <div class="row align-items-center perfil-dato">
+          <div class="col-3 text-center"><i class="fas fa-phone fa-2x" aria-hidden="true"></i></div>
+          <div class="col-9">
+            <div class="perfil-dato-etiqueta fw-semibold text-uppercase small">Teléfono</div>
+            <div class="perfil-dato-valor fs-5" id="dato-telefono"><span class="placeholder col-5"></span></div>
+          </div>
+        </div>
+
+        <div class="row align-items-center perfil-dato">
+          <div class="col-3 text-center"><i class="fas fa-envelope fa-2x" aria-hidden="true"></i></div>
+          <div class="col-9">
+            <div class="perfil-dato-etiqueta fw-semibold text-uppercase small">Email</div>
+            <div class="perfil-dato-valor fs-5" id="dato-email"><span class="placeholder col-8"></span></div>
+          </div>
+        </div>
+
+        <div class="row align-items-center perfil-dato">
+          <div class="col-3 text-center"><i class="fas fa-calendar-alt fa-2x" aria-hidden="true"></i></div>
+          <div class="col-9">
+            <div class="perfil-dato-etiqueta fw-semibold text-uppercase small">Fecha de registro</div>
+            <div class="perfil-dato-valor fs-5" id="dato-registro"><span class="placeholder col-4"></span></div>
+          </div>
+        </div>
+
+        <div class="row align-items-center perfil-dato">
+          <div class="col-3 text-center"><i class="fas fa-star fa-2x text-warning" aria-hidden="true"></i></div>
+          <div class="col-9">
+            <div class="perfil-dato-etiqueta fw-semibold text-uppercase small">Puntos</div>
+            <div class="perfil-dato-valor fs-5" id="dato-puntos"><span class="placeholder col-2"></span></div>
+            <div class="small texto-ayuda" id="dato-puntos-valor" hidden></div>
+          </div>
+        </div>
+
+        <div class="text-center mt-4">
+          <button type="button" class="btn btn-outline-light btn-lg btn-redondo fw-semibold shadow-sm" data-bs-toggle="modal" data-bs-target="#modalEditarCliente">
+            <i class="fa-solid fa-pen-to-square me-2" aria-hidden="true"></i>Editar mis datos
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="titulo-historial">
+      <h2 id="titulo-historial" class="text-center mb-4 perfil-titulo">
+        <i class="fas fa-receipt text-warning me-2" aria-hidden="true"></i>Historial de pedidos
+      </h2>
+      <div id="historial-pedidos" class="historial" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <!-- Modal para editar los datos y cambiar la contraseña -->
+  <div class="modal fade perfil-modal" id="modalEditarCliente" tabindex="-1" aria-labelledby="modalEditarClienteLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header border-0">
+          <h5 class="modal-title fw-bold" id="modalEditarClienteLabel">
+            <i class="fas fa-user-edit me-2 text-warning" aria-hidden="true"></i>Editar mis datos
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+
+        <div class="modal-body">
+          <form id="form-datos" novalidate>
+            <h5 class="mb-3 text-warning">Datos personales</h5>
+            <div data-mensaje hidden></div>
+
+            <div class="mb-3">
+              <label for="editar-nombre" class="form-label">Nombre:</label>
+              <input type="text" class="form-control" name="nombre" id="editar-nombre" autocomplete="name" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="editar-email" class="form-label">Email:</label>
+              <input type="email" class="form-control" name="email" id="editar-email" placeholder="ejemplo@correo.com" autocomplete="email" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="editar-telefono" class="form-label">Teléfono:</label>
+              <div class="input-group">
+                <select class="form-select select-pais" name="codigoPais" id="editar-codigo-pais" aria-label="Código de país" required></select>
+                <input type="tel" class="form-control" name="telefono" id="editar-telefono" placeholder="Ej: 3511234567" inputmode="numeric" autocomplete="tel-national" required>
+              </div>
+              <small class="form-text texto-ayuda">Ingresá solo números, sin espacios ni guiones.</small>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-gold">Guardar cambios</button>
+            </div>
+          </form>
+
+          <hr class="my-4 border-secondary">
+
+          <form id="form-password" novalidate>
+            <h5 class="mb-3 text-warning">Cambiar contraseña</h5>
+            <div data-mensaje hidden></div>
+
+            <div class="mb-3">
+              <label for="password-actual" class="form-label">Contraseña actual:</label>
+              <input type="password" class="form-control" name="actual" id="password-actual" autocomplete="current-password" required>
+            </div>
+
+            <div class="mb-3">
+              <label for="password-nueva" class="form-label">Nueva contraseña:</label>
+              <input type="password" class="form-control" name="nueva" id="password-nueva" autocomplete="new-password" required aria-describedby="password-requisitos">
+              <div class="form-text texto-ayuda" id="password-requisitos">
+                Al menos 8 caracteres, con mayúsculas, minúsculas, números y símbolos.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password-confirmar" class="form-label">Confirmar nueva contraseña:</label>
+              <input type="password" class="form-control" name="confirmar" id="password-confirmar" autocomplete="new-password" required>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-gold">Cambiar contraseña</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script type="module" src="../assets/js/pages/perfil.js"></script>
+</body>
+
+</html>

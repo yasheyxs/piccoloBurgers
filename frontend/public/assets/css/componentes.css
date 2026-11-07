@@ -1,0 +1,76 @@
+/* Botones flotantes (carrito, WhatsApp y volver arriba) */
+.btn-flotante {
+  position: fixed;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0.6;
+  transition: transform 0.3s, box-shadow 0.3s, opacity 0.3s;
+}
+
+.btn-flotante:hover,
+.btn-flotante:focus-visible {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+  opacity: 1;
+}
+
+.btn-carrito {
+  bottom: 170px;
+  z-index: 1100;
+  background-color: var(--main-gold, #fac30c);
+  color: #000;
+}
+
+.btn-carrito:hover {
+  background-color: var(--gold-hover, #e0ae00);
+  color: #000;
+}
+
+.btn-whatsapp {
+  bottom: 100px;
+  z-index: 1000;
+  background-color: #25d366;
+  color: #fff;
+}
+
+.btn-whatsapp:hover {
+  color: #fff;
+}
+
+.btn-scroll-up {
+  bottom: 30px;
+  z-index: 999;
+  display: none;
+  font-size: 1.8rem;
+  background-color: var(--main-gold, #fac30c);
+  color: #000;
+}
+
+.btn-scroll-up.visible {
+  display: flex;
+}
+
+/* Estado de carga y mensajes vacíos */
+.estado-vacio {
+  color: var(--text-muted, #ccc);
+  text-align: center;
+  padding: 2rem 1rem;
+}
+
+@media (max-width: 576px) {
+  .btn-flotante {
+    right: 16px;
+    width: 52px;
+    height: 52px;
+    font-size: 1.6rem;
+  }
+}
