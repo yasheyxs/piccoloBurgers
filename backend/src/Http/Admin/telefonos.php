@@ -6,7 +6,7 @@ if (!function_exists('obtenerCatalogoTelefonos')) {
     /**
      * Devuelve el catálogo de códigos telefónicos disponibles para los formularios internos.
      *
-     * @return array<string, array{bandera: string, pais: string, longitudes: int[]}>
+     * @return array<int|string, array{bandera: string, pais: string, longitudes: int[]}> (PHP guarda los códigos numéricos como claves int)
      */
     function obtenerCatalogoTelefonos(): array
     {

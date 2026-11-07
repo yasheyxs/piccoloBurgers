@@ -23,3 +23,7 @@ Thumbs.db
 
 # Dependencias de Composer (se instalan con composer install)
 backend/vendor/
+
+# Caché de PHPUnit
+.phpunit.result.cache
+.phpunit.cache/

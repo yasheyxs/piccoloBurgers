@@ -4,6 +4,7 @@ include(__DIR__ . "/../../../../src/Core/database.php");
 
 $mensaje = "";
 $tipoMensaje = "";
+$txtID = $nombre = $telefono = $email = "";
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $txtID = trim($_POST["txtID"] ?? "");
@@ -36,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       $sentencia->bindParam(":nombre", $nombre);
       $sentencia->bindParam(":telefono", $telefono);
-      $sentencia->bindParam(":email", $email !== "" ? $email : null);
+      $sentencia->bindValue(":email", $email !== "" ? $email : null);
       $sentencia->bindParam(":id", $txtID, PDO::PARAM_INT);
       $sentencia->execute();
 

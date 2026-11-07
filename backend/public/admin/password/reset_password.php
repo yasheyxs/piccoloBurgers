@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../../src/Services/Security/password_utils.php';
 
 $token = $_GET["token"] ?? "";
 $tipo  = $_GET["tipo"] ?? "";
+$mensaje = "";
 
 if (!in_array($tipo, ["usuario", "cliente"])) {
   $mensaje = "Tipo de cuenta inválido.";

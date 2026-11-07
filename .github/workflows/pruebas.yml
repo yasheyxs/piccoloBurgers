@@ -6,28 +6,43 @@ on:
   pull_request:
 
 jobs:
-  sintaxis:
-    name: Sintaxis PHP (${{ matrix.php }})
+  codigo:
+    name: Código (PHP ${{ matrix.php }})
     runs-on: ubuntu-latest
     strategy:
       matrix:
         php: ['8.2', '8.3']
+    defaults:
+      run:
+        working-directory: backend
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
+          extensions: gd, zip, pdo_mysql, pdo_sqlite
           coverage: none
-      - name: Revisar todos los archivos PHP
+
+      - name: Sintaxis de todos los archivos PHP
         run: |
-          find backend -name '*.php' -not -path 'backend/vendor/*' -print0 \
+          find . -name '*.php' -not -path './vendor/*' -print0 \
             | xargs -0 -n1 -P4 php -l -d display_errors=1 > /tmp/lint.txt || { grep -v '^No syntax errors' /tmp/lint.txt; exit 1; }
           echo "$(wc -l < /tmp/lint.txt) archivos sin errores"
-      - name: Validación de teléfonos
-        run: php backend/tests/ValidarTelefonoTest.php
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --no-progress
+
+      - name: Pruebas unitarias
+        run: vendor/bin/phpunit --testsuite unitarias
+
+      - name: Análisis estático
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+
+      - name: Librerías sin fallas de seguridad conocidas
+        run: composer audit --no-dev
 
   sistema:
-    name: API y permisos del panel
+    name: API, panel y base de datos
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +74,7 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
+          extensions: gd, zip, pdo_mysql
           coverage: none
 
       - name: Recorrido de la API
@@ -68,6 +84,21 @@ jobs:
         env:
           PANEL_USUARIOS: 'admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!'
         run: php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
+
+      - name: Base de pruebas
+        run: |
+          docker compose exec -T mysql mysql -uroot -proot_ci \
+            -e "CREATE DATABASE piccolodb_pruebas; GRANT ALL ON piccolodb_pruebas.* TO 'piccolo'@'%';"
+          docker compose exec -T -e MYSQL_DATABASE=piccolodb_pruebas backend php /var/www/html/bin/migrar.php --con-datos
+
+      - name: Pruebas con base de datos (pedidos, reservas y límite de intentos)
+        working-directory: backend
+        env:
+          MYSQL_HOST: 127.0.0.1
+          MYSQL_DATABASE: piccolodb_pruebas
+        run: |
+          composer install --no-interaction --no-progress
+          vendor/bin/phpunit --testsuite integracion --fail-on-skipped
 
       - name: Registros del backend si algo falla
         if: failure()

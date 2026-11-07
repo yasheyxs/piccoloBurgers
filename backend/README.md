@@ -14,7 +14,7 @@ Todo lo que corre en el servidor: la API que usa el sitio de clientes, el panel 
 | `config/` | Configuración de la aplicación y del correo. |
 | `database/` | Migraciones de la base (`migraciones/`) y datos de ejemplo. |
 | `bin/` | Scripts de consola, como `migrar.php`. |
-| `tests/` | Pruebas. |
+| `tests/` | Pruebas: `Unit/` y `Integracion/` (PHPUnit), y los recorridos de la API y del panel. |
 | `vendor/` | Dependencias de Composer. |
 
 ## Configuración
@@ -46,13 +46,20 @@ Una base que ya existía antes de las migraciones se reconoce sola: se toma el e
 ## Pruebas
 
 ```bash
-php tests/ValidarTelefonoTest.php
+composer pruebas     # pruebas unitarias
+composer analizar    # análisis estático con PHPStan (nivel 3)
 php tests/ApiTest.php http://localhost:8080/api/v1
 PANEL_USUARIOS="admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!" php tests/PanelPermisosTest.php http://localhost:8080/admin
 ```
 
 - `ApiTest` recorre la API completa y crea datos de prueba, así que conviene correrlo contra una base de desarrollo.
 - `PanelPermisosTest` entra al panel con cada rol indicado y verifica a qué pantallas puede entrar y a cuáles no, según `config/permisos.php`, y que los envíos sin token CSRF se rechacen.
+- Las pruebas de `tests/Integracion/` usan MySQL y solo corren contra una base cuyo nombre termine en `_pruebas`, para no tocar nunca la real:
+
+```bash
+MYSQL_DATABASE=piccolodb_pruebas php bin/migrar.php --con-datos
+MYSQL_DATABASE=piccolodb_pruebas vendor/bin/phpunit --testsuite integracion
+```
 
 ## Permisos del panel
 

@@ -143,6 +143,7 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
         $maximoPorcentajeCanje = 1;
     }
 
+    $sessionId = null;
     try {
         $conexion->beginTransaction();
 
@@ -363,7 +364,9 @@ function registrarVentaConDescuento(PDO $conexion, array $payload): array
         }
 
         try {
-            limpiarReservasSesion($conexion, $sessionId);
+            if ($sessionId !== null) {
+                limpiarReservasSesion($conexion, $sessionId);
+            }
         } catch (Throwable $cleanupError) {
             error_log('No se pudieron limpiar las reservas virtuales tras un error de venta: ' . $cleanupError->getMessage());
         }

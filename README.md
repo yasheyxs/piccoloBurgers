@@ -123,15 +123,19 @@ Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd`
 ### Pruebas automáticas
 
 ```bash
-php backend/tests/ApiTest.php http://localhost:8080/api/v1
-PANEL_USUARIOS="admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!" php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
-php backend/tests/ValidarTelefonoTest.php
+cd backend
+composer pruebas      # pruebas unitarias (PHPUnit)
+composer analizar     # análisis estático (PHPStan)
+php tests/ApiTest.php http://localhost:8080/api/v1
+PANEL_USUARIOS="admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!" php tests/PanelPermisosTest.php http://localhost:8080/admin
 ```
 
+- Las **pruebas unitarias** cubren las reglas de negocio: cálculo y canje de puntos, validación de pedidos y teléfonos, contraseñas y estado de pago.
+- Las **pruebas con base de datos** verifican que los pedidos se cobren con los precios de la base, que el carrito no reserve más stock del que hay y el bloqueo por intentos fallidos.
 - `ApiTest` recorre la API como un cliente: menú, carrito, registro, pedido, historial y sesión.
 - `PanelPermisosTest` entra al panel con cada rol y verifica a qué secciones puede acceder.
 
-Las tres pruebas corren solas en GitHub Actions con cada cambio, levantando el sistema completo con Docker.
+Todo corre solo en GitHub Actions con cada cambio, levantando el sistema completo con Docker. También se revisa que las librerías no tengan fallas de seguridad conocidas.
 
 ---
 
