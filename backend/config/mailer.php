@@ -18,9 +18,9 @@ function crearMailer(): PHPMailer
         $envCargado = true;
     }
 
-    $host = getenv('MAILER_HOST') ?: '';
-    $username = getenv('MAILER_USERNAME') ?: '';
-    $password = getenv('MAILER_PASSWORD') ?: '';
+    $host = piccolo_env('MAILER_HOST') ?: '';
+    $username = piccolo_env('MAILER_USERNAME') ?: '';
+    $password = piccolo_env('MAILER_PASSWORD') ?: '';
 
     if ($host === '' || $username === '' || $password === '') {
         throw new RuntimeException(
@@ -28,10 +28,10 @@ function crearMailer(): PHPMailer
         );
     }
 
-    $fromAddress = getenv('MAILER_FROM_ADDRESS') ?: $username;
-    $fromName = getenv('MAILER_FROM_NAME') ?: 'Piccolo Burgers';
-    $port = (int) (getenv('MAILER_PORT') ?: 587);
-    $encryption = strtolower((string) getenv('MAILER_ENCRYPTION')) ?: 'tls';
+    $fromAddress = piccolo_env('MAILER_FROM_ADDRESS') ?: $username;
+    $fromName = piccolo_env('MAILER_FROM_NAME') ?: 'Piccolo Burgers';
+    $port = (int) (piccolo_env('MAILER_PORT') ?: 587);
+    $encryption = strtolower((string) piccolo_env('MAILER_ENCRYPTION')) ?: 'tls';
 
     $mailer = new PHPMailer(true);
     $mailer->isSMTP();

@@ -1,0 +1,180 @@
+/* Perfil del cliente: datos de la cuenta, edición y historial de pedidos */
+
+body {
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Fondo con la imagen de la marca, oscurecido para que se lea el contenido */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: linear-gradient(135deg, rgba(17, 17, 17, 0.95), rgba(17, 17, 17, 0.7)),
+    url("../../img/fondo.svg");
+  background-size: cover;
+  background-position: center;
+  opacity: 0.6;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.perfil-titulo {
+  text-shadow: 0 0 8px rgba(0, 0, 0, 0.7);
+}
+
+/* Tarjetas con efecto vidrio */
+.glass-card {
+  background: rgba(44, 44, 44, 0.7);
+  color: var(--text-light);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* Tarjeta con los datos del cliente */
+.perfil-card {
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 15px;
+}
+
+.perfil-dato + .perfil-dato {
+  margin-top: 1rem;
+}
+
+.perfil-dato-etiqueta {
+  letter-spacing: 0.1em;
+}
+
+.perfil-dato-valor {
+  overflow-wrap: anywhere;
+}
+
+.perfil-puntos-valor {
+  color: var(--main-gold);
+}
+
+.btn-outline-light.btn-redondo {
+  border-width: 2px;
+  border-radius: 50px;
+  color: #fff;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-light.btn-redondo:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+/* Modal de edición */
+.perfil-modal .modal-content {
+  background: rgba(30, 30, 30, 0.95);
+  border-radius: 20px;
+  color: var(--text-light);
+}
+
+.perfil-modal .form-control,
+.perfil-modal .form-select {
+  background-color: #1e1e1e;
+  color: var(--text-light);
+  border: 1px solid #444;
+  font-size: 1rem;
+}
+
+.perfil-modal .form-control::placeholder {
+  color: #777;
+}
+
+.perfil-modal .form-control:focus,
+.perfil-modal .form-select:focus {
+  background-color: #1e1e1e;
+  color: var(--text-light);
+  border-color: var(--main-gold);
+  box-shadow: 0 0 0 0.2rem rgba(250, 195, 12, 0.25);
+}
+
+.perfil-modal .form-select option {
+  background-color: #1e1e1e;
+  color: var(--text-light);
+}
+
+.select-pais {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 110px;
+}
+
+.texto-ayuda {
+  color: var(--text-muted);
+}
+
+/* Historial de pedidos */
+.historial {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.pedido {
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: var(--gray-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.pedido + .pedido {
+  margin-top: 0.75rem;
+}
+
+.pedido-resumen {
+  width: 100%;
+  border: none;
+  border-left: 5px solid var(--main-gold);
+  background-color: var(--gray-bg);
+  color: var(--text-light);
+  font-weight: 600;
+  text-align: left;
+  padding: 12px 16px;
+  transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.pedido-resumen:hover,
+.pedido-resumen:focus-visible,
+.pedido-resumen[aria-expanded="true"] {
+  background-color: var(--gold-hover);
+  color: #000;
+}
+
+.pedido-resumen[aria-expanded="true"] {
+  box-shadow: 0 0 8px var(--main-gold);
+}
+
+.pedido-resumen .pedido-flecha {
+  transition: transform 0.3s ease;
+}
+
+.pedido-resumen[aria-expanded="true"] .pedido-flecha {
+  transform: rotate(180deg);
+}
+
+.pedido-detalle {
+  background-color: rgba(30, 30, 30, 0.85);
+  padding: 1rem 1.25rem;
+}
+
+.pedido-detalle dt {
+  color: var(--main-gold);
+  font-weight: 600;
+}
+
+.pedido-items .list-group-item {
+  background-color: transparent;
+  color: var(--text-light);
+  border-color: #444;
+}

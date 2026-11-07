@@ -91,8 +91,8 @@ $ultimaActualizacionZona = null;
 $ultimaActualizacionTitulo = null;
 
 if (!empty($configuracionActual['actualizado_en'])) {
-    $dbTimezoneId = getenv('DB_TIMEZONE') ?: 'UTC';
-    $appTimezoneId = getenv('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
+    $dbTimezoneId = piccolo_env('DB_TIMEZONE') ?: 'UTC';
+    $appTimezoneId = piccolo_env('APP_TIMEZONE') ?: 'America/Argentina/Buenos_Aires';
 
     try {
         $dbTimezone = new DateTimeZone($dbTimezoneId);

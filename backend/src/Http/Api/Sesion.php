@@ -16,7 +16,7 @@ final class Sesion
 
         $esHttps = \piccolo_detect_scheme() === 'https';
         // Si el frontend vive en otro dominio, la cookie necesita SameSite=None (y HTTPS).
-        $sameSite = (string) (getenv('SESSION_SAMESITE') ?: 'Lax');
+        $sameSite = (string) (piccolo_env('SESSION_SAMESITE') ?: 'Lax');
 
         session_set_cookie_params([
             'lifetime' => 0,

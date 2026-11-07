@@ -28,54 +28,56 @@ if (!function_exists('piccolo_start_session')) {
     }
 }
 
-if (!function_exists('piccolo_load_env_file')) {
-    function piccolo_load_env_file(string $path, bool $overwrite = false): void
+if (!function_exists('piccolo_leer_env_file')) {
+    /** @return array<string, string> variables definidas en un archivo .env */
+    function piccolo_leer_env_file(string $path): array
     {
         if (!is_file($path) || !is_readable($path)) {
-            return;
+            return [];
         }
 
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
-            return;
-        }
-
-        foreach ($lines as $line) {
+        $variables = [];
+        foreach (file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [] as $line) {
             $line = trim($line);
             if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
                 continue;
             }
 
             [$key, $value] = array_map('trim', explode('=', $line, 2));
-            if ($key === '' || (!$overwrite && getenv($key) !== false)) {
-                continue;
+            if ($key !== '') {
+                $variables[$key] = trim($value, "\"'");
             }
-
-            $value = trim($value, "\"'");
-            putenv($key . '=' . $value);
-            $_ENV[$key] = $value;
-            $_SERVER[$key] = $value;
         }
+
+        return $variables;
     }
 }
 
-if (!function_exists('piccolo_load_environment')) {
-    function piccolo_load_environment(): void
+if (!function_exists('piccolo_env')) {
+    /**
+     * Valor de una variable de configuración.
+     * Prioridad: variables reales del entorno (Docker, hosting) > .env.local > .env
+     *
+     * Las variables de los archivos se guardan en memoria y no con putenv(): en servidores
+     * con hilos (como el Apache de XAMPP) putenv() se comparte entre peticiones simultáneas
+     * y PHP borra esas variables al terminar cada una, dejando a las demás sin configuración.
+     */
+    function piccolo_env(string $clave, ?string $porDefecto = null): ?string
     {
-        static $loaded = false;
+        static $archivos = null;
 
-        if ($loaded) {
-            return;
+        $real = getenv($clave);
+        if ($real !== false) {
+            return $real;
         }
 
-        // Prioridad: variables reales del entorno (Docker, hosting) > .env.local > .env
-        piccolo_load_env_file(PICCOLO_ROOT . '/.env.local');
-        piccolo_load_env_file(PICCOLO_ROOT . '/.env');
-        $loaded = true;
+        if ($archivos === null) {
+            $archivos = piccolo_leer_env_file(PICCOLO_ROOT . '/.env.local') + piccolo_leer_env_file(PICCOLO_ROOT . '/.env');
+        }
+
+        return $archivos[$clave] ?? $porDefecto;
     }
 }
-
-piccolo_load_environment();
 
 if (!function_exists('requireConnection')) {
     function requireConnection(PDO $conn = null): PDO

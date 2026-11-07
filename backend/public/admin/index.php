@@ -34,8 +34,8 @@ if ($esAdminAutenticado) {
       return false;
     }
 
-    $valor = getenv($variable);
-    return $valor !== false && $valor !== '';
+    $valor = piccolo_env($variable);
+    return $valor !== null && $valor !== '';
   }, true);
 
   if ($configuracionDisponible) {
