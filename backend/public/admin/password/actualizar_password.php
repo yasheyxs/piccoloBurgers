@@ -71,7 +71,7 @@ $stmt->execute();
 
 echo "<div class='alert alert-success text-center'>Contraseña actualizada correctamente. Redirigiendo al login...</div>";
 $loginUrl = $tipo === "cliente"
-  ? piccolo_public_base_url() . 'cliente/login_cliente.php'
+  ? piccolo_frontend_url('cliente/login.html')
   : piccolo_admin_base_url() . 'login.php';
 $loginUrl = htmlspecialchars($loginUrl, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 echo "<script>setTimeout(() => window.location.href = '" . $loginUrl . "', 3000);</script>";

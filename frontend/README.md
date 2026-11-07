@@ -28,17 +28,22 @@ Cada página carga solo su script (`assets/js/pages/...`), que importa los módu
 
 ## Cómo probarlo
 
-**Con XAMPP**, con el proyecto en `htdocs/piccoloBurgers`: abrir http://localhost/piccoloBurgers/frontend/public/. La dirección de la API se detecta sola.
+**Con Docker** (desde la raíz del proyecto, `docker compose up -d --build`): el sitio queda en http://localhost:8080. El contenedor usa Nginx para servir los archivos y reenvía `/api`, `/admin` y las fotos subidas al backend, así todo funciona desde una misma dirección (ver `nginx.conf.template`).
 
-**Publicado aparte del backend**: definir la dirección de la API antes de los scripts de cada página:
+**Con XAMPP**, con el proyecto en `htdocs/piccoloBurgers`: abrir http://localhost/piccoloBurgers/. La dirección de la API se detecta sola.
 
-```html
-<script>window.PICCOLO_API_URL = "https://api.midominio.com/api/v1";</script>
-```
+## Publicarlo
 
-y en el backend agregar el dominio del frontend en `FRONTEND_URL` (y `SESSION_SAMESITE=None` si son dominios distintos, ver `backend/.env.example`).
+- **Con su propio Nginx** (como en Docker): la imagen se construye con el `Dockerfile` de esta carpeta. La variable `BACKEND_URL` indica a qué dirección reenviar la API y el panel.
+- **En un hosting estático** (Netlify, GitHub Pages, etc.), separado del backend: definir la dirección de la API antes de los scripts de cada página:
 
-Para que el mail de recuperación de contraseña lleve a la página nueva, configurar en el backend `RESET_PASSWORD_URL` con la dirección de `cliente/restablecer.html`.
+  ```html
+  <script>window.PICCOLO_API_URL = "https://api.midominio.com/api/v1";</script>
+  ```
+
+  y en el backend configurar `FRONTEND_URL` con el dominio del frontend y `SESSION_SAMESITE=None` (ver `backend/.env.example`).
+
+El mail de recuperación de contraseña ya lleva a `cliente/restablecer.html` del frontend.
 
 ## Carrito
 

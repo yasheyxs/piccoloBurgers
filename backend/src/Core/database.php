@@ -14,8 +14,7 @@ if (!function_exists('piccolo_finalizar_por_error_bd')) {
             $uri = $_SERVER['REQUEST_URI'] ?? '';
             $esperaJson = stripos($accept, 'application/json') !== false
                 || strtolower($requestedWith) === 'xmlhttprequest'
-                || stripos($uri, '/api/') !== false
-                || str_ends_with($uri, '.php') && stripos($uri, 'guardar_pedido.php') !== false;
+                || stripos($uri, '/api/') !== false;
 
             if (!headers_sent()) {
                 http_response_code(500);

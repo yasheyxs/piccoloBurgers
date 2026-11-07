@@ -10,13 +10,13 @@
   const reservasEndpoint =
     typeof data.reservas_endpoint === "string" && data.reservas_endpoint
       ? data.reservas_endpoint
-      : "../api/carrito_actualizar.php";
+      : "api/carrito_actualizar.php";
 
   const disponibilidadEndpoint =
     typeof data.disponibilidad_endpoint === "string" &&
     data.disponibilidad_endpoint
       ? data.disponibilidad_endpoint
-      : "../api/disponibilidad_menu.php";
+      : "api/disponibilidad_menu.php";
 
   const productosPorId = new Map(
     menuDisponible

@@ -101,10 +101,18 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 * `backend/config/config.php` – modo desarrollo; `backend/config/mailer.php` – configuración de PHPMailer.
 
 7️⃣ Acceder al sitio:
-* 🌍 Público: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
+* 🌍 Sitio: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
 * 🔐 Admin: [http://localhost/piccoloBurgers/backend/public/admin/](http://localhost/piccoloBurgers/backend/public/admin/)
 
-🐳 **Con Docker**: desde `backend/` ejecutar `docker compose up -d --build` y entrar a [http://localhost:8080/](http://localhost:8080/) (panel en `/admin/`).
+🐳 **Con Docker** (desde la raíz del proyecto):
+
+```bash
+docker compose up -d --build
+```
+
+* 🌍 Sitio: [http://localhost:8080/](http://localhost:8080/)
+* 🔐 Admin: [http://localhost:8080/admin/](http://localhost:8080/admin/)
+* 🗄️ phpMyAdmin: [http://localhost:8081/](http://localhost:8081/)
 
 ---------------
 
@@ -134,24 +142,28 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 ---------------
 ## Arquitectura actual
 
-El proyecto está dividido en dos carpetas principales, pensadas para poder desplegarse por separado:
+El proyecto está dividido en dos partes que se pueden desplegar por separado:
 
 ```
 piccoloBurgers/
-├── backend/     servidor: sitio de clientes (PHP), panel de administración, lógica, configuración y base de datos
-│   ├── public/  lo único accesible desde el navegador (incluye el panel en public/admin)
-│   ├── src/     código PHP: arranque, controladores y reglas de negocio
-│   ├── views/   plantillas del sitio y del panel
-│   └── ...      config/, database/, tests/, Dockerfile, docker-compose.yml
-├── frontend/    sitio de clientes independiente (HTML, CSS y JS) que usa la API del backend
-└── docs/        documentación y plan de reestructuración
+├── frontend/            sitio de clientes: HTML, CSS y JavaScript, sin PHP ni base de datos
+│   ├── public/          las páginas del sitio
+│   └── Dockerfile       servidor Nginx que también reenvía la API y el panel al backend
+├── backend/             API, panel de administración, lógica de negocio y base de datos
+│   ├── public/          lo único accesible desde el navegador: api/v1, admin/ e img/
+│   ├── src/             código PHP: API, panel y reglas de negocio
+│   ├── views/admin/     plantillas del panel
+│   └── ...              config/, database/, tests/, Dockerfile
+├── docs/                documentación de la API y del proceso de reestructuración
+└── docker-compose.yml   levanta frontend, backend, MySQL y phpMyAdmin
 ```
 
-Cada carpeta tiene su propio README. El sitio de clientes nuevo vive en `frontend/` (con XAMPP: [http://localhost/piccoloBurgers/frontend/public/](http://localhost/piccoloBurgers/frontend/public/)); la versión anterior en PHP dentro de `backend/` sigue funcionando hasta terminar la migración planificada en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).
+```
+Navegador ──▶ frontend (Nginx) ──▶ páginas del sitio
+                     │
+                     └── /api, /admin, /img ──▶ backend (PHP + Apache) ──▶ MySQL
+```
 
-El backend ya expone una **API JSON** (`/api/v1`) con el menú, el carrito, los pedidos y la cuenta del cliente, que es la que va a usar el nuevo frontend. Está documentada en [`docs/API.md`](docs/API.md).
-
-En producción, el directorio raíz del sitio apunta a `backend/public`:
-
-- Cliente: `/`
-- Panel: `/admin/`
+- El **frontend** obtiene todos los datos de la **API JSON** del backend (`/api/v1`), documentada en [`docs/API.md`](docs/API.md).
+- El **backend** también sirve el **panel de administración** en `/admin/`.
+- Cada carpeta tiene su propio README con los detalles. El proceso completo de reestructuración está en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).

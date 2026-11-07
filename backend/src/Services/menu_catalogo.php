@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Búsqueda de productos del menú. La usan el sitio (filtrar_menu.php) y la API.
+ * Búsqueda de productos del menú. La usa la API (GET /menu).
  */
 
 if (!function_exists('menuCategoriasDisponibles')) {

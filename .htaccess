@@ -1,5 +1,5 @@
 # Solo se usa cuando el proyecto completo se sirve desde XAMPP (htdocs/piccoloBurgers).
-# En Docker o en un hosting, el sitio se sirve directamente desde backend/public.
+# En Docker o en un hosting, cada parte se publica por separado (frontend/public y backend/public).
 Options -Indexes
 
 <IfModule mod_rewrite.c>
@@ -9,19 +9,21 @@ Options -Indexes
   RewriteCond %{REQUEST_URI}::$1 ^(.*?/)(.*)::\2$
   RewriteRule ^(.*)$ - [E=PICCOLO_BASE:%1]
 
-  # Entrada al sitio
-  RewriteRule ^$ %{ENV:PICCOLO_BASE}backend/public/ [R=302,L]
+  # Entrada al sitio de clientes
+  RewriteRule ^$ %{ENV:PICCOLO_BASE}frontend/public/ [R=302,L]
 
-  # Compatibilidad con las URLs anteriores (/public/... y /admin/...)
-  RewriteRule ^public/(.*)$ %{ENV:PICCOLO_BASE}backend/public/$1 [R=301,L]
+  # Compatibilidad con las URLs anteriores: el sitio viejo (/public/...) lleva al nuevo y /admin/ al panel
+  RewriteRule ^public/(.*)$ %{ENV:PICCOLO_BASE}frontend/public/ [R=301,L]
   RewriteRule ^admin/(.*)$ %{ENV:PICCOLO_BASE}backend/public/admin/$1 [R=301,L]
 
-  # Nada fuera de backend/public es accesible desde el navegador
+  # Solo las carpetas públicas de cada parte son accesibles desde el navegador
   RewriteRule ^(\.git|\.claude)(/|$) - [F,L,NC]
   RewriteRule ^backend/(src|views|config|database|tests|vendor|apache)(/|$) - [F,L,NC]
   RewriteRule ^backend/(\.env.*|\.dockerignore|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$ - [F,L,NC]
+  RewriteRule ^frontend/(Dockerfile|nginx\.conf|\.dockerignore)$ - [F,L,NC]
+  RewriteRule ^docker-compose\.yml$ - [F,L,NC]
 </IfModule>
 
-<FilesMatch "^(\.env.*|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$">
+<FilesMatch "^(\.env.*|composer\.(json|lock)|Dockerfile|docker-compose\.yml|nginx\.conf)$">
   Require all denied
 </FilesMatch>

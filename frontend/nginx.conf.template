@@ -1,0 +1,40 @@
+# Sitio de clientes (archivos estáticos) + reenvío al backend.
+# BACKEND_URL se define al levantar el contenedor (por defecto http://backend).
+#
+# Nginx usa la primera regla con expresión regular que coincide, así que las del backend
+# van primero: si no, un script del panel (/admin/....js) se buscaría en el frontend.
+server {
+    listen 80;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # API, panel de administración y fotos que se suben desde el panel: los atiende el backend
+    location ~ ^/(api|admin)/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        client_max_body_size 10m;
+    }
+
+    location ~ ^/img/(menu|banners|premios|placeholders)/ {
+        proxy_pass ${BACKEND_URL};
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Evita que el navegador use versiones viejas de los estilos y scripts después de publicar cambios
+    location ~* \.(css|js)$ {
+        add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    # Archivos del sitio
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
