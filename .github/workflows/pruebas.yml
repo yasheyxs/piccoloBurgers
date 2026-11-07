@@ -59,6 +59,17 @@ jobs:
           SESSION_SAMESITE=Lax
           EOF
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: gd, zip, pdo_mysql
+          coverage: none
+
+      # Antes de Docker: el contenedor monta backend/ y si no, vendor/ queda a nombre de root
+      - name: Instalar dependencias para las pruebas
+        working-directory: backend
+        run: composer install --no-interaction --no-progress
+
       - name: Levantar el sistema con Docker
         run: docker compose up -d --build frontend backend mysql
 
@@ -70,12 +81,6 @@ jobs:
           done
           docker compose logs
           exit 1
-
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: gd, zip, pdo_mysql
-          coverage: none
 
       - name: Recorrido de la API
         run: php backend/tests/ApiTest.php http://localhost:8080/api/v1
@@ -96,9 +101,7 @@ jobs:
         env:
           MYSQL_HOST: 127.0.0.1
           MYSQL_DATABASE: piccolodb_pruebas
-        run: |
-          composer install --no-interaction --no-progress
-          vendor/bin/phpunit --testsuite integracion --fail-on-skipped
+        run: vendor/bin/phpunit --testsuite integracion --fail-on-skipped
 
       - name: Registros del backend si algo falla
         if: failure()
