@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ . '/../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+  piccolo_admin_iniciar_sesion();
 }
 
 header('Content-Type: application/json');

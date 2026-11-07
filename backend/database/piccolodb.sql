@@ -895,15 +895,6 @@ CREATE TABLE `tbl_reservas_virtuales` (
 -- Dumping data for table `tbl_reservas_virtuales`
 --
 
-INSERT INTO `tbl_reservas_virtuales` (`ID`, `session_id`, `menu_id`, `cantidad`, `actualizado_en`) VALUES
-(18, 'hln2oi1c76hheid1fe5c910blt', 47, 1, '2025-10-03 01:33:06'),
-(32, 'ac04105cd58ef5b107c344b939f6fc81', 38, 2, '2025-10-12 06:22:49'),
-(33, 'ac04105cd58ef5b107c344b939f6fc81', 39, 1, '2025-10-12 06:22:51'),
-(51, '1fbf01389eb46fe6374912382b0da009', 41, 1, '2025-10-30 06:45:16'),
-(52, '1fbf01389eb46fe6374912382b0da009', 47, 1, '2025-10-30 06:45:17'),
-(73, 'a74457849e75423e9a509e4693f3b4ac', 37, 1, '2025-11-06 22:56:42'),
-(74, 'a74457849e75423e9a509e4693f3b4ac', 26, 1, '2025-11-06 22:56:43'),
-(75, 'a74457849e75423e9a509e4693f3b4ac', 27, 1, '2025-11-06 22:56:43');
 
 -- --------------------------------------------------------
 
@@ -948,7 +939,7 @@ CREATE TABLE `tbl_usuarios` (
 --
 
 INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
-(4, 'Delivery', '202cb962ac59075b964b07152d234b70', 'contacto-da15e0@piccolo-falso.test', 'delivery', NULL, NULL),
+(4, 'Delivery', '$2y$10$LMP854nISeN8xayyAfG3o.a1HAFM9xsMZumPErKJMmOWpyp9Qp/Cy', 'contacto-da15e0@piccolo-falso.test', 'delivery', NULL, NULL),
 (5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'contacto-3a5671@piccolo-falso.test', 'admin', NULL, NULL);
 
 -- --------------------------------------------------------

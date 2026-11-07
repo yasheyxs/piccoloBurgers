@@ -27,14 +27,18 @@ server {
         proxy_set_header X-Forwarded-Proto $scheme;
     }
 
+    server_tokens off;
+
     # Evita que el navegador use versiones viejas de los estilos y scripts después de publicar cambios
     location ~* \.(css|js)$ {
+        include /etc/nginx/snippets/seguridad.conf;
         add_header Cache-Control "no-cache";
         try_files $uri =404;
     }
 
     # Archivos del sitio
     location / {
+        include /etc/nginx/snippets/seguridad.conf;
         try_files $uri $uri/ =404;
     }
 }

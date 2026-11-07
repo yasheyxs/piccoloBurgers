@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 require_once __DIR__ . '/../../../../src/Core/database.php';
 require_once __DIR__ . '/../../../../src/Services/premios_schema.php';
 
@@ -6,15 +7,15 @@ verificarRol('admin');
 asegurarTablaPremios($conexion);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
+    piccolo_admin_iniciar_sesion();
 }
 
 $mensaje = $_SESSION['mensaje_premios'] ?? '';
 $tipoMensaje = $_SESSION['tipo_mensaje_premios'] ?? '';
 unset($_SESSION['mensaje_premios'], $_SESSION['tipo_mensaje_premios']);
 
-if (isset($_GET['txtID'])) {
-    $premioId = $_GET['txtID'];
+if (isset($_POST['txtID'])) {
+    $premioId = $_POST['txtID'];
 
     if (!is_numeric($premioId) || (int) $premioId <= 0) {
         $mensaje = 'El identificador del premio no es válido.';
@@ -144,10 +145,13 @@ include __DIR__ . '/../../../../views/admin/header.php';
                                                 <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
                                                 <span class="visually-hidden">Editar</span>
                                             </a>
-                                            <a class="btn btn-sm btn-outline-danger" href="index.php?txtID=<?= urlencode((string) ($premio['id'] ?? '')); ?>" onclick="return confirm('¿Seguro que querés eliminar este premio? Esta acción no se puede deshacer.');">
-                                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                                                <span class="visually-hidden">Eliminar</span>
-                                            </a>
+                                            <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Seguro que querés eliminar este premio? Esta acción no se puede deshacer.');">
+                                                <input type="hidden" name="txtID" value="<?= (int) ($premio['id'] ?? 0); ?>">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                                    <span class="visually-hidden">Eliminar</span>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

@@ -20,7 +20,7 @@ Options -Indexes
   RewriteRule ^(\.git|\.claude)(/|$) - [F,L,NC]
   RewriteRule ^backend/(src|views|config|database|tests|vendor|apache)(/|$) - [F,L,NC]
   RewriteRule ^backend/(\.env.*|\.dockerignore|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$ - [F,L,NC]
-  RewriteRule ^frontend/(Dockerfile|nginx\.conf|\.dockerignore)$ - [F,L,NC]
+  RewriteRule ^frontend/(Dockerfile|nginx\.conf\.template|seguridad\.conf|\.dockerignore)$ - [F,L,NC]
   RewriteRule ^docker-compose\.yml$ - [F,L,NC]
 </IfModule>
 

@@ -1,6 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) {
-  session_start();
+  piccolo_admin_iniciar_sesion();
 }
 
 if (empty($_SESSION['csrf_token'])) {
@@ -54,6 +54,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="<?php echo htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8'); ?>">
+  <script src="<?php echo $url_base; ?>assets/js/csrf.js"></script>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -85,86 +86,68 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
         <div class="collapse navbar-collapse" id="navbarAdmin">
           <ul class="navbar-nav me-auto mb-2 mb-lg-0">
 
-            <?php if ($rol === "admin") { ?>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="landingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Landing
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="landingDropdown">
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/banners/">Banner</a></li>
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/testimonios/">Testimonios</a></li>
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/comentarios/">Comentarios</a></li>
-                </ul>
-              </li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/menu/">Menú</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/materiasPrimas/">Materias Primas</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/proveedores/">Proveedores</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/puntos/">Puntos</a></li>
-              <li class="nav-item"><a class="nav-link" href="<?php echo $url_base; ?>seccion/premios/">Premios</a></li>
+            <?php
+            // Menú del panel: cada opción se muestra solo si el rol puede entrar (config/permisos.php)
+            $menuPanel = [
+                ['Landing', [
+                    ['Banner', 'seccion/banners/index.php'],
+                    ['Testimonios', 'seccion/testimonios/index.php'],
+                    ['Comentarios', 'seccion/comentarios/index.php'],
+                ]],
+                ['Menú', 'seccion/menu/index.php'],
+                ['Materias Primas', 'seccion/materiasPrimas/index.php'],
+                ['Proveedores', 'seccion/proveedores/index.php'],
+                ['Puntos', 'seccion/puntos/index.php'],
+                ['Premios', 'seccion/premios/index.php'],
+                ['Gestión de personas', [
+                    ['Clientes', 'clientes.php'],
+                    ['Usuarios', 'seccion/usuarios/index.php'],
+                ]],
+                ['Transacciones', [
+                    ['Ventas', 'seccion/ventas/index.php'],
+                    ['Compras', 'seccion/compras/index.php'],
+                ]],
+                ['Paneles', [
+                    ['Panel de cocina', 'panel_cocina.php'],
+                    ['Panel de delivery', 'panel_delivery.php'],
+                ]],
+                ['Pools', [
+                    ['Fichas', 'seccion/pool/index.php'],
+                    ['Estadísticas de Pool', 'seccion/estadisticasPool/index.php'],
+                    ['Parámetros', 'seccion/poolParametros/index.php'],
+                ]],
+                ['Bebidas', [
+                    ['Gestión', 'seccion/bebidas/index.php'],
+                    ['Estadísticas', 'seccion/estadisticasBebidas/index.php'],
+                    ['Parámetros', 'seccion/bebidasParametros/index.php'],
+                ]],
+            ];
 
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="personasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Gestión de personas
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="personasDropdown">
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>clientes.php">Clientes</a></li>
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/usuarios/">Usuarios</a></li>
-                </ul>
-              </li>
+            $enlaceMenu = static fn(string $ruta): string => $url_base . preg_replace('#index\.php$#', '', $ruta);
 
+            foreach ($menuPanel as $indice => [$titulo, $destino]):
+                if (is_string($destino)):
+                    if (!piccolo_admin_puede($destino)) {
+                        continue;
+                    } ?>
+              <li class="nav-item"><a class="nav-link" href="<?php echo htmlspecialchars($enlaceMenu($destino), ENT_QUOTES, 'UTF-8'); ?>"><?php echo $titulo; ?></a></li>
+                <?php else:
+                    $opciones = array_filter($destino, static fn($opcion) => piccolo_admin_puede($opcion[1]));
+                    if (!$opciones) {
+                        continue;
+                    } ?>
               <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="transaccionesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Transacciones
+                <a class="nav-link dropdown-toggle" href="#" id="menuGrupo<?php echo $indice; ?>" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  <?php echo $titulo; ?>
                 </a>
-                <ul class="dropdown-menu" aria-labelledby="transaccionesDropdown">
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/ventas/">Ventas</a></li>
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/compras/">Compras</a></li>
+                <ul class="dropdown-menu" aria-labelledby="menuGrupo<?php echo $indice; ?>">
+                  <?php foreach ($opciones as [$texto, $ruta]): ?>
+                    <li><a class="dropdown-item" href="<?php echo htmlspecialchars($enlaceMenu($ruta), ENT_QUOTES, 'UTF-8'); ?>"><?php echo $texto; ?></a></li>
+                  <?php endforeach; ?>
                 </ul>
               </li>
-            <?php } ?>
-
-            <?php if (in_array($rol, ["admin", "empleado", "delivery"])) { ?>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="panelDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Paneles
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="panelDropdown">
-                  <?php if ($rol === "admin" || $rol === "empleado") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_cocina.php">Panel de cocina</a></li>
-                  <?php } ?>
-                  <?php if ($rol === "admin" || $rol === "delivery") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>panel_delivery.php">Panel de delivery</a></li>
-                  <?php } ?>
-                </ul>
-              </li>
-            <?php } ?>
-
-            <?php if (in_array($rol, ["admin", "empleado"], true)) { ?>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="poolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Pools
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="poolsDropdown">
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/pool/">Fichas</a></li>
-                  <?php if ($rol === "admin") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/estadisticasPool/">Estadísticas de Pool</a></li>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/poolParametros/">Parámetros</a></li>
-                  <?php } ?>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="bebidasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                  Bebidas
-                </a>
-                <ul class="dropdown-menu" aria-labelledby="bebidasDropdown">
-                  <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/bebidas/">Gestión</a></li>
-                  <?php if ($rol === "admin") { ?>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/estadisticasBebidas/">Estadísticas</a></li>
-                    <li><a class="dropdown-item" href="<?php echo $url_base; ?>seccion/bebidasParametros/">Parámetros</a></li>
-                  <?php } ?>
-                </ul>
-              </li>
-            <?php } ?>
+            <?php endif;
+            endforeach; ?>
           </ul>
 
           <ul class="navbar-nav ms-auto align-items-center">

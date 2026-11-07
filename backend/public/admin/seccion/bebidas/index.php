@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 require_once __DIR__ . '/../../../../src/Core/database.php';
 require_once __DIR__ . '/../../../../src/Services/bebidas_schema.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
+    piccolo_admin_iniciar_sesion();
 }
 $rolActual = $_SESSION['rol'] ?? '';
 if (!isset($_SESSION['admin_logueado']) || !in_array($rolActual, ['admin', 'empleado'], true)) {

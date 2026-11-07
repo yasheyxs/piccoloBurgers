@@ -7,3 +7,16 @@ Options -Indexes
 <FilesMatch "^\.">
   Require all denied
 </FilesMatch>
+
+# Cabeceras de seguridad del backend (API y panel de administración).
+# El panel todavía tiene scripts dentro de las páginas, por eso permite 'unsafe-inline';
+# cuando el JavaScript del panel pase a archivos propios se puede quitar.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdn.datatables.net https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' data: https://cdnjs.cloudflare.com https://fonts.gstatic.com https://cdn.jsdelivr.net; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'self'; form-action 'self'; base-uri 'self'; object-src 'none'"
+  Header always unset X-Powered-By
+  Header unset X-Powered-By
+</IfModule>

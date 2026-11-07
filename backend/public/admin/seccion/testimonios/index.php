@@ -1,12 +1,13 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 include(__DIR__ . "/../../../../src/Core/database.php");
 
-if (isset($_GET["txtID"])) {
-    $txtID = $_GET["txtID"] ?? "";
+if (isset($_POST["txtID"])) {
+    $txtID = $_POST["txtID"] ?? "";
     $sentencia = $conexion->prepare("DELETE FROM tbl_testimonios WHERE ID=:id");
     $sentencia->bindParam(":id", $txtID);
     $sentencia->execute();
@@ -43,7 +44,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
               <td><?php echo $value['nombre']; ?></td>
               <td>
                 <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo $value['ID']; ?>">Editar</a>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $value['ID']; ?>">Borrar</a>
+                <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Seguro que querés borrarlo?')"><input type="hidden" name="txtID" value="<?php echo $value['ID']; ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
               </td>
             </tr>
           <?php } ?>
