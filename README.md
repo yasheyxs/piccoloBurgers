@@ -2,7 +2,7 @@ Piccolo Burgers 🍔✨
 
 👥 **Usuarios de prueba**
 
-* 👤 **Usuario:** Cliente | 🔑 **Clave:** Cliente1! – Perfil pensado para simular la experiencia completa de un comensal fidelizado.
+* 👤 **Usuario:** Cliente (📱 teléfono `0000825022`, código +54) | 🔑 **Clave:** Cliente1! – Perfil pensado para simular la experiencia completa de un comensal fidelizado.
 * 👤 **Usuario:** Usuario | 🔑 **Clave:** Usuario1! – Rol administrativo con todos los permisos habilitados para gestión diaria.
 
 ---------------
@@ -96,8 +96,8 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 * Importar **database/piccolodb.sql**.
 
 6️⃣ Configurar credenciales y ajustes en los archivos:
-* `admin/bd.php` – credenciales de conexión.
-* `config/app.php` – nombre del sitio, correo remitente y timezone.
+* `.env` / `.env.local` – credenciales de MySQL (`MYSQL_*`) y del correo (`MAILER_*`).
+* `config/config.php` – modo desarrollo; `config/mailer.php` – configuración de PHPMailer.
 
 7️⃣ Acceder al sitio:
 * 🌍 Público: [http://localhost/piccoloBurgers/public/](http://localhost/piccoloBurgers/public/)
@@ -137,8 +137,9 @@ La aplicacion esta organizada como PHP tradicional con separacion progresiva ent
 - `frontend/customer/`: vistas y componentes del sitio publico.
 - `frontend/backoffice/`: templates del panel administrativo.
 - `public/`: webroot recomendado y entrypoints del cliente.
-- `admin/`: entrypoints del backoffice.
-- `includes/`, `views/`, `componentes/` y `shared/`: compatibilidad temporal para rutas/includes antiguos.
+- `admin/`: entrypoints del backoffice (`admin/templates/` es un puente hacia `frontend/backoffice/templates/`).
+- `tests/`: pruebas automatizadas (`php tests/ValidarTelefonoTest.php`).
+- `docs/`: documentación y propuesta de reestructuración.
 
 URLs recomendadas en produccion:
 

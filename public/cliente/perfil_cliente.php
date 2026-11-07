@@ -363,7 +363,7 @@ if ($datos_guardados_exitosamente) {
   $navAuthLink = 'login_cliente.php';
   $navProfileLink = 'perfil_cliente.php';
   $navLogoutLink = 'logout_cliente.php';
-  include __DIR__ . '/../views/partials/navbar.php';
+  include PICCOLO_FRONTEND_CUSTOMER . '/views/partials/navbar.php';
   ?>
 
   <div class="container mt-5 pt-5">
@@ -838,13 +838,13 @@ if (modalTitle) {
   </script>
 
 
-  <?php include __DIR__ . '/../components/whatsapp_button.php'; ?>
+  <?php include PICCOLO_FRONTEND_CUSTOMER . '/components/whatsapp_button.php'; ?>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
   <?php
   $carritoButtonHref = '../carrito.php';
-  include __DIR__ . '/../components/carrito_button.php';
+  include PICCOLO_FRONTEND_CUSTOMER . '/components/carrito_button.php';
   ?>
 
   <?php if (isset($_SESSION['toast'])): ?>
