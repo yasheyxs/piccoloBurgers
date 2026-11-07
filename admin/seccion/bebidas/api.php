@@ -102,7 +102,20 @@ try {
             break;
 
         case 'cerrar_jornada':
-            poolCerrarJornada($conexion);
+            $totales = is_array($payload['totales'] ?? null) ? $payload['totales'] : [];
+            poolCerrarJornada($conexion, $totales);
+            break;
+
+        case 'totales_cierre':
+            $jornada = poolJornadaActiva($conexion);
+            if (!$jornada) {
+                throw new RuntimeException('No hay una jornada activa.');
+            }
+            bebidaResponder([
+                'exito' => true,
+                'totales' => poolTotalesCierre($conexion, (int) $jornada['id']),
+                'estado' => bebidaEstadoPublico($conexion),
+            ]);
             break;
 
         case 'agregar':

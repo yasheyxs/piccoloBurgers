@@ -251,22 +251,22 @@ include __DIR__ . '/../../templates/header.php';
     padding: 0;
   }
 
-  .pool-action--consume,
-  .pool-action--restore {
+  .pool-action--decrease,
+  .pool-action--increase {
     font-size: 1.35rem;
     line-height: 1;
   }
 
-  .pool-action--consume {
-    background: var(--admin-btn-success-bg);
-    border-color: var(--admin-btn-success-bg);
-    color: var(--admin-btn-success-text);
-  }
-
-  .pool-action--restore {
+  .pool-action--decrease {
     background: var(--admin-btn-danger-bg);
     border-color: var(--admin-btn-danger-bg);
     color: var(--admin-btn-danger-text);
+  }
+
+  .pool-action--increase {
+    background: var(--admin-btn-success-bg);
+    border-color: var(--admin-btn-success-bg);
+    color: var(--admin-btn-success-text);
   }
 
   .pool-empty {
@@ -345,6 +345,56 @@ include __DIR__ . '/../../templates/header.php';
     </div>
   </div>
 
+  <div class="modal fade" id="poolClosePromptModal" tabindex="-1" aria-labelledby="poolClosePromptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="poolClosePromptModalLabel">Cerrar jornada</h2>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">¿Necesitas editar las cantidades totales vendidas antes de cerrar?</p>
+          <p class="text-muted small mb-0">El ajuste se aplicará solo a estadísticas generales, sin modificar personas, pools ni bebidas específicas.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-outline-danger" data-close-direct>Cerrar sin editar</button>
+          <button type="button" class="btn btn-primary" data-close-edit>Editar totales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="poolCloseAdjustModal" tabindex="-1" aria-labelledby="poolCloseAdjustModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form data-close-adjust-form>
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="poolCloseAdjustModalLabel">Ajustar totales de cierre</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted small">Edita el total final vendido. Las diferencias se guardan como ajuste global de la jornada.</p>
+            <div class="mb-3">
+              <label class="form-label" for="poolCloseFichas">Total de fichas vendidas</label>
+              <input class="form-control form-control-lg" id="poolCloseFichas" name="fichasVendidas" type="number" min="0" step="1" required>
+            </div>
+            <div>
+              <label class="form-label" for="poolCloseBebidas">Total de bebidas vendidas (jarras)</label>
+              <input class="form-control form-control-lg" id="poolCloseBebidas" name="bebidasVendidas" type="number" min="0" step="1" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn btn-danger" data-close-adjust-submit>
+              <i class="fa-solid fa-lock me-1" aria-hidden="true"></i> Cerrar jornada
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <div class="pool-jornada-card d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
     <div>
       <span class="pool-jornada-card__status" data-jornada-status>
@@ -410,8 +460,15 @@ include __DIR__ . '/../../templates/header.php';
   const privacyForm = shell.querySelector('[data-privacy-form]');
   const privacyPassword = shell.querySelector('#poolPrivacyPassword');
   const privacyFeedback = shell.querySelector('[data-privacy-feedback]');
+  const closePromptModal = document.getElementById('poolClosePromptModal');
+  const closeAdjustModal = document.getElementById('poolCloseAdjustModal');
+  const closeAdjustForm = shell.querySelector('[data-close-adjust-form]');
+  const closeDirectButton = shell.querySelector('[data-close-direct]');
+  const closeEditButton = shell.querySelector('[data-close-edit]');
+  const closeAdjustSubmit = shell.querySelector('[data-close-adjust-submit]');
   let draggedId = null;
   let sensitiveVisible = false;
+  let closeTotals = null;
 
   function showAlert(message, type = 'danger') {
     const alert = document.getElementById('poolAlert');
@@ -497,8 +554,8 @@ include __DIR__ . '/../../templates/header.php';
         </div>
         <div class="pool-actions">
           <div class="pool-actions__chips">
-            <button class="btn btn-sm pool-action pool-action--consume" data-action="consumir" title="Consumir ficha" aria-label="Consumir ficha"><i class="fa-solid fa-plus"></i></button>
-            <button class="btn btn-sm pool-action pool-action--restore" data-action="revertir" title="Revertir ficha" aria-label="Revertir ficha"><i class="fa-solid fa-minus"></i></button>
+            <button class="btn btn-sm pool-action pool-action--decrease" data-action="consumir" title="Restar ficha" aria-label="Restar ficha"><i class="fa-solid fa-minus"></i></button>
+            <button class="btn btn-sm pool-action pool-action--increase" data-action="revertir" title="Sumar ficha" aria-label="Sumar ficha"><i class="fa-solid fa-plus"></i></button>
           </div>
           <div class="pool-actions__order">
             <button class="btn btn-outline-secondary btn-sm pool-action" data-action="arriba" title="Subir" aria-label="Subir turno"><i class="fa-solid fa-arrow-up"></i></button>
@@ -664,6 +721,51 @@ include __DIR__ . '/../../templates/header.php';
     }
   }
 
+  function setClosingBusy(busy) {
+    [closeDirectButton, closeEditButton, closeAdjustSubmit].forEach((button) => {
+      if (button) button.disabled = busy;
+    });
+  }
+
+  async function openClosePrompt() {
+    setClosingBusy(true);
+    try {
+      const data = await request({ accion: 'totales_cierre' });
+      closeTotals = data.totales || { fichasVendidas: 0, bebidasVendidas: 0 };
+      bootstrap.Modal.getOrCreateInstance(closePromptModal).show();
+    } catch (error) {
+      showAlert(error.message);
+    } finally {
+      setClosingBusy(false);
+    }
+  }
+
+  function openCloseAdjust() {
+    if (!closeTotals) return;
+    closeAdjustForm.elements.fichasVendidas.value = Number(closeTotals.fichasVendidas || 0);
+    closeAdjustForm.elements.bebidasVendidas.value = Number(closeTotals.bebidasVendidas || 0);
+    bootstrap.Modal.getOrCreateInstance(closePromptModal).hide();
+    bootstrap.Modal.getOrCreateInstance(closeAdjustModal).show();
+  }
+
+  async function closeJornada(totales = null) {
+    setClosingBusy(true);
+    try {
+      await request({
+        accion: 'cerrar_jornada',
+        ...(totales ? { totales } : {}),
+      });
+      bootstrap.Modal.getOrCreateInstance(closePromptModal).hide();
+      bootstrap.Modal.getOrCreateInstance(closeAdjustModal).hide();
+      closeTotals = null;
+      showAlert('Jornada cerrada correctamente.', 'success');
+    } catch (error) {
+      showAlert(error.message);
+    } finally {
+      setClosingBusy(false);
+    }
+  }
+
   privacyToggle?.addEventListener('click', () => {
     if (sensitiveVisible) {
       setSensitiveVisible(false);
@@ -742,12 +844,23 @@ include __DIR__ . '/../../templates/header.php';
     finishInlineNameEdit(editableName, true);
   });
 
+  closeDirectButton?.addEventListener('click', () => closeJornada());
+  closeEditButton?.addEventListener('click', openCloseAdjust);
+  closeAdjustForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    closeJornada({
+      fichasVendidas: Number(closeAdjustForm.elements.fichasVendidas.value || 0),
+      bebidasVendidas: Number(closeAdjustForm.elements.bebidasVendidas.value || 0),
+    });
+  });
+
   shell.addEventListener('click', async (event) => {
     const button = event.target.closest('[data-jornada-action]');
     if (!button) return;
 
     const accion = button.dataset.jornadaAction;
-    if (accion === 'cerrar_jornada' && !confirm('¿Cerrar la jornada activa? No se podrán registrar más operaciones en ella.')) {
+    if (accion === 'cerrar_jornada') {
+      await openClosePrompt();
       return;
     }
 
