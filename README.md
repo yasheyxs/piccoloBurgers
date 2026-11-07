@@ -149,6 +149,8 @@ piccoloBurgers/
 
 Cada carpeta tiene su propio README. Hoy el sitio de clientes todavía se genera desde PHP dentro de `backend/`; el paso a `frontend/` está planificado en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).
 
+El backend ya expone una **API JSON** (`/api/v1`) con el menú, el carrito, los pedidos y la cuenta del cliente, que es la que va a usar el nuevo frontend. Está documentada en [`docs/API.md`](docs/API.md).
+
 En producción, el directorio raíz del sitio apunta a `backend/public`:
 
 - Cliente: `/`
