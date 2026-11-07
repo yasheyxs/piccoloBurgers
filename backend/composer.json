@@ -1,0 +1,15 @@
+{
+    "require": {
+        "dompdf/dompdf": "^3.1",
+        "phpoffice/phpspreadsheet": "^5.0",
+        "phpmailer/phpmailer": "^6.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "Piccolo\\": "src/"
+        },
+        "files": [
+            "src/Core/helpers.php"
+        ]
+    }
+}

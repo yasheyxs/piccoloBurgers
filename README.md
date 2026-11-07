@@ -81,8 +81,9 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
    ```bash
    git clone https://github.com/<usuario>/piccoloBurgers.git
    ```
-3️⃣ Instalar dependencias con:
+3️⃣ Instalar dependencias (desde la carpeta `backend/`):
    ```bash
+   cd backend
    composer install
    ```
 4️⃣ Mover el proyecto a la ruta del servidor web:
@@ -93,15 +94,17 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 5️⃣ Crear base de datos en MySQL:
 * Iniciar Apache y MySQL.
 * Acceder a [http://localhost/phpmyadmin](http://localhost/phpmyadmin) y crear base de datos **piccolodb**.
-* Importar **database/piccolodb.sql**.
+* Importar **backend/database/piccolodb.sql**.
 
-6️⃣ Configurar credenciales y ajustes en los archivos:
-* `.env` / `.env.local` – credenciales de MySQL (`MYSQL_*`) y del correo (`MAILER_*`).
-* `config/config.php` – modo desarrollo; `config/mailer.php` – configuración de PHPMailer.
+6️⃣ Configurar credenciales y ajustes:
+* Copiar `backend/.env.example` como `backend/.env.local` y completar MySQL (`MYSQL_*`) y correo (`MAILER_*`).
+* `backend/config/config.php` – modo desarrollo; `backend/config/mailer.php` – configuración de PHPMailer.
 
 7️⃣ Acceder al sitio:
-* 🌍 Público: [http://localhost/piccoloBurgers/public/](http://localhost/piccoloBurgers/public/)
-* 🔐 Admin: [http://localhost/piccoloBurgers/admin/](http://localhost/piccoloBurgers/admin/)
+* 🌍 Público: [http://localhost/piccoloBurgers/](http://localhost/piccoloBurgers/)
+* 🔐 Admin: [http://localhost/piccoloBurgers/backend/public/admin/](http://localhost/piccoloBurgers/backend/public/admin/)
+
+🐳 **Con Docker**: desde `backend/` ejecutar `docker compose up -d --build` y entrar a [http://localhost:8080/](http://localhost:8080/) (panel en `/admin/`).
 
 ---------------
 
@@ -131,22 +134,22 @@ Combina un **sitio público** de alto impacto visual con un **panel administrati
 ---------------
 ## Arquitectura actual
 
-La aplicacion esta organizada como PHP tradicional con separacion progresiva entre backend y frontend:
+El proyecto está dividido en dos carpetas principales, pensadas para poder desplegarse por separado:
 
-- `app/`: backend, bootstrap, controladores, services y repositories.
-- `frontend/customer/`: vistas y componentes del sitio publico.
-- `frontend/backoffice/`: templates del panel administrativo.
-- `public/`: webroot recomendado y entrypoints del cliente.
-- `admin/`: entrypoints del backoffice (`admin/templates/` es un puente hacia `frontend/backoffice/templates/`).
-- `tests/`: pruebas automatizadas (`php tests/ValidarTelefonoTest.php`).
-- `docs/`: documentación y propuesta de reestructuración.
+```
+piccoloBurgers/
+├── backend/     servidor: sitio de clientes (PHP), panel de administración, lógica, configuración y base de datos
+│   ├── public/  lo único accesible desde el navegador (incluye el panel en public/admin)
+│   ├── src/     código PHP: arranque, controladores y reglas de negocio
+│   ├── views/   plantillas del sitio y del panel
+│   └── ...      config/, database/, tests/, Dockerfile, docker-compose.yml
+├── frontend/    futuro sitio de clientes independiente (HTML, CSS y JS)
+└── docs/        documentación y plan de reestructuración
+```
 
-URLs recomendadas en produccion:
+Cada carpeta tiene su propio README. Hoy el sitio de clientes todavía se genera desde PHP dentro de `backend/`; el paso a `frontend/` está planificado en [`docs/PROPUESTA_REESTRUCTURACION.md`](docs/PROPUESTA_REESTRUCTURACION.md).
+
+En producción, el directorio raíz del sitio apunta a `backend/public`:
 
 - Cliente: `/`
-- Backoffice: `/admin/`
-
-Compatibilidad local XAMPP:
-
-- Cliente: `/piccoloBurgers/public/`
-- Backoffice: `/piccoloBurgers/admin/`
+- Panel: `/admin/`
