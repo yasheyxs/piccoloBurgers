@@ -11,13 +11,6 @@ require_once __DIR__ . '/../src/Core/bootstrap.php';
  */
 function crearMailer(): PHPMailer
 {
-    static $envCargado = false;
-
-    if (!$envCargado) {
-        piccolo_load_environment();
-        $envCargado = true;
-    }
-
     $host = piccolo_env('MAILER_HOST') ?: '';
     $username = piccolo_env('MAILER_USERNAME') ?: '';
     $password = piccolo_env('MAILER_PASSWORD') ?: '';
@@ -48,7 +41,7 @@ function crearMailer(): PHPMailer
             break;
         case 'none':
         case '':
-            $mailer->SMTPSecure = false;
+            $mailer->SMTPSecure = '';
             $mailer->SMTPAutoTLS = false;
             break;
         case 'tls':

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
 
+$txtID = $opinion = $nombre = "";
 
 if (isset($_GET['txtID'])) {
     $txtID = (isset($_GET["txtID"])) ? $_GET["txtID"] : "";

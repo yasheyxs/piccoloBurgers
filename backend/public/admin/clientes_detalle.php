@@ -71,8 +71,6 @@ try {
     exit();
 }
 
-$historialCanjes = $historialCanjes ?? [];
-
 include(__DIR__ . "/../../views/admin/header.php");
 ?>
 

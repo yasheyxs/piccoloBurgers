@@ -1,0 +1,17 @@
+# Análisis estático: busca errores sin ejecutar el código (variables sin definir,
+# funciones mal llamadas, tipos incorrectos). Se corre con: vendor/bin/phpstan
+parameters:
+    level: 3
+    paths:
+        - src
+        - public
+        - bin
+        - database/migraciones
+        - views
+        - config
+    excludePaths:
+        - public/img
+    ignoreErrors:
+        # La conexión y la dirección base del panel las definen los archivos que se incluyen
+        # al principio de cada pantalla (src/Core/database.php y views/admin/header.php)
+        - '#^Variable \$(conexion|url_base) might not be defined\.$#'

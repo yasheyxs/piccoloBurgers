@@ -11,5 +11,13 @@
         "files": [
             "src/Core/helpers.php"
         ]
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1"
+    },
+    "scripts": {
+        "pruebas": "phpunit --testsuite unitarias",
+        "analizar": "phpstan analyse --memory-limit=1G"
     }
 }

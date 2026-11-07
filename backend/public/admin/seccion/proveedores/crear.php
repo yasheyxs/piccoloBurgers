@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $sentencia = $conexion->prepare("INSERT INTO tbl_proveedores (nombre, telefono, email) VALUES (:nombre, :telefono, :email)");
       $sentencia->bindParam(":nombre", $nombre);
       $sentencia->bindParam(":telefono", $telefono);
-      $sentencia->bindParam(":email", $email !== "" ? $email : null);
+      $sentencia->bindValue(":email", $email !== "" ? $email : null);
       $sentencia->execute();
 
       $mensaje = "Proveedor agregado correctamente.";
