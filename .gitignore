@@ -20,3 +20,6 @@
 *.log
 .DS_Store
 Thumbs.db
+
+# Dependencias de Composer (se instalan con composer install)
+backend/vendor/

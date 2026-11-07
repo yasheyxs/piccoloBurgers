@@ -8,6 +8,7 @@ Sistema web para una hamburguesería: un **sitio de pedidos online** con program
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5-7952B3?logo=bootstrap&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Nginx](https://img.shields.io/badge/Nginx-009639?logo=nginx&logoColor=white)
+[![Pruebas](https://github.com/yasheyxs/piccoloBurgers/actions/workflows/pruebas.yml/badge.svg)](https://github.com/yasheyxs/piccoloBurgers/actions/workflows/pruebas.yml)
 
 ![Inicio del sitio](docs/capturas/inicio.png)
 
@@ -103,10 +104,11 @@ La base de datos se crea sola con datos de ejemplo la primera vez.
 
 1. Copiar el proyecto en `C:\xampp\htdocs\piccoloBurgers` (o `/opt/lampp/htdocs/piccoloBurgers`).
 2. Crear la base `piccolodb` e importar `backend/database/piccolodb.sql`.
-3. Copiar `backend/.env.example` como `backend/.env.local` y completar los datos de MySQL (con XAMPP, `MYSQL_HOST=127.0.0.1`).
-4. Entrar a http://localhost/piccoloBurgers/ (sitio) y http://localhost/piccoloBurgers/backend/public/admin/ (panel).
+3. Instalar las dependencias: `cd backend && composer install`.
+4. Copiar `backend/.env.example` como `backend/.env.local` y completar los datos de MySQL (con XAMPP, `MYSQL_HOST=127.0.0.1`).
+5. Entrar a http://localhost/piccoloBurgers/ (sitio) y http://localhost/piccoloBurgers/backend/public/admin/ (panel).
 
-Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd` y `zip`, MySQL 8 y Apache con `mod_rewrite`.
+Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd` y `zip`, Composer, MySQL 8 y Apache con `mod_rewrite`.
 
 ### Usuarios de prueba
 
@@ -114,18 +116,21 @@ Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd`
 |---|---|---|---|
 | Sitio | Teléfono `0000825022` (código +54) | `Cliente1!` | Cliente con puntos acumulados |
 | Panel | `Usuario` | `Usuario1!` | Administración: acceso completo |
+| Panel | `Empleado` | `Empleado1!` | Empleado: cocina, pool y bebidas |
 | Panel | `Delivery` | `Delivery1!` | Delivery: solo el panel de envíos |
 
 ### Pruebas automáticas
 
 ```bash
 php backend/tests/ApiTest.php http://localhost:8080/api/v1
-PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
+PANEL_USUARIOS="admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!" php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
 php backend/tests/ValidarTelefonoTest.php
 ```
 
 - `ApiTest` recorre la API como un cliente: menú, carrito, registro, pedido, historial y sesión.
 - `PanelPermisosTest` entra al panel con cada rol y verifica a qué secciones puede acceder.
+
+Las tres pruebas corren solas en GitHub Actions con cada cambio, levantando el sistema completo con Docker.
 
 ---
 

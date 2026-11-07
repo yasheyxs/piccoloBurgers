@@ -1,0 +1,74 @@
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  sintaxis:
+    name: Sintaxis PHP (${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['8.2', '8.3']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+      - name: Revisar todos los archivos PHP
+        run: |
+          find backend -name '*.php' -not -path 'backend/vendor/*' -print0 \
+            | xargs -0 -n1 -P4 php -l -d display_errors=1 > /tmp/lint.txt || { grep -v '^No syntax errors' /tmp/lint.txt; exit 1; }
+          echo "$(wc -l < /tmp/lint.txt) archivos sin errores"
+      - name: Validación de teléfonos
+        run: php backend/tests/ValidarTelefonoTest.php
+
+  sistema:
+    name: API y permisos del panel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configuración de prueba
+        run: |
+          cat > backend/.env <<'EOF'
+          MYSQL_HOST=mysql
+          MYSQL_PORT=3306
+          MYSQL_DATABASE=piccolodb
+          MYSQL_USER=piccolo
+          MYSQL_PASSWORD=piccolo_ci
+          MYSQL_ROOT_PASSWORD=root_ci
+          SESSION_SAMESITE=Lax
+          EOF
+
+      - name: Levantar el sistema con Docker
+        run: docker compose up -d --build frontend backend mysql
+
+      - name: Esperar a que la API responda
+        run: |
+          for i in $(seq 1 60); do
+            if curl -fs http://localhost:8080/api/v1/menu > /dev/null; then echo "Lista"; exit 0; fi
+            sleep 3
+          done
+          docker compose logs
+          exit 1
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+
+      - name: Recorrido de la API
+        run: php backend/tests/ApiTest.php http://localhost:8080/api/v1
+
+      - name: Permisos del panel por rol
+        env:
+          PANEL_USUARIOS: 'admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!'
+        run: php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
+
+      - name: Registros del backend si algo falla
+        if: failure()
+        run: docker compose logs backend
