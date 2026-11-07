@@ -12,7 +12,6 @@ if (!isset($_SESSION['admin_logueado']) || !in_array($rolActual, ['admin', 'empl
     exit;
 }
 
-asegurarTablasBebidas($conexion);
 $adminPageIdentifier = 'bebidas-admin';
 include __DIR__ . '/../../../../views/admin/header.php';
 ?>

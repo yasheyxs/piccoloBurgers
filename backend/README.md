@@ -12,7 +12,8 @@ Todo lo que corre en el servidor: la API que usa el sitio de clientes, el panel 
 | `src/` | Código PHP del sistema: `Core/` (arranque, conexión, helpers), `Http/` (API y panel), `Services/` (reglas de negocio). |
 | `views/admin/` | Plantillas del panel. |
 | `config/` | Configuración de la aplicación y del correo. |
-| `database/` | Base de datos de ejemplo (`piccolodb.sql`). |
+| `database/` | Migraciones de la base (`migraciones/`) y datos de ejemplo. |
+| `bin/` | Scripts de consola, como `migrar.php`. |
 | `tests/` | Pruebas. |
 | `vendor/` | Dependencias de Composer. |
 
@@ -24,10 +25,23 @@ Copiar `.env.example` como `.env` (Docker) o `.env.local` (XAMPP) y completar lo
 
 **Con Docker**: el `docker-compose.yml` de la raíz del proyecto levanta el backend junto con el frontend y MySQL (ver el README principal). La imagen del backend también se puede construir sola con el `Dockerfile` de esta carpeta.
 
-**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, importar `database/piccolodb.sql` en una base llamada `piccolodb`, instalar las dependencias con `composer install` dentro de `backend/` y entrar a:
+**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, crear una base vacía llamada `piccolodb` y, dentro de `backend/`, correr `composer install` y `php bin/migrar.php --con-datos`. Después entrar a:
 
 - Panel: http://localhost/piccoloBurgers/backend/public/admin/
 - API: http://localhost/piccoloBurgers/backend/public/api/v1/menu
+
+## Base de datos
+
+La estructura de la base se arma con las migraciones de `database/migraciones/`: archivos numerados que se aplican una sola vez y en orden. El script `bin/migrar.php` aplica las que falten y las anota en la tabla `tbl_migraciones`. En Docker corre solo cada vez que arranca el backend.
+
+```bash
+php bin/migrar.php               # aplica las migraciones pendientes
+php bin/migrar.php --con-datos   # además carga los datos de ejemplo si la base está vacía
+```
+
+Para cambiar la base (una tabla o columna nueva, por ejemplo) se agrega un archivo nuevo con el número siguiente, como `005_descripcion.sql`, y nunca se edita uno que ya se aplicó. Si el cambio necesita lógica (revisar si algo existe antes de crearlo) puede ser un `.php` que devuelve una función que recibe la conexión, como `002_pool_y_bebidas.php`.
+
+Una base que ya existía antes de las migraciones se reconoce sola: se toma el esquema inicial como aplicado y se agregan solo las tablas nuevas.
 
 ## Pruebas
 
@@ -52,5 +66,7 @@ El token CSRF se agrega solo a los formularios y a los `fetch()` del panel (`adm
 ## Despliegue
 
 En un hosting, el directorio raíz del sitio (document root) tiene que apuntar a `backend/public`. Así nada fuera de esa carpeta queda expuesto.
+
+Con cada actualización hay que correr `php bin/migrar.php` para aplicar los cambios de la base (sin `--con-datos`).
 
 Si el frontend se publica en otro dominio, configurar `FRONTEND_URL` y `SESSION_SAMESITE=None` (ver `.env.example`).

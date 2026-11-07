@@ -103,10 +103,11 @@ La base de datos se crea sola con datos de ejemplo la primera vez.
 ### Con XAMPP
 
 1. Copiar el proyecto en `C:\xampp\htdocs\piccoloBurgers` (o `/opt/lampp/htdocs/piccoloBurgers`).
-2. Crear la base `piccolodb` e importar `backend/database/piccolodb.sql`.
+2. Crear una base vacía llamada `piccolodb`.
 3. Instalar las dependencias: `cd backend && composer install`.
 4. Copiar `backend/.env.example` como `backend/.env.local` y completar los datos de MySQL (con XAMPP, `MYSQL_HOST=127.0.0.1`).
-5. Entrar a http://localhost/piccoloBurgers/ (sitio) y http://localhost/piccoloBurgers/backend/public/admin/ (panel).
+5. Crear las tablas y cargar los datos de ejemplo: `php bin/migrar.php --con-datos` (desde `backend/`).
+6. Entrar a http://localhost/piccoloBurgers/ (sitio) y http://localhost/piccoloBurgers/backend/public/admin/ (panel).
 
 Requisitos: PHP 8.2 o superior con las extensiones `pdo_mysql`, `mbstring`, `gd` y `zip`, Composer, MySQL 8 y Apache con `mod_rewrite`.
 
@@ -146,7 +147,8 @@ piccoloBurgers/
 │   ├── src/               API, panel y reglas de negocio
 │   ├── views/admin/       plantillas del panel
 │   ├── config/            configuración y permisos del panel
-│   ├── database/          base de datos de ejemplo
+│   ├── database/          migraciones y datos de ejemplo
+│   ├── bin/migrar.php     aplica los cambios pendientes de la base
 │   ├── tests/             pruebas automáticas
 │   └── Dockerfile         imagen de PHP + Apache
 ├── docs/API.md            documentación de la API

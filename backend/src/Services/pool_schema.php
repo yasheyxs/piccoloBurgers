@@ -1,106 +1,5 @@
 <?php
 
-if (!function_exists('asegurarTablaPoolTurnos')) {
-    function asegurarTablaPoolTurnos(PDO $conexion): void
-    {
-        $conexion->exec(
-            "CREATE TABLE IF NOT EXISTS pool_jornadas (
-                id INT NOT NULL AUTO_INCREMENT,
-                estado ENUM('abierta','cerrada') NOT NULL DEFAULT 'abierta',
-                fecha_apertura DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                fecha_cierre DATETIME NULL,
-                fichas_vendidas_azul INT UNSIGNED NOT NULL DEFAULT 0,
-                fichas_vendidas_rojo INT UNSIGNED NOT NULL DEFAULT 0,
-                fichas_consumidas_azul INT UNSIGNED NOT NULL DEFAULT 0,
-                fichas_consumidas_rojo INT UNSIGNED NOT NULL DEFAULT 0,
-                fichas_pendientes_azul INT UNSIGNED NOT NULL DEFAULT 0,
-                fichas_pendientes_rojo INT UNSIGNED NOT NULL DEFAULT 0,
-                monto_vendido_azul DECIMAL(12,2) NOT NULL DEFAULT 0,
-                monto_vendido_rojo DECIMAL(12,2) NOT NULL DEFAULT 0,
-                ajuste_fichas_vendidas INT NOT NULL DEFAULT 0,
-                ajuste_bebidas_vendidas INT NOT NULL DEFAULT 0,
-                jugadores_atendidos INT UNSIGNED NOT NULL DEFAULT 0,
-                turnos_completados INT UNSIGNED NOT NULL DEFAULT 0,
-                duracion_minutos INT UNSIGNED NULL,
-                created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id),
-                INDEX idx_pool_jornadas_estado (estado),
-                INDEX idx_pool_jornadas_apertura (fecha_apertura)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
-        );
-
-        $conexion->exec(
-            "CREATE TABLE IF NOT EXISTS pool_turnos (
-                id INT NOT NULL AUTO_INCREMENT,
-                jornada_id INT NULL,
-                pool ENUM('azul','rojo') NOT NULL,
-                nombre VARCHAR(120) NOT NULL,
-                fichas_total TINYINT UNSIGNED NOT NULL,
-                fichas_consumidas TINYINT UNSIGNED NOT NULL DEFAULT 0,
-                valor_ficha DECIMAL(10,2) NOT NULL DEFAULT 0,
-                orden INT NOT NULL DEFAULT 0,
-                jornada_fecha DATE NOT NULL,
-                created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id),
-                INDEX idx_pool_jornada_orden (pool, jornada_fecha, orden),
-                INDEX idx_pool_jornada_consumo (pool, jornada_fecha, fichas_consumidas, fichas_total),
-                INDEX idx_pool_turnos_jornada_pool (jornada_id, pool, orden),
-                CONSTRAINT fk_pool_turnos_jornada
-                    FOREIGN KEY (jornada_id) REFERENCES pool_jornadas(id)
-                    ON DELETE SET NULL
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
-        );
-
-        $conexion->exec(
-            "CREATE TABLE IF NOT EXISTS pool_configuracion (
-                id TINYINT UNSIGNED NOT NULL,
-                max_fichas_por_registro INT UNSIGNED NOT NULL DEFAULT 3,
-                valor_ficha DECIMAL(10,2) NOT NULL DEFAULT 1000,
-                actualizado_en TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                PRIMARY KEY (id)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci"
-        );
-
-        $conexion->exec(
-            "INSERT IGNORE INTO pool_configuracion (id, max_fichas_por_registro, valor_ficha)
-             VALUES (1, 3, 1000)"
-        );
-
-        if (!piccolo_columna_existe($conexion, 'pool_turnos', 'jornada_id')) {
-            $conexion->exec('ALTER TABLE pool_turnos ADD COLUMN jornada_id INT NULL AFTER id');
-            $conexion->exec('ALTER TABLE pool_turnos ADD INDEX idx_pool_turnos_jornada_pool (jornada_id, pool, orden)');
-        }
-
-        if (!piccolo_columna_existe($conexion, 'pool_turnos', 'valor_ficha')) {
-            $conexion->exec('ALTER TABLE pool_turnos ADD COLUMN valor_ficha DECIMAL(10,2) NOT NULL DEFAULT 0 AFTER fichas_consumidas');
-        }
-
-        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'monto_vendido_azul')) {
-            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN monto_vendido_azul DECIMAL(12,2) NOT NULL DEFAULT 0 AFTER fichas_pendientes_rojo');
-        }
-
-        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'monto_vendido_rojo')) {
-            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN monto_vendido_rojo DECIMAL(12,2) NOT NULL DEFAULT 0 AFTER monto_vendido_azul');
-        }
-
-        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'ajuste_fichas_vendidas')) {
-            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN ajuste_fichas_vendidas INT NOT NULL DEFAULT 0 AFTER monto_vendido_rojo');
-        }
-
-        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'ajuste_bebidas_vendidas')) {
-            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN ajuste_bebidas_vendidas INT NOT NULL DEFAULT 0 AFTER ajuste_fichas_vendidas');
-        }
-
-        $conexion->exec(
-            "UPDATE pool_turnos
-             SET valor_ficha = (SELECT valor_ficha FROM pool_configuracion WHERE id = 1)
-             WHERE valor_ficha <= 0"
-        );
-    }
-}
-
 if (!function_exists('poolObtenerConfiguracion')) {
     function poolObtenerConfiguracion(PDO $conexion): array
     {
@@ -682,7 +581,6 @@ if (!function_exists('poolResumenGeneral')) {
 if (!function_exists('poolMontoVendidoEntreFechas')) {
     function poolMontoVendidoEntreFechas(PDO $conexion, string $fechaInicio, string $fechaFin): float
     {
-        asegurarTablaPoolTurnos($conexion);
         $jornadas = poolListarJornadas($conexion, substr($fechaInicio, 0, 10), substr($fechaFin, 0, 10));
         $resumen = poolResumenGeneral($jornadas);
 

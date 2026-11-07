@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../../../src/Core/database.php';
 require_once __DIR__ . '/../../../../src/Services/bebidas_schema.php';
 
 verificarRol('admin');
-asegurarTablasBebidas($conexion);
 
 $errores = [];
 $mensajeExito = '';

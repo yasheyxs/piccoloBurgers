@@ -19,33 +19,10 @@ if (!function_exists('piccoloLoginClave')) {
     }
 }
 
-if (!function_exists('piccoloLoginAsegurarTabla')) {
-    // Pendiente: pasar a una migración de base de datos cuando el proyecto tenga un sistema de migraciones
-    function piccoloLoginAsegurarTabla(PDO $conexion): void
-    {
-        static $lista = false;
-        if ($lista) {
-            return;
-        }
-
-        $conexion->exec(
-            'CREATE TABLE IF NOT EXISTS tbl_intentos_login (
-                clave CHAR(64) NOT NULL,
-                intentos SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-                primer_intento DATETIME NOT NULL,
-                bloqueado_hasta DATETIME NULL,
-                PRIMARY KEY (clave)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci'
-        );
-        $lista = true;
-    }
-}
-
 if (!function_exists('piccoloLoginMinutosBloqueado')) {
     /** Minutos que faltan para poder volver a intentar, o 0 si no está bloqueado. */
     function piccoloLoginMinutosBloqueado(PDO $conexion, string $tipo, string $identificador): int
     {
-        piccoloLoginAsegurarTabla($conexion);
         $stmt = $conexion->prepare(
             'SELECT CEIL(TIMESTAMPDIFF(SECOND, NOW(), bloqueado_hasta) / 60)
              FROM tbl_intentos_login WHERE clave = ? AND bloqueado_hasta > NOW()'
@@ -59,7 +36,6 @@ if (!function_exists('piccoloLoginMinutosBloqueado')) {
 if (!function_exists('piccoloLoginRegistrarFallo')) {
     function piccoloLoginRegistrarFallo(PDO $conexion, string $tipo, string $identificador): void
     {
-        piccoloLoginAsegurarTabla($conexion);
         $clave = piccoloLoginClave($tipo, $identificador);
         $ventana = PICCOLO_LOGIN_MINUTOS_BLOQUEO;
 
@@ -81,7 +57,6 @@ if (!function_exists('piccoloLoginRegistrarFallo')) {
 if (!function_exists('piccoloLoginRegistrarExito')) {
     function piccoloLoginRegistrarExito(PDO $conexion, string $tipo, string $identificador): void
     {
-        piccoloLoginAsegurarTabla($conexion);
         $conexion->prepare('DELETE FROM tbl_intentos_login WHERE clave = ?')
             ->execute([piccoloLoginClave($tipo, $identificador)]);
     }

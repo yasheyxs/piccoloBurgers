@@ -1,98 +1,11 @@
--- phpMyAdmin SQL Dump
--- version 5.2.3
--- https://www.phpmyadmin.net/
---
--- Host: mysql
--- Generation Time: Nov 07, 2025 at 12:18 AM
--- Server version: 8.0.44
--- PHP Version: 8.3.26
+-- Datos de ejemplo para probar el sistema (anonimizados).
+-- Se cargan con: php bin/migrar.php --con-datos
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `piccolodb`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `movimientos_puntos`
---
-
-CREATE TABLE `movimientos_puntos` (
-  `id` int NOT NULL,
-  `cliente_id` int NOT NULL,
-  `tipo` enum('compra','canje','ajuste') NOT NULL,
-  `descripcion` varchar(255) DEFAULT NULL,
-  `puntos` int NOT NULL,
-  `saldo_resultante` int NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `premios`
---
-
-CREATE TABLE `premios` (
-  `id` int NOT NULL,
-  `nombre` varchar(100) NOT NULL,
-  `descripcion` text,
-  `costo_puntos` int NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_banners`
---
-
-CREATE TABLE `tbl_banners` (
-  `ID` int NOT NULL,
-  `imagen` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `titulo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `descripcion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `link` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_banners`
---
+SET SQL_MODE = 'NO_AUTO_VALUE_ON_ZERO';
+SET FOREIGN_KEY_CHECKS = 0;
 
 INSERT INTO `tbl_banners` (`ID`, `imagen`, `titulo`, `descripcion`, `link`) VALUES
 (1, 'img/banners/banner_690308a16b6b16.41068513.jpg', 'Piccolo Burgers', '100% cargadas de sabor', '#menu');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_clientes`
---
-
-CREATE TABLE `tbl_clientes` (
-  `ID` int NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `puntos` int DEFAULT '0',
-  `reset_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `token_expira` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_clientes`
---
 
 INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fecha_registro`, `puntos`, `reset_token`, `token_expira`) VALUES
 (2, 'Juanita', '123445444141', 'cliente0002@piccolo-falso.test', '$2y$10$1/J42AZMSpKzryAUXUC3tOS9Ri/ULK8t1nNjSeJgyBm2a9O3NIFoC', '2025-06-20 03:08:38', 25, NULL, NULL),
@@ -105,44 +18,11 @@ INSERT INTO `tbl_clientes` (`ID`, `nombre`, `telefono`, `email`, `password`, `fe
 (9, 'Cliente', '+540000825022', 'contacto-7f3c29@piccolo-falso.test', '$2y$10$JUXGr5Wq2JPrzsJcaLXmRuApQUE32wjS9FLCMkiA1RcyzPFs02eoq', '2025-09-15 03:52:18', 70, NULL, NULL),
 (10, 'Esta es una prueba', '+540000884802', 'cliente0010@piccolo-falso.test', '$2y$10$7R//2QO36epDdd.r8ho9UeizXdnJmIJAjUQLysxME8bi0PrdYJ05q', '2025-09-27 19:46:51', 0, NULL, NULL);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_comentarios`
---
-
-CREATE TABLE `tbl_comentarios` (
-  `ID` int NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `correo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `mensaje` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_comentarios`
---
-
 INSERT INTO `tbl_comentarios` (`ID`, `nombre`, `correo`, `mensaje`) VALUES
 (14, 'Yass', 'contacto-3b597c@piccolo-falso.test', 'feed'),
 (15, 'Yass', 'contacto-3b597c@piccolo-falso.test', 'aaa'),
 (16, 'Yass', 'contacto-3b597c@piccolo-falso.test', 'aaa'),
 (17, 'Yass', 'contacto-3b597c@piccolo-falso.test', '3123');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_compras`
---
-
-CREATE TABLE `tbl_compras` (
-  `ID` int NOT NULL,
-  `fecha` date NOT NULL,
-  `proveedor_id` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_compras`
---
 
 INSERT INTO `tbl_compras` (`ID`, `fecha`, `proveedor_id`) VALUES
 (4, '2025-09-03', 17),
@@ -160,24 +40,6 @@ INSERT INTO `tbl_compras` (`ID`, `fecha`, `proveedor_id`) VALUES
 (16, '2025-10-09', 23),
 (17, '2025-10-12', 18),
 (18, '2025-10-14', 19);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_compras_detalle`
---
-
-CREATE TABLE `tbl_compras_detalle` (
-  `ID` int NOT NULL,
-  `compra_id` int NOT NULL,
-  `materia_prima_id` int NOT NULL,
-  `cantidad` decimal(10,0) NOT NULL,
-  `precio_unitario` decimal(10,0) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_compras_detalle`
---
 
 INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `cantidad`, `precio_unitario`) VALUES
 (1, 4, 24, 2, 4000),
@@ -213,46 +75,8 @@ INSERT INTO `tbl_compras_detalle` (`ID`, `compra_id`, `materia_prima_id`, `canti
 (31, 18, 114, 18, 6200),
 (32, 18, 34, 10, 7400);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_configuracion_puntos`
---
-
-CREATE TABLE `tbl_configuracion_puntos` (
-  `id` int NOT NULL,
-  `minimo_puntos` int NOT NULL,
-  `valor_punto` decimal(10,2) NOT NULL,
-  `maximo_porcentaje` decimal(5,4) NOT NULL,
-  `actualizado_en` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_configuracion_puntos`
---
-
-INSERT INTO `tbl_configuracion_puntos` (`id`, `minimo_puntos`, `valor_punto`, `maximo_porcentaje`, `actualizado_en`) VALUES
+REPLACE INTO `tbl_configuracion_puntos` (`id`, `minimo_puntos`, `valor_punto`, `maximo_porcentaje`, `actualizado_en`) VALUES
 (1, 50, 20.00, 0.2500, '2025-11-06 23:28:40');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_materias_primas`
---
-
-CREATE TABLE `tbl_materias_primas` (
-  `ID` int NOT NULL,
-  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `unidad_medida` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `cantidad` decimal(10,2) NOT NULL,
-  `proveedor_id` int NOT NULL,
-  `unidades_por_pack` int NOT NULL DEFAULT '1',
-  `stock_minimo` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_materias_primas`
---
 
 INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, `proveedor_id`, `unidades_por_pack`, `stock_minimo`) VALUES
 (1, 'Tomate', 'kg', 3.32, 20, 1, NULL),
@@ -310,26 +134,6 @@ INSERT INTO `tbl_materias_primas` (`ID`, `nombre`, `unidad_medida`, `cantidad`, 
 (119, 'Nugget de pollo', 'unidad', 33.00, 1, 1, 10.00),
 (120, 'Papas fritas', 'kg', 5.50, 17, 1, NULL),
 (121, 'Aros de cebolla', 'kg', 6.85, 17, 1, NULL);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_menu`
---
-
-CREATE TABLE `tbl_menu` (
-  `ID` int NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `ingredientes` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `foto` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `precio` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `categoria` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'General',
-  `visible_en_menu` tinyint(1) DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_menu`
---
 
 INSERT INTO `tbl_menu` (`ID`, `nombre`, `ingredientes`, `foto`, `precio`, `categoria`, `visible_en_menu`) VALUES
 (12, 'Jamón y queso', 'Carne, jamón, queso y mayonesa', '1754019339_5.png', '9000', 'Hamburguesas', 1),
@@ -389,23 +193,6 @@ INSERT INTO `tbl_menu` (`ID`, `nombre`, `ingredientes`, `foto`, `precio`, `categ
 (66, 'Agua Saborizada', 'Agua saborizada de 500ml. Sabor por disponibilidad o elección', '1754112720_43.png', '1500', 'Bebidas', 1),
 (67, 'Sprite', 'Sprite de 1,5lts', '1754112745_45.png', '4500', 'Bebidas', 1),
 (68, 'Fanta', 'Fanta 1,5lts', '1754112763_46.png', '4500', 'Bebidas', 1);
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_menu_materias_primas`
---
-
-CREATE TABLE `tbl_menu_materias_primas` (
-  `ID` int NOT NULL,
-  `menu_id` int NOT NULL,
-  `materia_prima_id` int NOT NULL,
-  `cantidad` decimal(10,4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_menu_materias_primas`
---
 
 INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `cantidad`) VALUES
 (3, 12, 14, 0.0200),
@@ -648,33 +435,6 @@ INSERT INTO `tbl_menu_materias_primas` (`ID`, `menu_id`, `materia_prima_id`, `ca
 (262, 45, 35, 6.0000),
 (263, 46, 35, 12.0000);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_pedidos`
---
-
-CREATE TABLE `tbl_pedidos` (
-  `ID` int NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `nota` text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
-  `total` decimal(10,0) NOT NULL,
-  `fecha` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `metodo_pago` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `tipo_entrega` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `direccion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `estado` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'En preparación',
-  `cliente_id` int DEFAULT NULL,
-  `referencias` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `esta_pago` enum('No','Si') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'No'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_pedidos`
---
-
 INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`, `fecha`, `metodo_pago`, `tipo_entrega`, `direccion`, `estado`, `cliente_id`, `referencias`, `esta_pago`) VALUES
 (67, 'Yass', '123', '', '', 4500, '2025-08-02 12:24:58', 'MercadoPago', 'Delivery', 'Zona 123', 'Listo', 4, NULL, 'No'),
 (68, 'Yass', '123', '', 'Agua manzana', 4500, '2025-08-02 12:26:41', 'Efectivo', 'Retiro', '', 'Listo', 4, NULL, 'No'),
@@ -726,25 +486,6 @@ INSERT INTO `tbl_pedidos` (`ID`, `nombre`, `telefono`, `email`, `nota`, `total`,
 (114, 'Cliente', '+540000825022', 'contacto-7f3c29@piccolo-falso.test', '', 8920, '2025-10-30 07:01:19', 'Efectivo', 'Delivery', 'Zona 123', 'Listo', 9, NULL, 'Si'),
 (115, 'Cliente', '+540000825022', 'contacto-7f3c29@piccolo-falso.test', '', 36000, '2025-11-06 22:55:47', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No'),
 (116, 'Cliente', '+540000825022', 'contacto-7f3c29@piccolo-falso.test', '', 62000, '2025-11-06 22:56:07', 'Efectivo', 'Retiro', '', 'En preparación', 9, NULL, 'No');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_pedidos_detalle`
---
-
-CREATE TABLE `tbl_pedidos_detalle` (
-  `ID` int NOT NULL,
-  `pedido_id` int NOT NULL,
-  `producto_id` int NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `precio` decimal(10,0) NOT NULL,
-  `cantidad` int NOT NULL DEFAULT '1'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_pedidos_detalle`
---
 
 INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `precio`, `cantidad`) VALUES
 (78, 67, 67, 'Sprite', 4500, 1),
@@ -850,23 +591,6 @@ INSERT INTO `tbl_pedidos_detalle` (`ID`, `pedido_id`, `producto_id`, `nombre`, `
 (178, 116, 51, 'Lomo de bondiola', 13000, 3),
 (179, 116, 55, 'Lomo de pollo', 10000, 1);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_proveedores`
---
-
-CREATE TABLE `tbl_proveedores` (
-  `ID` int NOT NULL,
-  `nombre` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `telefono` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `email` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_proveedores`
---
-
 INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
 (17, 'Distribuidora redolfi s.r.l', '+54 0000 736084', 'contacto-950743@piccolo-falso.test'),
 (18, 'Distribuidora lozano', '+54 0000 580136', 'contacto-28e98f@piccolo-falso.test'),
@@ -877,344 +601,15 @@ INSERT INTO `tbl_proveedores` (`ID`, `nombre`, `telefono`, `email`) VALUES
 (23, 'Arrodimez', '+54 0000 514552', 'contacto-498455@piccolo-falso.test'),
 (24, 'Andrada', 'Desconocido', '');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_reservas_virtuales`
---
-
-CREATE TABLE `tbl_reservas_virtuales` (
-  `ID` int NOT NULL,
-  `session_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `menu_id` int NOT NULL,
-  `cantidad` int NOT NULL,
-  `actualizado_en` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_reservas_virtuales`
---
-
-
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_testimonios`
---
-
-CREATE TABLE `tbl_testimonios` (
-  `ID` int NOT NULL,
-  `opinion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `nombre` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_testimonios`
---
-
 INSERT INTO `tbl_testimonios` (`ID`, `opinion`, `nombre`) VALUES
 (1, 'Este es un testimonio de prueba', 'Juanita'),
 (3, 'Este es el tercer testimonio de prueba!', 'La developer'),
 (4, 'ultimo testimoniooo', 'la developer'),
 (5, '⭐⭐⭐⭐⭐ me encantó todo!', 'Un opinante');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `tbl_usuarios`
---
-
-CREATE TABLE `tbl_usuarios` (
-  `ID` int NOT NULL,
-  `usuario` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `correo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
-  `rol` enum('admin','empleado','delivery') CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'empleado',
-  `reset_token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL,
-  `token_expira` datetime DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `tbl_usuarios`
---
-
 INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
 (4, 'Delivery', '$2y$10$LMP854nISeN8xayyAfG3o.a1HAFM9xsMZumPErKJMmOWpyp9Qp/Cy', 'contacto-da15e0@piccolo-falso.test', 'delivery', NULL, NULL),
 (5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'contacto-3a5671@piccolo-falso.test', 'admin', NULL, NULL),
 (6, 'Empleado', '$2y$10$QWomg6BaOWHi9gMErTPfQOK2vizI9gZuK6FCau3DSQX2Ny8debRs.', 'contacto-e1b2c3@piccolo-falso.test', 'empleado', NULL, NULL);
 
--- --------------------------------------------------------
-
---
--- Stand-in structure for view `vw_stock_materias_primas`
--- (See below for the actual view)
---
-CREATE TABLE `vw_stock_materias_primas` (
-`ID` int
-,`nombre` varchar(50)
-,`stock_pack` decimal(10,2)
-,`stock_unidades_estimado` decimal(20,2)
-,`unidad_medida` varchar(50)
-,`unidades_por_pack` int
-);
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `movimientos_puntos`
---
-ALTER TABLE `movimientos_puntos`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `cliente_id` (`cliente_id`);
-
---
--- Indexes for table `premios`
---
-ALTER TABLE `premios`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `tbl_banners`
---
-ALTER TABLE `tbl_banners`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_clientes`
---
-ALTER TABLE `tbl_clientes`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `telefono` (`telefono`),
-  ADD UNIQUE KEY `email` (`email`);
-
---
--- Indexes for table `tbl_comentarios`
---
-ALTER TABLE `tbl_comentarios`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_compras`
---
-ALTER TABLE `tbl_compras`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_compras_detalle`
---
-ALTER TABLE `tbl_compras_detalle`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_configuracion_puntos`
---
-ALTER TABLE `tbl_configuracion_puntos`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `tbl_materias_primas`
---
-ALTER TABLE `tbl_materias_primas`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_menu`
---
-ALTER TABLE `tbl_menu`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_menu_materias_primas`
---
-ALTER TABLE `tbl_menu_materias_primas`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `uq_menu_mp` (`menu_id`,`materia_prima_id`),
-  ADD KEY `fk_mmp_mp` (`materia_prima_id`);
-
---
--- Indexes for table `tbl_pedidos`
---
-ALTER TABLE `tbl_pedidos`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_pedidos_detalle`
---
-ALTER TABLE `tbl_pedidos_detalle`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `pedido_id` (`pedido_id`),
-  ADD KEY `producto_id` (`producto_id`),
-  ADD KEY `idx_pedido` (`pedido_id`),
-  ADD KEY `idx_producto` (`producto_id`);
-
---
--- Indexes for table `tbl_proveedores`
---
-ALTER TABLE `tbl_proveedores`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_reservas_virtuales`
---
-ALTER TABLE `tbl_reservas_virtuales`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `session_menu_unique` (`session_id`,`menu_id`),
-  ADD KEY `menu_id` (`menu_id`);
-
---
--- Indexes for table `tbl_testimonios`
---
-ALTER TABLE `tbl_testimonios`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `tbl_usuarios`
---
-ALTER TABLE `tbl_usuarios`
-  ADD PRIMARY KEY (`ID`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `movimientos_puntos`
---
-ALTER TABLE `movimientos_puntos`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `premios`
---
-ALTER TABLE `premios`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `tbl_banners`
---
-ALTER TABLE `tbl_banners`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `tbl_clientes`
---
-ALTER TABLE `tbl_clientes`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `tbl_comentarios`
---
-ALTER TABLE `tbl_comentarios`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
-
---
--- AUTO_INCREMENT for table `tbl_compras`
---
-ALTER TABLE `tbl_compras`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
-
---
--- AUTO_INCREMENT for table `tbl_compras_detalle`
---
-ALTER TABLE `tbl_compras_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
-
---
--- AUTO_INCREMENT for table `tbl_materias_primas`
---
-ALTER TABLE `tbl_materias_primas`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=122;
-
---
--- AUTO_INCREMENT for table `tbl_menu`
---
-ALTER TABLE `tbl_menu`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
-
---
--- AUTO_INCREMENT for table `tbl_menu_materias_primas`
---
-ALTER TABLE `tbl_menu_materias_primas`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=264;
-
---
--- AUTO_INCREMENT for table `tbl_pedidos`
---
-ALTER TABLE `tbl_pedidos`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=117;
-
---
--- AUTO_INCREMENT for table `tbl_pedidos_detalle`
---
-ALTER TABLE `tbl_pedidos_detalle`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
-
---
--- AUTO_INCREMENT for table `tbl_proveedores`
---
-ALTER TABLE `tbl_proveedores`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
-
---
--- AUTO_INCREMENT for table `tbl_reservas_virtuales`
---
-ALTER TABLE `tbl_reservas_virtuales`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=76;
-
---
--- AUTO_INCREMENT for table `tbl_testimonios`
---
-ALTER TABLE `tbl_testimonios`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `tbl_usuarios`
---
-ALTER TABLE `tbl_usuarios`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
-
--- --------------------------------------------------------
-
---
--- Structure for view `vw_stock_materias_primas`
---
-DROP TABLE IF EXISTS `vw_stock_materias_primas`;
-
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_stock_materias_primas`  AS SELECT `mp`.`ID` AS `ID`, `mp`.`nombre` AS `nombre`, `mp`.`unidad_medida` AS `unidad_medida`, `mp`.`cantidad` AS `stock_pack`, `mp`.`unidades_por_pack` AS `unidades_por_pack`, (`mp`.`cantidad` * `mp`.`unidades_por_pack`) AS `stock_unidades_estimado` FROM `tbl_materias_primas` AS `mp` ;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `movimientos_puntos`
---
-ALTER TABLE `movimientos_puntos`
-  ADD CONSTRAINT `movimientos_puntos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `tbl_clientes` (`ID`);
-
---
--- Constraints for table `tbl_menu_materias_primas`
---
-ALTER TABLE `tbl_menu_materias_primas`
-  ADD CONSTRAINT `fk_mmp_menu` FOREIGN KEY (`menu_id`) REFERENCES `tbl_menu` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_mmp_mp` FOREIGN KEY (`materia_prima_id`) REFERENCES `tbl_materias_primas` (`ID`) ON UPDATE CASCADE;
-
---
--- Constraints for table `tbl_pedidos_detalle`
---
-ALTER TABLE `tbl_pedidos_detalle`
-  ADD CONSTRAINT `tbl_pedidos_detalle_ibfk_1` FOREIGN KEY (`pedido_id`) REFERENCES `tbl_pedidos` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `tbl_pedidos_detalle_ibfk_2` FOREIGN KEY (`producto_id`) REFERENCES `tbl_menu` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `tbl_reservas_virtuales`
---
-ALTER TABLE `tbl_reservas_virtuales`
-  ADD CONSTRAINT `tbl_reservas_virtuales_menu_fk` FOREIGN KEY (`menu_id`) REFERENCES `tbl_menu` (`ID`) ON DELETE CASCADE;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+SET FOREIGN_KEY_CHECKS = 1;

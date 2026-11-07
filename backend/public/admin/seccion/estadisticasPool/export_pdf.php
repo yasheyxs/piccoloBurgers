@@ -8,7 +8,6 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 
 verificarRol('admin');
-asegurarTablaPoolTurnos($conexion);
 
 function poolPdfBarChart(array $resumen): string
 {

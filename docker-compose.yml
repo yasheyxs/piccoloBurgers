@@ -28,6 +28,8 @@ services:
     environment:
       # Dentro de Docker la base se llama "mysql", aunque .env.local diga otra cosa
       MYSQL_HOST: mysql
+      # Al arrancar se aplican las migraciones y, si la base está vacía, los datos de ejemplo
+      PICCOLO_DATOS_EJEMPLO: "1"
     volumes:
       # Para desarrollo: los cambios en backend/ se ven sin reconstruir la imagen
       - ./backend:/var/www/html
@@ -43,7 +45,6 @@ services:
       - "${MYSQL_PORT:-3306}:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/database/piccolodb.sql:/docker-entrypoint-initdb.d/piccolodb.sql:ro
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:latest
