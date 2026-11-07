@@ -2,7 +2,9 @@
 
 > Objetivo: dejar el proyecto organizado en **dos carpetas principales, `frontend/` y `backend/`**, que se puedan **desplegar por separado**, que sean fáciles de navegar y **sin romper funcionalidades** durante la migración.
 
-**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fases 2 a 4 pendientes.
+**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fase 2 ✅ · Fases 3 y 4 pendientes.
+
+En la Fase 2 la API quedó con una única entrada (`backend/public/api/v1/index.php`) y rutas limpias como `GET /api/v1/menu`, en lugar de un archivo PHP por endpoint. La documentación está en [`API.md`](API.md).
 
 En la Fase 1 hubo dos ajustes respecto del plan original: las vistas PHP del sitio de clientes pasaron a `backend/views/customer/` (mientras sigan generándose con PHP son parte del servidor), y la conexión `admin/bd.php` quedó directamente en `backend/src/Core/database.php`, sin archivo puente.
 

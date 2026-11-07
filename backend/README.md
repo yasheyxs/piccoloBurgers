@@ -8,7 +8,8 @@ Todo lo que corre en el servidor: el sitio de clientes (por ahora generado con P
 |---|---|
 | `public/` | Lo único accesible desde el navegador. Páginas del sitio, `api/`, `assets/`, `img/` y el panel en `admin/`. |
 | `public/admin/` | Panel de administración: pantallas, `seccion/` (menú, ventas, pool, etc.), `password/` y `assets/`. |
-| `src/` | Código PHP del sistema: `Core/` (arranque, conexión, helpers), `Http/` (controladores), `Services/` (reglas de negocio). |
+| `public/api/v1/` | API JSON para el frontend (ver [`docs/API.md`](../docs/API.md)). |
+| `src/` | Código PHP del sistema: `Core/` (arranque, conexión, helpers), `Http/` (controladores del sitio y de la API), `Services/` (reglas de negocio). |
 | `views/` | Plantillas PHP: `customer/` para el sitio y `admin/` para el panel. |
 | `config/` | Configuración de la aplicación y del correo. |
 | `database/` | Base de datos de ejemplo (`piccolodb.sql`). |
@@ -42,7 +43,10 @@ Las direcciones anteriores (`/piccoloBurgers/public/...` y `/piccoloBurgers/admi
 
 ```bash
 php tests/ValidarTelefonoTest.php
+php tests/ApiTest.php http://localhost:8080/api/v1
 ```
+
+El segundo recorre la API completa y crea datos de prueba, así que conviene correrlo contra una base de desarrollo.
 
 ## Despliegue
 

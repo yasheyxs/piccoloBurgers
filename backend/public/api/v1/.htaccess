@@ -1,0 +1,6 @@
+# Todas las rutas de la API (por ejemplo /api/v1/menu) las atiende index.php
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^ index.php [L,QSA]
+</IfModule>

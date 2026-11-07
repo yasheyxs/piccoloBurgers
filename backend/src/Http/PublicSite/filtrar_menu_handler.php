@@ -1,115 +1,20 @@
 <?php
 require_once piccolo_path('src/Core/database.php');
 require_once piccolo_path('src/Services/reservas_virtuales.php');
+require_once piccolo_path('src/Services/menu_catalogo.php');
 
 iniciarSesionSiEsNecesario();
 
-$categorias_disponibles = ["Acompañamientos", "Hamburguesas", "Bebidas", "Lomitos y Sándwiches", "Pizzas"];
+$resultado = buscarMenu(
+  $conexion,
+  (string) ($_GET['categoria'] ?? ''),
+  (string) ($_GET['busqueda'] ?? ''),
+  isset($_GET['offset']) ? (int) $_GET['offset'] : 0,
+  isset($_GET['limit']) ? (int) $_GET['limit'] : 8
+);
 
-$categoria = $_GET['categoria'] ?? '';
-$busqueda = strtolower(trim($_GET['busqueda'] ?? ''));
-$offset = isset($_GET['offset']) ? (int)$_GET['offset'] : 0;
-$limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 8;
-
-$intencion_categoria = [
-  "gaseosa" => "Bebidas",
-  "refresco" => "Bebidas",
-  "lata" => "Bebidas",
-  "botella" => "Bebidas",
-  "hamburguesa" => "Hamburguesas",
-  "papas" => "Acompañamientos",
-  "papas fritas" => "Acompañamientos"
-];
-
-$busqueda_equivalente = [
-  "cheddar" => "fritas con cheddar",
-  "panceta" => "fritas con panceta",
-  "latas" => "lata",
-  "papas" => "fritas"
-];
-
-// Detectar equivalencias semánticas
-$extra = '';
-if (isset($busqueda_equivalente[$busqueda])) {
-  $extra = strtolower($busqueda_equivalente[$busqueda]);
-}
-
-// Detectar intención de categoría
-if (in_array(ucfirst($busqueda), $categorias_disponibles)) {
-  $categoria = ucfirst($busqueda);
-  $busqueda = '';
-}
-
-if (isset($intencion_categoria[$busqueda])) {
-  $categoria = $intencion_categoria[$busqueda];
-  $busqueda = '';
-}
-
-$excluir_lata = ($busqueda === "botella");
-
-// Construir condiciones
-$condiciones = ["m.visible_en_menu = 1"];
-
-$parametros = [];
-
-if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $condiciones[] = "m.categoria = ?";
-
-  $parametros[] = $categoria;
-}
-
-$busquedaCondiciones = [];
-if ($busqueda !== '') {
-  $busquedaCondiciones[] = "(LOWER(m.nombre) LIKE ? OR LOWER(m.ingredientes) LIKE ? OR LOWER(m.categoria) LIKE ?)";
-  $parametros[] = "%$busqueda%";
-  $parametros[] = "%$busqueda%";
-  $parametros[] = "%$busqueda%";
-}
-
-if ($extra !== '') {
-  $busquedaCondiciones[] = "(LOWER(m.nombre) LIKE ? OR LOWER(m.ingredientes) LIKE ?)";
-  $parametros[] = "%$extra%";
-  $parametros[] = "%$extra%";
-}
-
-if (!empty($busquedaCondiciones)) {
-  $condiciones[] = "(" . implode(" OR ", $busquedaCondiciones) . ")";
-}
-
-if ($excluir_lata) {
-  $condiciones[] = "LOWER(m.ingredientes) NOT LIKE ?";
-  $parametros[] = "%lata%";
-}
-
-// Consulta total
-$sqlTotal = "SELECT COUNT(DISTINCT m.ID) FROM tbl_menu m WHERE " . implode(" AND ", $condiciones);
-$stmTotal = $conexion->prepare($sqlTotal);
-$stmTotal->execute($parametros);
-$totalItems = $stmTotal->fetchColumn();
-
-// Consulta principal
-$sql = "SELECT
-    m.*
-  FROM tbl_menu m
-  WHERE " . implode(" AND ", $condiciones);
-
-// Ordenamiento
-if ($categoria && in_array($categoria, $categorias_disponibles)) {
-  $sql .= " ORDER BY m.ID DESC";
-} else {
-  $case = "CASE";
-  foreach ($categorias_disponibles as $i => $cat) {
-    $case .= " WHEN m.categoria = " . $conexion->quote($cat) . " THEN " . ($i + 1);
-  }
-  $case .= " ELSE " . (count($categorias_disponibles) + 1) . " END";
-  $sql .= " ORDER BY $case, m.nombre ASC";
-}
-
-$sql .= " LIMIT $limit OFFSET $offset";
-
-$stmt = $conexion->prepare($sql);
-$stmt->execute($parametros);
-$lista_menu = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$lista_menu = $resultado['items'];
+$totalItems = $resultado['total'];
 
 $idsMenus = array_map(static fn($item) => $item['ID'] ?? null, $lista_menu);
 $idsMenus = array_values(array_filter($idsMenus, static fn($id) => $id !== null));
