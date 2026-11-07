@@ -2,6 +2,10 @@
 
 > Objetivo: dejar el proyecto organizado en **dos carpetas principales, `frontend/` y `backend/`**, que se puedan **desplegar por separado**, que sean fáciles de navegar y **sin romper funcionalidades** durante la migración.
 
+**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fases 2 a 4 pendientes.
+
+En la Fase 1 hubo dos ajustes respecto del plan original: las vistas PHP del sitio de clientes pasaron a `backend/views/customer/` (mientras sigan generándose con PHP son parte del servidor), y la conexión `admin/bd.php` quedó directamente en `backend/src/Core/database.php`, sin archivo puente.
+
 ---
 
 ## 1. Diagnóstico de la estructura actual

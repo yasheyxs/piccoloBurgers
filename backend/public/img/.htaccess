@@ -1,0 +1,15 @@
+# Si una imagen no existe, se muestra una de reemplazo en lugar de un error.
+# Las fotos reales que se suban desde el panel tienen prioridad.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  RewriteRule ^placeholders/ - [L]
+
+  # Productos, premios, banners e icono del sitio: ilustracion de hamburguesa
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^(menu|premios|banners)/|^favicon\. placeholders/producto.svg [L]
+
+  # Fondos y fotos generales del sitio
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule \.(jpe?g|png|webp|gif)$ placeholders/fondo.svg [L,NC]
+</IfModule>

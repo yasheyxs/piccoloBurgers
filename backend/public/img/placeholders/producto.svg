@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2c2c2c"/>
+      <stop offset="1" stop-color="#1a1a1a"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="300" fill="url(#base)"/>
+  <g fill="none" stroke="#fac30c" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.75">
+    <!-- pan de arriba -->
+    <path d="M140 140 C140 100 170 85 200 85 C230 85 260 100 260 140 Z"/>
+    <!-- lechuga -->
+    <path d="M132 156 Q148 146 164 156 T196 156 T228 156 T260 156 T268 156"/>
+    <!-- carne -->
+    <rect x="136" y="168" width="128" height="20" rx="10"/>
+    <!-- pan de abajo -->
+    <path d="M140 200 H260 V206 C260 218 250 224 238 224 H162 C150 224 140 218 140 206 Z"/>
+  </g>
+  <g fill="#fac30c" opacity="0.75">
+    <circle cx="180" cy="108" r="3"/>
+    <circle cx="204" cy="100" r="3"/>
+    <circle cx="226" cy="112" r="3"/>
+  </g>
+</svg>

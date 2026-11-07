@@ -1,14 +1,27 @@
+# Solo se usa cuando el proyecto completo se sirve desde XAMPP (htdocs/piccoloBurgers).
+# En Docker o en un hosting, el sitio se sirve directamente desde backend/public.
 Options -Indexes
 
 <IfModule mod_rewrite.c>
   RewriteEngine On
 
-  RewriteRule ^$ public/ [R=302,L]
+  # URL base de esta carpeta (por ejemplo /piccoloBurgers/), sin depender de la ruta en disco
+  RewriteCond %{REQUEST_URI}::$1 ^(.*?/)(.*)::\2$
+  RewriteRule ^(.*)$ - [E=PICCOLO_BASE:%1]
 
-  RewriteRule ^(\.env|\.git|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$ - [F,L,NC]
-  RewriteRule ^(app|config|database|frontend|includes|shared|vendor)(/|$) - [F,L,NC]
+  # Entrada al sitio
+  RewriteRule ^$ %{ENV:PICCOLO_BASE}backend/public/ [R=302,L]
+
+  # Compatibilidad con las URLs anteriores (/public/... y /admin/...)
+  RewriteRule ^public/(.*)$ %{ENV:PICCOLO_BASE}backend/public/$1 [R=301,L]
+  RewriteRule ^admin/(.*)$ %{ENV:PICCOLO_BASE}backend/public/admin/$1 [R=301,L]
+
+  # Nada fuera de backend/public es accesible desde el navegador
+  RewriteRule ^(\.git|\.claude)(/|$) - [F,L,NC]
+  RewriteRule ^backend/(src|views|config|database|tests|vendor|apache)(/|$) - [F,L,NC]
+  RewriteRule ^backend/(\.env.*|\.dockerignore|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$ - [F,L,NC]
 </IfModule>
 
-<FilesMatch "^(\.env|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$">
+<FilesMatch "^(\.env.*|composer\.(json|lock)|Dockerfile|docker-compose\.yml)$">
   Require all denied
 </FilesMatch>
