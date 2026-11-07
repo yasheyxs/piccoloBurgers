@@ -1,0 +1,56 @@
+# Entorno completo: frontend, backend, MySQL y phpMyAdmin.
+#
+#   docker compose up -d --build
+#
+#   Sitio:       http://localhost:8080
+#   Panel:       http://localhost:8080/admin/
+#   Backend:     http://localhost:8000      (acceso directo a la API y al panel)
+#   phpMyAdmin:  http://localhost:8081
+#
+# Las credenciales se leen de backend/.env (ver backend/.env.example).
+name: piccoloburgers
+
+services:
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    environment:
+      BACKEND_URL: http://backend
+    depends_on:
+      - backend
+
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT:-8000}:80"
+    env_file: ./backend/.env
+    environment:
+      # Dentro de Docker la base se llama "mysql", aunque .env.local diga otra cosa
+      MYSQL_HOST: mysql
+    volumes:
+      # Para desarrollo: los cambios en backend/ se ven sin reconstruir la imagen
+      - ./backend:/var/www/html
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    env_file: ./backend/.env
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/piccolodb.sql:/docker-entrypoint-initdb.d/piccolodb.sql:ro
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    environment:
+      PMA_HOST: mysql
+    ports:
+      - "${PHPMYADMIN_PORT:-8081}:80"
+    depends_on:
+      - mysql
+
+volumes:
+  mysql_data:

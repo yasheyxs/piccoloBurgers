@@ -269,9 +269,9 @@ final class CuentaController
 
     private function enviarCorreoRecuperacion(string $email, string $nombre, string $token): void
     {
-        // Mientras no exista la pantalla en el frontend, el enlace usa la del sitio actual.
-        $base = (string) (piccolo_env('RESET_PASSWORD_URL') ?: \piccolo_admin_base_url() . 'password/reset_password.php');
-        $enlace = $base . (str_contains($base, '?') ? '&' : '?') . http_build_query(['token' => $token, 'tipo' => 'cliente']);
+        // Por defecto el enlace lleva a la pantalla del frontend; RESET_PASSWORD_URL permite cambiarla.
+        $base = (string) (\piccolo_env('RESET_PASSWORD_URL') ?: \piccolo_frontend_url('cliente/restablecer.html'));
+        $enlace = $base . (str_contains($base, '?') ? '&' : '?') . http_build_query(['token' => $token]);
 
         try {
             require_once \piccolo_path('config/mailer.php');

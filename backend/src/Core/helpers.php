@@ -4,10 +4,6 @@ if (!defined('PICCOLO_ROOT')) {
     define('PICCOLO_ROOT', dirname(__DIR__, 2));
 }
 
-if (!defined('PICCOLO_VIEWS_CUSTOMER')) {
-    define('PICCOLO_VIEWS_CUSTOMER', PICCOLO_ROOT . '/views/customer');
-}
-
 if (!defined('PICCOLO_VIEWS_ADMIN')) {
     define('PICCOLO_VIEWS_ADMIN', PICCOLO_ROOT . '/views/admin');
 }
@@ -220,6 +216,29 @@ if (!function_exists('piccolo_public_base_url')) {
     function piccolo_public_base_url(): string
     {
         return rtrim(piccolo_detect_scheme() . '://' . piccolo_detect_host() . piccolo_public_base_path(), '/') . '/';
+    }
+}
+
+if (!function_exists('piccolo_frontend_url')) {
+    /**
+     * Dirección del sitio de clientes (frontend/).
+     * - Si FRONTEND_URL está configurada, se usa la primera dirección.
+     * - Con XAMPP se deduce de la ruta del backend (/backend/public/ -> /frontend/public/).
+     * - Si no, se asume que el frontend se publica en la misma dirección que el backend (con un proxy).
+     */
+    function piccolo_frontend_url(string $ruta = ''): string
+    {
+        $configurada = trim(explode(',', (string) (piccolo_env('FRONTEND_URL') ?? ''))[0]);
+        if ($configurada !== '') {
+            $base = rtrim($configurada, '/') . '/';
+        } else {
+            $base = piccolo_public_base_url();
+            if (str_contains($base, '/backend/public/')) {
+                $base = str_replace('/backend/public/', '/frontend/public/', $base);
+            }
+        }
+
+        return $base . ltrim($ruta, '/');
     }
 }
 

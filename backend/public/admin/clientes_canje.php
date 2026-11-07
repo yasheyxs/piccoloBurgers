@@ -1033,8 +1033,8 @@ include __DIR__ . '/../../views/admin/header.php';
                                         'valor_punto' => (float) ($configuracionPuntos['valor_punto'] ?? 0),
                                         'maximo_porcentaje' => (float) ($configuracionPuntos['maximo_porcentaje'] ?? 0),
                                     ],
-                                    'reservas_endpoint' => piccolo_public_base_url() . 'api/carrito_actualizar.php',
-                                    'disponibilidad_endpoint' => piccolo_public_base_url() . 'api/disponibilidad_menu.php',
+                                    'reservas_endpoint' => piccolo_admin_base_url() . 'api/carrito_actualizar.php',
+                                    'disponibilidad_endpoint' => piccolo_admin_base_url() . 'api/disponibilidad_menu.php',
                                 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
                                 ?>;
 </script>

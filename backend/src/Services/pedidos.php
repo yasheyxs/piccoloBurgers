@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Creación de pedidos. La usan el checkout del sitio (guardar_pedido.php) y la API.
+ * Creación de pedidos. La usa la API (POST /pedidos).
  *
  * Los precios y nombres de los productos siempre se toman de la base de datos:
  * lo que mande el navegador solo indica qué productos y cuántos.

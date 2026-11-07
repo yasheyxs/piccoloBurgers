@@ -2,7 +2,9 @@
 
 > Objetivo: dejar el proyecto organizado en **dos carpetas principales, `frontend/` y `backend/`**, que se puedan **desplegar por separado**, que sean fáciles de navegar y **sin romper funcionalidades** durante la migración.
 
-**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fase 2 ✅ · Fase 3 ✅ · Fase 4 pendiente.
+**Estado:** Fase 0 ✅ · Fase 1 ✅ · Fase 2 ✅ · Fase 3 ✅ · Fase 4 ✅ — reestructuración completa.
+
+En la Fase 4 se retiraron las páginas del cliente en PHP. Los dos endpoints que todavía usaba el canje de puntos del panel pasaron a `backend/public/admin/api/` (con control de sesión). El `docker-compose.yml` quedó en la raíz y levanta las dos partes; el frontend usa Nginx y reenvía la API y el panel al backend, así en local todo funciona desde una misma dirección.
 
 En la Fase 3 el frontend quedó como HTML, CSS y JavaScript con módulos nativos del navegador (sin paso de compilación), y el carrito pasó a guardarse en el servidor en lugar del navegador. Las páginas viejas en PHP siguen funcionando hasta la Fase 4.
 
