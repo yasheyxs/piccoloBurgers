@@ -24,7 +24,7 @@ Copiar `.env.example` como `.env` (Docker) o `.env.local` (XAMPP) y completar lo
 
 **Con Docker**: el `docker-compose.yml` de la raíz del proyecto levanta el backend junto con el frontend y MySQL (ver el README principal). La imagen del backend también se puede construir sola con el `Dockerfile` de esta carpeta.
 
-**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, importar `database/piccolodb.sql` en una base llamada `piccolodb` y entrar a:
+**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, importar `database/piccolodb.sql` en una base llamada `piccolodb`, instalar las dependencias con `composer install` dentro de `backend/` y entrar a:
 
 - Panel: http://localhost/piccoloBurgers/backend/public/admin/
 - API: http://localhost/piccoloBurgers/backend/public/api/v1/menu
@@ -34,7 +34,7 @@ Copiar `.env.example` como `.env` (Docker) o `.env.local` (XAMPP) y completar lo
 ```bash
 php tests/ValidarTelefonoTest.php
 php tests/ApiTest.php http://localhost:8080/api/v1
-PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php tests/PanelPermisosTest.php http://localhost:8080/admin
+PANEL_USUARIOS="admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!" php tests/PanelPermisosTest.php http://localhost:8080/admin
 ```
 
 - `ApiTest` recorre la API completa y crea datos de prueba, así que conviene correrlo contra una base de desarrollo.

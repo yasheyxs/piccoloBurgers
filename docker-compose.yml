@@ -31,6 +31,8 @@ services:
     volumes:
       # Para desarrollo: los cambios en backend/ se ven sin reconstruir la imagen
       - ./backend:/var/www/html
+      # ...menos vendor/, que se usa el que instaló Composer dentro de la imagen
+      - /var/www/html/vendor
     depends_on:
       - mysql
 

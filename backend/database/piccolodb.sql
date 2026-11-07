@@ -940,7 +940,8 @@ CREATE TABLE `tbl_usuarios` (
 
 INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset_token`, `token_expira`) VALUES
 (4, 'Delivery', '$2y$10$LMP854nISeN8xayyAfG3o.a1HAFM9xsMZumPErKJMmOWpyp9Qp/Cy', 'contacto-da15e0@piccolo-falso.test', 'delivery', NULL, NULL),
-(5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'contacto-3a5671@piccolo-falso.test', 'admin', NULL, NULL);
+(5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'contacto-3a5671@piccolo-falso.test', 'admin', NULL, NULL),
+(6, 'Empleado', '$2y$10$QWomg6BaOWHi9gMErTPfQOK2vizI9gZuK6FCau3DSQX2Ny8debRs.', 'contacto-e1b2c3@piccolo-falso.test', 'empleado', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -1172,7 +1173,7 @@ ALTER TABLE `tbl_testimonios`
 -- AUTO_INCREMENT for table `tbl_usuarios`
 --
 ALTER TABLE `tbl_usuarios`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 -- --------------------------------------------------------
 
