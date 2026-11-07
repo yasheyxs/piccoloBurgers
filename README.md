@@ -4,6 +4,7 @@ Piccolo Burgers 🍔✨
 
 * 👤 **Usuario:** Cliente (📱 teléfono `0000825022`, código +54) | 🔑 **Clave:** Cliente1! – Perfil pensado para simular la experiencia completa de un comensal fidelizado.
 * 👤 **Usuario:** Usuario | 🔑 **Clave:** Usuario1! – Rol administrativo con todos los permisos habilitados para gestión diaria.
+* 👤 **Usuario:** Delivery | 🔑 **Clave:** Delivery1! – Rol de reparto: solo ve el panel de delivery.
 
 ---------------
 

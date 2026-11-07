@@ -70,14 +70,21 @@ final class CuentaController
             throw ApiException::validacion([], 'Completá teléfono y contraseña.');
         }
 
+        $minutos = \piccoloLoginMinutosBloqueado($this->conexion, 'cliente', $telefono);
+        if ($minutos > 0) {
+            throw new ApiException("Demasiados intentos fallidos. Probá de nuevo en $minutos minuto" . ($minutos === 1 ? '' : 's') . '.', 429);
+        }
+
         $stmt = $this->conexion->prepare('SELECT * FROM tbl_clientes WHERE telefono = ?');
         $stmt->execute([$telefono]);
         $cliente = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Mismo mensaje si el teléfono no existe o la contraseña no coincide
         if (!$cliente || !\passwordCoincideConHash($password, (string) $cliente['password'])) {
+            \piccoloLoginRegistrarFallo($this->conexion, 'cliente', $telefono);
             throw new ApiException('Teléfono o contraseña incorrectos.', 401);
         }
+        \piccoloLoginRegistrarExito($this->conexion, 'cliente', $telefono);
 
         if (\passwordDebeRehash((string) $cliente['password'])) {
             try {

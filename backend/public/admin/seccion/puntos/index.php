@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 require_once __DIR__ . '/../../../../src/Core/database.php';
 require_once __DIR__ . '/../../../../src/Services/puntos_config.php';
 

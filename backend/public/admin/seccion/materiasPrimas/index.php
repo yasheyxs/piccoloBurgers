@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
 
 // Eliminar materia prima con validación y manejo de errores
-if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
-  $txtID = intval($_GET["txtID"]);
+if (isset($_POST['txtID']) && is_numeric($_POST['txtID'])) {
+  $txtID = intval($_POST["txtID"]);
 
   try {
     $sentencia = $conexion->prepare("DELETE FROM tbl_materias_primas WHERE ID = :id");
@@ -135,7 +136,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
                 <td><?= htmlspecialchars($registro["proveedor"] ?? '—') ?></td>
                 <td>
                   <a class="btn btn-info btn-sm" href="editar.php?txtID=<?= $registro['ID'] ?>">Editar</a>
-                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?= $registro['ID'] ?>" onclick="return confirm('¿Eliminar esta materia prima?')">Borrar</a>
+                  <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Eliminar esta materia prima?')"><input type="hidden" name="txtID" value="<?= $registro['ID'] ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
                 </td>
               </tr>
             <?php endforeach; ?>

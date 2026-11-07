@@ -34,9 +34,20 @@ Copiar `.env.example` como `.env` (Docker) o `.env.local` (XAMPP) y completar lo
 ```bash
 php tests/ValidarTelefonoTest.php
 php tests/ApiTest.php http://localhost:8080/api/v1
+PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php tests/PanelPermisosTest.php http://localhost:8080/admin
 ```
 
-El segundo recorre la API completa y crea datos de prueba, así que conviene correrlo contra una base de desarrollo.
+- `ApiTest` recorre la API completa y crea datos de prueba, así que conviene correrlo contra una base de desarrollo.
+- `PanelPermisosTest` entra al panel con cada rol indicado y verifica a qué pantallas puede entrar y a cuáles no, según `config/permisos.php`, y que los envíos sin token CSRF se rechacen.
+
+## Permisos del panel
+
+Todas las pantallas de `public/admin/` cargan primero `src/Http/Admin/acceso.php`, que controla la sesión, el rol y el token CSRF. Los roles permitidos de cada pantalla están en `config/permisos.php`; una pantalla que no figure ahí solo la puede abrir un administrador. Al agregar una pantalla nueva:
+
+1. Ponerle como primera línea el `require_once` de `acceso.php` (copiarlo de cualquier otra pantalla).
+2. Si la tienen que ver otros roles además de admin, agregarla en `config/permisos.php`.
+
+El token CSRF se agrega solo a los formularios y a los `fetch()` del panel (`admin/assets/js/csrf.js`).
 
 ## Despliegue
 

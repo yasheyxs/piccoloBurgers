@@ -1,17 +1,24 @@
 <?php
-session_start();
+require_once __DIR__ . '/../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
+piccolo_admin_iniciar_sesion();
 if ($_POST) {
   include(__DIR__ . "/../../src/Core/database.php");
   require_once __DIR__ . '/../../src/Http/Admin/url.php';
   require_once __DIR__ . '/../../src/Services/Security/password_utils.php';
+  require_once __DIR__ . '/../../src/Services/Security/limite_intentos.php';
 
   $usuario  = trim($_POST["usuario"] ?? "");
   $password = $_POST["password"] ?? "";
 
-  $sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios WHERE usuario = :usuario");
-  $sentencia->bindParam(":usuario", $usuario);
-  $sentencia->execute();
-  $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
+  $minutosBloqueado = piccoloLoginMinutosBloqueado($conexion, 'panel', $usuario);
+  $usuarioEncontrado = false;
+
+  if ($minutosBloqueado === 0) {
+    $sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios WHERE usuario = :usuario");
+    $sentencia->bindParam(":usuario", $usuario);
+    $sentencia->execute();
+    $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
+  }
 
   if ($usuarioEncontrado) {
      $hashAlmacenado = $usuarioEncontrado["password"] ?? '';
@@ -43,15 +50,22 @@ if ($_POST) {
         'samesite' => 'Strict'
       ]);
     
+      piccoloLoginRegistrarExito($conexion, 'panel', $usuario);
       $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
       $_SESSION["admin_logueado"] = true;
       $_SESSION["rol"] = $usuarioEncontrado["rol"];
+      $_SESSION["admin_ultima_actividad"] = time();
       header("Location:index.php");
       exit();
     }
   }
 
-  $mensaje = "Usuario o contraseña incorrectos...";
+  if ($minutosBloqueado > 0) {
+    $mensaje = "Demasiados intentos fallidos. Probá de nuevo en {$minutosBloqueado} minuto" . ($minutosBloqueado === 1 ? "" : "s") . ".";
+  } else {
+    piccoloLoginRegistrarFallo($conexion, 'panel', $usuario);
+    $mensaje = "Usuario o contraseña incorrectos...";
+  }
 }
 ?>
 

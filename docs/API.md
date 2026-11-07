@@ -29,6 +29,7 @@ Todas las respuestas tienen la misma forma:
 | 410 | El enlace para recuperar la contraseña venció |
 | 415 | El cuerpo no se envió como JSON |
 | 422 | Datos inválidos (ver `errores`) |
+| 429 | Demasiados intentos de inicio de sesión fallidos: hay que esperar unos minutos |
 | 500 | Error inesperado del servidor |
 
 ## Catálogo
@@ -169,6 +170,7 @@ Variables en `backend/.env` (ver `backend/.env.example`):
 - La cookie de sesión no es accesible desde JavaScript (`HttpOnly`).
 - Los errores inesperados no muestran detalles internos al cliente: quedan registrados en el log del servidor.
 - Pedir la recuperación de contraseña responde lo mismo exista o no la cuenta, para no revelar qué emails están registrados.
+- Después de 5 intentos de inicio de sesión fallidos en 15 minutos, ese teléfono queda bloqueado desde esa conexión durante 15 minutos (`429`).
 
 ## Pruebas
 
