@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../../bd.php';
 require_once __DIR__ . '/../../../app/Services/pool_schema.php';
+require_once __DIR__ . '/../../../app/Services/bebidas_schema.php';
 require_once __DIR__ . '/../../../app/Services/Security/password_utils.php';
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -73,7 +74,7 @@ function poolEstadoPublico(PDO $conexion): array
 }
 
 poolValidarAcceso();
-asegurarTablaPoolTurnos($conexion);
+asegurarTablasBebidas($conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
@@ -120,7 +121,17 @@ try {
             break;
 
         case 'cerrar_jornada':
-            poolCerrarJornada($conexion);
+            $totales = is_array($payload['totales'] ?? null) ? $payload['totales'] : [];
+            poolCerrarJornada($conexion, $totales);
+            break;
+
+        case 'totales_cierre':
+            $jornada = poolJornadaActivaObligatoria($conexion);
+            poolResponder([
+                'exito' => true,
+                'totales' => poolTotalesCierre($conexion, (int) $jornada['id']),
+                'estado' => poolEstadoPublico($conexion),
+            ]);
             break;
 
         case 'agregar':

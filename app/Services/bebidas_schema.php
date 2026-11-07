@@ -304,6 +304,23 @@ if (!function_exists('bebidaObtenerEstado')) {
     }
 }
 
+if (!function_exists('bebidaValorJarraReferencia')) {
+    /**
+     * Precio de referencia de una jarra: promedio del valor de jarra de las bebidas activas.
+     */
+    function bebidaValorJarraReferencia(PDO $conexion): float
+    {
+        static $valor = null;
+        if ($valor === null) {
+            $valor = (float) $conexion
+                ->query('SELECT COALESCE(AVG(valor_jarra), 0) FROM bebidas WHERE activa = 1 AND valor_jarra > 0')
+                ->fetchColumn();
+        }
+
+        return $valor;
+    }
+}
+
 if (!function_exists('bebidaResumenJornada')) {
     function bebidaResumenJornada(PDO $conexion, int $jornadaId): array
     {
@@ -344,12 +361,23 @@ if (!function_exists('bebidaResumenJornada')) {
             'SELECT COUNT(DISTINCT persona) FROM bebida_ventas WHERE jornada_id = :jornada_id'
         );
         $personasStmt->execute([':jornada_id' => $jornadaId]);
+        $ajustes = poolAjustesJornada($conexion, $jornadaId);
+        $ajusteVendidas = (int) ($ajustes['ajuste_bebidas_vendidas'] ?? 0);
+        $vendidasAjustadas = max(0, $vendidas + $ajusteVendidas);
+        // Las jarras agregadas a mano se valorizan al precio promedio de la jornada;
+        // si no hubo ventas registradas, se usa el precio de jarra configurado.
+        $valorPromedioJarra = $vendidas > 0 ? $monto / $vendidas : bebidaValorJarraReferencia($conexion);
+        $montoAjustado = max(0, $monto + ($ajusteVendidas * $valorPromedioJarra));
 
         return [
-            'vendidas' => $vendidas,
+            'vendidas' => $vendidasAjustadas,
+            'vendidas_sin_ajuste' => $vendidas,
+            'ajuste_vendidas' => $ajusteVendidas,
             'entregadas' => $entregadas,
+            // El ajuste corrige lo vendido, pero no genera jarras por entregar.
             'pendientes' => max(0, $vendidas - $entregadas),
-            'monto_vendido' => $monto,
+            'monto_vendido' => $montoAjustado,
+            'monto_vendido_sin_ajuste' => $monto,
             'personas' => (int) $personasStmt->fetchColumn(),
             'detalle' => $detalle,
         ];
@@ -402,16 +430,9 @@ if (!function_exists('bebidaMontoVendidoEntreFechas')) {
     function bebidaMontoVendidoEntreFechas(PDO $conexion, string $fechaInicio, string $fechaFin): float
     {
         asegurarTablasBebidas($conexion);
-        $stmt = $conexion->prepare(
-            'SELECT COALESCE(SUM(v.cantidad_total * v.valor_unitario), 0)
-             FROM bebida_ventas v
-             INNER JOIN pool_jornadas j ON j.id = v.jornada_id
-             WHERE j.fecha_apertura BETWEEN :inicio AND :fin'
-        );
-        $stmt->execute([
-            ':inicio' => substr($fechaInicio, 0, 10) . ' 00:00:00',
-            ':fin' => substr($fechaFin, 0, 10) . ' 23:59:59',
-        ]);
-        return (float) $stmt->fetchColumn();
+        $jornadas = bebidaListarJornadas($conexion, substr($fechaInicio, 0, 10), substr($fechaFin, 0, 10));
+        $resumen = bebidaResumenGeneral($jornadas);
+
+        return (float) ($resumen['monto_vendido_total'] ?? 0);
     }
 }

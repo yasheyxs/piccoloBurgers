@@ -173,6 +173,56 @@ include __DIR__ . '/../../templates/header.php';
       </div>
     </div>
   </div>
+
+  <div class="modal fade" id="drinkClosePromptModal" tabindex="-1" aria-labelledby="drinkClosePromptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title fs-5" id="drinkClosePromptModalLabel">Cerrar jornada</h2>
+          <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <p class="mb-2">¿Necesitas editar las cantidades totales vendidas antes de cerrar?</p>
+          <p class="text-muted small mb-0">El ajuste se aplicará solo a estadísticas generales, sin modificar personas, pools ni bebidas específicas.</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+          <button class="btn btn-outline-danger" type="button" data-close-direct>Cerrar sin editar</button>
+          <button class="btn btn-primary" type="button" data-close-edit>Editar totales</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="drinkCloseAdjustModal" tabindex="-1" aria-labelledby="drinkCloseAdjustModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <form data-close-adjust-form>
+          <div class="modal-header">
+            <h2 class="modal-title fs-5" id="drinkCloseAdjustModalLabel">Ajustar totales de cierre</h2>
+            <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p class="text-muted small">Edita el total final vendido. Las diferencias se guardan como ajuste global de la jornada.</p>
+            <div class="mb-3">
+              <label class="form-label" for="drinkCloseFichas">Total de fichas vendidas</label>
+              <input class="form-control form-control-lg" id="drinkCloseFichas" name="fichasVendidas" type="number" min="0" step="1" required>
+            </div>
+            <div>
+              <label class="form-label" for="drinkCloseBebidas">Total de bebidas vendidas (jarras)</label>
+              <input class="form-control form-control-lg" id="drinkCloseBebidas" name="bebidasVendidas" type="number" min="0" step="1" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Cancelar</button>
+            <button class="btn btn-danger" type="submit" data-close-adjust-submit>
+              <i class="fa-solid fa-lock me-1"></i> Cerrar jornada
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -186,8 +236,15 @@ include __DIR__ . '/../../templates/header.php';
   const privacyForm = shell.querySelector('[data-privacy-form]');
   const privacyPassword = shell.querySelector('[data-privacy-password]');
   const privacyFeedback = shell.querySelector('[data-privacy-feedback]');
+  const closePromptModal = document.getElementById('drinkClosePromptModal');
+  const closeAdjustModal = document.getElementById('drinkCloseAdjustModal');
+  const closeAdjustForm = shell.querySelector('[data-close-adjust-form]');
+  const closeDirectButton = shell.querySelector('[data-close-direct]');
+  const closeEditButton = shell.querySelector('[data-close-edit]');
+  const closeAdjustSubmit = shell.querySelector('[data-close-adjust-submit]');
   let sensitiveVisible = false;
   let latestState = null;
+  let closeTotals = null;
 
   const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
@@ -357,6 +414,45 @@ include __DIR__ . '/../../templates/header.php';
     }
   }
 
+  function setClosingBusy(busy) {
+    [closeDirectButton, closeEditButton, closeAdjustSubmit].forEach(button => {
+      if (button) button.disabled = busy;
+    });
+  }
+
+  async function openClosePrompt() {
+    setClosingBusy(true);
+    try {
+      const data = await request({ accion: 'totales_cierre' });
+      closeTotals = data.totales || { fichasVendidas: 0, bebidasVendidas: 0 };
+      bootstrap.Modal.getOrCreateInstance(closePromptModal).show();
+    } catch (error) { showAlert(error.message); }
+    finally { setClosingBusy(false); }
+  }
+
+  function openCloseAdjust() {
+    if (!closeTotals) return;
+    closeAdjustForm.elements.fichasVendidas.value = Number(closeTotals.fichasVendidas || 0);
+    closeAdjustForm.elements.bebidasVendidas.value = Number(closeTotals.bebidasVendidas || 0);
+    bootstrap.Modal.getOrCreateInstance(closePromptModal).hide();
+    bootstrap.Modal.getOrCreateInstance(closeAdjustModal).show();
+  }
+
+  async function closeJornada(totales = null) {
+    setClosingBusy(true);
+    try {
+      await request({
+        accion: 'cerrar_jornada',
+        ...(totales ? { totales } : {})
+      });
+      bootstrap.Modal.getOrCreateInstance(closePromptModal).hide();
+      bootstrap.Modal.getOrCreateInstance(closeAdjustModal).hide();
+      closeTotals = null;
+      showAlert('Jornada cerrada correctamente.', 'success');
+    } catch (error) { showAlert(error.message); }
+    finally { setClosingBusy(false); }
+  }
+
   shell.addEventListener('submit', async event => {
     const form = event.target.closest('[data-add-form]');
     if (!form) return;
@@ -412,11 +508,24 @@ include __DIR__ . '/../../templates/header.php';
     finishInlineNameEdit(editableName, true);
   });
 
+  closeDirectButton?.addEventListener('click', () => closeJornada());
+  closeEditButton?.addEventListener('click', openCloseAdjust);
+  closeAdjustForm?.addEventListener('submit', event => {
+    event.preventDefault();
+    closeJornada({
+      fichasVendidas: Number(closeAdjustForm.elements.fichasVendidas.value || 0),
+      bebidasVendidas: Number(closeAdjustForm.elements.bebidasVendidas.value || 0)
+    });
+  });
+
   shell.addEventListener('click', async event => {
     const jornadaButton = event.target.closest('[data-jornada-action]');
     if (jornadaButton) {
       const accion = jornadaButton.dataset.jornadaAction;
-      if (accion === 'cerrar_jornada' && !confirm('¿Cerrar la jornada compartida? También se cerrará para POOLS.')) return;
+      if (accion === 'cerrar_jornada') {
+        await openClosePrompt();
+        return;
+      }
       try { await request({ accion }); } catch (error) { showAlert(error.message); }
       return;
     }

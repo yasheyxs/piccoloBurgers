@@ -17,6 +17,8 @@ if (!function_exists('asegurarTablaPoolTurnos')) {
                 fichas_pendientes_rojo INT UNSIGNED NOT NULL DEFAULT 0,
                 monto_vendido_azul DECIMAL(12,2) NOT NULL DEFAULT 0,
                 monto_vendido_rojo DECIMAL(12,2) NOT NULL DEFAULT 0,
+                ajuste_fichas_vendidas INT NOT NULL DEFAULT 0,
+                ajuste_bebidas_vendidas INT NOT NULL DEFAULT 0,
                 jugadores_atendidos INT UNSIGNED NOT NULL DEFAULT 0,
                 turnos_completados INT UNSIGNED NOT NULL DEFAULT 0,
                 duracion_minutos INT UNSIGNED NULL,
@@ -81,6 +83,14 @@ if (!function_exists('asegurarTablaPoolTurnos')) {
 
         if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'monto_vendido_rojo')) {
             $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN monto_vendido_rojo DECIMAL(12,2) NOT NULL DEFAULT 0 AFTER monto_vendido_azul');
+        }
+
+        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'ajuste_fichas_vendidas')) {
+            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN ajuste_fichas_vendidas INT NOT NULL DEFAULT 0 AFTER monto_vendido_rojo');
+        }
+
+        if (!piccolo_columna_existe($conexion, 'pool_jornadas', 'ajuste_bebidas_vendidas')) {
+            $conexion->exec('ALTER TABLE pool_jornadas ADD COLUMN ajuste_bebidas_vendidas INT NOT NULL DEFAULT 0 AFTER ajuste_fichas_vendidas');
         }
 
         $conexion->exec(
@@ -297,8 +307,83 @@ if (!function_exists('poolCalcularResumenJornada')) {
     }
 }
 
+if (!function_exists('poolTablaExiste')) {
+    function poolTablaExiste(PDO $conexion, string $tabla): bool
+    {
+        $stmt = $conexion->prepare(
+            'SELECT COUNT(*)
+             FROM INFORMATION_SCHEMA.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = :tabla'
+        );
+        $stmt->execute([':tabla' => $tabla]);
+        return (bool) $stmt->fetchColumn();
+    }
+}
+
+if (!function_exists('poolTotalBebidasVendidasJornada')) {
+    function poolTotalBebidasVendidasJornada(PDO $conexion, int $jornadaId): int
+    {
+        if (!poolTablaExiste($conexion, 'bebida_ventas')) {
+            return 0;
+        }
+
+        $multiplicador = piccolo_columna_existe($conexion, 'bebida_ventas', 'unidades_por_item')
+            ? 'unidades_por_item'
+            : '1';
+        $stmt = $conexion->prepare(
+            "SELECT COALESCE(SUM(cantidad_total * {$multiplicador}), 0)
+             FROM bebida_ventas
+             WHERE jornada_id = :jornada_id"
+        );
+        $stmt->execute([':jornada_id' => $jornadaId]);
+        return (int) $stmt->fetchColumn();
+    }
+}
+
+if (!function_exists('poolTotalesCierre')) {
+    function poolTotalesCierre(PDO $conexion, int $jornadaId): array
+    {
+        $resumen = poolCalcularResumenJornada($conexion, $jornadaId);
+
+        return [
+            'fichasVendidas' => (int) $resumen['fichas_vendidas_azul'] + (int) $resumen['fichas_vendidas_rojo'],
+            'bebidasVendidas' => poolTotalBebidasVendidasJornada($conexion, $jornadaId),
+        ];
+    }
+}
+
+if (!function_exists('poolTotalCierreEditado')) {
+    function poolTotalCierreEditado(array $totalesEditados, string $clave, int $valorActual): int
+    {
+        if (!array_key_exists($clave, $totalesEditados) || $totalesEditados[$clave] === null || $totalesEditados[$clave] === '') {
+            return $valorActual;
+        }
+
+        return max(0, (int) $totalesEditados[$clave]);
+    }
+}
+
+if (!function_exists('poolAjustesJornada')) {
+    function poolAjustesJornada(PDO $conexion, int $jornadaId): array
+    {
+        $stmt = $conexion->prepare(
+            'SELECT ajuste_fichas_vendidas, ajuste_bebidas_vendidas
+             FROM pool_jornadas
+             WHERE id = :id'
+        );
+        $stmt->execute([':id' => $jornadaId]);
+        $ajustes = $stmt->fetch(PDO::FETCH_ASSOC) ?: [];
+
+        return [
+            'ajuste_fichas_vendidas' => (int) ($ajustes['ajuste_fichas_vendidas'] ?? 0),
+            'ajuste_bebidas_vendidas' => (int) ($ajustes['ajuste_bebidas_vendidas'] ?? 0),
+        ];
+    }
+}
+
 if (!function_exists('poolCerrarJornada')) {
-    function poolCerrarJornada(PDO $conexion): array
+    function poolCerrarJornada(PDO $conexion, array $totalesEditados = []): array
     {
         $activa = poolJornadaActiva($conexion);
         if (!$activa) {
@@ -307,6 +392,12 @@ if (!function_exists('poolCerrarJornada')) {
 
         $jornadaId = (int) $activa['id'];
         $resumen = poolCalcularResumenJornada($conexion, $jornadaId);
+        $totalesCierre = [
+            'fichasVendidas' => (int) $resumen['fichas_vendidas_azul'] + (int) $resumen['fichas_vendidas_rojo'],
+            'bebidasVendidas' => poolTotalBebidasVendidasJornada($conexion, $jornadaId),
+        ];
+        $fichasEditadas = poolTotalCierreEditado($totalesEditados, 'fichasVendidas', $totalesCierre['fichasVendidas']);
+        $bebidasEditadas = poolTotalCierreEditado($totalesEditados, 'bebidasVendidas', $totalesCierre['bebidasVendidas']);
 
         $stmt = $conexion->prepare(
             "UPDATE pool_jornadas
@@ -320,6 +411,8 @@ if (!function_exists('poolCerrarJornada')) {
                  fichas_pendientes_rojo = :fichas_pendientes_rojo,
                  monto_vendido_azul = :monto_vendido_azul,
                  monto_vendido_rojo = :monto_vendido_rojo,
+                 ajuste_fichas_vendidas = :ajuste_fichas_vendidas,
+                 ajuste_bebidas_vendidas = :ajuste_bebidas_vendidas,
                  jugadores_atendidos = :jugadores_atendidos,
                  turnos_completados = :turnos_completados,
                  duracion_minutos = TIMESTAMPDIFF(MINUTE, fecha_apertura, NOW())
@@ -334,6 +427,8 @@ if (!function_exists('poolCerrarJornada')) {
             ':fichas_pendientes_rojo' => $resumen['fichas_pendientes_rojo'],
             ':monto_vendido_azul' => $resumen['monto_vendido_azul'],
             ':monto_vendido_rojo' => $resumen['monto_vendido_rojo'],
+            ':ajuste_fichas_vendidas' => $fichasEditadas - $totalesCierre['fichasVendidas'],
+            ':ajuste_bebidas_vendidas' => $bebidasEditadas - $totalesCierre['bebidasVendidas'],
             ':jugadores_atendidos' => $resumen['jugadores_atendidos'],
             ':turnos_completados' => $resumen['turnos_completados'],
             ':id' => $jornadaId,
@@ -469,7 +564,9 @@ if (!function_exists('poolListarJornadas')) {
             ':fin' => $fechaFin . ' 23:59:59',
         ]);
 
-        return array_map(static function (array $jornada) use ($conexion): array {
+        $valorFichaActual = (float) poolObtenerConfiguracion($conexion)['valor_ficha'];
+
+        return array_map(static function (array $jornada) use ($conexion, $valorFichaActual): array {
             if (
                 ($jornada['estado'] ?? '') === 'abierta'
                 || $jornada['duracion_minutos'] === null
@@ -494,13 +591,13 @@ if (!function_exists('poolListarJornadas')) {
                 $jornada['duracion_minutos'] = (int) $duracionStmt->fetchColumn();
             }
 
-            return poolNormalizarJornadaEstadistica($jornada);
+            return poolNormalizarJornadaEstadistica($jornada, $valorFichaActual);
         }, $stmt->fetchAll(PDO::FETCH_ASSOC));
     }
 }
 
 if (!function_exists('poolNormalizarJornadaEstadistica')) {
-    function poolNormalizarJornadaEstadistica(array $jornada): array
+    function poolNormalizarJornadaEstadistica(array $jornada, float $valorFichaActual = 0.0): array
     {
         $vendidasAzul = (int) ($jornada['fichas_vendidas_azul'] ?? 0);
         $vendidasRojo = (int) ($jornada['fichas_vendidas_rojo'] ?? 0);
@@ -510,6 +607,17 @@ if (!function_exists('poolNormalizarJornadaEstadistica')) {
         $pendientesRojo = (int) ($jornada['fichas_pendientes_rojo'] ?? 0);
         $montoAzul = (float) ($jornada['monto_vendido_azul'] ?? 0);
         $montoRojo = (float) ($jornada['monto_vendido_rojo'] ?? 0);
+        $ajusteFichas = (int) ($jornada['ajuste_fichas_vendidas'] ?? 0);
+        $totalVendidasSinAjuste = $vendidasAzul + $vendidasRojo;
+        $totalVendidas = max(0, $totalVendidasSinAjuste + $ajusteFichas);
+        $totalConsumidas = $consumidasAzul + $consumidasRojo;
+        $montoTotalSinAjuste = $montoAzul + $montoRojo;
+        // Las fichas agregadas a mano se valorizan al precio promedio de la jornada;
+        // si no hubo ventas registradas, se usa el precio de ficha configurado.
+        $valorPromedioFicha = $totalVendidasSinAjuste > 0
+            ? $montoTotalSinAjuste / $totalVendidasSinAjuste
+            : $valorFichaActual;
+        $montoVendidoTotal = max(0, $montoTotalSinAjuste + ($ajusteFichas * $valorPromedioFicha));
 
         $jornada['id'] = (int) ($jornada['id'] ?? 0);
         $jornada['fichas_vendidas_azul'] = $vendidasAzul;
@@ -520,10 +628,15 @@ if (!function_exists('poolNormalizarJornadaEstadistica')) {
         $jornada['fichas_pendientes_rojo'] = $pendientesRojo;
         $jornada['monto_vendido_azul'] = $montoAzul;
         $jornada['monto_vendido_rojo'] = $montoRojo;
-        $jornada['total_vendidas'] = $vendidasAzul + $vendidasRojo;
-        $jornada['total_consumidas'] = $consumidasAzul + $consumidasRojo;
-        $jornada['total_pendientes'] = $pendientesAzul + $pendientesRojo;
-        $jornada['monto_vendido_total'] = $montoAzul + $montoRojo;
+        $jornada['ajuste_fichas_vendidas'] = $ajusteFichas;
+        $jornada['ajuste_bebidas_vendidas'] = (int) ($jornada['ajuste_bebidas_vendidas'] ?? 0);
+        $jornada['total_vendidas_sin_ajuste'] = $totalVendidasSinAjuste;
+        $jornada['total_vendidas'] = $totalVendidas;
+        $jornada['total_consumidas'] = $totalConsumidas;
+        // El ajuste corrige lo vendido, pero no genera fichas por consumir.
+        $jornada['total_pendientes'] = max(0, $totalVendidasSinAjuste - $totalConsumidas);
+        $jornada['monto_vendido_total_sin_ajuste'] = $montoTotalSinAjuste;
+        $jornada['monto_vendido_total'] = $montoVendidoTotal;
         $jornada['jugadores_atendidos'] = (int) ($jornada['jugadores_atendidos'] ?? 0);
         $jornada['turnos_completados'] = (int) ($jornada['turnos_completados'] ?? 0);
         $jornada['duracion_minutos'] = $jornada['duracion_minutos'] === null ? null : (int) $jornada['duracion_minutos'];
@@ -545,6 +658,7 @@ if (!function_exists('poolResumenGeneral')) {
         $consumidasRojo = array_sum(array_column($jornadas, 'fichas_consumidas_rojo'));
         $montoAzul = array_sum(array_column($jornadas, 'monto_vendido_azul'));
         $montoRojo = array_sum(array_column($jornadas, 'monto_vendido_rojo'));
+        $montoTotal = array_sum(array_column($jornadas, 'monto_vendido_total'));
 
         return [
             'total_jornadas' => $totalJornadas,
@@ -556,7 +670,7 @@ if (!function_exists('poolResumenGeneral')) {
             'vendidas_rojo' => $vendidasRojo,
             'consumidas_azul' => $consumidasAzul,
             'consumidas_rojo' => $consumidasRojo,
-            'monto_vendido_total' => $montoAzul + $montoRojo,
+            'monto_vendido_total' => $montoTotal,
             'monto_vendido_azul' => $montoAzul,
             'monto_vendido_rojo' => $montoRojo,
             'jugadores_atendidos' => array_sum(array_column($jornadas, 'jugadores_atendidos')),
