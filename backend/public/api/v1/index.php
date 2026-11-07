@@ -27,6 +27,7 @@ require_once piccolo_path('src/Services/pedidos.php');
 require_once piccolo_path('src/Services/estado_pago_helpers.php');
 require_once piccolo_path('src/Services/Security/password_utils.php');
 require_once piccolo_path('src/Services/Security/validar_telefono.php');
+require_once piccolo_path('src/Services/Security/limite_intentos.php');
 
 Sesion::iniciar();
 

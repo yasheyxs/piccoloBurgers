@@ -1,13 +1,14 @@
 <?php
 
 declare(strict_types=1);
+require_once __DIR__ . '/../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 
 require_once __DIR__ . '/../../src/Core/database.php';
 require_once __DIR__ . '/../../src/Services/puntos_config.php';
 require_once __DIR__ . '/../../src/Services/reservas_virtuales.php';
 
 if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+    piccolo_admin_iniciar_sesion();
 }
 
 /**

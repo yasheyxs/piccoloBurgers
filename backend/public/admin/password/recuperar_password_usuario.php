@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 // No requiere sesión activa
 ?>
 

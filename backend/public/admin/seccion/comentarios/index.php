@@ -1,8 +1,9 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
 
-if (isset($_GET['txtID'])) {
-    $txtID = $_GET["txtID"] ?? "";
+if (isset($_POST['txtID'])) {
+    $txtID = $_POST["txtID"] ?? "";
 
     $sentencia = $conexion->prepare("DELETE FROM tbl_comentarios WHERE ID=:id");
     $sentencia->bindParam(":id", $txtID);
@@ -41,7 +42,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
               <td><?php echo $registro["correo"]; ?></td>
               <td><?php echo $registro["mensaje"]; ?></td>
               <td>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro['ID']; ?>">Borrar</a>
+                <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Seguro que querés borrarlo?')"><input type="hidden" name="txtID" value="<?php echo $registro['ID']; ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
               </td>
             </tr>
           <?php } ?>

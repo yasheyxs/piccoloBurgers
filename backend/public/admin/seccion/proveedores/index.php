@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
 
 // Inicializar variables
@@ -6,8 +7,8 @@ $mensaje = "";
 $tipoMensaje = "";
 
 // Manejo de eliminación con validación y try/catch
-if (isset($_GET['txtID'])) {
-    $txtID = $_GET["txtID"] ?? "";
+if (isset($_POST['txtID'])) {
+    $txtID = $_POST["txtID"] ?? "";
 
     if (!is_numeric($txtID) || intval($txtID) <= 0) {
         $mensaje = "ID inválido para eliminar proveedor.";
@@ -85,7 +86,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
                 <td><?php echo $registro["email"] ? htmlspecialchars($registro["email"]) : '—'; ?></td>
                 <td>
                   <a class="btn btn-info btn-sm" href="editar.php?txtID=<?php echo urlencode($registro['ID']); ?>">Editar</a>
-                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo urlencode($registro['ID']); ?>" onclick="return confirm('¿Estás seguro de eliminar este proveedor?')">Borrar</a>
+                  <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Estás seguro de eliminar este proveedor?')"><input type="hidden" name="txtID" value="<?php echo urlencode($registro['ID']); ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
                 </td>
               </tr>
             <?php } ?>

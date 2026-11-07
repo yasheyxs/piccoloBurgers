@@ -1,9 +1,10 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
 
 // Eliminar compra con validación y manejo de errores
-if (isset($_GET['txtID']) && is_numeric($_GET['txtID'])) {
-  $txtID = intval($_GET["txtID"]);
+if (isset($_POST['txtID']) && is_numeric($_POST['txtID'])) {
+  $txtID = intval($_POST["txtID"]);
 
   try {
     $conexion->beginTransaction();
@@ -144,7 +145,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
               <td>$<?= number_format($compra["total"], 2) ?></td>
               <td>
                 <a class="btn btn-info btn-sm" href="detalle.php?txtID=<?= $compra['ID'] ?>">Ver detalles</a>
-                <a class="btn btn-danger btn-sm" href="index.php?txtID=<?= $compra['ID'] ?>" onclick="return confirm('¿Eliminar esta compra?')">Eliminar</a>
+                <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Eliminar esta compra?')"><input type="hidden" name="txtID" value="<?= $compra['ID'] ?>"><button type="submit" class="btn btn-danger btn-sm">Eliminar</button></form>
               </td>
             </tr>
           <?php } ?>

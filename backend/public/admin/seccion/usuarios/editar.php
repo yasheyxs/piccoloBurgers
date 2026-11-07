@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 include(__DIR__ . "/../../../../src/Core/database.php");
 
-session_start();
+piccolo_admin_iniciar_sesion();
 if (!isset($_SESSION["rol"]) || $_SESSION["rol"] !== "admin") {
     header("Location: ../../login.php");
     exit();

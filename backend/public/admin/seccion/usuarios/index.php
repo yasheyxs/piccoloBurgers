@@ -1,6 +1,7 @@
 <?php
+require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
 include(__DIR__ . "/../../../../src/Core/database.php");
-session_start();
+piccolo_admin_iniciar_sesion();
 
 // Solo admin puede acceder
 if (!isset($_SESSION["rol"]) || $_SESSION["rol"] !== "admin") {
@@ -12,8 +13,8 @@ $mensajeUsuarios = $_SESSION['mensaje_usuarios'] ?? '';
 unset($_SESSION['mensaje_usuarios']);
 
 // Eliminar usuario si se pasa txtID
-if (isset($_GET["txtID"])) {
-    $txtID = intval($_GET["txtID"]);
+if (isset($_POST["txtID"])) {
+    $txtID = intval($_POST["txtID"]);
 
     // Verificar si el usuario a eliminar es admin
     $stmt = $conexion->prepare("SELECT rol FROM tbl_usuarios WHERE ID = :id");
@@ -97,7 +98,7 @@ include(__DIR__ . "/../../../../views/admin/header.php");
 
                   if ($mostrarBoton) {
                 ?>
-                  <a class="btn btn-danger btn-sm" href="index.php?txtID=<?php echo $registro["ID"]; ?>" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?')">Borrar</a>
+                  <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?')"><input type="hidden" name="txtID" value="<?php echo $registro["ID"]; ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
                 <?php } else { ?>
                   <span class="text-muted">Protegido</span>
                 <?php } ?>

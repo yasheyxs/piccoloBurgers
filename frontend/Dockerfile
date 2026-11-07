@@ -5,6 +5,7 @@ ENV BACKEND_URL=http://backend
 
 # La imagen de nginx reemplaza las variables de las plantillas al arrancar
 COPY nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY seguridad.conf /etc/nginx/snippets/seguridad.conf
 COPY public/ /usr/share/nginx/html/
 
 EXPOSE 80
