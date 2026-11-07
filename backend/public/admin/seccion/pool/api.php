@@ -75,7 +75,6 @@ function poolEstadoPublico(PDO $conexion): array
 }
 
 poolValidarAcceso();
-asegurarTablasBebidas($conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);

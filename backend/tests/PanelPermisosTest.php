@@ -58,7 +58,8 @@ $pantallas = [
     'seccion/menu/index.php', 'seccion/ventas/index.php', 'seccion/compras/index.php',
     'seccion/usuarios/index.php', 'seccion/premios/index.php', 'seccion/banners/index.php',
     'seccion/pool/index.php', 'seccion/bebidas/index.php', 'seccion/estadisticasPool/index.php',
-    'seccion/puntos/index.php',
+    'seccion/puntos/index.php', 'seccion/poolParametros/index.php',
+    'seccion/bebidasParametros/index.php', 'seccion/estadisticasBebidas/index.php',
 ];
 
 $usuarios = array_filter(explode(',', (string) getenv('PANEL_USUARIOS')));
@@ -97,8 +98,10 @@ foreach ($usuarios as $definicion) {
         }
         $puede = in_array($rol, $roles ?? ['admin'], true);
         $r = pedir("$base/$pantalla", $cookies);
+        // Si puede entrar, además la pantalla no tiene que mostrar errores de PHP
+        $sinErrores = !preg_match('/(Fatal error|Warning|Uncaught [A-Za-z]+)(<\/b>)?:/', $r['cuerpo']);
         verificar(
-            $puede ? $r['status'] === 200 : $r['status'] === 403,
+            $puede ? $r['status'] === 200 && $sinErrores : $r['status'] === 403,
             ($puede ? 'entra a ' : 'no entra a ') . $pantalla . " (respondió {$r['status']})"
         );
     }

@@ -13,7 +13,6 @@ if (!isset($_SESSION['admin_logueado']) || !in_array($rolActual, ['admin', 'empl
     exit;
 }
 
-asegurarTablaPoolTurnos($conexion);
 $configuracionPool = poolObtenerConfiguracion($conexion);
 
 $adminPageIdentifier = 'pool-admin';

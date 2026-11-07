@@ -66,7 +66,6 @@ function bebidaEstadoPublico(PDO $conexion): array
 }
 
 bebidaValidarAcceso();
-asegurarTablasBebidas($conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     bebidaResponder(['exito' => true, 'estado' => bebidaEstadoPublico($conexion)]);

@@ -4,7 +4,6 @@ require_once __DIR__ . '/../../../../src/Core/database.php';
 require_once __DIR__ . '/../../../../src/Services/pool_schema.php';
 
 verificarRol('admin');
-asegurarTablaPoolTurnos($conexion);
 
 [$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
 

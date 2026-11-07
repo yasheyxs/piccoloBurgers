@@ -10,7 +10,6 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 verificarRol('admin');
-asegurarTablaPoolTurnos($conexion);
 
 [$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
 

@@ -31,4 +31,5 @@ EXPOSE 8080
 # Directorio de trabajo final
 WORKDIR /var/www/html/public
 
-CMD ["apache2-foreground"]
+# Antes de arrancar Apache se aplican las migraciones pendientes de la base
+CMD ["sh", "-c", "php /var/www/html/bin/migrar.php --esperar && exec apache2-foreground"]
