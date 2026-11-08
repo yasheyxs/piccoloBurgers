@@ -235,6 +235,33 @@ $r = api('DELETE', "/admin/clientes/$cliente", $cookies, null, $csrf);
 $r2 = api('GET', "/admin/clientes/$cliente", $cookies);
 verificar($r['status'] === 200 && $r2['status'] === 404, 'borra el cliente');
 
+echo "
+Usuarios del panel
+";
+$r = api('GET', '/admin/usuarios', $cookies);
+$yo = array_values(array_filter($r['cuerpo']['datos'] ?? [], fn($u) => $u['sos_vos'] ?? false))[0] ?? null;
+verificar($r['status'] === 200 && $yo !== null && $yo['se_puede_borrar'] === false, 'lista los usuarios y marca el propio como protegido');
+$r = api('DELETE', '/admin/usuarios/' . ($yo['id'] ?? 0), $cookies, null, $csrf);
+verificar($r['status'] === 409, 'no deja borrar el propio usuario (409)');
+$nuevo = ['usuario' => 'empleado_api', 'correo' => 'empleado.api@ejemplo.test', 'rol' => 'empleado', 'password' => 'Empleado9!', 'confirmar' => 'Empleado9!'];
+$r = api('POST', '/admin/usuarios', $cookies, ['password' => 'corta'] + $nuevo, $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['password']), 'pide una contraseña segura (422)');
+$r = api('POST', '/admin/usuarios', $cookies, $nuevo, $csrf);
+$empleado = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && $empleado > 0, 'crea un empleado');
+$r = api('PUT', "/admin/usuarios/$empleado", $cookies, ['rol' => 'admin'] + $nuevo, $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['password_actual']), 'para hacerlo administrador pide tu contraseña (422)');
+
+// Una sesión abierta del empleado se corta en cuanto se lo borra
+$suya = tempnam(sys_get_temp_dir(), 'pb_api_');
+api('POST', '/admin/sesion', $suya, ['usuario' => 'empleado_api', 'password' => 'Empleado9!']);
+$r = api('GET', '/admin/sesion', $suya);
+verificar(($r['cuerpo']['datos']['rol'] ?? '') === 'empleado', 'el empleado nuevo puede entrar');
+$r = api('DELETE', "/admin/usuarios/$empleado", $cookies, null, $csrf);
+$r2 = api('GET', '/admin/sesion', $suya);
+verificar($r['status'] === 200 && array_key_exists('datos', $r2['cuerpo']) && $r2['cuerpo']['datos'] === null, 'al borrarlo, su sesión abierta deja de valer');
+@unlink($suya);
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -245,6 +272,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni las ventas (403)');
     $r = api('GET', '/admin/clientes', $otra);
     verificar($r['status'] === 403, 'ni los clientes (403)');
+    $r = api('GET', '/admin/usuarios', $otra);
+    verificar($r['status'] === 403, 'ni los usuarios (403)');
     @unlink($otra);
 }
 

@@ -168,7 +168,44 @@ if (!function_exists('piccolo_admin_sesion_vigente')) {
             return false;
         }
 
+        // El usuario puede haber sido borrado o cambiado de rol mientras tenía la sesión abierta
+        if (!MODO_DESARROLLO && !piccolo_admin_actualizar_usuario()) {
+            piccolo_admin_cerrar_sesion();
+            return false;
+        }
+
         $_SESSION['admin_ultima_actividad'] = time();
+        return true;
+    }
+}
+
+if (!function_exists('piccolo_admin_actualizar_usuario')) {
+    /**
+     * Vuelve a leer de la base el usuario de la sesión y actualiza su nombre y su rol.
+     * Devuelve false si ya no existe (por ejemplo, porque lo borraron desde Usuarios).
+     */
+    function piccolo_admin_actualizar_usuario(): bool
+    {
+        require_once piccolo_path('src/Core/database.php');
+        $conexion = $GLOBALS['conexion'];
+
+        if (!empty($_SESSION['admin_id'])) {
+            $stmt = $conexion->prepare('SELECT ID, usuario, rol FROM tbl_usuarios WHERE ID = ?');
+            $stmt->execute([(int) $_SESSION['admin_id']]);
+        } else {
+            // Sesiones iniciadas antes de guardar el id
+            $stmt = $conexion->prepare('SELECT ID, usuario, rol FROM tbl_usuarios WHERE usuario = ?');
+            $stmt->execute([(string) ($_SESSION['admin_usuario'] ?? '')]);
+        }
+        $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$usuario) {
+            return false;
+        }
+
+        $_SESSION['admin_id'] = (int) $usuario['ID'];
+        $_SESSION['admin_usuario'] = $usuario['usuario'];
+        $_SESSION['rol'] = $usuario['rol'];
+
         return true;
     }
 }
@@ -178,6 +215,7 @@ if (!function_exists('piccolo_admin_guardar_sesion')) {
     function piccolo_admin_guardar_sesion(array $usuario): void
     {
         session_regenerate_id(true);
+        $_SESSION['admin_id'] = (int) $usuario['ID'];
         $_SESSION['admin_usuario'] = $usuario['usuario'];
         $_SESSION['admin_logueado'] = true;
         $_SESSION['rol'] = $usuario['rol'];
@@ -189,7 +227,7 @@ if (!function_exists('piccolo_admin_guardar_sesion')) {
 if (!function_exists('piccolo_admin_cerrar_sesion')) {
     function piccolo_admin_cerrar_sesion(): void
     {
-        unset($_SESSION['admin_logueado'], $_SESSION['admin_usuario'], $_SESSION['rol'], $_SESSION['admin_ultima_actividad']);
+        unset($_SESSION['admin_logueado'], $_SESSION['admin_id'], $_SESSION['admin_usuario'], $_SESSION['rol'], $_SESSION['admin_ultima_actividad']);
     }
 }
 

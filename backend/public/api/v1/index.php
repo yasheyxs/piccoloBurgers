@@ -13,6 +13,7 @@ use Piccolo\Http\Admin\ComprasController;
 use Piccolo\Http\Admin\MateriasPrimasController;
 use Piccolo\Http\Admin\MenuController;
 use Piccolo\Http\Admin\ProveedoresController;
+use Piccolo\Http\Admin\UsuariosController;
 use Piccolo\Http\Admin\VentasController;
 use Piccolo\Http\Api\Admin\CanjeApi;
 use Piccolo\Http\Api\Admin\ClientesApi;
@@ -21,6 +22,7 @@ use Piccolo\Http\Api\Admin\MateriasPrimasApi;
 use Piccolo\Http\Api\Admin\MenuApi;
 use Piccolo\Http\Api\Admin\ProveedoresApi;
 use Piccolo\Http\Api\Admin\SesionPanelController;
+use Piccolo\Http\Api\Admin\UsuariosApi;
 use Piccolo\Http\Api\Admin\VentasApi;
 use Piccolo\Http\Api\CatalogoController;
 use Piccolo\Http\Api\Cors;
@@ -35,6 +37,7 @@ use Piccolo\Repositories\ComprasRepositorio;
 use Piccolo\Repositories\MateriasPrimasRepositorio;
 use Piccolo\Repositories\MenuRepositorio;
 use Piccolo\Repositories\ProveedoresRepositorio;
+use Piccolo\Repositories\UsuariosRepositorio;
 use Piccolo\Repositories\VentasRepositorio;
 
 if (Cors::aplicar()) {
@@ -145,5 +148,12 @@ $canje = new CanjeApi(new CanjeController($repoClientes, new CanjeRepositorio($c
 $router->get('/admin/clientes/{id}/canje', [$canje, 'datos']);
 $router->post('/admin/clientes/{id}/canje/venta', [$canje, 'venta']);
 $router->post('/admin/clientes/{id}/canje/premios', [$canje, 'premios']);
+
+$usuarios = new UsuariosApi(new UsuariosController(new UsuariosRepositorio($conexion)));
+$router->get('/admin/usuarios', [$usuarios, 'listar']);
+$router->post('/admin/usuarios', [$usuarios, 'crear']);
+$router->get('/admin/usuarios/{id}', [$usuarios, 'ver']);
+$router->put('/admin/usuarios/{id}', [$usuarios, 'actualizar']);
+$router->delete('/admin/usuarios/{id}', [$usuarios, 'eliminar']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));

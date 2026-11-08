@@ -46,6 +46,12 @@ if (!function_exists('piccolo_finalizar_por_error_bd')) {
     }
 }
 
+// Una sola conexión por petición: si ya se abrió (por ejemplo, al revisar la sesión del panel), se reutiliza.
+if (($GLOBALS['conexion'] ?? null) instanceof PDO) {
+    $conexion = $GLOBALS['conexion'];
+    return;
+}
+
 $requiredEnv = ['MYSQL_HOST', 'MYSQL_DATABASE', 'MYSQL_USER'];
 $configuracion = [];
 
@@ -77,6 +83,7 @@ try {
         PDO::ATTR_PERSISTENT         => false,
     ];
     $conexion = new PDO($dsn, $usuario, $contrasenia, $opciones);
+    $GLOBALS['conexion'] = $conexion;
 } catch (Exception $error) {
      piccolo_finalizar_por_error_bd(
         'Error al conectar a la base de datos: ' . $error->getMessage(),
@@ -107,6 +114,7 @@ if (!function_exists('piccolo_columna_existe')) {
     }
 }
 
+if (!function_exists('verificarRol')) {
 function verificarRol(string $rolPermitido): void
 {
     if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -121,4 +129,5 @@ function verificarRol(string $rolPermitido): void
         header('Location: ' . $loginUrl);
         exit();
     }
+}
 }

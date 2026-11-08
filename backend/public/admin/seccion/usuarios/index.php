@@ -1,123 +1,26 @@
 <?php
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-include(__DIR__ . "/../../../../src/Core/database.php");
-piccolo_admin_iniciar_sesion();
+require_once piccolo_path('src/Core/database.php');
 
-// Solo admin puede acceder
-if (!isset($_SESSION["rol"]) || $_SESSION["rol"] !== "admin") {
-    header("Location: ../../login.php");
-    exit();
-}
+use Piccolo\Http\Admin\UsuariosController;
+use Piccolo\Http\Api\ApiException;
+use Piccolo\Repositories\UsuariosRepositorio;
 
-$mensajeUsuarios = $_SESSION['mensaje_usuarios'] ?? '';
-unset($_SESSION['mensaje_usuarios']);
+$usuarios = new UsuariosController(new UsuariosRepositorio($conexion));
+$actualId = (int) ($_SESSION['admin_id'] ?? 0);
 
-// Eliminar usuario si se pasa txtID
-if (isset($_POST["txtID"])) {
-    $txtID = intval($_POST["txtID"]);
-
-    // Verificar si el usuario a eliminar es admin
-    $stmt = $conexion->prepare("SELECT rol FROM tbl_usuarios WHERE ID = :id");
-    $stmt->bindParam(":id", $txtID);
-    $stmt->execute();
-    $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($usuario && $usuario["rol"] === "admin") {
-        // Contar admins
-        $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
-        $stmt->execute();
-        $totalAdmins = $stmt->fetchColumn();
-
-        if ($totalAdmins <= 1) {
-            echo "<script>alert('No se puede eliminar el último administrador'); window.location.href='index.php';</script>";
-            exit();
-        }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        $usuarios->eliminar((int) ($_POST['txtID'] ?? 0), $actualId);
+        piccolo_admin_aviso('success', 'Usuario eliminado. Ya no puede entrar al panel.');
+    } catch (ApiException $error) {
+        piccolo_admin_aviso('warning', $error->getMessage());
     }
-
-    // Ejecutar eliminación
-    $stmt = $conexion->prepare("DELETE FROM tbl_usuarios WHERE ID = :id");
-    $stmt->bindParam(":id", $txtID);
-    $stmt->execute();
-
-    header("Location:index.php");
-    exit();
+    header('Location: index.php');
+    exit;
 }
 
-// Obtener lista de usuarios
-$sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios");
-$sentencia->execute();
-$lista_usuarios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-
-include(__DIR__ . "/../../../../views/admin/header.php");
-?>
-
-<br>
-<div class="card">
-  <div class="card-header">
-    <a class="btn btn-primary" href="crear.php" role="button">Agregar registros</a>
-  </div>
-  <div class="card-body">
-    <?php if ($mensajeUsuarios) { ?>
-      <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <?php echo htmlspecialchars($mensajeUsuarios, ENT_QUOTES, 'UTF-8'); ?>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-      </div>
-    <?php } ?>
-    <div class="table-responsive">
-      <table id="tablaUsuarios" class="table table-bordered table-hover table-sm align-middle w-100">
-        <thead class="table-light"> 
-          <tr>
-            <th>Usuario</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php foreach ($lista_usuarios as $registro) { ?>
-            <tr>
-              <td><?php echo $registro["usuario"]; ?></td>
-              <td><?php echo $registro["correo"]; ?></td>
-              <td><?php echo ucfirst($registro["rol"]); ?></td>
-              <td class="d-flex gap-2 flex-wrap">
-                <a class="btn btn-warning btn-sm" href="editar.php?id=<?php echo $registro["ID"]; ?>">Editar</a>
-                <?php
-                  $mostrarBoton = true;
-
-                  if ($registro["rol"] === "admin") {
-                      // Contar admins
-                      $stmt = $conexion->prepare("SELECT COUNT(*) FROM tbl_usuarios WHERE rol = 'admin'");
-                      $stmt->execute();
-                      $totalAdmins = $stmt->fetchColumn();
-
-                      // Si es el último admin, no mostrar botón
-                      if ($totalAdmins <= 1) {
-                          $mostrarBoton = false;
-                      }
-                  }
-
-                  if ($mostrarBoton) {
-                ?>
-                  <form method="post" action="index.php" class="d-inline" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?')"><input type="hidden" name="txtID" value="<?php echo $registro["ID"]; ?>"><button type="submit" class="btn btn-danger btn-sm">Borrar</button></form>
-                <?php } else { ?>
-                  <span class="text-muted">Protegido</span>
-                <?php } ?>
-
-              </td>
-
-            </tr>
-          <?php } ?>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="card-footer text-muted"></div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    initDataTable('#tablaUsuarios');
-  });
-</script>
-
-<?php include(__DIR__ . "/../../../../views/admin/footer.php"); ?>
+piccolo_admin_pagina('usuarios/lista', [
+    'usuarios' => $usuarios->listar($actualId),
+    'aviso' => piccolo_admin_tomar_aviso(),
+]);

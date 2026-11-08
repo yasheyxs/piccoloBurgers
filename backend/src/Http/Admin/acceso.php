@@ -27,7 +27,7 @@ require_once __DIR__ . '/sesion_panel.php';
 
     $habiaSesion = !empty($_SESSION['admin_logueado']);
     if (!piccolo_admin_sesion_vigente()) {
-        $mensaje = $habiaSesion ? 'La sesión se cerró por inactividad.' : 'Tenés que iniciar sesión en el panel.';
+        $mensaje = $habiaSesion ? 'Tu sesión se cerró. Volvé a iniciar sesión.' : 'Tenés que iniciar sesión en el panel.';
         piccolo_admin_rechazar(401, $mensaje, $pagina);
     }
 
