@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Recorre la API del panel (/api/v1/admin/...): sesión, permisos por rol, token CSRF y la
- * sección de proveedores completa (crear, editar, borrar).
+ * secciones de proveedores, materias primas y compras (incluido el ajuste del stock).
  *
  * Uso:
  *   PANEL_USUARIOS="admin:Usuario:clave,delivery:Delivery:clave" php tests/ApiPanelTest.php http://localhost:8080/api/v1
@@ -112,6 +112,40 @@ verificar($r['status'] === 200, 'borra el proveedor');
 
 $r = api('GET', "/admin/proveedores/$id", $cookies);
 verificar($r['status'] === 404, 'un proveedor borrado da 404');
+
+echo "\nMaterias primas y compras\n";
+$proveedor = api('POST', '/admin/proveedores', $cookies, ['nombre' => 'Proveedor compras API', 'telefono' => '3511234567'], $csrf)['cuerpo']['datos']['id'] ?? 0;
+
+$r = api('POST', '/admin/materias-primas', $cookies, ['nombre' => 'Insumo de prueba API', 'unidad_medida' => 'kg', 'cantidad' => '1,5', 'stock_minimo' => 2, 'proveedor_id' => $proveedor], $csrf);
+$materia = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['cantidad'] ?? null) === 1.5 && ($r['cuerpo']['datos']['estado_stock'] ?? '') === 'bajo', 'crea una materia prima (acepta "1,5" y marca el stock bajo)');
+
+$r = api('GET', '/admin/materias-primas?criticos=1', $cookies);
+verificar(in_array($materia, array_column($r['cuerpo']['datos'] ?? [], 'id'), true), 'aparece entre los insumos críticos');
+
+$r = api('POST', '/admin/compras', $cookies, ['fecha' => date('Y-m-d'), 'proveedor_id' => $proveedor, 'items' => []], $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['items']), 'una compra sin materias primas se rechaza');
+
+$r = api('POST', '/admin/compras', $cookies, ['fecha' => date('Y-m-d'), 'proveedor_id' => $proveedor, 'items' => [['materia_prima_id' => $materia, 'cantidad' => 2.5, 'precio_unitario' => 100]]], $csrf);
+$compra = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['total'] ?? null) === 250.0, 'registra una compra (201) con su total');
+
+$r = api('GET', "/admin/materias-primas/$materia", $cookies);
+verificar(($r['cuerpo']['datos']['cantidad'] ?? null) === 4.0, 'la compra se sumó al stock');
+
+$r = api('DELETE', "/admin/materias-primas/$materia", $cookies, null, $csrf);
+verificar($r['status'] === 409, 'no deja borrar una materia prima con compras (409)');
+
+$r = api('GET', '/admin/compras/resumen', $cookies);
+verificar($r['status'] === 200 && isset($r['cuerpo']['datos']['gasto_mes']), 'muestra el resumen de gastos');
+
+$r = api('DELETE', "/admin/compras/$compra", $cookies, null, $csrf);
+$stock = api('GET', "/admin/materias-primas/$materia", $cookies)['cuerpo']['datos']['cantidad'] ?? null;
+verificar($r['status'] === 200 && $stock === 1.5, 'borrar la compra descuenta del stock lo que había sumado');
+
+$r = api('DELETE', "/admin/materias-primas/$materia", $cookies, null, $csrf);
+$r2 = api('DELETE', "/admin/proveedores/$proveedor", $cookies, null, $csrf);
+verificar($r['status'] === 200 && $r2['status'] === 200, 'sin compras, la materia prima y el proveedor se pueden borrar');
 
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";

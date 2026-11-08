@@ -7,7 +7,11 @@
 
 require_once __DIR__ . '/../../../src/Core/bootstrap.php';
 
+use Piccolo\Http\Admin\ComprasController;
+use Piccolo\Http\Admin\MateriasPrimasController;
 use Piccolo\Http\Admin\ProveedoresController;
+use Piccolo\Http\Api\Admin\ComprasApi;
+use Piccolo\Http\Api\Admin\MateriasPrimasApi;
 use Piccolo\Http\Api\Admin\ProveedoresApi;
 use Piccolo\Http\Api\Admin\SesionPanelController;
 use Piccolo\Http\Api\CatalogoController;
@@ -17,6 +21,8 @@ use Piccolo\Http\Api\PedidosController;
 use Piccolo\Http\Api\Peticion;
 use Piccolo\Http\Api\Router;
 use Piccolo\Http\Api\Sesion;
+use Piccolo\Repositories\ComprasRepositorio;
+use Piccolo\Repositories\MateriasPrimasRepositorio;
 use Piccolo\Repositories\ProveedoresRepositorio;
 
 if (Cors::aplicar()) {
@@ -76,11 +82,28 @@ $router->get('/admin/sesion', [$sesionPanel, 'ver']);
 $router->post('/admin/sesion', [$sesionPanel, 'iniciar']);
 $router->delete('/admin/sesion', [$sesionPanel, 'cerrar']);
 
-$proveedores = new ProveedoresApi(new ProveedoresController(new ProveedoresRepositorio($conexion)));
+$repoProveedores = new ProveedoresRepositorio($conexion);
+$repoMaterias = new MateriasPrimasRepositorio($conexion);
+
+$proveedores = new ProveedoresApi(new ProveedoresController($repoProveedores));
 $router->get('/admin/proveedores', [$proveedores, 'listar']);
 $router->post('/admin/proveedores', [$proveedores, 'crear']);
 $router->get('/admin/proveedores/{id}', [$proveedores, 'ver']);
 $router->put('/admin/proveedores/{id}', [$proveedores, 'actualizar']);
 $router->delete('/admin/proveedores/{id}', [$proveedores, 'eliminar']);
+
+$materias = new MateriasPrimasApi(new MateriasPrimasController($repoMaterias, $repoProveedores));
+$router->get('/admin/materias-primas', [$materias, 'listar']);
+$router->post('/admin/materias-primas', [$materias, 'crear']);
+$router->get('/admin/materias-primas/{id}', [$materias, 'ver']);
+$router->put('/admin/materias-primas/{id}', [$materias, 'actualizar']);
+$router->delete('/admin/materias-primas/{id}', [$materias, 'eliminar']);
+
+$compras = new ComprasApi(new ComprasController(new ComprasRepositorio($conexion), $repoProveedores, $repoMaterias));
+$router->get('/admin/compras', [$compras, 'listar']);
+$router->post('/admin/compras', [$compras, 'registrar']);
+$router->get('/admin/compras/resumen', [$compras, 'resumen']); // antes de /{id}, para que "resumen" no se tome como un id
+$router->get('/admin/compras/{id}', [$compras, 'ver']);
+$router->delete('/admin/compras/{id}', [$compras, 'eliminar']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));
