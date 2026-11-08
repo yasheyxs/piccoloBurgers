@@ -262,6 +262,24 @@ $r2 = api('GET', '/admin/sesion', $suya);
 verificar($r['status'] === 200 && array_key_exists('datos', $r2['cuerpo']) && $r2['cuerpo']['datos'] === null, 'al borrarlo, su sesión abierta deja de valer');
 @unlink($suya);
 
+echo "\nPremios y puntos\n";
+$r = api('POST', '/admin/premios', $cookies, ['nombre' => 'Premio API', 'descripcion' => '', 'costo_puntos' => '0'], $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['costo_puntos']), 'un premio sin costo se rechaza (422)');
+$r = api('POST', '/admin/premios', $cookies, ['nombre' => 'Premio API', 'descripcion' => 'Algo rico', 'costo_puntos' => 150], $csrf);
+$premioApi = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['costo_puntos'] ?? 0) === 150, 'crea un premio');
+$r = api('PUT', "/admin/premios/$premioApi", $cookies, ['nombre' => 'Premio API', 'descripcion' => '', 'costo_puntos' => 200], $csrf);
+verificar($r['status'] === 200 && ($r['cuerpo']['datos']['costo_puntos'] ?? 0) === 200 && array_key_exists('descripcion', $r['cuerpo']['datos']) && $r['cuerpo']['datos']['descripcion'] === null, 'lo modifica');
+$r = api('DELETE', "/admin/premios/$premioApi", $cookies, null, $csrf);
+verificar($r['status'] === 200 && api('GET', "/admin/premios/$premioApi", $cookies)['status'] === 404, 'lo borra');
+$r = api('GET', '/admin/puntos/configuracion', $cookies);
+$config = $r['cuerpo']['datos'] ?? [];
+verificar($r['status'] === 200 && isset($config['minimo_puntos'], $config['ejemplo']['maximo_puntos']), 'muestra la configuración de puntos con un ejemplo');
+$r = api('PUT', '/admin/puntos/configuracion', $cookies, ['minimo_puntos' => -1, 'valor_punto' => 0, 'maximo_porcentaje' => 150], $csrf);
+verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 3, 'rechaza valores fuera de rango (422)');
+$r = api('PUT', '/admin/puntos/configuracion', $cookies, ['minimo_puntos' => $config['minimo_puntos'] ?? 50, 'valor_punto' => $config['valor_punto'] ?? 20, 'maximo_porcentaje' => $config['maximo_porcentaje'] ?? 25], $csrf);
+verificar($r['status'] === 200 && ($r['cuerpo']['datos']['maximo_porcentaje'] ?? null) == ($config['maximo_porcentaje'] ?? 25), 'guarda la configuración');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -274,6 +292,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni los clientes (403)');
     $r = api('GET', '/admin/usuarios', $otra);
     verificar($r['status'] === 403, 'ni los usuarios (403)');
+    $r = api('GET', '/admin/premios', $otra);
+    verificar($r['status'] === 403, 'ni los premios (403)');
     @unlink($otra);
 }
 
