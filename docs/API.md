@@ -335,6 +335,22 @@ La jornada se abre al empezar el día y se cierra al terminar; mientras está ab
 
 Sin jornada abierta, las operaciones de la fila responden `409`. Un turno que no es de la jornada activa responde `404`.
 
+### Bebidas (administración y empleados)
+
+La jornada es la misma que la del pool: se abre y se cierra con `/admin/pool/jornada`. Una venta es una jarra o una promoción (varias jarras) para una persona, y se entrega jarra por jarra.
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/bebidas` | Jornada activa, bebidas disponibles, resumen y ventas pendientes de entregar. Cantidades vendidas, precios y montos vienen en `null`. |
+| `POST /admin/bebidas/datos-sensibles` | Con `{ "password" }` (la tuya) devuelve el estado completo. Mismas reglas que en el pool. |
+| `POST /admin/bebidas/ventas` | Registra una venta: `{ "bebida_id": 2, "persona": "Ana", "tipo": "promo", "cantidad": 1 }`. Guarda el nombre y el precio del momento. `409` sin jornada abierta. |
+| `PUT /admin/bebidas/ventas/{id}` | Cambia el nombre de la persona: `{ "nombre" }`. |
+| `POST /admin/bebidas/ventas/{id}/entregar` | Anota una jarra entregada. `409` si ya se entregó todo. |
+| `POST /admin/bebidas/ventas/{id}/revertir` | Deshace una entrega. `409` si no hay entregas. |
+| `GET /admin/bebidas/catalogo` | Todas las bebidas, también las inactivas (solo administración). |
+| `POST /admin/bebidas/catalogo` | Agrega una bebida: `{ "nombre", "valor_jarra", "valor_promo", "jarras_por_promo", "activa" }` (solo administración). |
+| `PUT /admin/bebidas/catalogo/{id}` | Modifica una bebida. Las ventas ya hechas conservan su precio (solo administración). |
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.

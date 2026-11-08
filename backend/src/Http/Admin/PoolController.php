@@ -28,8 +28,6 @@ final class PoolController
     {
         require_once \piccolo_path('src/Services/pool_schema.php');
         require_once \piccolo_path('src/Services/bebidas_schema.php');
-        require_once \piccolo_path('src/Services/Security/password_utils.php');
-        require_once \piccolo_path('src/Services/Security/limite_intentos.php');
     }
 
     /** @return array<string, mixed> jornada activa y fila de cada mesa; sin los datos sensibles salvo que se pida */
@@ -49,29 +47,12 @@ final class PoolController
 
     /**
      * Confirma la contraseña de quien usa el panel para mostrar los datos sensibles.
-     * Después de varios intentos fallidos se bloquea unos minutos, igual que el ingreso al panel.
      *
      * @return array<string, mixed> el estado completo
      */
     public function mostrarSensibles(int $usuarioId, string $password): array
     {
-        $clave = (string) $usuarioId;
-        $minutos = \piccoloLoginMinutosBloqueado($this->conexion, 'privacidad', $clave);
-        if ($minutos > 0) {
-            throw new ApiException("Demasiados intentos. Probá de nuevo en $minutos minuto" . ($minutos === 1 ? '' : 's') . '.', 429);
-        }
-        if ($password === '') {
-            throw ApiException::validacion(['password' => 'Ingresá tu contraseña para continuar.']);
-        }
-
-        $stmt = $this->conexion->prepare('SELECT password FROM tbl_usuarios WHERE ID = ?');
-        $stmt->execute([$usuarioId]);
-        $hash = (string) ($stmt->fetchColumn() ?: '');
-        if ($hash === '' || !\passwordCoincideConHash($password, $hash)) {
-            \piccoloLoginRegistrarFallo($this->conexion, 'privacidad', $clave);
-            throw ApiException::validacion(['password' => 'La contraseña no es correcta.']);
-        }
-        \piccoloLoginRegistrarExito($this->conexion, 'privacidad', $clave);
+        DatosSensibles::confirmar($this->conexion, $usuarioId, $password);
 
         return $this->estado(true);
     }

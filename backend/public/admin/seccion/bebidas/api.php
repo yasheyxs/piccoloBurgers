@@ -1,221 +1,74 @@
 <?php
+/**
+ * Operaciones de la pantalla de bebidas (assets/js/pages/bebidas.js). Recibe {accion, ...} en JSON
+ * y responde {exito, estado} o {exito: false, mensaje}. Las reglas están en BebidasController.
+ */
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-require_once __DIR__ . '/../../../../src/Core/database.php';
-require_once __DIR__ . '/../../../../src/Services/bebidas_schema.php';
-require_once __DIR__ . '/../../../../src/Services/Security/password_utils.php';
+require_once piccolo_path('src/Core/database.php');
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    piccolo_admin_iniciar_sesion();
-}
+use Piccolo\Http\Admin\BebidasController;
+use Piccolo\Http\Admin\PoolController;
+use Piccolo\Http\Api\ApiException;
+use Piccolo\Repositories\BebidasRepositorio;
+use Piccolo\Repositories\PoolRepositorio;
 
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
 
-function bebidaResponder(array $payload, int $status = 200): void
-{
+$responder = static function (int $status, array $cuerpo): never {
     http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode($cuerpo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
-}
+};
 
-function bebidaValidarAcceso(): void
-{
-    $rol = $_SESSION['rol'] ?? '';
-    if (!isset($_SESSION['admin_logueado']) || !in_array($rol, ['admin', 'empleado'], true)) {
-        bebidaResponder(['exito' => false, 'mensaje' => 'No autorizado.'], 403);
-    }
-}
-
-function bebidaValidarCsrf(): void
-{
-    $sesion = (string) ($_SESSION['csrf_token'] ?? '');
-    $recibido = (string) ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
-    if ($sesion === '' || !hash_equals($sesion, $recibido)) {
-        bebidaResponder(['exito' => false, 'mensaje' => 'Token CSRF inválido.'], 403);
-    }
-}
-
-function bebidaPayload(): array
-{
-    $payload = json_decode(file_get_contents('php://input') ?: '[]', true);
-    return is_array($payload) ? $payload : [];
-}
-
-function bebidaEstadoPublico(PDO $conexion): array
-{
-    $estado = bebidaObtenerEstado($conexion);
-    $estado['stats']['vendidas'] = null;
-    $estado['stats']['entregadas'] = null;
-    $estado['stats']['montoVendido'] = null;
-
-    foreach ($estado['bebidas'] as &$bebida) {
-        $bebida['valor_jarra'] = null;
-        $bebida['valor_promo'] = null;
-    }
-    unset($bebida);
-
-    foreach ($estado['ventas'] as &$venta) {
-        $venta['cantidad_total'] = null;
-        $venta['cantidad_entregada'] = null;
-        $venta['valor_unitario'] = null;
-    }
-    unset($venta);
-
-    return $estado;
-}
-
-bebidaValidarAcceso();
+$bebidas = new BebidasController(new BebidasRepositorio($conexion), new PoolController(new PoolRepositorio($conexion), $conexion), $conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    bebidaResponder(['exito' => true, 'estado' => bebidaEstadoPublico($conexion)]);
+    $responder(200, ['exito' => true, 'estado' => $bebidas->estado()]);
 }
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    bebidaResponder(['exito' => false, 'mensaje' => 'Método no permitido.'], 405);
+    $responder(405, ['exito' => false, 'mensaje' => 'Método no permitido.']);
 }
 
-bebidaValidarCsrf();
-$payload = bebidaPayload();
-$accion = (string) ($payload['accion'] ?? '');
+$datos = json_decode((string) file_get_contents('php://input'), true);
+$datos = is_array($datos) ? $datos : [];
+$id = (int) ($datos['id'] ?? 0);
 
 try {
-    switch ($accion) {
+    switch ($datos['accion'] ?? '') {
         case 'validar_privacidad':
-            $password = (string) ($payload['password'] ?? '');
-            $usuario = (string) ($_SESSION['admin_usuario'] ?? '');
-            $stmt = $conexion->prepare('SELECT password FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1');
-            $stmt->execute([':usuario' => $usuario]);
-            $hash = (string) ($stmt->fetchColumn() ?: '');
-
-            if ($password === '' || $usuario === '' || !passwordCoincideConHash($password, $hash)) {
-                bebidaResponder(['exito' => false, 'mensaje' => 'La contraseña es incorrecta.'], 401);
-            }
-            bebidaResponder([
-                'exito' => true,
-                'privacidadAutorizada' => true,
-                'estado' => bebidaObtenerEstado($conexion),
-            ]);
-            break;
-
-        case 'abrir_jornada':
-            poolAbrirJornada($conexion);
-            break;
-
-        case 'cerrar_jornada':
-            $totales = is_array($payload['totales'] ?? null) ? $payload['totales'] : [];
-            poolCerrarJornada($conexion, $totales);
-            break;
-
+            $estado = $bebidas->mostrarSensibles((int) ($_SESSION['admin_id'] ?? 0), (string) ($datos['password'] ?? ''));
+            $responder(200, ['exito' => true, 'privacidadAutorizada' => true, 'estado' => $estado]);
+            // no break: $responder termina la ejecución
         case 'totales_cierre':
-            $jornada = poolJornadaActiva($conexion);
-            if (!$jornada) {
-                throw new RuntimeException('No hay una jornada activa.');
-            }
-            bebidaResponder([
-                'exito' => true,
-                'totales' => poolTotalesCierre($conexion, (int) $jornada['id']),
-                'estado' => bebidaEstadoPublico($conexion),
-            ]);
+            $responder(200, ['exito' => true, 'totales' => $bebidas->totalesCierre(), 'estado' => $bebidas->estado()]);
+            // no break
+        case 'abrir_jornada':
+            $bebidas->abrirJornada();
             break;
-
+        case 'cerrar_jornada':
+            $bebidas->cerrarJornada(is_array($datos['totales'] ?? null) ? $datos['totales'] : []);
+            break;
         case 'agregar':
-            $jornada = poolJornadaActiva($conexion);
-            if (!$jornada) {
-                throw new RuntimeException('Abrí una jornada antes de registrar ventas.');
-            }
-            bebidaRegistrarVenta(
-                $conexion,
-                (int) $jornada['id'],
-                (int) ($payload['bebidaId'] ?? 0),
-                (string) ($payload['persona'] ?? ''),
-                (string) ($payload['tipo'] ?? 'jarra'),
-                (int) ($payload['cantidad'] ?? 0)
-            );
+            $bebidas->vender($datos);
             break;
-
         case 'renombrar':
-            $jornada = poolJornadaActiva($conexion);
-            if (!$jornada) {
-                throw new RuntimeException('No hay una jornada activa.');
-            }
-
-            $id = (int) ($payload['id'] ?? 0);
-            $nombre = trim((string) ($payload['nombre'] ?? ''));
-            $largoNombre = function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') : strlen($nombre);
-
-            if ($id <= 0) {
-                throw new RuntimeException('Venta inválida.');
-            }
-
-            if ($nombre === '') {
-                throw new RuntimeException('Ingresa un nombre o identificación.');
-            }
-
-            if ($largoNombre > 120) {
-                throw new RuntimeException('El nombre no puede superar 120 caracteres.');
-            }
-
-            $stmt = $conexion->prepare(
-                'UPDATE bebida_ventas SET persona = :persona WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $stmt->execute([
-                ':persona' => $nombre,
-                ':id' => $id,
-                ':jornada_id' => (int) $jornada['id'],
-            ]);
-
-            if ($stmt->rowCount() === 0) {
-                throw new RuntimeException('No encontramos esa venta en la jornada activa.');
-            }
+            $bebidas->renombrar($id, $datos);
             break;
-
         case 'entregar':
-        case 'revertir':
-            $jornada = poolJornadaActiva($conexion);
-            if (!$jornada) {
-                throw new RuntimeException('No hay una jornada activa.');
-            }
-            $id = (int) ($payload['id'] ?? 0);
-            $stmt = $conexion->prepare(
-                'SELECT cantidad_total, cantidad_entregada, unidades_por_item
-                 FROM bebida_ventas WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $stmt->execute([':id' => $id, ':jornada_id' => (int) $jornada['id']]);
-            $venta = $stmt->fetch(PDO::FETCH_ASSOC);
-            if (!$venta) {
-                throw new RuntimeException('No encontramos esa venta en la jornada activa.');
-            }
-
-            $cantidadAEntregar = (int) $venta['cantidad_total'] * max(1, (int) $venta['unidades_por_item']);
-            if ($accion === 'entregar' && (int) $venta['cantidad_entregada'] >= $cantidadAEntregar) {
-                throw new RuntimeException('La venta ya fue entregada por completo.');
-            }
-            if ($accion === 'revertir' && (int) $venta['cantidad_entregada'] <= 0) {
-                throw new RuntimeException('No hay entregas para revertir.');
-            }
-
-            $expresion = $accion === 'entregar'
-                ? 'LEAST(cantidad_total * unidades_por_item, cantidad_entregada + 1)'
-                : 'GREATEST(0, cantidad_entregada - 1)';
-            $update = $conexion->prepare(
-                "UPDATE bebida_ventas SET cantidad_entregada = {$expresion}
-                 WHERE id = :id AND jornada_id = :jornada_id"
-            );
-            $update->execute([':id' => $id, ':jornada_id' => (int) $jornada['id']]);
+            $bebidas->entregar($id);
             break;
-
+        case 'revertir':
+            $bebidas->revertir($id);
+            break;
         default:
-            bebidaResponder(['exito' => false, 'mensaje' => 'Acción no reconocida.'], 422);
+            throw new ApiException('Acción no reconocida.', 400);
     }
-
-    bebidaResponder(['exito' => true, 'estado' => bebidaEstadoPublico($conexion)]);
+    $responder(200, ['exito' => true, 'estado' => $bebidas->estado()]);
+} catch (ApiException $error) {
+    $mensaje = $error->errores() ? implode(' ', $error->errores()) : $error->getMessage();
+    $responder($error->status(), ['exito' => false, 'mensaje' => $mensaje]);
 } catch (Throwable $error) {
-    if ($conexion->inTransaction()) {
-        $conexion->rollBack();
-    }
-    error_log('Error en modulo bebidas: ' . $error->getMessage());
-    bebidaResponder([
-        'exito' => false,
-        'mensaje' => $error instanceof RuntimeException ? $error->getMessage() : 'No se pudo completar la operación.',
-    ], $error instanceof RuntimeException ? 409 : 500);
+    error_log('Error en bebidas: ' . $error->getMessage());
+    $responder(500, ['exito' => false, 'mensaje' => 'No se pudo completar la operación. Intentá de nuevo.']);
 }

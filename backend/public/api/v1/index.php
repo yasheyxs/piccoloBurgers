@@ -7,6 +7,7 @@
 
 require_once __DIR__ . '/../../../src/Core/bootstrap.php';
 
+use Piccolo\Http\Admin\BebidasController;
 use Piccolo\Http\Admin\CanjeController;
 use Piccolo\Http\Admin\ClientesController;
 use Piccolo\Http\Admin\ComprasController;
@@ -18,6 +19,7 @@ use Piccolo\Http\Admin\ProveedoresController;
 use Piccolo\Http\Admin\PuntosController;
 use Piccolo\Http\Admin\UsuariosController;
 use Piccolo\Http\Admin\VentasController;
+use Piccolo\Http\Api\Admin\BebidasApi;
 use Piccolo\Http\Api\Admin\CanjeApi;
 use Piccolo\Http\Api\Admin\ClientesApi;
 use Piccolo\Http\Api\Admin\ComprasApi;
@@ -36,6 +38,7 @@ use Piccolo\Http\Api\PedidosController;
 use Piccolo\Http\Api\Peticion;
 use Piccolo\Http\Api\Router;
 use Piccolo\Http\Api\Sesion;
+use Piccolo\Repositories\BebidasRepositorio;
 use Piccolo\Repositories\CanjeRepositorio;
 use Piccolo\Repositories\ClientesRepositorio;
 use Piccolo\Repositories\ComprasRepositorio;
@@ -172,7 +175,8 @@ $router->delete('/admin/premios/{id}', [$premios, 'eliminar']);
 $router->get('/admin/puntos/configuracion', [$premios, 'verConfiguracion']);
 $router->put('/admin/puntos/configuracion', [$premios, 'guardarConfiguracion']);
 
-$pool = new PoolApi(new PoolController(new PoolRepositorio($conexion), $conexion));
+$poolController = new PoolController(new PoolRepositorio($conexion), $conexion);
+$pool = new PoolApi($poolController);
 $router->get('/admin/pool', [$pool, 'estado']);
 $router->post('/admin/pool/datos-sensibles', [$pool, 'sensibles']);
 $router->post('/admin/pool/jornada', [$pool, 'abrir']);
@@ -187,5 +191,16 @@ $router->post('/admin/pool/turnos/{id}/mover', [$pool, 'mover']);
 $router->put('/admin/pool/orden', [$pool, 'reordenar']);
 $router->get('/admin/pool/configuracion', [$pool, 'verConfiguracion']);
 $router->put('/admin/pool/configuracion', [$pool, 'guardarConfiguracion']);
+
+$bebidas = new BebidasApi(new BebidasController(new BebidasRepositorio($conexion), $poolController, $conexion));
+$router->get('/admin/bebidas', [$bebidas, 'estado']);
+$router->post('/admin/bebidas/datos-sensibles', [$bebidas, 'sensibles']);
+$router->post('/admin/bebidas/ventas', [$bebidas, 'vender']);
+$router->put('/admin/bebidas/ventas/{id}', [$bebidas, 'renombrar']);
+$router->post('/admin/bebidas/ventas/{id}/entregar', [$bebidas, 'entregar']);
+$router->post('/admin/bebidas/ventas/{id}/revertir', [$bebidas, 'revertir']);
+$router->get('/admin/bebidas/catalogo', [$bebidas, 'catalogo']);
+$router->post('/admin/bebidas/catalogo', [$bebidas, 'crearBebida']);
+$router->put('/admin/bebidas/catalogo/{id}', [$bebidas, 'actualizarBebida']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));

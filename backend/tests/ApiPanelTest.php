@@ -292,6 +292,20 @@ verificar(in_array($r['status'], [404, 409], true), 'un turno que no existe no s
 $r = api('PUT', '/admin/pool/configuracion', $cookies, ['max_fichas_por_registro' => 0, 'valor_ficha' => 0], $csrf);
 verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 2, 'rechaza parámetros fuera de rango (422)');
 
+echo "\nBebidas\n";
+$r = api('GET', '/admin/bebidas', $cookies);
+verificar($r['status'] === 200 && array_key_exists('montoVendido', $r['cuerpo']['datos']['stats'] ?? []) && $r['cuerpo']['datos']['stats']['montoVendido'] === null, 'muestra las bebidas sin los montos');
+$r = api('POST', '/admin/bebidas/catalogo', $cookies, ['nombre' => '', 'valor_jarra' => 0, 'valor_promo' => 0, 'jarras_por_promo' => 0], $csrf);
+verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 4, 'una bebida sin datos se rechaza con el error de cada campo (422)');
+$nombreBebida = 'Bebida API ' . bin2hex(random_bytes(3));
+$r = api('POST', '/admin/bebidas/catalogo', $cookies, ['nombre' => $nombreBebida, 'valor_jarra' => '1500,5', 'valor_promo' => 4000, 'jarras_por_promo' => 3, 'activa' => false], $csrf);
+$bebidaApi = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['valor_jarra'] ?? 0) === 1500.5 && ($r['cuerpo']['datos']['activa'] ?? true) === false, 'agrega una bebida (inactiva, con decimales con coma)');
+$r = api('POST', '/admin/bebidas/catalogo', $cookies, ['nombre' => $nombreBebida, 'valor_jarra' => 1, 'valor_promo' => 1, 'jarras_por_promo' => 1], $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['nombre']), 'no repite el nombre (422)');
+$r = api('POST', '/admin/bebidas/ventas', $cookies, ['bebida_id' => $bebidaApi, 'persona' => 'Ana', 'tipo' => 'jarra', 'cantidad' => 1], $csrf);
+verificar(in_array($r['status'], [409, 422], true), 'no se vende una bebida inactiva ni sin jornada');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -308,6 +322,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni los premios (403)');
     $r = api('GET', '/admin/pool', $otra);
     verificar($r['status'] === 403, 'ni el pool (403)');
+    $r = api('GET', '/admin/bebidas', $otra);
+    verificar($r['status'] === 403, 'ni las bebidas (403)');
     @unlink($otra);
 }
 
