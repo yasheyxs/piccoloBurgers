@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /**
  * Recorre la API del panel (/api/v1/admin/...): sesión, permisos por rol, token CSRF y la
- * secciones de proveedores, materias primas y compras (incluido el ajuste del stock).
+ * secciones de proveedores, materias primas, compras (incluido el ajuste del stock) y menú (receta y foto).
  *
  * Uso:
  *   PANEL_USUARIOS="admin:Usuario:clave,delivery:Delivery:clave" php tests/ApiPanelTest.php http://localhost:8080/api/v1
@@ -146,6 +146,44 @@ verificar($r['status'] === 200 && $stock === 1.5, 'borrar la compra descuenta de
 $r = api('DELETE', "/admin/materias-primas/$materia", $cookies, null, $csrf);
 $r2 = api('DELETE', "/admin/proveedores/$proveedor", $cookies, null, $csrf);
 verificar($r['status'] === 200 && $r2['status'] === 200, 'sin compras, la materia prima y el proveedor se pueden borrar');
+
+echo "\nMenú\n";
+$r = api('GET', '/admin/menu/categorias', $cookies);
+verificar(in_array('Hamburguesas', $r['cuerpo']['datos'] ?? [], true), 'lista las categorías');
+
+$r = api('POST', '/admin/menu', $cookies, ['nombre' => 'Producto de prueba API', 'ingredientes' => 'Pan', 'precio' => '1999,90', 'categoria' => 'Hamburguesas', 'visible' => false], $csrf);
+$producto = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['precio'] ?? null) === 1999.9 && ($r['cuerpo']['datos']['visible'] ?? null) === false, 'crea un producto oculto (201)');
+
+$insumo = api('POST', '/admin/materias-primas', $cookies, ['nombre' => 'Insumo receta API', 'unidad_medida' => 'kg', 'cantidad' => 3], $csrf)['cuerpo']['datos']['id'] ?? 0;
+$r = api('PUT', "/admin/menu/$producto/receta", $cookies, ['items' => [['materia_prima_id' => $insumo, 'cantidad' => 0.5]]], $csrf);
+verificar($r['status'] === 200 && count($r['cuerpo']['datos'] ?? []) === 1 && ($r['cuerpo']['datos'][0]['alcanza'] ?? false) === true, 'guarda la receta');
+
+$subir = function (string $contenido, string $tipo) use ($base, $cookies, $producto, $csrf): array {
+    $archivo = tempnam(sys_get_temp_dir(), 'pb_img_');
+    file_put_contents($archivo, $contenido);
+    $curl = curl_init("$base/admin/menu/$producto/foto");
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEFILE => $cookies, CURLOPT_COOKIEJAR => $cookies,
+        CURLOPT_HTTPHEADER => ['Accept: application/json', 'X-CSRF-Token: ' . $csrf],
+        CURLOPT_POSTFIELDS => ['foto' => new CURLFile($archivo, $tipo, 'foto.png')],
+    ]);
+    $cuerpo = json_decode((string) curl_exec($curl), true) ?: [];
+    $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+    curl_close($curl);
+    @unlink($archivo);
+    return ['status' => $status, 'cuerpo' => $cuerpo];
+};
+$r = $subir('<?php echo "no";', 'image/png');
+verificar($r['status'] === 422, 'rechaza un archivo que no es una imagen aunque se llame .png');
+$png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
+$r = $subir($png, 'image/png');
+$foto = (string) ($r['cuerpo']['datos']['foto'] ?? '');
+verificar($r['status'] === 200 && preg_match('/^producto_[0-9a-f]{16}\.png$/', $foto) === 1, 'sube una foto real con un nombre generado por el sistema');
+
+$r = api('DELETE', "/admin/menu/$producto", $cookies, null, $csrf);
+$r2 = api('DELETE', "/admin/materias-primas/$insumo", $cookies, null, $csrf);
+verificar($r['status'] === 200 && $r2['status'] === 200, 'borra el producto sin ventas (y su receta)');
 
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";

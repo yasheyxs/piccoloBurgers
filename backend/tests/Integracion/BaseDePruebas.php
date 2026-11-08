@@ -52,6 +52,9 @@ abstract class BaseDePruebas extends TestCase
         // Se borra en orden inverso para respetar las relaciones entre tablas
         foreach (array_reverse($this->creados, true) as $tabla => $ids) {
             $marcadores = implode(',', array_fill(0, count($ids), '?'));
+            if ($tabla === 'tbl_materias_primas') {
+                $this->conexion->prepare("DELETE FROM tbl_menu_materias_primas WHERE materia_prima_id IN ($marcadores)")->execute($ids);
+            }
             if ($tabla === 'tbl_compras') {
                 $this->conexion->prepare("DELETE FROM tbl_compras_detalle WHERE compra_id IN ($marcadores)")->execute($ids);
             }

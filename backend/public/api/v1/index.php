@@ -9,9 +9,11 @@ require_once __DIR__ . '/../../../src/Core/bootstrap.php';
 
 use Piccolo\Http\Admin\ComprasController;
 use Piccolo\Http\Admin\MateriasPrimasController;
+use Piccolo\Http\Admin\MenuController;
 use Piccolo\Http\Admin\ProveedoresController;
 use Piccolo\Http\Api\Admin\ComprasApi;
 use Piccolo\Http\Api\Admin\MateriasPrimasApi;
+use Piccolo\Http\Api\Admin\MenuApi;
 use Piccolo\Http\Api\Admin\ProveedoresApi;
 use Piccolo\Http\Api\Admin\SesionPanelController;
 use Piccolo\Http\Api\CatalogoController;
@@ -23,6 +25,7 @@ use Piccolo\Http\Api\Router;
 use Piccolo\Http\Api\Sesion;
 use Piccolo\Repositories\ComprasRepositorio;
 use Piccolo\Repositories\MateriasPrimasRepositorio;
+use Piccolo\Repositories\MenuRepositorio;
 use Piccolo\Repositories\ProveedoresRepositorio;
 
 if (Cors::aplicar()) {
@@ -105,5 +108,16 @@ $router->post('/admin/compras', [$compras, 'registrar']);
 $router->get('/admin/compras/resumen', [$compras, 'resumen']); // antes de /{id}, para que "resumen" no se tome como un id
 $router->get('/admin/compras/{id}', [$compras, 'ver']);
 $router->delete('/admin/compras/{id}', [$compras, 'eliminar']);
+
+$menu = new MenuApi(new MenuController(new MenuRepositorio($conexion), $repoMaterias, piccolo_path('public/img/menu')));
+$router->get('/admin/menu', [$menu, 'listar']);
+$router->post('/admin/menu', [$menu, 'crear']);
+$router->get('/admin/menu/categorias', [$menu, 'categorias']); // antes de /{id}
+$router->get('/admin/menu/{id}', [$menu, 'ver']);
+$router->put('/admin/menu/{id}', [$menu, 'actualizar']);
+$router->delete('/admin/menu/{id}', [$menu, 'eliminar']);
+$router->post('/admin/menu/{id}/foto', [$menu, 'foto']);
+$router->get('/admin/menu/{id}/receta', [$menu, 'receta']);
+$router->put('/admin/menu/{id}/receta', [$menu, 'guardarReceta']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));
