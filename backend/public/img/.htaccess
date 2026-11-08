@@ -13,3 +13,8 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule \.(jpe?g|png|webp|gif)$ placeholders/fondo.svg [L,NC]
 </IfModule>
+
+# En las carpetas de imágenes nunca se ejecuta código, aunque alguien logre subir un archivo .php
+<FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp)$">
+  Require all denied
+</FilesMatch>

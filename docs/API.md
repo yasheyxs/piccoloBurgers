@@ -233,6 +233,28 @@ Registrar una compra suma lo comprado al stock de cada materia prima; borrarla l
 
 Si algo no es válido responde `422`, y los errores de cada ítem vienen como `items.0.cantidad`, `items.1.materia_prima_id`, etc. La fecha no puede ser posterior a hoy.
 
+### Menú (solo administración)
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /admin/menu` | Todos los productos, también los ocultos, con la cantidad de insumos de su receta. |
+| `GET /admin/menu/categorias` | Las categorías válidas. |
+| `GET /admin/menu/{id}` | Un producto con su receta. |
+| `POST /admin/menu` | Crea un producto. Recibe `{ "nombre", "ingredientes", "precio", "categoria", "visible" }`. Responde `201`. |
+| `PUT /admin/menu/{id}` | Modifica un producto. Mismos campos que al crear. |
+| `POST /admin/menu/{id}/foto` | Cambia la foto. Se envía como `multipart/form-data` con el campo `foto` (JPG, PNG o WEBP, hasta 5 MB). |
+| `DELETE /admin/menu/{id}` | Borra un producto. `409` si ya figura en pedidos: en ese caso conviene ocultarlo (`visible: false`) para no perder el historial. |
+| `GET /admin/menu/{id}/receta` | Qué materias primas descuenta cada unidad vendida y si el stock alcanza. |
+| `PUT /admin/menu/{id}/receta` | Reemplaza la receta completa: `{ "items": [{ "materia_prima_id": 4, "cantidad": 0.15 }] }`. |
+
+```json
+{ "id": 12, "nombre": "Jamón y queso", "ingredientes": "Carne, jamón, queso y mayonesa", "precio": 7500.0,
+  "categoria": "Hamburguesas", "visible": true, "foto": "producto_3f9a1c2b4d5e6f70.jpg",
+  "imagen": "http://localhost:8080/img/menu/producto_3f9a1c2b4d5e6f70.jpg", "insumos": 4 }
+```
+
+Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las fotos se guardan con un nombre generado por el sistema y solo se aceptan imágenes reales (se revisa el contenido del archivo, no su nombre).
+
 ## Configuración
 
 Variables en `backend/.env` (ver `backend/.env.example`):
@@ -261,7 +283,7 @@ php backend/tests/ApiTest.php http://localhost:8080/api/v1
 
 Crea un cliente, un comentario y un pedido de prueba, así que conviene correrlo contra una base de desarrollo.
 
-`backend/tests/ApiPanelTest.php` hace lo mismo con la API del panel: sesión, permisos por rol, token CSRF y las secciones de proveedores, materias primas y compras (incluido el ajuste del stock).
+`backend/tests/ApiPanelTest.php` hace lo mismo con la API del panel: sesión, permisos por rol, token CSRF y las secciones de proveedores, materias primas, compras (incluido el ajuste del stock) y menú (receta y fotos).
 
 ```bash
 PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php backend/tests/ApiPanelTest.php http://localhost:8080/api/v1

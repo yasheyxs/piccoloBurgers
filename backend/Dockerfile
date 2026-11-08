@@ -31,5 +31,6 @@ EXPOSE 8080
 # Directorio de trabajo final
 WORKDIR /var/www/html/public
 
-# Antes de arrancar Apache se aplican las migraciones pendientes de la base
-CMD ["sh", "-c", "php /var/www/html/bin/migrar.php --esperar && exec apache2-foreground"]
+# Antes de arrancar Apache: Apache tiene que poder guardar las fotos que se suben desde el panel
+# (también cuando backend/ está montado desde la computadora) y se aplican las migraciones pendientes.
+CMD ["sh", "-c", "mkdir -p /var/www/html/public/img/menu /var/www/html/public/img/banners /var/www/html/public/img/premios && chown -R www-data:www-data /var/www/html/public/img && php /var/www/html/bin/migrar.php --esperar && exec apache2-foreground"]
