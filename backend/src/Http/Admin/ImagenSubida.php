@@ -32,7 +32,7 @@ final class ImagenSubida
      * @param array{name?: string, tmp_name?: string, error?: int, size?: int} $archivo
      * @throws ApiException 422 si no es una imagen válida
      */
-    public static function guardar(array $archivo, string $carpeta, string $prefijo, string $campo = 'foto'): string
+    public static function guardar(array $archivo, string $carpeta, string $prefijo, string $campo = 'foto', int $anchoMinimo = 0, int $altoMinimo = 0): string
     {
         $error = $archivo['error'] ?? UPLOAD_ERR_NO_FILE;
         if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE || ($archivo['size'] ?? 0) > self::MAXIMO_MB * 1024 * 1024) {
@@ -48,6 +48,9 @@ final class ImagenSubida
         $extension = self::FORMATOS[$info['mime'] ?? ''] ?? null;
         if ($info === false || $extension === null) {
             throw ApiException::validacion([$campo => 'El archivo tiene que ser una imagen JPG, PNG o WEBP.']);
+        }
+        if ($info[0] < $anchoMinimo || $info[1] < $altoMinimo) {
+            throw ApiException::validacion([$campo => "La imagen tiene que medir al menos {$anchoMinimo} × {$altoMinimo} píxeles (esta mide {$info[0]} × {$info[1]})."]);
         }
 
         if (!is_dir($carpeta) && !mkdir($carpeta, 0775, true) && !is_dir($carpeta)) {

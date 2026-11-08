@@ -1,85 +1,38 @@
 <?php
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-include(__DIR__ . "/../../../../src/Core/database.php");
+require_once piccolo_path('src/Core/database.php');
 
-$txtID = $opinion = $nombre = "";
+use Piccolo\Http\Admin\ContenidoController;
+use Piccolo\Http\Api\ApiException;
+use Piccolo\Repositories\ContenidoRepositorio;
 
-if (isset($_GET['txtID'])) {
-    $txtID = (isset($_GET["txtID"])) ? $_GET["txtID"] : "";
-    $sentencia = $conexion->prepare("SELECT * FROM `tbl_testimonios` WHERE ID=:id");
-    $sentencia->bindParam(":id", $txtID);
-    $sentencia->execute();
-    $registro = $sentencia->fetch(PDO::FETCH_LAZY);
+$contenido = new ContenidoController(new ContenidoRepositorio($conexion), piccolo_path('public/img/banners'));
+$id = (int) ($_GET['id'] ?? 0);
+try {
+    $testimonio = $contenido->testimonio($id);
+} catch (ApiException $error) {
+    piccolo_admin_aviso('warning', $error->getMessage());
+    header('Location: index.php');
+    exit;
+}
+$errores = [];
+$aviso = null;
 
-    $opinion = $registro["opinion"];
-    $nombre = $registro["nombre"];
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $testimonio = array_intersect_key($_POST, ['opinion' => '', 'nombre' => '']) + $testimonio;
+    try {
+        $contenido->guardarTestimonio($testimonio, $id);
+        piccolo_admin_aviso('success', $id > 0 ? 'Testimonio modificado.' : 'Testimonio agregado. Ya se ve en el sitio.');
+        header('Location: index.php');
+        exit;
+    } catch (ApiException $error) {
+        $errores = $error->errores();
+        $aviso = ['tipo' => 'danger', 'mensaje' => $error->getMessage()];
+    }
 }
 
-if ($_POST) {
-
-    $opinion = (isset($_POST["opinion"])) ? $_POST["opinion"] : "";
-    $nombre = (isset($_POST["nombre"])) ? $_POST["nombre"] : "";
-    $txtID = (isset($_POST["txtID"])) ? $_POST["txtID"] : "";
-
-    $sentencia = $conexion->prepare("UPDATE tbl_testimonios SET 
-        opinion=:opinion, 
-        nombre=:nombre
-        WHERE ID=:id");
-
-    $sentencia->bindParam(":opinion", $opinion);
-    $sentencia->bindParam(":nombre", $nombre);
-    $sentencia->bindParam(":id", $txtID);
-    $sentencia->execute();
-
-    header("Location:index.php");
-}
-
-
-include(__DIR__ . "/../../../../views/admin/header.php");
-
-?>
-
-<br />
-<div class="card">
-    <div class="card-header">
-        Testimonios
-    </div>
-    <div class="card-body">
-
-        <form action="" method="post">
-
-
-            <div class="mb-3">
-                <label for="" class="form-label">ID:</label>
-                <input type="text"
-                    class="form-control" value="<?php echo $txtID; ?>" name="txtID" id="txtID" aria-describedby="helpId" placeholder="">
-
-            </div>
-
-            <div class="mb-3">
-                <label for="" class="form-label">Opinión:</label>
-                <input type="text"
-                    class="form-control" value="<?php echo $opinion; ?>" name="opinion" id="opinion" aria-describedby="helpId" placeholder="Opinión">
-            </div>
-
-            <div class="mb-3">
-                <label for="nombre" class="form-label">Nombre:</label>
-                <input type="text"
-                    class="form-control" value="<?php echo $nombre; ?>" name="nombre" id="nombre" aria-describedby="helpId" placeholder="Nombre">
-
-            </div>
-
-            <button type="submit" class="btn btn-success">Modificar testimonios </button>
-            <a name="" id="" class="btn btn-primary" href="index.php" role="button">Cancelar</a>
-
-
-        </form>
-
-    </div>
-    <div class="card-footer text-muted">
-
-    </div>
-</div>
-
-
-<?php include(__DIR__ . "/../../../../views/admin/footer.php"); ?>
+piccolo_admin_pagina('contenido/testimonio_formulario', [
+    'titulo' => $id > 0 ? 'Editar testimonio' : 'Nuevo testimonio',
+    'boton' => $id > 0 ? 'Guardar cambios' : 'Agregar testimonio',
+    'testimonio' => $testimonio, 'errores' => $errores, 'aviso' => $aviso,
+]);

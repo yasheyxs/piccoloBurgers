@@ -63,7 +63,7 @@ $pantallas = [
     'seccion/proveedores/index.php', 'seccion/proveedores/crear.php',
     'seccion/materiasPrimas/index.php', 'seccion/materiasPrimas/crear.php', 'seccion/compras/crear.php',
     'seccion/menu/crear.php',
-    'clientes_crear.php', 'seccion/usuarios/crear.php', 'seccion/premios/crear.php',
+    'clientes_crear.php', 'seccion/usuarios/crear.php', 'seccion/premios/crear.php', 'seccion/banners/crear.php', 'seccion/testimonios/crear.php', 'seccion/comentarios/index.php',
     'seccion/ventas/export_excel.php', 'seccion/ventas/export_pdf.php',
     'seccion/estadisticasPool/export_excel.php', 'seccion/estadisticasPool/export_pdf.php',
     'seccion/estadisticasPool/index.php?desde=2001-05-02&hasta=2001-05-01',
