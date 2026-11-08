@@ -211,6 +211,26 @@ $movs = $r2['cuerpo']['datos']['movimientos'] ?? [];
 verificar($r['status'] === 200 && ($r['cuerpo']['datos']['puntos'] ?? null) === 5 && count($movs) === 2 && ($movs[0]['puntos'] ?? 0) === -15, 'al cambiar los puntos anota la diferencia');
 $r = api('GET', '/admin/clientes/codigos-pais', $cookies);
 verificar($r['status'] === 200 && isset($r['cuerpo']['datos']['54']), 'lista los códigos de país');
+
+echo "
+Canje de puntos
+";
+api('PUT', "/admin/clientes/$cliente", $cookies, ['nombre' => 'Cliente API', 'email' => 'cliente.api@ejemplo.test', 'codigo_pais' => '54', 'telefono' => '3519990077', 'puntos' => 100000], $csrf);
+$r = api('GET', "/admin/clientes/$cliente/canje", $cookies);
+$canje = $r['cuerpo']['datos'] ?? [];
+verificar($r['status'] === 200 && ($canje['cliente']['puntos'] ?? 0) === 100000 && !empty($canje['menu']) && isset($canje['config']['valor_punto']), 'trae el cliente, las reglas de puntos y los productos');
+$premio = $canje['premios'][0] ?? null;
+if ($premio) {
+    $r = api('POST', "/admin/clientes/$cliente/canje/premios", $cookies, ['premios' => [['id' => $premio['id'], 'cantidad' => 1]]], $csrf);
+    verificar($r['status'] === 201 && ($r['cuerpo']['datos']['puntos_actuales'] ?? 0) === 100000 - $premio['costo_puntos'], 'canjea un premio y descuenta su costo');
+}
+$r = api('POST', "/admin/clientes/$cliente/canje/premios", $cookies, ['premios' => []], $csrf);
+verificar($r['status'] === 422, 'sin premios elegidos se rechaza (422)');
+$r = api('POST', "/admin/clientes/$cliente/canje/venta", $cookies, ['items' => [['id' => $canje['menu'][0]['id'] ?? 0, 'cantidad' => 1]], 'puntos_utilizados' => 999999, 'metodo_pago' => 'Efectivo', 'tipo_entrega' => 'Retiro'], $csrf);
+verificar($r['status'] === 422, 'una venta con más puntos que el tope se rechaza (422)');
+$r = api('POST', "/admin/clientes/$cliente/canje/venta", $cookies, ['items' => [['id' => $canje['menu'][0]['id'] ?? 0, 'cantidad' => 1]], 'puntos_utilizados' => 0, 'metodo_pago' => 'Bitcoin', 'tipo_entrega' => 'Retiro'], $csrf);
+verificar($r['status'] === 422, 'un método de pago inexistente se rechaza (422)');
+
 $r = api('DELETE', "/admin/clientes/$cliente", $cookies, null, $csrf);
 $r2 = api('GET', "/admin/clientes/$cliente", $cookies);
 verificar($r['status'] === 200 && $r2['status'] === 404, 'borra el cliente');

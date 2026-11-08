@@ -7,12 +7,14 @@
 
 require_once __DIR__ . '/../../../src/Core/bootstrap.php';
 
+use Piccolo\Http\Admin\CanjeController;
 use Piccolo\Http\Admin\ClientesController;
 use Piccolo\Http\Admin\ComprasController;
 use Piccolo\Http\Admin\MateriasPrimasController;
 use Piccolo\Http\Admin\MenuController;
 use Piccolo\Http\Admin\ProveedoresController;
 use Piccolo\Http\Admin\VentasController;
+use Piccolo\Http\Api\Admin\CanjeApi;
 use Piccolo\Http\Api\Admin\ClientesApi;
 use Piccolo\Http\Api\Admin\ComprasApi;
 use Piccolo\Http\Api\Admin\MateriasPrimasApi;
@@ -27,6 +29,7 @@ use Piccolo\Http\Api\PedidosController;
 use Piccolo\Http\Api\Peticion;
 use Piccolo\Http\Api\Router;
 use Piccolo\Http\Api\Sesion;
+use Piccolo\Repositories\CanjeRepositorio;
 use Piccolo\Repositories\ClientesRepositorio;
 use Piccolo\Repositories\ComprasRepositorio;
 use Piccolo\Repositories\MateriasPrimasRepositorio;
@@ -129,12 +132,18 @@ $router->put('/admin/menu/{id}/receta', [$menu, 'guardarReceta']);
 $ventas = new VentasApi(new VentasController(new VentasRepositorio($conexion), $conexion));
 $router->get('/admin/ventas', [$ventas, 'resumen']);
 
-$clientes = new ClientesApi(new ClientesController(new ClientesRepositorio($conexion)));
+$repoClientes = new ClientesRepositorio($conexion);
+$clientes = new ClientesApi(new ClientesController($repoClientes));
 $router->get('/admin/clientes', [$clientes, 'listar']);
 $router->post('/admin/clientes', [$clientes, 'crear']);
 $router->get('/admin/clientes/codigos-pais', [$clientes, 'codigosPais']); // antes de /{id}
 $router->get('/admin/clientes/{id}', [$clientes, 'ver']);
 $router->put('/admin/clientes/{id}', [$clientes, 'actualizar']);
 $router->delete('/admin/clientes/{id}', [$clientes, 'eliminar']);
+
+$canje = new CanjeApi(new CanjeController($repoClientes, new CanjeRepositorio($conexion), $conexion));
+$router->get('/admin/clientes/{id}/canje', [$canje, 'datos']);
+$router->post('/admin/clientes/{id}/canje/venta', [$canje, 'venta']);
+$router->post('/admin/clientes/{id}/canje/premios', [$canje, 'premios']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));

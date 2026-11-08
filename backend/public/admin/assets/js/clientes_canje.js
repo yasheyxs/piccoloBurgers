@@ -170,10 +170,14 @@
     const alerta = document.createElement("div");
     alerta.className = `alert alert-${tipo} alert-dismissible fade show`;
     alerta.setAttribute("role", "alert");
-    alerta.innerHTML = `
-      ${mensaje}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
-    `;
+    // El mensaje va como texto, nunca como HTML
+    alerta.append(document.createTextNode(String(mensaje)));
+    const cerrar = document.createElement("button");
+    cerrar.type = "button";
+    cerrar.className = "btn-close";
+    cerrar.setAttribute("data-bs-dismiss", "alert");
+    cerrar.setAttribute("aria-label", "Cerrar");
+    alerta.appendChild(cerrar);
 
     elementos.contenedorAlertas.appendChild(alerta);
     elementos.contenedorAlertas.classList.remove("d-none");
@@ -630,10 +634,13 @@
     fila.dataset.productoId = String(id);
 
     const celdaNombre = document.createElement("td");
-    celdaNombre.innerHTML = `
-      <div class="fw-semibold">${nombre}</div>
-      <div class="text-muted small">${formatearMoneda(precio)} c/u</div>
-    `;
+    const nombreProducto = document.createElement("div");
+    nombreProducto.className = "fw-semibold";
+    nombreProducto.textContent = nombre;
+    const precioProducto = document.createElement("div");
+    precioProducto.className = "text-muted small";
+    precioProducto.textContent = `${formatearMoneda(precio)} c/u`;
+    celdaNombre.append(nombreProducto, precioProducto);
 
     const celdaCantidad = document.createElement("td");
     celdaCantidad.className = "text-center";

@@ -66,6 +66,44 @@ if (!function_exists('pedidoCalcularCanjePuntos')) {
     }
 }
 
+if (!function_exists('pedidoValidarPuntosElegidos')) {
+    /**
+     * Canje con una cantidad de puntos elegida a mano (venta desde el panel). A diferencia del sitio,
+     * que usa el máximo redondeado a $100, acá se respeta lo que se eligió si entra en las reglas:
+     * no más de lo que tiene el cliente, no más del tope por venta y, si se usan, al menos el mínimo.
+     *
+     * @param array{minimo_puntos?: int|string, valor_punto?: float|string, maximo_porcentaje?: float|string} $configuracion
+     * @return array{puntos_usados: int, descuento: float}
+     * @throws PedidoException
+     */
+    function pedidoValidarPuntosElegidos(float $total, int $puntosDisponibles, array $configuracion, int $puntosElegidos): array
+    {
+        $valorPorPunto = max(0.01, (float) ($configuracion['valor_punto'] ?? 0));
+        $minimoPuntos = max(0, (int) ($configuracion['minimo_puntos'] ?? 0));
+        $maximoPorcentaje = min(1, max(0, (float) ($configuracion['maximo_porcentaje'] ?? 0.25)));
+        $descuentoMaximo = $total * $maximoPorcentaje;
+        $maximoPuntos = (int) floor($descuentoMaximo / $valorPorPunto);
+
+        if ($puntosElegidos < 0) {
+            throw new PedidoException('Ingresá una cantidad de puntos válida.');
+        }
+        if ($puntosElegidos === 0) {
+            return ['puntos_usados' => 0, 'descuento' => 0.0];
+        }
+        if ($puntosElegidos > $puntosDisponibles) {
+            throw new PedidoException('El cliente no tiene puntos suficientes para ese canje.');
+        }
+        if ($puntosElegidos > $maximoPuntos) {
+            throw new PedidoException(sprintf('Para esta venta se pueden usar hasta %d puntos.', $maximoPuntos));
+        }
+        if ($puntosElegidos < $minimoPuntos) {
+            throw new PedidoException(sprintf('El mínimo de puntos para canjear es de %d.', $minimoPuntos));
+        }
+
+        return ['puntos_usados' => $puntosElegidos, 'descuento' => min($puntosElegidos * $valorPorPunto, $descuentoMaximo)];
+    }
+}
+
 if (!function_exists('pedidoPuntosGanados')) {
     /** Puntos que suma un pedido: 1 cada $1500 pagados. */
     function pedidoPuntosGanados(float $totalPagado): int
@@ -77,6 +115,9 @@ if (!function_exists('pedidoPuntosGanados')) {
 if (!function_exists('crearPedido')) {
     /**
      * Valida y registra un pedido, aplica el canje de puntos y suma los puntos ganados.
+     * Los puntos usados y ganados quedan anotados en movimientos_puntos.
+     *
+     * Con $puntosElegidos (venta desde el panel) se usan exactamente esos puntos en lugar del máximo.
      *
      * @param array{
      *   nombre?: string, telefono?: string, codigo_pais?: string, email?: ?string, nota?: string,
@@ -86,7 +127,7 @@ if (!function_exists('crearPedido')) {
      * @return array{pedido_id:int, nombre:string, items:array, total_original:float, descuento:float, total:float, puntos_ganados:int, puntos_usados:int}
      * @throws PedidoException si los datos no son válidos o no hay stock
      */
-    function crearPedido(PDO $conexion, array $datos, ?int $clienteId = null): array
+    function crearPedido(PDO $conexion, array $datos, ?int $clienteId = null, ?int $puntosElegidos = null): array
     {
         $nombre = trim((string) ($datos['nombre'] ?? ''));
         $telefono = trim((string) ($datos['telefono'] ?? ''));
@@ -184,12 +225,18 @@ if (!function_exists('crearPedido')) {
             }
 
             // Canje de puntos
-            if ($usarPuntos && $clienteId) {
-                $stmt = $conexion->prepare('SELECT puntos FROM tbl_clientes WHERE ID = ? FOR UPDATE');
+            $saldo = 0;
+            if ($clienteId) {
+                $stmt = $conexion->prepare('SELECT COALESCE(puntos, 0) FROM tbl_clientes WHERE ID = ? FOR UPDATE');
                 $stmt->execute([$clienteId]);
-                $puntosDisponibles = (int) $stmt->fetchColumn();
+                $saldo = (int) $stmt->fetchColumn();
+            }
+            if (($usarPuntos || $puntosElegidos !== null) && $clienteId) {
+                $puntosDisponibles = $saldo;
 
-                $canje = pedidoCalcularCanjePuntos($total, $puntosDisponibles, $configuracionPuntos);
+                $canje = $puntosElegidos !== null
+                    ? pedidoValidarPuntosElegidos($total, $puntosDisponibles, $configuracionPuntos, $puntosElegidos)
+                    : pedidoCalcularCanjePuntos($total, $puntosDisponibles, $configuracionPuntos);
                 $puntosUsados = $canje['puntos_usados'];
 
                 if ($puntosUsados > 0) {
@@ -222,6 +269,19 @@ if (!function_exists('crearPedido')) {
                 $puntosGanados = pedidoPuntosGanados($total);
                 $stmt = $conexion->prepare('UPDATE tbl_clientes SET puntos = puntos + ? WHERE ID = ?');
                 $stmt->execute([$puntosGanados, $clienteId]);
+
+                // Historial de puntos del cliente
+                $movimiento = $conexion->prepare(
+                    'INSERT INTO movimientos_puntos (cliente_id, tipo, descripcion, puntos, saldo_resultante) VALUES (?, ?, ?, ?, ?)'
+                );
+                if ($puntosUsados > 0) {
+                    $saldo -= $puntosUsados;
+                    $movimiento->execute([$clienteId, 'canje', "Canje de $puntosUsados puntos como descuento en el pedido #$pedidoId", -$puntosUsados, $saldo]);
+                }
+                if ($puntosGanados > 0) {
+                    $saldo += $puntosGanados;
+                    $movimiento->execute([$clienteId, 'compra', "Puntos ganados con el pedido #$pedidoId", $puntosGanados, $saldo]);
+                }
             }
 
             $conexion->commit();
