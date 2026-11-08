@@ -255,6 +255,18 @@ Si algo no es válido responde `422`, y los errores de cada ítem vienen como `i
 
 Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las fotos se guardan con un nombre generado por el sistema y solo se aceptan imágenes reales (se revisa el contenido del archivo, no su nombre).
 
+### Usuarios del panel (solo administración)
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/usuarios` | Los usuarios del panel, sin contraseñas. Cada uno trae `sos_vos` (es quien está usando el panel) y `se_puede_borrar`. |
+| `GET /admin/usuarios/{id}` | Un usuario. |
+| `POST /admin/usuarios` | Crea un usuario: `{ "usuario", "correo", "rol", "password", "confirmar" }`. El rol es `admin`, `empleado` o `delivery`. Responde `201`. |
+| `PUT /admin/usuarios/{id}` | Modifica nombre, correo y rol. La contraseña no se cambia por acá (cada usuario la recupera por correo). |
+| `DELETE /admin/usuarios/{id}` | Borra un usuario. `409` si es el propio o el único administrador. |
+
+Para crear un administrador, editar uno o darle ese rol a alguien, hay que mandar también `password_actual` con la contraseña de quien está usando el panel; si falta o no coincide responde `422`. Siempre queda al menos un administrador. Si se borra un usuario o se le cambia el rol, el cambio vale en el momento, aunque tenga una sesión abierta.
+
 ### Clientes (solo administración)
 
 | Ruta | Qué hace |
