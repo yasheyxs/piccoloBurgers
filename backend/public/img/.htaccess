@@ -18,3 +18,15 @@
 <FilesMatch "\.(php\d?|phtml|phar|pl|py|cgi|sh|asp|aspx|jsp)$">
   Require all denied
 </FilesMatch>
+
+# Caché del navegador: las fotos que se suben desde el panel tienen un nombre único que nunca se
+# reutiliza (si se cambia la foto, cambia el nombre), así que el navegador puede guardarlas un año
+# sin volver a pedirlas. Las ilustraciones de reemplazo (.svg) se guardan un día.
+<IfModule mod_headers.c>
+  <FilesMatch "\.(jpe?g|png|webp|gif)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "\.svg$">
+    Header set Cache-Control "public, max-age=86400"
+  </FilesMatch>
+</IfModule>

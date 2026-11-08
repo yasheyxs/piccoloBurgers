@@ -29,10 +29,24 @@ server {
 
     server_tokens off;
 
+    # Los archivos de texto viajan comprimidos (también las respuestas de la API que pasan por acá)
+    gzip on;
+    gzip_proxied any;
+    gzip_min_length 1024;
+    gzip_types text/css application/javascript text/javascript application/json image/svg+xml;
+    gzip_vary on;
+
     # Evita que el navegador use versiones viejas de los estilos y scripts después de publicar cambios
     location ~* \.(css|js)$ {
         include /etc/nginx/snippets/seguridad.conf;
         add_header Cache-Control "no-cache";
+        try_files $uri =404;
+    }
+
+    # Ilustraciones del sitio: cambian muy poco, el navegador las guarda un día
+    location /img/ {
+        include /etc/nginx/snippets/seguridad.conf;
+        add_header Cache-Control "public, max-age=86400";
         try_files $uri =404;
     }
 

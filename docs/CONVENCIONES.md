@@ -44,7 +44,8 @@ El paso a paso para armar una sección nueva del panel está en [`backend/README
 - **Formularios y `fetch()` del panel** llevan el token CSRF solo (`csrf.js`); las pantallas sin sesión lo agregan a mano.
 - **Montos de dinero** con dos decimales; los decimales que escribe una persona pueden llevar coma (`Datos::decimal()`).
 - **Fechas de reportes** con `Periodo::leer()`: `desde` y `hasta` en AAAA-MM-DD.
-- **Imágenes subidas** con `ImagenSubida`: solo JPG, PNG o WEBP reales, con nombre generado.
+- **Imágenes subidas** con `ImagenSubida`: solo JPG, PNG o WEBP reales, con nombre generado. Si PHP tiene la extensión `gd`, se guardan achicadas y en WEBP (las fotos del menú hasta 1000 px de ancho y los banners hasta 1920).
+- **Caché del navegador**: las fotos subidas no cambian nunca (cambiar una foto cambia su nombre), así que se guardan un año; estilos y scripts se revisan en cada visita. Ver `backend/public/img/.htaccess` y `frontend/nginx.conf.template`.
 - **Datos del local**: nunca escritos en el código; se leen de `piccolo_negocio()` (backend) o `cargarNegocio()` (sitio).
 
 ## Base de datos

@@ -15,6 +15,9 @@ use Piccolo\Repositories\MenuRepositorio;
  */
 final class MenuController
 {
+    /** Las fotos del menú se ven chicas en el sitio: con este ancho alcanza y pesan poco */
+    public const FOTO_ANCHO_MAXIMO = 1000;
+
     public function __construct(
         private MenuRepositorio $repositorio,
         private MateriasPrimasRepositorio $materiasPrimas,
@@ -52,7 +55,7 @@ final class MenuController
     public function crear(array $datos, ?array $foto = null): array
     {
         $valido = $this->validar($datos);
-        $valido['foto'] = ImagenSubida::fueEnviada($foto) ? ImagenSubida::guardar($foto, $this->carpetaFotos, 'producto') : '';
+        $valido['foto'] = ImagenSubida::fueEnviada($foto) ? ImagenSubida::guardar($foto, $this->carpetaFotos, 'producto', 'foto', 0, 0, self::FOTO_ANCHO_MAXIMO) : '';
 
         return $this->obtener($this->repositorio->crear($valido));
     }
@@ -69,7 +72,7 @@ final class MenuController
         $valido['foto'] = (string) $actual['foto'];
 
         if (ImagenSubida::fueEnviada($foto)) {
-            $valido['foto'] = ImagenSubida::guardar($foto, $this->carpetaFotos, 'producto');
+            $valido['foto'] = ImagenSubida::guardar($foto, $this->carpetaFotos, 'producto', 'foto', 0, 0, self::FOTO_ANCHO_MAXIMO);
         }
 
         $this->repositorio->actualizar($id, $valido);

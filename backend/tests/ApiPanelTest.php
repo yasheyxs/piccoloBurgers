@@ -179,7 +179,7 @@ verificar($r['status'] === 422, 'rechaza un archivo que no es una imagen aunque 
 $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==');
 $r = $subir($png, 'image/png');
 $foto = (string) ($r['cuerpo']['datos']['foto'] ?? '');
-verificar($r['status'] === 200 && preg_match('/^producto_[0-9a-f]{16}\.png$/', $foto) === 1, 'sube una foto real con un nombre generado por el sistema');
+verificar($r['status'] === 200 && preg_match('/^producto_[0-9a-f]{16}\.(webp|png)$/', $foto) === 1, 'sube una foto real con un nombre generado por el sistema (en WEBP si el servidor puede convertirla)');
 
 $r = api('DELETE', "/admin/menu/$producto", $cookies, null, $csrf);
 $r2 = api('DELETE', "/admin/materias-primas/$insumo", $cookies, null, $csrf);
@@ -344,6 +344,27 @@ $r = api('DELETE', '/admin/comentarios/' . ($comentario['id'] ?? 0), $cookies, n
 verificar($r['status'] === 200, 'borra el comentario');
 $r = api('POST', '/admin/banners', $cookies, ['titulo' => 'Sin imagen'], $csrf);
 verificar($r['status'] === 415 || $r['status'] === 422, 'un banner sin imagen se rechaza');
+
+// Una foto grande se guarda achicada a 1920 px y en WEBP (si el servidor tiene la extensión gd)
+$grande = __DIR__ . '/../public/img/banners/banner_68eb429274f908.48531900.jpg';
+if (is_file($grande)) {
+    $curl = curl_init("$base/admin/banners");
+    curl_setopt_array($curl, [
+        CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEFILE => $cookies, CURLOPT_COOKIEJAR => $cookies,
+        CURLOPT_HTTPHEADER => ['Accept: application/json', 'X-CSRF-Token: ' . $csrf],
+        CURLOPT_POSTFIELDS => ['titulo' => 'Banner de prueba', 'descripcion' => 'Prueba', 'imagen' => new CURLFile($grande, 'image/jpeg', 'grande.jpg')],
+    ]);
+    $banner = (json_decode((string) curl_exec($curl), true) ?: [])['datos'] ?? [];
+    curl_close($curl);
+    $guardada = isset($banner['imagen']) ? @getimagesizefromstring((string) @file_get_contents($banner['imagen'])) : false;
+    verificar(
+        str_ends_with($banner['imagen_ruta'] ?? '', '.webp') && $guardada !== false && $guardada[0] === 1920 && $guardada['mime'] === 'image/webp',
+        'un banner de 2880 px se guarda en WEBP de 1920 px (' . ($guardada ? "{$guardada[0]} px, {$guardada['mime']}" : 'sin imagen') . ')'
+    );
+    if (isset($banner['id'])) {
+        api('DELETE', "/admin/banners/{$banner['id']}", $cookies, null, $csrf);
+    }
+}
 
 echo "\nCocina y delivery\n";
 $r = api('GET', '/admin/pedidos/cocina', $cookies);

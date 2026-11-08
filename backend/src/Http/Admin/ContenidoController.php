@@ -18,6 +18,8 @@ final class ContenidoController
     /** Tamaño mínimo de la imagen del banner, para que no se vea pixelada a pantalla completa */
     public const BANNER_ANCHO = 1200;
     public const BANNER_ALTO = 600;
+    /** Más ancho no se nota en pantalla y solo hace pesar la página */
+    public const BANNER_ANCHO_MAXIMO = 1920;
 
     /** @param string $carpetaBanners carpeta pública donde se guardan las imágenes (public/img/banners) */
     public function __construct(private ContenidoRepositorio $repositorio, private string $carpetaBanners)
@@ -178,7 +180,7 @@ final class ContenidoController
 
     private function guardarImagen(array $archivo): string
     {
-        return ImagenSubida::guardar($archivo, $this->carpetaBanners, 'banner', 'imagen', self::BANNER_ANCHO, self::BANNER_ALTO);
+        return ImagenSubida::guardar($archivo, $this->carpetaBanners, 'banner', 'imagen', self::BANNER_ANCHO, self::BANNER_ALTO, self::BANNER_ANCHO_MAXIMO);
     }
 
     /** Solo se borran imágenes subidas desde el panel (las que viven en img/banners/). */
