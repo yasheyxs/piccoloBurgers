@@ -90,6 +90,11 @@ jobs:
           PANEL_USUARIOS: 'admin:Usuario:Usuario1!,empleado:Empleado:Empleado1!,delivery:Delivery:Delivery1!'
         run: php backend/tests/PanelPermisosTest.php http://localhost:8080/admin
 
+      - name: API del panel
+        env:
+          PANEL_USUARIOS: 'admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!'
+        run: php backend/tests/ApiPanelTest.php http://localhost:8080/api/v1
+
       - name: Base de pruebas
         run: |
           docker compose exec -T mysql mysql -uroot -proot_ci \

@@ -70,6 +70,21 @@ Todas las pantallas de `public/admin/` cargan primero `src/Http/Admin/acceso.php
 
 El token CSRF se agrega solo a los formularios y a los `fetch()` del panel (`admin/assets/js/csrf.js`).
 
+## Cómo está armada una sección del panel
+
+Las secciones del panel se van ordenando en capas, una por una. Proveedores es la primera y sirve de modelo:
+
+| Capa | Archivo | Qué hace |
+|---|---|---|
+| Repositorio | `src/Repositories/ProveedoresRepositorio.php` | Solo las consultas a la base. |
+| Controlador | `src/Http/Admin/ProveedoresController.php` | Las reglas: valida los datos y decide qué se puede hacer (por ejemplo, no borrar un proveedor con compras). |
+| Pantallas | `public/admin/seccion/proveedores/*.php` | Archivos cortos que llaman al controlador y muestran la plantilla. |
+| Plantillas | `views/admin/proveedores/*.php` | Solo HTML con los datos ya preparados. |
+| JavaScript | `public/admin/assets/js/pages/proveedores.js` | El comportamiento de la pantalla, fuera del PHP. |
+| API | `src/Http/Api/Admin/ProveedoresApi.php` | Las rutas `/api/v1/admin/proveedores`, que usan el mismo controlador. |
+
+Así las pantallas actuales y la API aplican exactamente las mismas reglas, y rediseñar una pantalla es tocar solo su plantilla.
+
 ## Despliegue
 
 En un hosting, el directorio raíz del sitio (document root) tiene que apuntar a `backend/public`. Así nada fuera de esa carpeta queda expuesto.

@@ -276,3 +276,11 @@ if (!function_exists('piccolo_render')) {
         require $viewPath;
     }
 }
+
+if (!function_exists('piccolo_e')) {
+    /** Escapa un texto para mostrarlo en HTML sin riesgo de inyección. */
+    function piccolo_e(mixed $valor): string
+    {
+        return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
+    }
+}

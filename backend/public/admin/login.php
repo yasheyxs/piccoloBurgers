@@ -3,69 +3,29 @@ require_once __DIR__ . '/../../src/Http/Admin/acceso.php'; // permisos, sesión 
 piccolo_admin_iniciar_sesion();
 if ($_POST) {
   include(__DIR__ . "/../../src/Core/database.php");
-  require_once __DIR__ . '/../../src/Http/Admin/url.php';
-  require_once __DIR__ . '/../../src/Services/Security/password_utils.php';
-  require_once __DIR__ . '/../../src/Services/Security/limite_intentos.php';
+  require_once __DIR__ . '/../../src/Services/Security/login_panel.php';
 
-  $usuario  = trim($_POST["usuario"] ?? "");
-  $password = $_POST["password"] ?? "";
+  $resultado = piccoloPanelAutenticar($conexion, (string) ($_POST["usuario"] ?? ""), (string) ($_POST["password"] ?? ""));
 
-  $minutosBloqueado = piccoloLoginMinutosBloqueado($conexion, 'panel', $usuario);
-  $usuarioEncontrado = false;
+  if ($resultado['usuario'] !== null) {
+    piccolo_admin_guardar_sesion($resultado['usuario']);
 
-  if ($minutosBloqueado === 0) {
-    $sentencia = $conexion->prepare("SELECT * FROM tbl_usuarios WHERE usuario = :usuario");
-    $sentencia->bindParam(":usuario", $usuario);
-    $sentencia->execute();
-    $usuarioEncontrado = $sentencia->fetch(PDO::FETCH_ASSOC);
+    // En las pantallas del panel la cookie de sesión no viaja desde otros sitios
+    $parametrosCookie = session_get_cookie_params();
+    setcookie(session_name(), session_id(), [
+      'expires' => 0,
+      'path' => $parametrosCookie['path'],
+      'domain' => $parametrosCookie['domain'],
+      'secure' => piccolo_detect_scheme() === 'https',
+      'httponly' => true,
+      'samesite' => 'Strict'
+    ]);
+
+    header("Location:index.php");
+    exit();
   }
 
-  if ($usuarioEncontrado) {
-     $hashAlmacenado = $usuarioEncontrado["password"] ?? '';
-
-    if (passwordCoincideConHash($password, $hashAlmacenado)) {
-      if (passwordDebeRehash($hashAlmacenado) && isset($usuarioEncontrado['ID'])) {
-        $nuevoHash = generarHashPassword($password);
-
-        try {
-          $actualizar = $conexion->prepare("UPDATE tbl_usuarios SET password = :password WHERE ID = :id");
-          $actualizar->bindParam(':password', $nuevoHash);
-          $actualizar->bindParam(':id', $usuarioEncontrado['ID']);
-          $actualizar->execute();
-          $hashAlmacenado = $nuevoHash;
-        } catch (Throwable $error) {
-          error_log('No se pudo actualizar el hash del usuario ' . $usuarioEncontrado['ID'] . ': ' . $error->getMessage());
-        }
-      }
-
-      session_regenerate_id(true);
-      $parametrosCookie = session_get_cookie_params();
-      $esConexionSegura = piccolo_detect_scheme() === 'https';
-      setcookie(session_name(), session_id(), [
-        'expires' => 0,
-        'path' => $parametrosCookie['path'],
-        'domain' => $parametrosCookie['domain'],
-        'secure' => $esConexionSegura,
-        'httponly' => true,
-        'samesite' => 'Strict'
-      ]);
-    
-      piccoloLoginRegistrarExito($conexion, 'panel', $usuario);
-      $_SESSION["admin_usuario"] = $usuarioEncontrado["usuario"];
-      $_SESSION["admin_logueado"] = true;
-      $_SESSION["rol"] = $usuarioEncontrado["rol"];
-      $_SESSION["admin_ultima_actividad"] = time();
-      header("Location:index.php");
-      exit();
-    }
-  }
-
-  if ($minutosBloqueado > 0) {
-    $mensaje = "Demasiados intentos fallidos. Probá de nuevo en {$minutosBloqueado} minuto" . ($minutosBloqueado === 1 ? "" : "s") . ".";
-  } else {
-    piccoloLoginRegistrarFallo($conexion, 'panel', $usuario);
-    $mensaje = "Usuario o contraseña incorrectos...";
-  }
+  $mensaje = piccoloPanelMensajeRechazo($resultado);
 }
 ?>
 
