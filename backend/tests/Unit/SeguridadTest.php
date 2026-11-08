@@ -18,6 +18,17 @@ final class SeguridadTest extends TestCase
         $this->assertFalse(passwordCumpleRequisitos('SinSimbolo1'));
     }
 
+    public function testLaContrasenaProvisoriaDeUnClienteEsSeguraYDistinta(): void
+    {
+        $generadas = [];
+        for ($i = 0; $i < 50; $i++) {
+            $password = \Piccolo\Http\Admin\ClientesController::passwordProvisoria();
+            $this->assertTrue(passwordCumpleRequisitos($password), $password);
+            $generadas[$password] = true;
+        }
+        $this->assertCount(50, $generadas, 'no se repiten');
+    }
+
     public function testLasContrasenasSeGuardanConHashModerno(): void
     {
         $hash = generarHashPassword('Cliente1!');
