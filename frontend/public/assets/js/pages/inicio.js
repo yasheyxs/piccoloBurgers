@@ -1,6 +1,7 @@
 import { api } from "../api.js";
 import { agregarAlCarrito, cargarCarrito } from "../carrito.js";
 import { iniciarLayout } from "../layout.js";
+import { completarNegocio } from "../negocio.js";
 import { datosFormulario, escapar, limpiarErrores, mostrarErrores, precio, toast, conBotonOcupado } from "../ui.js";
 
 const POR_PAGINA = 8;
@@ -28,10 +29,23 @@ iniciarLayout({ enInicio: true }).then((cliente) => {
 if (window.AOS) AOS.init({ duration: 800, once: true });
 
 cargarInicio();
+mostrarNegocio();
 cargarPuntos();
 cargarMenu(true);
 iniciarFiltros();
 iniciarContacto();
+
+/** Dirección, horarios, mapa y redes del local (vienen de la API). */
+async function mostrarNegocio() {
+  try {
+    const negocio = await completarNegocio();
+    document.getElementById("horarios").innerHTML = negocio.horarios
+      .map((h) => `<p class="mb-1"><strong>${escapar(h.dias)}</strong></p><p>${escapar(h.horas)}</p>`)
+      .join("");
+  } catch {
+    // sin datos del local, la portada se ve igual salvo esas secciones
+  }
+}
 
 async function cargarInicio() {
   try {

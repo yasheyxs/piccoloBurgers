@@ -134,15 +134,14 @@
         <div class="col-lg-6 d-flex flex-column align-items-center align-items-lg-start mb-4 mb-lg-0">
           <h2 class="fw-bold display-6 mb-4 text-center w-100 section-heading">Nuestra Ubicación</h2>
           <p class="lead text-justify section-description section-description-lg">
-            Encontranos fácilmente en nuestro local en <strong class="text-gold">Villa del Rosario</strong>, Córdoba.
+            Encontranos fácilmente en nuestro local en <strong class="text-gold" data-negocio="direccion.localidad"></strong>, <span data-negocio="direccion.provincia"></span>.
             <br><br>
-            Estamos ubicados en <strong>25 de Mayo 1295</strong>, a pasos del centro. Acercate a disfrutar nuestras hamburguesas artesanales en un ambiente cálido y moderno.
+            Estamos ubicados en <strong data-negocio="direccion.calle"></strong>, <span data-negocio="direccion.referencia"></span>. Acercate a disfrutar nuestras hamburguesas artesanales en un ambiente cálido y moderno.
           </p>
         </div>
         <div class="col-lg-6 text-center">
           <div class="shadow-lg rounded-3 overflow-hidden map-container">
-            <iframe class="map-frame" title="Mapa de Piccolo Burgers"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3400.107065015397!2d-63.53723899007664!3d-31.548676202549203!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94332a4ac325a7ad%3A0x91ff9ca646897a8f!2s25%20de%20Mayo%201295%2C%20X5963%20Villa%20del%20Rosario%2C%20C%C3%B3rdoba!5e0!3m2!1ses-419!2sar!4v1756841415057!5m2!1ses-419!2sar"
+            <iframe class="map-frame" title="Mapa de Piccolo Burgers" data-negocio-src="mapa"
               width="100%" height="100%" allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </div>
         </div>
@@ -163,23 +162,22 @@
     <div class="container py-5">
       <div class="row text-center text-md-start">
         <div class="col-md-4 mb-4">
-          <h4 class="fw-bold mb-3 text-gold">Piccolo Burgers VDR</h4>
-          <p><i class="fa-solid fa-burger me-2" aria-hidden="true"></i>100% cargadas de sabor</p>
-          <p><i class="fa-solid fa-location-dot me-2" aria-hidden="true"></i>25 de Mayo 1295</p>
-          <p><i class="fa-solid fa-utensils me-2" aria-hidden="true"></i>Servicio a mesa y Take Away</p>
+          <h4 class="fw-bold mb-3 text-gold" data-negocio="nombreCorto">Piccolo Burgers</h4>
+          <p><i class="fa-solid fa-burger me-2" aria-hidden="true"></i><span data-negocio="eslogan"></span></p>
+          <p><i class="fa-solid fa-location-dot me-2" aria-hidden="true"></i><span data-negocio="direccion.calle"></span></p>
+          <p><i class="fa-solid fa-utensils me-2" aria-hidden="true"></i><span data-negocio="servicio"></span></p>
         </div>
         <div class="col-md-4 mb-4">
           <h4 class="fw-bold mb-3 text-gold">Horario de atención</h4>
-          <p><strong>Martes a Domingo y feriados</strong></p>
-          <p>20:00 hs - 00:30 hs</p>
-          <p><em>Lunes cerrado</em></p>
+          <div id="horarios"></div>
+          <p><em data-negocio="cerrado"></em></p>
         </div>
         <div class="col-md-4 mb-4">
           <h4 class="fw-bold mb-3 text-gold">Contacto</h4>
           <div class="d-flex justify-content-center justify-content-md-start gap-3 fs-3">
-            <a href="https://wa.me/543573438947" target="_blank" rel="noopener" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
-            <a href="https://www.facebook.com/profile.php?id=100087896013957" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-            <a href="https://www.instagram.com/piccoloburgers/" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" data-negocio-href="whatsapp.url" target="_blank" rel="noopener" class="social-link" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" data-negocio-href="redes.facebook" target="_blank" rel="noopener" class="social-link" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+            <a href="#" data-negocio-href="redes.instagram" target="_blank" rel="noopener" class="social-link" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
           </div>
         </div>
       </div>

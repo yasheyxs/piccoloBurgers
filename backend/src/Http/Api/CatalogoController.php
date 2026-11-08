@@ -72,6 +72,32 @@ final class CatalogoController
         ]);
     }
 
+    /** GET /negocio: datos del local (dirección, horarios, WhatsApp, redes, datos de pago) */
+    public function negocio(Peticion $peticion): void
+    {
+        $n = \piccolo_negocio();
+        Respuesta::ok([
+            'nombre' => $n['nombre'],
+            'nombreCorto' => $n['nombre_corto'],
+            'eslogan' => $n['eslogan'],
+            'servicio' => $n['servicio'],
+            'direccion' => [
+                'calle' => $n['direccion']['calle'],
+                'localidad' => $n['direccion']['localidad'],
+                'provincia' => $n['direccion']['provincia'],
+                'referencia' => $n['direccion']['referencia'],
+                'completa' => $n['direccion']['completa'],
+            ],
+            'mapa' => $n['mapa'],
+            'horarios' => $n['horarios'],
+            'cerrado' => $n['cerrado'],
+            'whatsapp' => ['numero' => $n['whatsapp'], 'visible' => $n['whatsapp_visible'], 'url' => $n['whatsapp_url']],
+            'redes' => $n['redes'],
+            'pago' => $n['pago'],
+            'costoDelivery' => $n['costo_delivery'],
+        ]);
+    }
+
     /** GET /puntos/configuracion */
     public function configuracionPuntos(Peticion $peticion): void
     {

@@ -1,7 +1,8 @@
 // Panel de delivery: pedidos en camino, se actualizan solos y se marcan como entregados
   const pedidosContainer = document.getElementById('lista-pedidos');
   const alertaSinPedidos = document.getElementById('alerta-sin-pedidos');
-  const LOCALIDAD_PREDETERMINADA = 'Villa del Rosario, Córdoba, Argentina';
+  // Se agrega a cada dirección para el enlace al mapa (viene de los datos del local)
+  const LOCALIDAD_PREDETERMINADA = pedidosContainer?.dataset.localidad || '';
   const formateadorPesos = new Intl.NumberFormat('es-AR', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2

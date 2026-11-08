@@ -86,6 +86,7 @@ $router = new Router();
 $router->get('/menu', [$catalogo, 'menu']);
 $router->get('/menu/disponibilidad', [$catalogo, 'disponibilidad']);
 $router->get('/inicio', [$catalogo, 'inicio']);
+$router->get('/negocio', [$catalogo, 'negocio']);
 $router->get('/puntos/configuracion', [$catalogo, 'configuracionPuntos']);
 $router->post('/comentarios', [$catalogo, 'comentar']);
 

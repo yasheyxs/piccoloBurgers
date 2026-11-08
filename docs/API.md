@@ -67,6 +67,9 @@ Unidades disponibles de varios productos: `[{ "productoId": 12, "disponibles": 3
 ### `GET /inicio`
 Banner principal y testimonios de la página de inicio.
 
+### `GET /negocio`
+Datos del local: nombre, eslogan, dirección, mapa, horarios, WhatsApp (`numero`, `visible` y `url`), redes, datos para pagar (`pago.alias`, `pago.titular`) y `costoDelivery`. Se cambian en `backend/config/negocio.php`.
+
 ### `GET /puntos/configuracion`
 Reglas del programa de puntos: `minimoPuntos` para poder canjear, `valorPunto` en pesos, `maximoPorcentaje` del total que se puede pagar con puntos y `puntosPorCada` (se gana 1 punto cada esa cantidad de pesos).
 
