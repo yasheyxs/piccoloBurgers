@@ -255,6 +255,23 @@ Si algo no es válido responde `422`, y los errores de cada ítem vienen como `i
 
 Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las fotos se guardan con un nombre generado por el sistema y solo se aceptan imágenes reales (se revisa el contenido del archivo, no su nombre).
 
+### Ventas (solo administración)
+
+`GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.
+
+```json
+{ "desde": "2026-11-01", "hasta": "2026-11-30", "total": 152300.0,
+  "por_origen": { "pedidos": 120300.0, "fichas": 18000.0, "bebidas": 14000.0 },
+  "cantidad_pedidos": 9, "ticket_promedio": 13366.67,
+  "producto_estrella": { "nombre": "Lomo de pollo", "cantidad": 6, "monto": 75000.0 },
+  "productos": [ { "nombre": "Lomo de pollo", "cantidad": 6, "monto": 75000.0 } ],
+  "metodos_pago": [ { "nombre": "Efectivo", "pedidos": 5, "monto": 70100.0 } ],
+  "tipos_entrega": [ { "nombre": "Retiro", "pedidos": 6, "monto": 80000.0 } ],
+  "mensual": { "anio": 2026, "meses": [ { "mes": 1, "nombre": "Enero", "pedidos": 0.0, "fichas": 0.0, "bebidas": 0.0, "total": 0.0 } ] } }
+```
+
+Los pedidos cancelados no cuentan. El monto de cada pedido es lo que se cobró, con el descuento por puntos ya aplicado; el `monto` de cada producto es a precio de lista. `mensual` trae los 12 meses del año de la fecha `hasta`. `producto_estrella` es `null` si no hubo ventas.
+
 ## Configuración
 
 Variables en `backend/.env` (ver `backend/.env.example`):

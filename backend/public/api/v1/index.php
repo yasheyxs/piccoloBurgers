@@ -11,11 +11,13 @@ use Piccolo\Http\Admin\ComprasController;
 use Piccolo\Http\Admin\MateriasPrimasController;
 use Piccolo\Http\Admin\MenuController;
 use Piccolo\Http\Admin\ProveedoresController;
+use Piccolo\Http\Admin\VentasController;
 use Piccolo\Http\Api\Admin\ComprasApi;
 use Piccolo\Http\Api\Admin\MateriasPrimasApi;
 use Piccolo\Http\Api\Admin\MenuApi;
 use Piccolo\Http\Api\Admin\ProveedoresApi;
 use Piccolo\Http\Api\Admin\SesionPanelController;
+use Piccolo\Http\Api\Admin\VentasApi;
 use Piccolo\Http\Api\CatalogoController;
 use Piccolo\Http\Api\Cors;
 use Piccolo\Http\Api\CuentaController;
@@ -27,6 +29,7 @@ use Piccolo\Repositories\ComprasRepositorio;
 use Piccolo\Repositories\MateriasPrimasRepositorio;
 use Piccolo\Repositories\MenuRepositorio;
 use Piccolo\Repositories\ProveedoresRepositorio;
+use Piccolo\Repositories\VentasRepositorio;
 
 if (Cors::aplicar()) {
     exit;
@@ -119,5 +122,8 @@ $router->delete('/admin/menu/{id}', [$menu, 'eliminar']);
 $router->post('/admin/menu/{id}/foto', [$menu, 'foto']);
 $router->get('/admin/menu/{id}/receta', [$menu, 'receta']);
 $router->put('/admin/menu/{id}/receta', [$menu, 'guardarReceta']);
+
+$ventas = new VentasApi(new VentasController(new VentasRepositorio($conexion), $conexion));
+$router->get('/admin/ventas', [$ventas, 'resumen']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));

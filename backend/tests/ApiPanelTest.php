@@ -185,12 +185,25 @@ $r = api('DELETE', "/admin/menu/$producto", $cookies, null, $csrf);
 $r2 = api('DELETE', "/admin/materias-primas/$insumo", $cookies, null, $csrf);
 verificar($r['status'] === 200 && $r2['status'] === 200, 'borra el producto sin ventas (y su receta)');
 
+echo "
+Ventas
+";
+$r = api('GET', '/admin/ventas', $cookies);
+$datos = $r['cuerpo']['datos'] ?? [];
+verificar($r['status'] === 200 && ($datos['desde'] ?? '') === date('Y-m-01') && count($datos['mensual']['meses'] ?? []) === 12, 'sin fechas, muestra el mes actual y los 12 meses del año');
+$r = api('GET', '/admin/ventas?desde=2001-01-01&hasta=2001-12-31', $cookies);
+verificar($r['status'] === 200 && (float) ($r['cuerpo']['datos']['total'] ?? -1) === 0.0 && array_key_exists('producto_estrella', $r['cuerpo']['datos'] ?? []) && $r['cuerpo']['datos']['producto_estrella'] === null, 'un año sin ventas da todo en cero');
+$r = api('GET', '/admin/ventas?desde=2024-05-02&hasta=2024-05-01', $cookies);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['hasta']), 'rechaza un período al revés (422)');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
     api('POST', '/admin/sesion', $otra, ['usuario' => $usuarios['delivery'][0], 'password' => $usuarios['delivery'][1]]);
     $r = api('GET', '/admin/proveedores', $otra);
     verificar($r['status'] === 403, 'el rol delivery no puede ver proveedores (403)');
+    $r = api('GET', '/admin/ventas', $otra);
+    verificar($r['status'] === 403, 'ni las ventas (403)');
     @unlink($otra);
 }
 
