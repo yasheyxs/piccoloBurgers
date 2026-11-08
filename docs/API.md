@@ -255,6 +255,25 @@ Si algo no es válido responde `422`, y los errores de cada ítem vienen como `i
 
 Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las fotos se guardan con un nombre generado por el sistema y solo se aceptan imágenes reales (se revisa el contenido del archivo, no su nombre).
 
+### Clientes (solo administración)
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/clientes` | Todos los clientes, con sus puntos, la cantidad de pedidos y la fecha del último. |
+| `GET /admin/clientes/codigos-pais` | Los códigos de país que se aceptan para el teléfono. |
+| `GET /admin/clientes/{id}` | Un cliente con su pedido más grande, sus pedidos y sus movimientos de puntos. |
+| `POST /admin/clientes` | Crea un cliente. Recibe `{ "nombre", "email", "codigo_pais", "telefono", "puntos" }` (el teléfono va sin el código de país). Responde `201` con `{ "cliente": {...}, "password_provisoria": "Pb-k7mqx2ra5" }`. |
+| `PUT /admin/clientes/{id}` | Modifica un cliente. Mismos campos que al crear. Si cambian los puntos, la diferencia queda anotada como ajuste. |
+| `DELETE /admin/clientes/{id}` | Borra el cliente y sus movimientos de puntos. Sus pedidos quedan en el historial, sin cliente asociado. |
+
+```json
+{ "id": 15, "nombre": "Ana Pérez", "telefono": "+543511234567", "codigo_pais": "54", "numero": "3511234567",
+  "email": "ana@ejemplo.com", "puntos": 40, "registrado": "2026-11-08 03:22:39",
+  "cantidad_pedidos": 3, "ultimo_pedido": "2026-11-07 21:10:00" }
+```
+
+La contraseña provisoria se genera al azar y solo se devuelve al crear el cliente: conviene dársela en el momento. El cliente puede cambiarla desde su cuenta o con "¿Olvidaste tu contraseña?". No se aceptan un email ni un teléfono que ya tenga otro cliente (`422`).
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.

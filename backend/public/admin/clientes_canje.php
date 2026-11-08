@@ -581,7 +581,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && stripos($contentType, 'application/
 $clienteId = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 
 if ($clienteId <= 0) {
-    $_SESSION['error_clientes'] = 'No encontramos al cliente que querés ver.';
+    piccolo_admin_aviso('warning', 'No encontramos al cliente que querés ver.');
     header('Location: clientes.php');
     exit;
 }
@@ -592,7 +592,7 @@ try {
     $cliente = $stmtCliente->fetch(PDO::FETCH_ASSOC);
 
     if (!$cliente) {
-        $_SESSION['error_clientes'] = 'No encontramos al cliente que querés ver.';
+        piccolo_admin_aviso('warning', 'No encontramos al cliente que querés ver.');
         header('Location: clientes.php');
         exit;
     }
@@ -653,7 +653,7 @@ try {
     }
 } catch (Throwable $error) {
     error_log('No se pudo cargar la información del canje: ' . $error->getMessage());
-    $_SESSION['error_clientes'] = 'Ocurrió un error al intentar cargar la sección de canje. Intentá nuevamente.';
+    piccolo_admin_aviso('warning', 'Ocurrió un error al intentar cargar la sección de canje. Intentá nuevamente.');
     header('Location: clientes.php');
     exit;
 }

@@ -196,6 +196,25 @@ verificar($r['status'] === 200 && (float) ($r['cuerpo']['datos']['total'] ?? -1)
 $r = api('GET', '/admin/ventas?desde=2024-05-02&hasta=2024-05-01', $cookies);
 verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['hasta']), 'rechaza un período al revés (422)');
 
+echo "
+Clientes
+";
+$r = api('POST', '/admin/clientes', $cookies, ['nombre' => 'Cliente API', 'email' => 'cliente.api@ejemplo.test', 'codigo_pais' => '54', 'telefono' => '3519990077', 'puntos' => 20], $csrf);
+$cliente = (int) ($r['cuerpo']['datos']['cliente']['id'] ?? 0);
+$provisoria = (string) ($r['cuerpo']['datos']['password_provisoria'] ?? '');
+verificar($r['status'] === 201 && $cliente > 0 && $provisoria !== '12345' && strlen($provisoria) >= 8, 'crea un cliente con una contraseña provisoria al azar');
+$r = api('POST', '/admin/clientes', $cookies, ['nombre' => 'Repetido', 'email' => 'cliente.api@ejemplo.test', 'codigo_pais' => '54', 'telefono' => '3519990077'], $csrf);
+verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['email'], $r['cuerpo']['errores']['telefono']), 'no repite email ni teléfono (422)');
+$r = api('PUT', "/admin/clientes/$cliente", $cookies, ['nombre' => 'Cliente API', 'email' => 'cliente.api@ejemplo.test', 'codigo_pais' => '54', 'telefono' => '3519990077', 'puntos' => 5], $csrf);
+$r2 = api('GET', "/admin/clientes/$cliente", $cookies);
+$movs = $r2['cuerpo']['datos']['movimientos'] ?? [];
+verificar($r['status'] === 200 && ($r['cuerpo']['datos']['puntos'] ?? null) === 5 && count($movs) === 2 && ($movs[0]['puntos'] ?? 0) === -15, 'al cambiar los puntos anota la diferencia');
+$r = api('GET', '/admin/clientes/codigos-pais', $cookies);
+verificar($r['status'] === 200 && isset($r['cuerpo']['datos']['54']), 'lista los códigos de país');
+$r = api('DELETE', "/admin/clientes/$cliente", $cookies, null, $csrf);
+$r2 = api('GET', "/admin/clientes/$cliente", $cookies);
+verificar($r['status'] === 200 && $r2['status'] === 404, 'borra el cliente');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -204,6 +223,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'el rol delivery no puede ver proveedores (403)');
     $r = api('GET', '/admin/ventas', $otra);
     verificar($r['status'] === 403, 'ni las ventas (403)');
+    $r = api('GET', '/admin/clientes', $otra);
+    verificar($r['status'] === 403, 'ni los clientes (403)');
     @unlink($otra);
 }
 

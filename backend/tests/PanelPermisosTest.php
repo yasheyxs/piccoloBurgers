@@ -63,6 +63,7 @@ $pantallas = [
     'seccion/proveedores/index.php', 'seccion/proveedores/crear.php',
     'seccion/materiasPrimas/index.php', 'seccion/materiasPrimas/crear.php', 'seccion/compras/crear.php',
     'seccion/menu/crear.php',
+    'clientes_crear.php',
     'seccion/ventas/export_excel.php', 'seccion/ventas/export_pdf.php',
     'seccion/ventas/index.php?desde=2001-05-02&hasta=2001-05-01', // fechas al revés: avisa y muestra el mes
 ];
