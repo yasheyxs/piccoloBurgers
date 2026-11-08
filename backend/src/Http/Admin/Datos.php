@@ -12,7 +12,16 @@ final class Datos
     /** Texto sin espacios al principio ni al final ('' si no es texto). */
     public static function texto(mixed $valor): string
     {
-        return is_scalar($valor) ? trim((string) $valor) : '';
+        if (!is_scalar($valor)) {
+            return '';
+        }
+        $texto = (string) $valor;
+        // Un texto con otra codificación (por ejemplo, Windows-1252) se pasa a UTF-8 en vez de hacer fallar la base
+        if (!mb_check_encoding($texto, 'UTF-8')) {
+            $texto = mb_convert_encoding($texto, 'UTF-8', 'Windows-1252');
+        }
+
+        return trim($texto);
     }
 
     /** Número con decimales; acepta coma o punto ("2,5" o "2.5"). null si está vacío o no es un número. */

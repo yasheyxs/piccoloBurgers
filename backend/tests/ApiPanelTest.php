@@ -314,6 +314,37 @@ verificar($r['status'] === 200 && ($r['cuerpo']['datos']['desde'] ?? '') === dat
 $r = api('GET', '/admin/estadisticas/pool?desde=2024-05-02&hasta=2024-05-01', $cookies);
 verificar($r['status'] === 422, 'rechaza un período al revés (422)');
 
+echo "\nContenido del sitio\n";
+$r = api('POST', '/admin/testimonios', $cookies, ['opinion' => '', 'nombre' => ''], $csrf);
+verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 2, 'un testimonio vacío se rechaza (422)');
+$r = api('POST', '/admin/testimonios', $cookies, ['opinion' => '<b>Muy rico</b>', 'nombre' => 'Lucía'], $csrf);
+$testimonioApi = (int) ($r['cuerpo']['datos']['id'] ?? 0);
+verificar($r['status'] === 201 && ($r['cuerpo']['datos']['opinion'] ?? '') === '<b>Muy rico</b>', 'agrega un testimonio tal cual se escribió (se escapa al mostrarlo)');
+$r = api('DELETE', "/admin/testimonios/$testimonioApi", $cookies, null, $csrf);
+verificar($r['status'] === 200, 'lo borra');
+
+// Un visitante deja un comentario largo y con caracteres especiales: el panel lo muestra escapado
+$curl = curl_init("$base/comentarios");
+curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true, CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+    CURLOPT_POSTFIELDS => json_encode(['nombre' => 'Tom & "Jerry"', 'correo' => 'visita@ejemplo.test', 'mensaje' => str_repeat('Largo. ', 70)])]);
+curl_exec($curl);
+$estado = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+curl_close($curl);
+verificar($estado === 201, 'el sitio acepta un comentario de casi 500 caracteres');
+$r = api('GET', '/admin/comentarios', $cookies);
+$comentario = $r['cuerpo']['datos'][0] ?? [];
+verificar($r['status'] === 200 && ($comentario['nombre'] ?? '') === 'Tom & "Jerry"' && !empty($comentario['fecha']), 'el comentario llega a la bandeja con su fecha');
+$panel = preg_replace('#/api/v1$#', '/admin', $base);
+$curl = curl_init("$panel/seccion/comentarios/index.php");
+curl_setopt_array($curl, [CURLOPT_RETURNTRANSFER => true, CURLOPT_COOKIEFILE => $cookies]);
+$html = (string) curl_exec($curl);
+curl_close($curl);
+verificar(str_contains($html, 'Tom &amp; &quot;Jerry&quot;'), 'la bandeja del panel muestra el texto escapado');
+$r = api('DELETE', '/admin/comentarios/' . ($comentario['id'] ?? 0), $cookies, null, $csrf);
+verificar($r['status'] === 200, 'borra el comentario');
+$r = api('POST', '/admin/banners', $cookies, ['titulo' => 'Sin imagen'], $csrf);
+verificar($r['status'] === 415 || $r['status'] === 422, 'un banner sin imagen se rechaza');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -334,6 +365,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni las bebidas (403)');
     $r = api('GET', '/admin/estadisticas/pool', $otra);
     verificar($r['status'] === 403, 'ni las estadísticas (403)');
+    $r = api('GET', '/admin/comentarios', $otra);
+    verificar($r['status'] === 403, 'ni los comentarios (403)');
     @unlink($otra);
 }
 

@@ -10,6 +10,13 @@ use PHPUnit\Framework\TestCase;
 
 final class DatosTest extends TestCase
 {
+    public function testTextoSinEspaciosYSiempreEnUtf8(): void
+    {
+        $this->assertSame('Promo', Datos::texto('  Promo '));
+        $this->assertSame('', Datos::texto(['no es texto']));
+        $this->assertSame('despuÃ©s', Datos::texto("después"), 'un acento en Windows-1252 se pasa a UTF-8');
+    }
+
     public function testDecimalesConComaOPunto(): void
     {
         $this->assertSame(2.5, Datos::decimal('2,5'));

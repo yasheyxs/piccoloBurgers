@@ -357,6 +357,21 @@ La jornada es la misma que la del pool: se abre y se cierra con `/admin/pool/jor
 
 Devuelven `resumen` (totales del período), `jornadas` (de la más nueva a la más vieja) y `seleccionada` (la jornada detallada, o `null` si no hubo). El pool trae además los totales por mesa (`mesas.azul` y `mesas.rojo`); bebidas trae `por_bebida`, lo vendido de cada bebida por tipo (jarra o promoción). Los totales incluyen las correcciones que se cargan al cerrar la jornada.
 
+### Contenido del sitio (solo administración)
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/banners` | Banners, del más nuevo al más viejo. El sitio muestra el primero (`en_el_sitio: true`). |
+| `GET /admin/banners/{id}` | Un banner. |
+| `POST /admin/banners` | Crea un banner. Se envía como `multipart/form-data` con `titulo`, `descripcion` e `imagen` (JPG, PNG o WEBP, de al menos 1200 × 600 píxeles y hasta 5 MB). Pasa a ser el que se ve en el sitio. |
+| `PUT /admin/banners/{id}` | Cambia título y descripción: `{ "titulo", "descripcion" }`. |
+| `POST /admin/banners/{id}/imagen` | Cambia la imagen (`multipart/form-data` con `imagen`). La anterior se borra. |
+| `DELETE /admin/banners/{id}` | Borra el banner y su imagen. Sin banners, el sitio usa la portada por defecto. |
+| `GET`, `POST /admin/testimonios` | Lista o agrega testimonios: `{ "opinion", "nombre" }`. |
+| `PUT`, `DELETE /admin/testimonios/{id}` | Modifica o borra un testimonio. |
+| `GET /admin/comentarios` | Comentarios del formulario de contacto, del más nuevo al más viejo, con su `fecha` (`null` en los que llegaron antes de guardarla). |
+| `DELETE /admin/comentarios/{id}` | Borra un comentario. |
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.
