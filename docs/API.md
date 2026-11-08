@@ -313,6 +313,28 @@ La contraseña provisoria se genera al azar y solo se devuelve al crear el clien
 
 La venta se registra igual que un pedido del sitio (mismos controles de stock, métodos de pago y entrega), pero con los puntos que se eligen: no más de los que tiene el cliente, no más del tope por venta y, si se usan, al menos el mínimo. Si algo no cumple las reglas responde `422` y no se toca el saldo. Todo cambio de puntos, también en los pedidos del sitio, queda anotado en el historial del cliente.
 
+### Pool (administración y empleados)
+
+La jornada se abre al empezar el día y se cierra al terminar; mientras está abierta, cada mesa (`azul` o `rojo`) tiene su fila de turnos. Las operaciones de la fila responden el estado actualizado.
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/pool` | Jornada activa y fila de cada mesa. Las fichas vendidas y los montos vienen en `null`. |
+| `POST /admin/pool/datos-sensibles` | Con `{ "password" }` (la tuya) devuelve el estado con fichas vendidas y montos. `422` si no coincide; después de varios intentos se bloquea unos minutos (`429`). |
+| `POST /admin/pool/jornada` | Abre la jornada. `409` si ya hay una abierta. |
+| `GET /admin/pool/jornada/totales` | Fichas y bebidas vendidas en la jornada, para revisar antes de cerrar. |
+| `POST /admin/pool/jornada/cierre` | Cierra la jornada. Opcional: `{ "fichasVendidas", "bebidasVendidas" }` corregidos a mano; la diferencia queda como ajuste. |
+| `POST /admin/pool/turnos` | Anota fichas: `{ "pool": "azul", "nombre": "Ana", "fichas": 5 }`. Si superan el máximo por turno se reparten en varios turnos seguidos. |
+| `PUT /admin/pool/turnos/{id}` | Cambia el nombre: `{ "nombre" }`. |
+| `POST /admin/pool/turnos/{id}/consumir` | Usa una ficha. `409` si ya usó todas. |
+| `POST /admin/pool/turnos/{id}/revertir` | Devuelve una ficha usada. `409` si no usó ninguna. |
+| `POST /admin/pool/turnos/{id}/transferir` | Lo pasa al final de la otra mesa: `{ "pool": "rojo" }`. |
+| `POST /admin/pool/turnos/{id}/mover` | Lo sube o baja un lugar: `{ "direccion": "arriba" }`. |
+| `PUT /admin/pool/orden` | Ordena una mesa: `{ "pool": "azul", "ids": [8, 5, 9] }`. |
+| `GET` y `PUT /admin/pool/configuracion` | Máximo de fichas por turno y valor de cada ficha: `{ "max_fichas_por_registro", "valor_ficha" }` (solo administración). |
+
+Sin jornada abierta, las operaciones de la fila responden `409`. Un turno que no es de la jornada activa responde `404`.
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.
