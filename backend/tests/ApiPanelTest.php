@@ -345,6 +345,14 @@ verificar($r['status'] === 200, 'borra el comentario');
 $r = api('POST', '/admin/banners', $cookies, ['titulo' => 'Sin imagen'], $csrf);
 verificar($r['status'] === 415 || $r['status'] === 422, 'un banner sin imagen se rechaza');
 
+echo "\nCocina y delivery\n";
+$r = api('GET', '/admin/pedidos/cocina', $cookies);
+verificar($r['status'] === 200 && is_array($r['cuerpo']['datos'] ?? null), 'lista los pedidos de cocina');
+$r = api('PUT', '/admin/pedidos/999999', $cookies, ['estado' => 'Listo'], $csrf);
+verificar($r['status'] === 404, 'un pedido que no existe responde 404');
+$r = api('PUT', '/admin/pedidos/1', $cookies, ['estado' => 'Perdido'], $csrf);
+verificar($r['status'] === 422, 'un estado inventado se rechaza (422)');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -367,6 +375,10 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni las estadísticas (403)');
     $r = api('GET', '/admin/comentarios', $otra);
     verificar($r['status'] === 403, 'ni los comentarios (403)');
+    $r = api('GET', '/admin/pedidos/delivery', $otra);
+    verificar($r['status'] === 200, 'pero sí ve los pedidos en camino');
+    $r = api('GET', '/admin/pedidos/cocina', $otra);
+    verificar($r['status'] === 403, 'y no el panel de cocina (403)');
     @unlink($otra);
 }
 
