@@ -60,6 +60,7 @@ $pantallas = [
     'seccion/pool/index.php', 'seccion/bebidas/index.php', 'seccion/estadisticasPool/index.php',
     'seccion/puntos/index.php', 'seccion/poolParametros/index.php',
     'seccion/bebidasParametros/index.php', 'seccion/estadisticasBebidas/index.php',
+    'seccion/proveedores/index.php', 'seccion/proveedores/crear.php',
 ];
 
 $usuarios = array_filter(explode(',', (string) getenv('PANEL_USUARIOS')));

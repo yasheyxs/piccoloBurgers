@@ -56,7 +56,7 @@ Navegador ──▶ frontend (Nginx) ──▶ sitio de clientes (HTML, CSS y Ja
 ```
 
 - **Frontend** (`frontend/`): el sitio de clientes es una aplicación estática que obtiene todos los datos de la API. No necesita PHP ni acceso a la base de datos.
-- **Backend** (`backend/`): una **API REST en JSON** (`/api/v1`) con el menú, el carrito, los pedidos y las cuentas de clientes, más el panel de administración. Solo la carpeta `public/` es accesible desde el navegador.
+- **Backend** (`backend/`): una **API REST en JSON** (`/api/v1`) con el menú, el carrito, los pedidos y las cuentas de clientes, más el panel de administración. El panel también se está llevando a la API sección por sección, con el código ordenado en capas (consultas, reglas y pantallas por separado). Solo la carpeta `public/` es accesible desde el navegador.
 - **Docker Compose** levanta todo con un comando: el frontend en Nginx, que también reenvía la API y el panel al backend, y el backend en Apache con MySQL.
 
 La API está documentada con ejemplos en [`docs/API.md`](docs/API.md).

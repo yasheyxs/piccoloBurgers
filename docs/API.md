@@ -1,6 +1,6 @@
 # API de Piccolo Burgers (v1)
 
-La API permite usar el sistema desde cualquier frontend: consultar el menú, armar el carrito, confirmar pedidos y manejar la cuenta del cliente.
+La API permite usar el sistema desde cualquier frontend: consultar el menú, armar el carrito, confirmar pedidos y manejar la cuenta del cliente. También tiene rutas para el panel de administración, que se van sumando sección por sección.
 
 - **Base:** `http://localhost:8080/api/v1` con Docker, o `http://localhost/piccoloBurgers/backend/public/api/v1` con XAMPP.
 - **Formato:** todas las respuestas son JSON. Las acciones que envían datos (`POST`, `PUT`) reciben JSON con `Content-Type: application/json`.
@@ -25,7 +25,8 @@ Todas las respuestas tienen la misma forma:
 | 200 / 201 | Todo bien (201 cuando se creó algo) |
 | 401 | Hace falta iniciar sesión, o los datos de acceso son incorrectos |
 | 404 / 405 | La ruta no existe o no acepta ese método |
-| 409 | Conflicto: no hay stock suficiente, o el teléfono o email ya están registrados |
+| 403 | Panel: el rol no tiene acceso a la sección, o falta el token CSRF |
+| 409 | Conflicto: no hay stock suficiente, el teléfono o email ya están registrados, o no se puede borrar algo en uso |
 | 410 | El enlace para recuperar la contraseña venció |
 | 415 | El cuerpo no se envió como JSON |
 | 422 | Datos inválidos (ver `errores`) |
@@ -154,6 +155,42 @@ Los datos del cliente se devuelven así (nunca incluyen la contraseña):
 
 La contraseña debe tener al menos 8 caracteres, con mayúscula, minúscula, número y símbolo.
 
+## Panel de administración
+
+Rutas bajo `/admin/...`, pensadas para un panel que use la API (por ejemplo, el panel nuevo en React). Usan la misma sesión que las pantallas actuales del panel: iniciar sesión en una también la inicia en la otra.
+
+- **Permisos por rol:** cada sección respeta la misma tabla que las pantallas (`backend/config/permisos.php`). Sin sesión responde `401`; con un rol sin acceso, `403`.
+- **Token CSRF:** las acciones que modifican datos (`POST`, `PUT`, `DELETE`) necesitan el encabezado `X-CSRF-Token` con el token que devuelve el inicio de sesión o `GET /admin/sesion`. Sin él responden `403`.
+- **Inactividad:** después de 2 horas sin uso la sesión se cierra sola.
+
+### Sesión
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /admin/sesion` | Usuario con sesión, su rol y el token CSRF. `null` si no hay sesión. |
+| `POST /admin/sesion` | Inicia sesión. Recibe `{ "usuario", "password" }`. `401` si los datos no son correctos, `429` después de 5 intentos fallidos. |
+| `DELETE /admin/sesion` | Cierra la sesión (con `X-CSRF-Token`). |
+
+```json
+{ "exito": true, "datos": { "usuario": "Usuario", "rol": "admin", "csrf_token": "7a32d2…" } }
+```
+
+### Proveedores (solo administración)
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /admin/proveedores` | Lista de proveedores, ordenada por nombre. |
+| `GET /admin/proveedores/{id}` | Un proveedor. `404` si no existe. |
+| `POST /admin/proveedores` | Crea un proveedor. Recibe `{ "nombre", "telefono", "email" }` (email opcional). Responde `201`. |
+| `PUT /admin/proveedores/{id}` | Modifica un proveedor. Mismos campos que al crear. |
+| `DELETE /admin/proveedores/{id}` | Borra un proveedor. `409` si tiene materias primas o compras asociadas. |
+
+```json
+{ "id": 3, "nombre": "Distribuidora Lozano", "telefono": "+54 0000 580136", "email": null }
+```
+
+Los datos inválidos devuelven `422` con el error de cada campo en `errores` (`nombre`, `telefono`, `email`).
+
 ## Configuración
 
 Variables en `backend/.env` (ver `backend/.env.example`):
@@ -181,3 +218,9 @@ php backend/tests/ApiTest.php http://localhost:8080/api/v1
 ```
 
 Crea un cliente, un comentario y un pedido de prueba, así que conviene correrlo contra una base de desarrollo.
+
+`backend/tests/ApiPanelTest.php` hace lo mismo con la API del panel: sesión, permisos por rol, token CSRF y la sección de proveedores completa.
+
+```bash
+PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php backend/tests/ApiPanelTest.php http://localhost:8080/api/v1
+```
