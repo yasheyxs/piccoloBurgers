@@ -8,12 +8,7 @@
  */
 $pesos = static fn(float $monto): string => '$' . number_format($monto, 2, ',', '.');
 $periodo = http_build_query(['desde' => $resumen['desde'], 'hasta' => $resumen['hasta']]);
-$hoy = date('Y-m-d');
-$atajos = [
-    'Última semana' => [date('Y-m-d', strtotime('-6 days')), $hoy],
-    'Este mes' => [date('Y-m-01'), $hoy],
-    'Este año' => [date('Y-01-01'), $hoy],
-];
+$atajos = \Piccolo\Http\Admin\Periodo::atajos();
 $estrella = $resumen['producto_estrella'];
 $origen = $resumen['por_origen'];
 ?>

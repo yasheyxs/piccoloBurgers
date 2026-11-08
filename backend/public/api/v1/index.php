@@ -11,6 +11,7 @@ use Piccolo\Http\Admin\BebidasController;
 use Piccolo\Http\Admin\CanjeController;
 use Piccolo\Http\Admin\ClientesController;
 use Piccolo\Http\Admin\ComprasController;
+use Piccolo\Http\Admin\EstadisticasController;
 use Piccolo\Http\Admin\MateriasPrimasController;
 use Piccolo\Http\Admin\MenuController;
 use Piccolo\Http\Admin\PoolController;
@@ -23,6 +24,7 @@ use Piccolo\Http\Api\Admin\BebidasApi;
 use Piccolo\Http\Api\Admin\CanjeApi;
 use Piccolo\Http\Api\Admin\ClientesApi;
 use Piccolo\Http\Api\Admin\ComprasApi;
+use Piccolo\Http\Api\Admin\EstadisticasApi;
 use Piccolo\Http\Api\Admin\MateriasPrimasApi;
 use Piccolo\Http\Api\Admin\MenuApi;
 use Piccolo\Http\Api\Admin\PoolApi;
@@ -202,5 +204,9 @@ $router->post('/admin/bebidas/ventas/{id}/revertir', [$bebidas, 'revertir']);
 $router->get('/admin/bebidas/catalogo', [$bebidas, 'catalogo']);
 $router->post('/admin/bebidas/catalogo', [$bebidas, 'crearBebida']);
 $router->put('/admin/bebidas/catalogo/{id}', [$bebidas, 'actualizarBebida']);
+
+$estadisticas = new EstadisticasApi(new EstadisticasController($conexion));
+$router->get('/admin/estadisticas/pool', [$estadisticas, 'pool']);
+$router->get('/admin/estadisticas/bebidas', [$estadisticas, 'bebidas']);
 
 $router->despachar(Peticion::desdeServidor('/api/v1'));

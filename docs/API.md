@@ -351,6 +351,12 @@ La jornada es la misma que la del pool: se abre y se cierra con `/admin/pool/jor
 | `POST /admin/bebidas/catalogo` | Agrega una bebida: `{ "nombre", "valor_jarra", "valor_promo", "jarras_por_promo", "activa" }` (solo administración). |
 | `PUT /admin/bebidas/catalogo/{id}` | Modifica una bebida. Las ventas ya hechas conservan su precio (solo administración). |
 
+### Estadísticas de pool y bebidas (solo administración)
+
+`GET /admin/estadisticas/pool` y `GET /admin/estadisticas/bebidas` reciben `?desde=AAAA-MM-DD&hasta=AAAA-MM-DD&jornada=ID` (todo opcional; sin fechas, el mes actual; sin jornada, la última del período). Si las fechas no son válidas o están al revés responden `422`, igual que las ventas.
+
+Devuelven `resumen` (totales del período), `jornadas` (de la más nueva a la más vieja) y `seleccionada` (la jornada detallada, o `null` si no hubo). El pool trae además los totales por mesa (`mesas.azul` y `mesas.rojo`); bebidas trae `por_bebida`, lo vendido de cada bebida por tipo (jarra o promoción). Los totales incluyen las correcciones que se cargan al cerrar la jornada.
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.
