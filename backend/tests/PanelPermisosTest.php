@@ -65,6 +65,8 @@ $pantallas = [
     'seccion/menu/crear.php',
     'clientes_crear.php', 'seccion/usuarios/crear.php', 'seccion/premios/crear.php',
     'seccion/ventas/export_excel.php', 'seccion/ventas/export_pdf.php',
+    'seccion/estadisticasPool/export_excel.php', 'seccion/estadisticasPool/export_pdf.php',
+    'seccion/estadisticasPool/index.php?desde=2001-05-02&hasta=2001-05-01',
     'seccion/ventas/index.php?desde=2001-05-02&hasta=2001-05-01', // fechas al revés: avisa y muestra el mes
 ];
 

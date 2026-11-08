@@ -34,28 +34,7 @@ final class VentasController
      */
     public function periodo(array $filtros): array
     {
-        $errores = [];
-        $periodo = ['desde' => date('Y-m-01'), 'hasta' => date('Y-m-d')];
-        foreach ($periodo as $campo => $porDefecto) {
-            $valor = Datos::texto($filtros[$campo] ?? '');
-            if ($valor === '') {
-                continue;
-            }
-            $fecha = Datos::fecha($valor);
-            if ($fecha === null) {
-                $errores[$campo] = 'Usá una fecha válida (AAAA-MM-DD).';
-            } else {
-                $periodo[$campo] = $fecha;
-            }
-        }
-        if (!$errores && $periodo['desde'] > $periodo['hasta']) {
-            $errores['hasta'] = 'La fecha "hasta" no puede ser anterior a "desde".';
-        }
-        if ($errores) {
-            throw ApiException::validacion($errores, 'Revisá las fechas del reporte.');
-        }
-
-        return $periodo;
+        return Periodo::leer($filtros);
     }
 
     /**

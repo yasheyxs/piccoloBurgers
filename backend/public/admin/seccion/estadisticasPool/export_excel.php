@@ -1,87 +1,76 @@
 <?php
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-require_once __DIR__ . '/../../../../src/Core/database.php';
-require_once __DIR__ . '/../../../../src/Services/pool_schema.php';
-require_once __DIR__ . '/../../../../vendor/autoload.php';
+require_once piccolo_path('src/Core/database.php');
 
+use Piccolo\Http\Admin\EstadisticasController;
+use Piccolo\Http\Api\ApiException;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-verificarRol('admin');
+$estadisticas = new EstadisticasController($conexion);
+try {
+    $datos = $estadisticas->pool($_GET);
+} catch (ApiException) {
+    $datos = $estadisticas->pool([]);
+}
+$resumen = $datos['resumen'];
+$pesos = '"$"#,##0.00';
 
-[$fecha_inicio, $fecha_fin] = poolRangoFechasDesdeParametros($_GET);
+$libro = new Spreadsheet();
+$hoja = $libro->getActiveSheet();
+$hoja->setTitle('Pool');
+$hoja->setCellValue('A1', "Estadísticas del pool del {$datos['desde']} al {$datos['hasta']}");
+$hoja->mergeCells('A1:E1');
+$hoja->getStyle('A1')->getFont()->setBold(true)->setSize(16);
 
-$jornadas = poolListarJornadas($conexion, $fecha_inicio, $fecha_fin);
-$resumen = poolResumenGeneral($jornadas);
-
-$spreadsheet = new Spreadsheet();
-$sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle('Estadisticas Pool');
-
-$sheet->setCellValue('A1', "Estadisticas de Pool desde $fecha_inicio hasta $fecha_fin");
-$sheet->mergeCells('A1:J1');
-$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-
-$metricas = [
-    ['Jornadas registradas', $resumen['total_jornadas']],
-    ['Fichas vendidas', $resumen['total_vendidas']],
-    ['Valor monetario vendido', $resumen['monto_vendido_total']],
-    ['Valor monetario Pool Azul', $resumen['monto_vendido_azul']],
-    ['Valor monetario Pool Rojo', $resumen['monto_vendido_rojo']],
-    ['Fichas pendientes', $resumen['total_pendientes']],
-    ['Promedio por jornada', $resumen['promedio_fichas_jornada']],
-];
-
-$row = 3;
-foreach ($metricas as $metrica) {
-    $sheet->setCellValue("A$row", $metrica[0]);
-    $sheet->setCellValue("B$row", $metrica[1]);
-    $sheet->getStyle("A$row:B$row")->getFont()->setBold(true);
-    $sheet->getStyle("A$row:B$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-    $sheet->getStyle("A$row:B$row")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D9EDF7');
-    $row++;
+$fila = 3;
+foreach ([
+    ['Jornadas', $resumen['jornadas'], false],
+    ['Fichas vendidas', $resumen['vendidas'], false],
+    ['Fichas vendidas mesa azul', $resumen['mesas']['azul']['vendidas'], false],
+    ['Fichas vendidas mesa roja', $resumen['mesas']['rojo']['vendidas'], false],
+    ['Fichas pendientes', $resumen['pendientes'], false],
+    ['Promedio de fichas por jornada', $resumen['promedio_por_jornada'], false],
+    ['Valor vendido', $resumen['monto'], true],
+    ['Valor vendido mesa azul', $resumen['mesas']['azul']['monto'], true],
+    ['Valor vendido mesa roja', $resumen['mesas']['rojo']['monto'], true],
+] as [$nombre, $valor, $esDinero]) {
+    $hoja->fromArray([$nombre, $valor], null, "A$fila", true);
+    $hoja->getStyle("A$fila:B$fila")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+    $hoja->getStyle("A$fila:B$fila")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('D9EDF7');
+    if ($esDinero) {
+        $hoja->getStyle("B$fila")->getNumberFormat()->setFormatCode($pesos);
+    }
+    $fila++;
 }
 
-$row += 2;
-$headers = ['ID', 'Apertura', 'Cierre', 'Estado', 'Vendidas Azul', 'Vendidas Rojo', 'Valor Azul', 'Valor Rojo', 'Valor Total', 'Pendientes Azul', 'Pendientes Rojo', 'Jugadores', 'Completados', 'Duracion min'];
-$col = 'A';
-foreach ($headers as $header) {
-    $sheet->setCellValue($col . $row, $header);
-    $col++;
-}
-$sheet->getStyle("A$row:N$row")->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
-$sheet->getStyle("A$row:N$row")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('4287F5');
-$row++;
+$fila += 2;
+$columnas = ['Jornada', 'Apertura', 'Cierre', 'Estado', 'Vendidas azul', 'Vendidas roja', 'Valor azul', 'Valor roja', 'Valor total', 'Pendientes', 'Jugadores', 'Turnos completos', 'Duración (min)'];
+$hoja->fromArray($columnas, null, "A$fila");
+$hoja->getStyle("A$fila:M$fila")->getFont()->setBold(true)->getColor()->setRGB('FFFFFF');
+$hoja->getStyle("A$fila:M$fila")->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('4287F5');
+$fila++;
 
-foreach ($jornadas as $jornada) {
-    $sheet->setCellValue("A$row", $jornada['id']);
-    $sheet->setCellValue("B$row", $jornada['fecha_apertura']);
-    $sheet->setCellValue("C$row", $jornada['fecha_cierre'] ?: 'En curso');
-    $sheet->setCellValue("D$row", $jornada['estado']);
-    $sheet->setCellValue("E$row", $jornada['fichas_vendidas_azul']);
-    $sheet->setCellValue("F$row", $jornada['fichas_vendidas_rojo']);
-    $sheet->setCellValue("G$row", $jornada['monto_vendido_azul']);
-    $sheet->setCellValue("H$row", $jornada['monto_vendido_rojo']);
-    $sheet->setCellValue("I$row", $jornada['monto_vendido_total']);
-    $sheet->setCellValue("J$row", $jornada['fichas_pendientes_azul']);
-    $sheet->setCellValue("K$row", $jornada['fichas_pendientes_rojo']);
-    $sheet->setCellValue("L$row", $jornada['jugadores_atendidos']);
-    $sheet->setCellValue("M$row", $jornada['turnos_completados']);
-    $sheet->setCellValue("N$row", $jornada['duracion_minutos'] ?? 'En curso');
-    $sheet->getStyle("A$row:N$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-    $row++;
+foreach ($datos['jornadas'] as $j) {
+    $hoja->fromArray([
+        $j['id'], $j['apertura'], $j['cierre'] ?? 'En curso', ucfirst($j['estado']),
+        $j['mesas']['azul']['vendidas'], $j['mesas']['rojo']['vendidas'],
+        $j['mesas']['azul']['monto'], $j['mesas']['rojo']['monto'], $j['monto'],
+        $j['pendientes'], $j['jugadores'], $j['turnos_completados'], $j['duracion_minutos'] ?? 'En curso',
+    ], null, "A$fila", true);
+    $hoja->getStyle("G$fila:I$fila")->getNumberFormat()->setFormatCode($pesos);
+    $hoja->getStyle("A$fila:M$fila")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+    $fila++;
 }
 
-foreach (range('A', 'N') as $column) {
-    $sheet->getColumnDimension($column)->setAutoSize(true);
+foreach (range('A', 'M') as $columna) {
+    $hoja->getColumnDimension($columna)->setAutoSize(true);
 }
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-header('Content-Disposition: attachment;filename="estadisticas_pool.xlsx"');
+header("Content-Disposition: attachment; filename=\"pool_{$datos['desde']}_{$datos['hasta']}.xlsx\"");
 header('Cache-Control: max-age=0');
-
-$writer = new Xlsx($spreadsheet);
-$writer->save('php://output');
+(new Xlsx($libro))->save('php://output');
 exit;

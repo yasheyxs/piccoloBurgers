@@ -306,6 +306,14 @@ verificar($r['status'] === 422 && isset($r['cuerpo']['errores']['nombre']), 'no 
 $r = api('POST', '/admin/bebidas/ventas', $cookies, ['bebida_id' => $bebidaApi, 'persona' => 'Ana', 'tipo' => 'jarra', 'cantidad' => 1], $csrf);
 verificar(in_array($r['status'], [409, 422], true), 'no se vende una bebida inactiva ni sin jornada');
 
+echo "\nEstadísticas\n";
+$r = api('GET', '/admin/estadisticas/pool?desde=2000-01-01&hasta=2000-12-31', $cookies);
+verificar($r['status'] === 200 && ($r['cuerpo']['datos']['resumen']['jornadas'] ?? -1) === 0 && array_key_exists('seleccionada', $r['cuerpo']['datos']) && $r['cuerpo']['datos']['seleccionada'] === null, 'un año sin jornadas da todo en cero');
+$r = api('GET', '/admin/estadisticas/bebidas', $cookies);
+verificar($r['status'] === 200 && ($r['cuerpo']['datos']['desde'] ?? '') === date('Y-m-01') && isset($r['cuerpo']['datos']['por_bebida']), 'sin fechas muestra el mes actual');
+$r = api('GET', '/admin/estadisticas/pool?desde=2024-05-02&hasta=2024-05-01', $cookies);
+verificar($r['status'] === 422, 'rechaza un período al revés (422)');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -324,6 +332,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni el pool (403)');
     $r = api('GET', '/admin/bebidas', $otra);
     verificar($r['status'] === 403, 'ni las bebidas (403)');
+    $r = api('GET', '/admin/estadisticas/pool', $otra);
+    verificar($r['status'] === 403, 'ni las estadísticas (403)');
     @unlink($otra);
 }
 
