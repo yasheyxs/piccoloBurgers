@@ -72,6 +72,7 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
   <script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js"></script>
   <script src="<?php echo $url_base; ?>assets/js/datatables-init.js"></script>
   <script src="<?php echo $url_base; ?>assets/js/feedback.js"></script>
+  <script src="<?php echo $url_base; ?>assets/js/confirmar.js"></script>
 </head>
 
 <body class="<?php echo htmlspecialchars($bodyClassAttribute, ENT_QUOTES, 'UTF-8'); ?>">

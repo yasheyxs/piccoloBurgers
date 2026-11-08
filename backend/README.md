@@ -72,7 +72,7 @@ El token CSRF se agrega solo a los formularios y a los `fetch()` del panel (`adm
 
 ## Cómo está armada una sección del panel
 
-Las secciones del panel se van ordenando en capas, una por una. Proveedores es la primera y sirve de modelo:
+Las secciones del panel se van ordenando en capas, una por una. Ya están proveedores, materias primas y compras; proveedores sirve de modelo:
 
 | Capa | Archivo | Qué hace |
 |---|---|---|
@@ -84,6 +84,8 @@ Las secciones del panel se van ordenando en capas, una por una. Proveedores es l
 | API | `src/Http/Api/Admin/ProveedoresApi.php` | Las rutas `/api/v1/admin/proveedores`, que usan el mismo controlador. |
 
 Así las pantallas actuales y la API aplican exactamente las mismas reglas, y rediseñar una pantalla es tocar solo su plantilla.
+
+Piezas comunes para todas las secciones: `piccolo_admin_pagina()` arma la pantalla con el encabezado y el pie, `piccolo_admin_aviso()` deja un mensaje para después de guardar, `Datos` lee los valores de los formularios (acepta decimales con coma) y los formularios con `data-confirmar="..."` piden confirmación antes de enviarse.
 
 ## Despliegue
 

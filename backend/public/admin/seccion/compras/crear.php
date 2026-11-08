@@ -1,168 +1,44 @@
 <?php
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-include(__DIR__ . "/../../../../src/Core/database.php");
+require_once piccolo_path('src/Core/database.php');
 
-// Inicializar listas
-$lista_proveedores = [];
-$lista_materias = [];
+use Piccolo\Http\Admin\ComprasController;
+use Piccolo\Http\Admin\MateriasPrimasController;
+use Piccolo\Http\Admin\ProveedoresController;
+use Piccolo\Http\Api\ApiException;
+use Piccolo\Repositories\ComprasRepositorio;
+use Piccolo\Repositories\MateriasPrimasRepositorio;
+use Piccolo\Repositories\ProveedoresRepositorio;
 
-try {
-  // Obtener proveedores
-  $sentencia = $conexion->prepare("SELECT ID, nombre, telefono FROM tbl_proveedores");
-  $sentencia->execute();
-  $lista_proveedores = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  error_log("Error al obtener proveedores: " . $e->getMessage());
-}
+$proveedores = new ProveedoresRepositorio($conexion);
+$materiasPrimas = new MateriasPrimasRepositorio($conexion);
+$compras = new ComprasController(new ComprasRepositorio($conexion), $proveedores, $materiasPrimas);
 
-try {
-  // Obtener materias primas
-  $sentencia = $conexion->prepare("SELECT ID, nombre FROM tbl_materias_primas");
-  $sentencia->execute();
-  $lista_materias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  error_log("Error al obtener materias primas: " . $e->getMessage());
-}
+$compra = ['fecha' => date('Y-m-d'), 'proveedor_id' => '', 'items' => []];
+$errores = [];
+$aviso = null;
 
-if ($_POST) {
-  $fecha = $_POST["fecha"] ?? date("Y-m-d");
-  $proveedor_id = $_POST["proveedor_id"] ?? null;
-  $materias = $_POST["materias"] ?? [];
-
-  if (!$proveedor_id || !is_numeric($proveedor_id)) {
-    echo "<script>alert('Proveedor inválido.');</script>";
-  } else {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $compra = [
+        'fecha' => (string) ($_POST['fecha'] ?? ''),
+        'proveedor_id' => (string) ($_POST['proveedor_id'] ?? ''),
+        'items' => is_array($_POST['items'] ?? null) ? array_values($_POST['items']) : [],
+    ];
     try {
-      $conexion->beginTransaction();
-
-      // Insertar compra
-      $sentencia = $conexion->prepare("INSERT INTO tbl_compras (fecha, proveedor_id) VALUES (:fecha, :proveedor_id)");
-      $sentencia->bindParam(":fecha", $fecha);
-      $sentencia->bindParam(":proveedor_id", $proveedor_id, PDO::PARAM_INT);
-      $sentencia->execute();
-
-      $compra_id = $conexion->lastInsertId();
-
-      // Insertar detalles
-      foreach ($materias as $item) {
-        $materia_id = $item["materia_id"] ?? null;
-        $cantidad = $item["cantidad"] ?? null;
-        $precio = $item["precio"] ?? null;
-
-        if (
-          $materia_id && is_numeric($materia_id) &&
-          is_numeric($cantidad) && $cantidad > 0 &&
-          is_numeric($precio) && $precio > 0
-        ) {
-          $sentencia = $conexion->prepare("INSERT INTO tbl_compras_detalle 
-            (compra_id, materia_prima_id, cantidad, precio_unitario) 
-            VALUES (:compra_id, :materia_id, :cantidad, :precio)");
-
-          $sentencia->bindParam(":compra_id", $compra_id, PDO::PARAM_INT);
-          $sentencia->bindParam(":materia_id", $materia_id, PDO::PARAM_INT);
-          $sentencia->bindParam(":cantidad", $cantidad);
-          $sentencia->bindParam(":precio", $precio);
-          $sentencia->execute();
-
-          // Actualizar stock
-          $sentencia = $conexion->prepare("UPDATE tbl_materias_primas 
-            SET cantidad = cantidad + :cantidad WHERE ID = :materia_id");
-          $sentencia->bindParam(":cantidad", $cantidad);
-          $sentencia->bindParam(":materia_id", $materia_id, PDO::PARAM_INT);
-          $sentencia->execute();
-        }
-      }
-
-      $conexion->commit();
-      header("Location:index.php");
-      exit;
-    } catch (Exception $e) {
-      $conexion->rollBack();
-      error_log("Error al registrar compra: " . $e->getMessage());
-      echo "<script>alert('Error al registrar la compra. Intenta nuevamente.');</script>";
+        $compras->registrar($compra);
+        piccolo_admin_aviso('success', 'Compra registrada. Lo comprado se sumó al stock.');
+        header('Location: index.php');
+        exit;
+    } catch (ApiException $error) {
+        $errores = $error->errores();
+        $aviso = ['tipo' => 'danger', 'mensaje' => $error->getMessage()];
     }
-  }
 }
 
-include(__DIR__ . "/../../../../views/admin/header.php");
-?>
-
-<br />
-<div class="card">
-  <div class="card-header">Registrar compra</div>
-  <div class="card-body">
-    <form method="post">
-
-      <div class="mb-3">
-        <label for="fecha" class="form-label">Fecha de compra:</label>
-        <input type="date" class="form-control" name="fecha" id="fecha" value="<?= htmlspecialchars(date("Y-m-d")) ?>" required>
-      </div>
-
-      <div class="mb-3">
-        <label for="proveedor_id" class="form-label">Proveedor:</label>
-        <select class="form-select" name="proveedor_id" id="proveedor_id" required>
-          <option value="">Seleccionar proveedor</option>
-          <?php foreach ($lista_proveedores as $proveedor) { ?>
-            <option value="<?= htmlspecialchars($proveedor['ID']) ?>">
-              <?= htmlspecialchars($proveedor['nombre']) ?> (<?= htmlspecialchars($proveedor['telefono']) ?>)
-            </option>
-          <?php } ?>
-        </select>
-      </div>
-
-      <hr>
-      <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-        <h5 class="mb-0 flex-grow-1">Materias primas</h5>
-        <button type="button" class="btn btn-secondary" onclick="agregarMateria()">
-          <span class="fw-semibold">+</span> Agregar materia prima
-        </button>
-      </div>
-      <div id="materias-container"></div>
-      <br> 
-      <button type="submit" class="btn btn-success">Registrar compra</button>
-      <a class="btn btn-primary" href="index.php" role="button">Cancelar</a>
-    </form>
-  </div>
-  <div class="card-footer text-muted"></div>
-</div> 
-
-<script>
-  const materias = <?= json_encode($lista_materias) ?>;
-  let materiaIndex = 0;
-
-  function agregarMateria() {
-    const container = document.getElementById("materias-container");
-
-    const div = document.createElement("div");
-    div.classList.add("row", "mb-2");
-
-    div.innerHTML = `
-      <div class="col-md-5">
-        <select class="form-select" name="materias[${materiaIndex}][materia_id]" required>
-          <option value="">Seleccionar materia prima</option>
-          ${materias.map(m => `<option value="${m.ID}">${m.nombre}</option>`).join("")}
-        </select>
-      </div>
-      <div class="col-md-3">
-        <input type="number" step="0.01" min="0.01" class="form-control" name="materias[${materiaIndex}][cantidad]" placeholder="Cantidad" required>
-      </div>
-      <div class="col-md-3">
-        <input type="number" step="0.01" min="0.01" class="form-control" name="materias[${materiaIndex}][precio]" placeholder="Precio unitario" required>
-      </div>
-      <div class="col-md-1 d-flex align-items-center">
-        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.row').remove()" aria-label="Eliminar"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
-      </div>
-    `;
-
-    container.appendChild(div);
-    materiaIndex++;
-  }
-
-  // Al cargar la página, mostrar un bloque por defecto
-  window.addEventListener("DOMContentLoaded", () => {
-    agregarMateria();
-  });
-
-</script>
-
-<?php include(__DIR__ . "/../../../../views/admin/footer.php"); ?>
+piccolo_admin_pagina('compras/formulario', [
+    'compra' => $compra,
+    'proveedores' => (new ProveedoresController($proveedores))->listar(),
+    'materias' => (new MateriasPrimasController($materiasPrimas, $proveedores))->listar(),
+    'errores' => $errores,
+    'aviso' => $aviso,
+]);

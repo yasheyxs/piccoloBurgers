@@ -31,4 +31,15 @@ final class AccesoPanel
             throw new ApiException('Falta el token de seguridad (X-CSRF-Token) o venció. Pedí uno nuevo en GET /admin/sesion.', 403);
         }
     }
+
+    /** El {id} de la ruta como número; si no es un número válido responde 404 con el mensaje indicado. */
+    public static function idDeRuta(Peticion $peticion, string $noEncontrado): int
+    {
+        $id = $peticion->parametroRuta('id');
+        if (!ctype_digit($id) || (int) $id <= 0) {
+            throw ApiException::noEncontrado($noEncontrado);
+        }
+
+        return (int) $id;
+    }
 }

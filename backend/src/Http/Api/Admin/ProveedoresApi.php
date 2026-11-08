@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Piccolo\Http\Api\Admin;
 
 use Piccolo\Http\Admin\ProveedoresController;
-use Piccolo\Http\Api\ApiException;
 use Piccolo\Http\Api\Peticion;
 use Piccolo\Http\Api\Respuesta;
 
@@ -59,11 +58,6 @@ final class ProveedoresApi
 
     private static function id(Peticion $peticion): int
     {
-        $id = $peticion->parametroRuta('id');
-        if (!ctype_digit($id) || (int) $id <= 0) {
-            throw ApiException::noEncontrado('El proveedor no existe o ya fue eliminado.');
-        }
-
-        return (int) $id;
+        return AccesoPanel::idDeRuta($peticion, 'El proveedor no existe o ya fue eliminado.');
     }
 }

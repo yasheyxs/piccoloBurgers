@@ -80,9 +80,9 @@ final class ProveedoresController
      */
     private function validar(array $datos): array
     {
-        $nombre = self::texto($datos['nombre'] ?? '');
-        $telefono = self::texto($datos['telefono'] ?? '');
-        $email = self::texto($datos['email'] ?? '');
+        $nombre = Datos::texto($datos['nombre'] ?? '');
+        $telefono = Datos::texto($datos['telefono'] ?? '');
+        $email = Datos::texto($datos['email'] ?? '');
         $errores = [];
 
         if ($nombre === '') {
@@ -108,11 +108,6 @@ final class ProveedoresController
         }
 
         return ['nombre' => $nombre, 'telefono' => $telefono, 'email' => $email === '' ? null : $email];
-    }
-
-    private static function texto(mixed $valor): string
-    {
-        return is_scalar($valor) ? trim((string) $valor) : '';
     }
 
     /** @return array{id: int, nombre: string, telefono: string, email: ?string} */

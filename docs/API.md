@@ -191,6 +191,48 @@ Rutas bajo `/admin/...`, pensadas para un panel que use la API (por ejemplo, el 
 
 Los datos inválidos devuelven `422` con el error de cada campo en `errores` (`nombre`, `telefono`, `email`).
 
+### Materias primas (solo administración)
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /admin/materias-primas` | Lista de materias primas con su stock. Con `?criticos=1`, solo las que están en el stock mínimo o por debajo. |
+| `GET /admin/materias-primas/{id}` | Una materia prima. |
+| `POST /admin/materias-primas` | Crea una. Recibe `{ "nombre", "unidad_medida", "cantidad", "stock_minimo", "proveedor_id" }` (`stock_minimo` y `proveedor_id` son opcionales). |
+| `PUT /admin/materias-primas/{id}` | Modifica una. Mismos campos que al crear. |
+| `DELETE /admin/materias-primas/{id}` | Borra una. `409` si la usa algún producto del menú o figura en compras. |
+
+```json
+{ "id": 12, "nombre": "Pan de hamburguesa", "unidad_medida": "unidades", "cantidad": 40.0, "stock_minimo": 20.0,
+  "estado_stock": "ok", "proveedor_id": 3, "proveedor": "Distribuidora Lozano" }
+```
+
+`estado_stock` es `sin_stock`, `bajo` (en el mínimo o por debajo; si no tiene mínimo cargado se toma 1) u `ok`. Los números aceptan coma o punto decimal.
+
+### Compras (solo administración)
+
+Registrar una compra suma lo comprado al stock de cada materia prima; borrarla lo descuenta.
+
+| Ruta | Qué hace |
+|---|---|
+| `GET /admin/compras` | Historial de compras con proveedor y total, de la más nueva a la más vieja. |
+| `GET /admin/compras/resumen` | Gasto del mes y del año, y los 5 proveedores y materias primas con más compras. |
+| `GET /admin/compras/{id}` | Una compra con sus ítems y el total. |
+| `POST /admin/compras` | Registra una compra. Ver el ejemplo abajo. Responde `201`. |
+| `DELETE /admin/compras/{id}` | Borra una compra y descuenta lo comprado del stock. `409` si parte de esa mercadería ya se usó (el stock quedaría negativo). |
+
+```json
+{
+  "fecha": "2026-11-08",
+  "proveedor_id": 3,
+  "items": [
+    { "materia_prima_id": 12, "cantidad": 50, "precio_unitario": 120.5 },
+    { "materia_prima_id": 15, "cantidad": 2.5, "precio_unitario": 3400 }
+  ]
+}
+```
+
+Si algo no es válido responde `422`, y los errores de cada ítem vienen como `items.0.cantidad`, `items.1.materia_prima_id`, etc. La fecha no puede ser posterior a hoy.
+
 ## Configuración
 
 Variables en `backend/.env` (ver `backend/.env.example`):
@@ -219,7 +261,7 @@ php backend/tests/ApiTest.php http://localhost:8080/api/v1
 
 Crea un cliente, un comentario y un pedido de prueba, así que conviene correrlo contra una base de desarrollo.
 
-`backend/tests/ApiPanelTest.php` hace lo mismo con la API del panel: sesión, permisos por rol, token CSRF y la sección de proveedores completa.
+`backend/tests/ApiPanelTest.php` hace lo mismo con la API del panel: sesión, permisos por rol, token CSRF y las secciones de proveedores, materias primas y compras (incluido el ajuste del stock).
 
 ```bash
 PANEL_USUARIOS="admin:Usuario:Usuario1!,delivery:Delivery:Delivery1!" php backend/tests/ApiPanelTest.php http://localhost:8080/api/v1

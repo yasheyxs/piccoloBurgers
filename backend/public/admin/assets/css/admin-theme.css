@@ -849,3 +849,11 @@ body.admin-body.admin-dark .theme-toggle.btn-outline-secondary:hover {
     height: 38px;
   }
 }
+
+/* Estado del stock en las tablas (materias primas) */
+.stock-bajo { background-color: #f3e4c2 !important; color: #6d5310; font-weight: 600; }
+.stock-cero { background-color: #f4ccd2 !important; color: #8a3d47; font-weight: 600; }
+.stock-ok { background-color: #d6ebde !important; color: #2f6543; font-weight: 500; }
+body.admin-dark .stock-bajo { background-color: rgba(173, 137, 57, 0.32) !important; color: #f3dba2; }
+body.admin-dark .stock-cero { background-color: rgba(172, 63, 72, 0.33) !important; color: #f5b8c1; }
+body.admin-dark .stock-ok { background-color: rgba(61, 122, 87, 0.32) !important; color: #bce6ce; }
