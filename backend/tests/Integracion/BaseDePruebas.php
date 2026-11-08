@@ -55,6 +55,9 @@ abstract class BaseDePruebas extends TestCase
             if ($tabla === 'tbl_materias_primas') {
                 $this->conexion->prepare("DELETE FROM tbl_menu_materias_primas WHERE materia_prima_id IN ($marcadores)")->execute($ids);
             }
+            if ($tabla === 'tbl_pedidos') {
+                $this->conexion->prepare("DELETE FROM tbl_pedidos_detalle WHERE pedido_id IN ($marcadores)")->execute($ids);
+            }
             if ($tabla === 'tbl_compras') {
                 $this->conexion->prepare("DELETE FROM tbl_compras_detalle WHERE compra_id IN ($marcadores)")->execute($ids);
             }
