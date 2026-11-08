@@ -612,4 +612,9 @@ INSERT INTO `tbl_usuarios` (`ID`, `usuario`, `password`, `correo`, `rol`, `reset
 (5, 'Usuario', '$2y$10$Oxyy879JaKROZ6lrKJ15PuGmBdcFSq9uvRy/REnASVatzayBjVRJi', 'contacto-3a5671@piccolo-falso.test', 'admin', NULL, NULL),
 (6, 'Empleado', '$2y$10$QWomg6BaOWHi9gMErTPfQOK2vizI9gZuK6FCau3DSQX2Ny8debRs.', 'contacto-e1b2c3@piccolo-falso.test', 'empleado', NULL, NULL);
 
+INSERT INTO `premios` (`id`, `nombre`, `descripcion`, `costo_puntos`) VALUES
+(1, 'Gaseosa chica', 'Lata de 354 ml a elección.', 60),
+(2, 'Porción de papas fritas', 'Papas fritas medianas.', 120),
+(3, 'Hamburguesa clásica', 'Medallón, cheddar y pan de papa.', 300);
+
 SET FOREIGN_KEY_CHECKS = 1;

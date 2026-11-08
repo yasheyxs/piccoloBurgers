@@ -267,6 +267,23 @@ Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las f
 
 Para crear un administrador, editar uno o darle ese rol a alguien, hay que mandar también `password_actual` con la contraseña de quien está usando el panel; si falta o no coincide responde `422`. Siempre queda al menos un administrador. Si se borra un usuario o se le cambia el rol, el cambio vale en el momento, aunque tenga una sesión abierta.
 
+### Premios y sistema de puntos (solo administración)
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/premios` | Los premios, del más nuevo al más viejo. |
+| `GET /admin/premios/{id}` | Un premio. |
+| `POST /admin/premios` | Crea un premio: `{ "nombre", "descripcion", "costo_puntos" }` (la descripción es opcional; el costo, un entero de 1 o más). Responde `201`. |
+| `PUT /admin/premios/{id}` | Modifica un premio. Mismos campos. |
+| `DELETE /admin/premios/{id}` | Borra un premio. Los canjes ya hechos siguen en el historial de cada cliente. |
+| `GET /admin/puntos/configuracion` | Las reglas de canje: `minimo_puntos`, `valor_punto`, `maximo_porcentaje` (de 0 a 100) y un `ejemplo` con lo que pasa en una compra de $10.000. |
+| `PUT /admin/puntos/configuracion` | Guarda las reglas. Mismos campos; los decimales aceptan coma. |
+
+```json
+{ "minimo_puntos": 50, "valor_punto": 20.0, "maximo_porcentaje": 25.0, "actualizado": "2026-11-08 04:00:00",
+  "ejemplo": { "compra": 10000, "maximo_puntos": 125, "maximo_descuento": 2500.0, "compras_para_el_minimo": 9 } }
+```
+
 ### Clientes (solo administración)
 
 | Ruta | Qué hace |
