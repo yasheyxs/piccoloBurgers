@@ -158,6 +158,11 @@ $bodyClassAttribute = implode(' ', array_unique(array_filter($bodyClasses)));
               </button>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="<?php echo $url_base; ?>password/cambiar_password.php" title="Cambiar mi contraseña" aria-label="Cambiar mi contraseña">
+                <i class="fa-solid fa-key" aria-hidden="true"></i>
+              </a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link text-danger" href="#" data-bs-toggle="modal" data-bs-target="#modalCerrarSesion" title="Cerrar sesión">
                 <i class="fa-solid fa-right-from-bracket fa-lg"></i>
               </a>

@@ -1,0 +1,117 @@
+/* Portada del panel: acciones rápidas, vista por rol y resumen del mes */
+.quick-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  border-radius: 12px;
+  color: var(--admin-btn-primary-text);
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;
+  border: 1px solid var(--admin-border);
+  transition: var(--admin-transition);
+  box-shadow: none;
+}
+
+.quick-action i {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.quick-action:hover {
+  filter: brightness(0.95);
+}
+
+.btn-add {
+  background: var(--admin-btn-primary-bg);
+}
+
+.btn-user {
+  background: var(--admin-btn-success-bg);
+}
+
+.btn-report {
+  background: var(--admin-btn-warning-bg);
+  color: var(--admin-btn-warning-text);
+}
+
+.btn-roles {
+  background: var(--admin-btn-danger-bg);
+}
+
+.btn-pool {
+  background: var(--admin-btn-secondary-bg);
+}
+
+.btn-drinks {
+  background: var(--admin-btn-info-bg);
+}
+
+.welcome-box {
+  background: var(--admin-surface);
+  border-radius: 20px;
+  padding: 3rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.welcome-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-box h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--admin-text);
+  margin-bottom: 1rem;
+}
+
+.welcome-box p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #3a3f45;
+  margin-bottom: 0.75rem;
+  transition: color 0.3s ease;
+}
+
+.welcome-box .text-muted {
+  font-size: 0.95rem;
+  color: #5b6169 !important;
+  transition: color 0.3s ease;
+}
+
+body.admin-dark .welcome-box {
+  background: var(--admin-surface);
+  box-shadow: 0 12px 35px rgba(4, 6, 10, 0.55);
+}
+
+body.admin-dark .welcome-box p {
+  color: #d5dae3;
+}
+
+body.admin-dark .welcome-box .text-muted {
+  color: #a5adba !important;
+}
+
+.metrics-section .card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.metrics-section .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.15);
+}
+
+.metrics-section .metric-icon {
+  font-size: 2rem;
+  margin-bottom: 0.75rem;
+}
+

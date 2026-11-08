@@ -91,8 +91,12 @@ foreach ($usuarios as $definicion) {
     echo "\nRol $rol ($usuario)\n";
 
     $cookies = tempnam(sys_get_temp_dir(), 'pb_');
-    pedir("$base/login.php", $cookies);
-    $r = pedir("$base/login.php", $cookies, 'POST', ['usuario' => $usuario, 'password' => $clave]);
+    // El formulario de ingreso trae el token de seguridad, que hay que devolver al entrar
+    $pagina = pedir("$base/login.php", $cookies);
+    preg_match('/name="csrf_token" value="([0-9a-f]+)"/', $pagina['cuerpo'], $token);
+    $r = pedir("$base/login.php", $cookies, 'POST', ['usuario' => $usuario, 'password' => 'incorrecta']);
+    verificar($r['status'] === 200 && str_contains($r['cuerpo'], 'venció'), 'sin el token, el ingreso se rechaza');
+    $r = pedir("$base/login.php", $cookies, 'POST', ['usuario' => $usuario, 'password' => $clave, 'csrf_token' => $token[1] ?? '']);
     verificar($r['status'] === 302 && str_contains($r['destino'], 'index.php'), 'inicia sesión');
 
     foreach ($pantallas as $pantalla) {
@@ -117,6 +121,22 @@ foreach ($usuarios as $definicion) {
     // Un envío sin token CSRF se rechaza, aunque el rol tenga permiso
     $r = pedir("$base/actualizar_estado.php", $cookies, 'POST', ['id' => 0, 'estado' => 'Listo']);
     verificar($r['status'] === 403, 'un envío sin token CSRF se rechaza');
+
+    // Vista rápida: un administrador ve el panel como empleado y después vuelve a su vista
+    if ($rol === 'admin') {
+        preg_match('/name="csrf-token" content="([0-9a-f]+)"/', pedir("$base/index.php", $cookies)['cuerpo'], $meta);
+        $cabecera = ['X-CSRF-Token: ' . ($meta[1] ?? '')];
+        $r = pedir("$base/cambiar_rol.php", $cookies, 'POST', ['rol' => 'empleado'], $cabecera);
+        $ventas = pedir("$base/seccion/ventas/index.php", $cookies);
+        verificar($r['status'] === 200 && $ventas['status'] === 403, 'viendo como empleado, no entra a ventas');
+        $r = pedir("$base/cambiar_rol.php", $cookies, 'POST', ['rol' => 'admin'], $cabecera);
+        $ventas = pedir("$base/seccion/ventas/index.php", $cookies);
+        verificar($r['status'] === 200 && $ventas['status'] === 200, 'y puede volver a su vista de administrador');
+    } else {
+        preg_match('/name="csrf-token" content="([0-9a-f]+)"/', pedir("$base/index.php", $cookies)['cuerpo'], $meta);
+        $r = pedir("$base/cambiar_rol.php", $cookies, 'POST', ['rol' => 'admin'], ['X-CSRF-Token: ' . ($meta[1] ?? '')]);
+        verificar($r['status'] === 403, 'no puede cambiarse a la vista de administrador');
+    }
 
     pedir("$base/cerrar.php", $cookies);
     @unlink($cookies);

@@ -2,13 +2,6 @@
 
 require_once __DIR__ . '/pool_schema.php';
 
-if (!function_exists('bebidaNormalizarTipo')) {
-    function bebidaNormalizarTipo(string $tipo): string
-    {
-        return $tipo === 'promo' ? 'promo' : 'jarra';
-    }
-}
-
 if (!function_exists('bebidaListar')) {
     function bebidaListar(PDO $conexion, bool $soloActivas = false): array
     {
@@ -26,119 +19,6 @@ if (!function_exists('bebidaListar')) {
             $bebida['activa'] = (bool) $bebida['activa'];
             return $bebida;
         }, $conexion->query($sql)->fetchAll(PDO::FETCH_ASSOC));
-    }
-}
-
-if (!function_exists('bebidaObtener')) {
-    function bebidaObtener(PDO $conexion, int $id): ?array
-    {
-        $stmt = $conexion->prepare('SELECT * FROM bebidas WHERE id = :id');
-        $stmt->execute([':id' => $id]);
-        $bebida = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $bebida ?: null;
-    }
-}
-
-if (!function_exists('bebidaGuardar')) {
-    function bebidaGuardar(
-        PDO $conexion,
-        int $id,
-        string $nombre,
-        float $valorJarra,
-        float $valorPromo,
-        int $jarrasPorPromo,
-        bool $activa
-    ): int {
-        $nombre = trim($nombre);
-        if ($nombre === '') {
-            throw new RuntimeException('Ingresa el nombre de la bebida.');
-        }
-        if ($valorJarra <= 0 || $valorPromo <= 0) {
-            throw new RuntimeException('Los valores de jarra y promo deben ser mayores a 0.');
-        }
-        if ($jarrasPorPromo < 1 || $jarrasPorPromo > 99) {
-            throw new RuntimeException('La cantidad de jarras por promoción debe estar entre 1 y 99.');
-        }
-
-        if ($id > 0) {
-            $stmt = $conexion->prepare(
-                'UPDATE bebidas
-                 SET nombre = :nombre, valor_jarra = :valor_jarra,
-                     valor_promo = :valor_promo, jarras_por_promo = :jarras_por_promo,
-                     activa = :activa
-                 WHERE id = :id'
-            );
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':valor_jarra' => round($valorJarra, 2),
-                ':valor_promo' => round($valorPromo, 2),
-                ':jarras_por_promo' => $jarrasPorPromo,
-                ':activa' => $activa ? 1 : 0,
-                ':id' => $id,
-            ]);
-            return $id;
-        }
-
-        $stmt = $conexion->prepare(
-            'INSERT INTO bebidas (nombre, valor_jarra, valor_promo, jarras_por_promo, activa)
-             VALUES (:nombre, :valor_jarra, :valor_promo, :jarras_por_promo, :activa)'
-        );
-        $stmt->execute([
-            ':nombre' => $nombre,
-            ':valor_jarra' => round($valorJarra, 2),
-            ':valor_promo' => round($valorPromo, 2),
-            ':jarras_por_promo' => $jarrasPorPromo,
-            ':activa' => $activa ? 1 : 0,
-        ]);
-
-        return (int) $conexion->lastInsertId();
-    }
-}
-
-if (!function_exists('bebidaRegistrarVenta')) {
-    function bebidaRegistrarVenta(
-        PDO $conexion,
-        int $jornadaId,
-        int $bebidaId,
-        string $persona,
-        string $tipo,
-        int $cantidad
-    ): void {
-        $persona = trim($persona);
-        $tipo = bebidaNormalizarTipo($tipo);
-
-        if ($persona === '') {
-            throw new RuntimeException('Ingresa una persona o identificación.');
-        }
-        if ($cantidad < 1 || $cantidad > 99) {
-            throw new RuntimeException('Ingresa una cantidad válida entre 1 y 99.');
-        }
-
-        $bebida = bebidaObtener($conexion, $bebidaId);
-        if (!$bebida || !(bool) $bebida['activa']) {
-            throw new RuntimeException('La bebida seleccionada no esta disponible.');
-        }
-
-        $valor = $tipo === 'promo' ? (float) $bebida['valor_promo'] : (float) $bebida['valor_jarra'];
-        $unidadesPorItem = $tipo === 'promo' ? max(1, (int) $bebida['jarras_por_promo']) : 1;
-        $stmt = $conexion->prepare(
-            'INSERT INTO bebida_ventas
-                (jornada_id, bebida_id, bebida_nombre, persona, tipo, cantidad_total,
-                 cantidad_entregada, unidades_por_item, valor_unitario)
-             VALUES
-                (:jornada_id, :bebida_id, :bebida_nombre, :persona, :tipo, :cantidad,
-                 0, :unidades_por_item, :valor_unitario)'
-        );
-        $stmt->execute([
-            ':jornada_id' => $jornadaId,
-            ':bebida_id' => $bebidaId,
-            ':bebida_nombre' => $bebida['nombre'],
-            ':persona' => $persona,
-            ':tipo' => $tipo,
-            ':cantidad' => $cantidad,
-            ':unidades_por_item' => $unidadesPorItem,
-            ':valor_unitario' => $valor,
-        ]);
     }
 }
 
