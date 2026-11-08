@@ -81,5 +81,9 @@ final class PedidoTest extends BaseDePruebas
 
         $puntos = (int) $this->conexion->query("SELECT puntos FROM tbl_clientes WHERE ID = $cliente")->fetchColumn();
         $this->assertSame(1000 - 125 + 5, $puntos);
+
+        // Los dos movimientos quedan en el historial del cliente, con el saldo de cada momento
+        $movimientos = $this->conexion->query("SELECT tipo, puntos, saldo_resultante FROM movimientos_puntos WHERE cliente_id = $cliente ORDER BY id")->fetchAll(\PDO::FETCH_NUM);
+        $this->assertEquals([['canje', -125, 875], ['compra', 5, 880]], $movimientos);
     }
 }

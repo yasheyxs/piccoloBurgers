@@ -274,6 +274,16 @@ Un producto con `visible: false` no aparece en el sitio ni se puede pedir. Las f
 
 La contraseña provisoria se genera al azar y solo se devuelve al crear el cliente: conviene dársela en el momento. El cliente puede cambiarla desde su cuenta o con "¿Olvidaste tu contraseña?". No se aceptan un email ni un teléfono que ya tenga otro cliente (`422`).
 
+### Canje de puntos (solo administración)
+
+| Ruta | Qué hace |
+| --- | --- |
+| `GET /admin/clientes/{id}/canje` | El cliente, las reglas de puntos (`minimo_puntos`, `valor_punto`, `maximo_porcentaje`), los métodos de pago, los tipos de entrega, los productos visibles y los premios. |
+| `POST /admin/clientes/{id}/canje/venta` | Registra una venta con descuento. Recibe `{ "items": [{ "id": 12, "cantidad": 2 }], "puntos_utilizados": 60, "metodo_pago", "tipo_entrega", "direccion", "referencias", "nota" }`. Responde `201` con el total, el descuento, los puntos usados y ganados, y el saldo nuevo. |
+| `POST /admin/clientes/{id}/canje/premios` | Canjea premios: `{ "premios": [{ "id": 3, "cantidad": 1 }] }`. Responde `201` con los puntos usados y el saldo nuevo. |
+
+La venta se registra igual que un pedido del sitio (mismos controles de stock, métodos de pago y entrega), pero con los puntos que se eligen: no más de los que tiene el cliente, no más del tope por venta y, si se usan, al menos el mínimo. Si algo no cumple las reglas responde `422` y no se toca el saldo. Todo cambio de puntos, también en los pedidos del sitio, queda anotado en el historial del cliente.
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.
