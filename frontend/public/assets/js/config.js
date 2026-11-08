@@ -19,4 +19,3 @@ function detectarApi() {
 
 export const API_URL = (window.PICCOLO_API_URL || detectarApi()).replace(/\/$/, "");
 
-export const WHATSAPP_NUMERO = "5493573438947";

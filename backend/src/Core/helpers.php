@@ -267,3 +267,24 @@ if (!function_exists('piccolo_columna_existe')) {
         return (bool) $consulta->fetchColumn();
     }
 }
+
+if (!function_exists('piccolo_negocio')) {
+    /**
+     * Datos del local (config/negocio.php) con algunos armados que usan el sitio y el panel.
+     *
+     * @return array<string, mixed>
+     */
+    function piccolo_negocio(): array
+    {
+        static $negocio = null;
+        if ($negocio === null) {
+            $negocio = require piccolo_path('config/negocio.php');
+            $d = $negocio['direccion'];
+            $negocio['direccion']['localidad_completa'] = "{$d['localidad']}, {$d['provincia']}, {$d['pais']}";
+            $negocio['direccion']['completa'] = "{$d['calle']}, {$d['localidad']}, {$d['provincia']}";
+            $negocio['whatsapp_url'] = 'https://wa.me/' . preg_replace('/\D/', '', (string) $negocio['whatsapp']);
+        }
+
+        return $negocio;
+    }
+}

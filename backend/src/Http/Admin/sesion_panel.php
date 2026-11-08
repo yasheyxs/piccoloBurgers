@@ -251,9 +251,10 @@ if (!function_exists('piccolo_admin_cerrar_sesion')) {
 
 if (!function_exists('piccolo_admin_aviso')) {
     /** Guarda un aviso para mostrar en la próxima pantalla (por ejemplo, después de guardar y redirigir). */
-    function piccolo_admin_aviso(string $tipo, string $mensaje): void
+    /** Con $fijo, el aviso no se cierra solo (para datos que hay que anotar). */
+    function piccolo_admin_aviso(string $tipo, string $mensaje, bool $fijo = false): void
     {
-        $_SESSION['admin_aviso'] = ['tipo' => $tipo, 'mensaje' => $mensaje];
+        $_SESSION['admin_aviso'] = ['tipo' => $tipo, 'mensaje' => $mensaje, 'fijo' => $fijo];
     }
 }
 

@@ -1,6 +1,6 @@
 import { api } from "./api.js";
 import { cargarCarrito, totalUnidades } from "./carrito.js";
-import { WHATSAPP_NUMERO } from "./config.js";
+import { cargarNegocio } from "./negocio.js";
 import { escapar, toast } from "./ui.js";
 
 /**
@@ -115,9 +115,18 @@ function agregarBotonesFlotantes(r, botonCarrito) {
   const contenedor = document.createElement("div");
   contenedor.innerHTML = `
     ${botonCarrito ? `<a href="${r}carrito.html" class="btn-flotante btn-carrito" aria-label="Ir al carrito"><i class="fa-solid fa-cart-shopping"></i></a>` : ""}
-    <a href="https://wa.me/${WHATSAPP_NUMERO}?text=${mensaje}" class="btn-flotante btn-whatsapp" target="_blank" rel="noopener" aria-label="Contactanos por WhatsApp"><i class="fab fa-whatsapp"></i></a>
+    <a href="#" class="btn-flotante btn-whatsapp d-none" target="_blank" rel="noopener" aria-label="Contactanos por WhatsApp"><i class="fab fa-whatsapp"></i></a>
     <button type="button" class="btn-flotante btn-scroll-up" aria-label="Volver arriba"><i class="fa-solid fa-chevron-up"></i></button>`;
   document.body.append(...contenedor.children);
+
+  // El número de WhatsApp viene de los datos del local
+  cargarNegocio()
+    .then((negocio) => {
+      const boton = document.querySelector(".btn-whatsapp");
+      boton.href = `${negocio.whatsapp.url}?text=${mensaje}`;
+      boton.classList.remove("d-none");
+    })
+    .catch(() => {});
 
   const subir = document.querySelector(".btn-scroll-up");
   const alternar = () => subir.classList.toggle("visible", window.scrollY > 300);

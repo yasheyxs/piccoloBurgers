@@ -156,6 +156,7 @@ piccoloBurgers/
 │   ├── tests/             pruebas automáticas
 │   └── Dockerfile         imagen de PHP + Apache
 ├── docs/API.md            documentación de la API
+├── docs/CONVENCIONES.md   cómo está escrito el código y dónde va cada cosa
 └── docker-compose.yml     entorno completo
 ```
 

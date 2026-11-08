@@ -1,7 +1,7 @@
 import { api, ApiError } from "../api.js";
 import { cargarCarrito, carritoActual, carritoConfirmado } from "../carrito.js";
-import { WHATSAPP_NUMERO } from "../config.js";
 import { iniciarLayout } from "../layout.js";
+import { cargarNegocio } from "../negocio.js";
 import { calcularCanje, cargarConfiguracionPuntos, olvidarUsarPuntos, puedeCanjear, quiereUsarPuntos } from "../puntos.js";
 import { conBotonOcupado, datosFormulario, escapar, limpiarErrores, mostrarErrores, precio } from "../ui.js";
 
@@ -193,7 +193,9 @@ async function enviarPedido(evento) {
     );
     carritoConfirmado();
     olvidarUsarPuntos();
-    mostrarAgradecimiento(resultado, pedido);
+    // Los datos para pagar (alias, titular, WhatsApp) vienen de los datos del local
+    const negocio = await cargarNegocio().catch(() => null);
+    mostrarAgradecimiento(resultado, pedido, negocio);
   } catch (error) {
     mostrarErrores(formulario, errorConCampo(error));
     formulario.querySelector(".is-invalid, [data-mensaje]")?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -212,7 +214,7 @@ function errorConCampo(error) {
 
 /* ---------- Pedido confirmado ---------- */
 
-function mostrarAgradecimiento(resultado, pedido) {
+function mostrarAgradecimiento(resultado, pedido, negocio) {
   const contenedor = document.createElement("div");
   contenedor.innerHTML = `
   <div class="modal fade modal-gracias" id="modalGracias" tabindex="-1" aria-labelledby="modalGraciasLabel" aria-hidden="true">
@@ -229,7 +231,7 @@ function mostrarAgradecimiento(resultado, pedido) {
           ${detalleDescuento(resultado)}
           <p class="mt-3"><i class="fa-solid fa-cash-register me-2" aria-hidden="true"></i><strong>Total a pagar:</strong> ${precio(resultado.total)}</p>
           ${resultado.puntosGanados > 0 ? `<p><i class="fa-solid fa-gift me-2" aria-hidden="true"></i><strong>Puntos ganados:</strong> ${resultado.puntosGanados}</p>` : ""}
-          ${pedido.metodoPago === "MercadoPago" ? datosMercadoPago(pedido.tipoEntrega === "Delivery") : ""}
+          ${pedido.metodoPago === "MercadoPago" && negocio ? datosMercadoPago(pedido.tipoEntrega === "Delivery", negocio) : ""}
         </div>
         <div class="modal-footer border-0 px-4 py-3 justify-content-center">
           <a href="index.html" class="btn btn-gold px-4">Volver al inicio</a>
@@ -258,20 +260,20 @@ function detalleDescuento(resultado) {
     </div>`;
 }
 
-function datosMercadoPago(esDelivery) {
+function datosMercadoPago(esDelivery, negocio) {
   return `
     <div class="pago-mercadopago p-4 mt-4 rounded">
       <h5 class="mb-3"><i class="fa-solid fa-mobile-screen-button me-2" aria-hidden="true"></i>Pagá por Mercado Pago</h5>
-      <p class="mb-2"><strong>Alias:</strong> piccolovdr</p>
-      <p class="mb-2"><strong>Nombre del titular:</strong> Mario Alberto Gaido</p>
+      <p class="mb-2"><strong>Alias:</strong> ${escapar(negocio.pago.alias)}</p>
+      <p class="mb-2"><strong>Nombre del titular:</strong> ${escapar(negocio.pago.titular)}</p>
       <p class="mb-2">
         Enviá el comprobante por WhatsApp a:
-        <a href="https://wa.me/${WHATSAPP_NUMERO}" target="_blank" rel="noopener">+54 9 3573 438947</a>
+        <a href="${escapar(negocio.whatsapp.url)}" target="_blank" rel="noopener">${escapar(negocio.whatsapp.visible)}</a>
       </p>
       ${
         esDelivery
           ? `<p class="aviso-costo-delivery mt-3 mb-0">
-               <i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i>El costo del delivery varía entre <strong>$1000</strong> y <strong>$1500</strong> según la zona.
+               <i class="fa-solid fa-money-bill-wave me-2" aria-hidden="true"></i>El costo del delivery varía <strong>${escapar(negocio.costoDelivery)}</strong>.
                Envianos un mensaje para confirmar el monto.
              </p>`
           : ""

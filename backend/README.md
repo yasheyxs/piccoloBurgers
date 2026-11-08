@@ -72,7 +72,7 @@ El token CSRF se agrega solo a los formularios y a los `fetch()` del panel (`adm
 
 ## Cómo está armada una sección del panel
 
-Las secciones del panel se van ordenando en capas, una por una. Ya están proveedores, materias primas, compras, menú, ventas, clientes, canje de puntos, usuarios, premios, sistema de puntos, pool, bebidas y sus estadísticas, banners, testimonios, comentarios, cocina y delivery; proveedores sirve de modelo:
+Todas las secciones del panel están ordenadas en capas. Proveedores sirve de modelo:
 
 | Capa | Archivo | Qué hace |
 |---|---|---|

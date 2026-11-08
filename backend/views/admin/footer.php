@@ -15,7 +15,8 @@
 <script src="<?php echo $url_base; ?>assets/js/theme-toggle.js"></script>
 
 <script>
-  $(document).ready(function() {
+  // Las pantallas sin sesión (recuperar contraseña) no cargan jQuery ni DataTables
+  window.jQuery && $(document).ready(function() {
     if (typeof $.fn.DataTable !== 'function') {
       return;
     }
@@ -62,6 +63,8 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {
+    // Solo se cierran solos los avisos de que algo salió bien; los errores, los avisos informativos
+    // y los marcados como fijos (por ejemplo, una contraseña provisoria) quedan hasta que se cierran a mano.
     const autoDismissAlerts = document.querySelectorAll('.alert');
 
     autoDismissAlerts.forEach(function(alertEl) {
@@ -75,6 +78,10 @@
         });
         alertEl.classList.add('alert-dismissible');
         alertEl.appendChild(closeButton);
+      }
+
+      if (!alertEl.classList.contains('alert-success') || alertEl.hasAttribute('data-fijo')) {
+        return;
       }
 
       setTimeout(function() {

@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $creado = $clientes->crear($cliente);
         piccolo_admin_aviso('success', "Cliente creado. Su contraseña provisoria es {$creado['password_provisoria']} (anotala: no se vuelve a mostrar). "
-            . 'Puede cambiarla desde su cuenta en el sitio o con "¿Olvidaste tu contraseña?".');
+            . 'Puede cambiarla desde su cuenta en el sitio o con "¿Olvidaste tu contraseña?".', true);
         header('Location: clientes_detalle.php?id=' . $creado['cliente']['id']);
         exit;
     } catch (ApiException $error) {

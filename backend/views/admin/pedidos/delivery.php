@@ -16,7 +16,7 @@
     No hay pedidos para entregar por el momento.
   </div>
 
-  <div id="lista-pedidos"></div>
+  <div id="lista-pedidos" data-localidad="<?= piccolo_e(piccolo_negocio()['direccion']['localidad_completa']) ?>"></div>
 </div>
 
 <script id="datosDelivery" type="application/json"><?= json_encode(array_reverse($pedidos), JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE) ?></script>

@@ -86,6 +86,9 @@ verificar($categorias === ['Bebidas'], 'buscar "gaseosa" muestra solo bebidas', 
 $r = pedir('GET', '/menu/disponibilidad');
 verificar($r['status'] === 422 && isset($r['json']['errores']['ids']), 'disponibilidad sin productos avisa el error', $r['json']);
 
+$r = pedir('GET', '/negocio');
+verificar($r['status'] === 200 && preg_match('#^https://wa\.me/549\d+$#', $r['json']['datos']['whatsapp']['url'] ?? '') === 1 && !empty($r['json']['datos']['horarios']), 'GET /negocio trae los datos del local (WhatsApp con el 9 de celular)');
+
 $r = pedir('GET', '/inicio');
 verificar($r['status'] === 200 && array_key_exists('testimonios', $r['json']['datos'] ?? []), 'inicio trae banner y testimonios');
 
