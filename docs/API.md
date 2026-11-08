@@ -372,6 +372,26 @@ Devuelven `resumen` (totales del período), `jornadas` (de la más nueva a la m�
 | `GET /admin/comentarios` | Comentarios del formulario de contacto, del más nuevo al más viejo, con su `fecha` (`null` en los que llegaron antes de guardarla). |
 | `DELETE /admin/comentarios/{id}` | Borra un comentario. |
 
+### Cocina y delivery
+
+| Ruta | Quién | Qué hace |
+| --- | --- | --- |
+| `GET /admin/pedidos/cocina` | administración y empleados | Pedidos en preparación y en camino, del más viejo al más nuevo, con sus productos. |
+| `GET /admin/pedidos/delivery` | administración y delivery | Pedidos en camino, del más nuevo al más viejo. |
+| `PUT /admin/pedidos/{id}` | según el cambio | Cambia el estado y/o el pago: `{ "estado": "Listo", "pago": "Si" }` (los dos son opcionales, pero al menos uno). |
+
+Recorrido de un pedido y quién puede hacer cada cambio:
+
+| De | A | Quién |
+| --- | --- | --- |
+| En preparación | Listo | administración, empleados |
+| En preparación | En camino (solo si es delivery) | administración, empleados |
+| En camino | Listo (entregado) | administración, delivery |
+| En preparación o En camino | Cancelado | administración, empleados |
+| Listo | Entregado | administración, empleados |
+
+Un cambio que no está en la tabla responde `409`; un rol que no puede hacerlo, `403`. Pasar a Listo o Entregado lo marca pagado y descuenta del stock los insumos de la receta (una sola vez). Cancelarlo lo marca no pagado y le devuelve al cliente los puntos que usó, quitándole los que ganó. Un pedido cancelado no se puede reabrir ni marcar como pagado. El delivery solo puede cambiar el pago de los pedidos en camino.
+
 ### Ventas (solo administración)
 
 `GET /admin/ventas?desde=2026-11-01&hasta=2026-11-30` devuelve el mismo reporte que la pantalla de ventas (y que el Excel y el PDF). Sin fechas, va del primer día del mes a hoy. Si alguna fecha no es válida o el período está al revés, responde `422` con el error en `desde` o `hasta`.

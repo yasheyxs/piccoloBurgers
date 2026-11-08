@@ -282,6 +282,10 @@ if (!function_exists('crearPedido')) {
                     $saldo += $puntosGanados;
                     $movimiento->execute([$clienteId, 'compra', "Puntos ganados con el pedido #$pedidoId", $puntosGanados, $saldo]);
                 }
+
+                // Se guardan en el pedido para poder devolverlos si se cancela
+                $conexion->prepare('UPDATE tbl_pedidos SET puntos_usados = ?, puntos_ganados = ? WHERE ID = ?')
+                    ->execute([$puntosUsados, $puntosGanados, $pedidoId]);
             }
 
             $conexion->commit();
