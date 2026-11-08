@@ -139,7 +139,7 @@ function tarjetaProducto(producto) {
   return `
     <div class="col d-flex" data-aos="fade-up">
       <div class="card position-relative d-flex flex-column h-100 w-100">
-        <img src="${escapar(producto.imagen)}" class="card-img-top" alt="Foto de ${escapar(producto.nombre)}" loading="lazy">
+        <img src="${escapar(producto.imagen)}" class="card-img-top" alt="Foto de ${escapar(producto.nombre)}" loading="lazy" decoding="async">
         <div class="card-body d-flex flex-column">
           <h5 class="card-title">${escapar(producto.nombre)}</h5>
           <p class="card-text small"><strong>${escapar(producto.ingredientes)}</strong></p>

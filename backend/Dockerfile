@@ -1,10 +1,10 @@
 FROM php:8.3-apache
 
 # Instalar extensiones requeridas por PHP y Composer
-# (gd y zip los necesita phpspreadsheet para exportar a Excel)
+# (gd y zip los necesita phpspreadsheet para exportar a Excel; gd con WEBP achica las fotos que se suben)
 RUN apt-get update \
-    && apt-get install -y libzip-dev libxml2-dev libonig-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev git unzip \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && apt-get install -y libzip-dev libxml2-dev libonig-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev git unzip \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install pdo pdo_mysql gd zip \
     && a2enmod rewrite headers \
     && rm -rf /var/lib/apt/lists/*

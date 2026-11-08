@@ -25,7 +25,7 @@ Copiar `.env.example` como `.env` (Docker) o `.env.local` (XAMPP) y completar lo
 
 **Con Docker**: el `docker-compose.yml` de la raíz del proyecto levanta el backend junto con el frontend y MySQL (ver el README principal). La imagen del backend también se puede construir sola con el `Dockerfile` de esta carpeta.
 
-**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, crear una base vacía llamada `piccolodb` y, dentro de `backend/`, correr `composer install` y `php bin/migrar.php --con-datos`. Después entrar a:
+**Con XAMPP**: copiar o enlazar el proyecto completo en `htdocs/piccoloBurgers`, crear una base vacía llamada `piccolodb` y, dentro de `backend/`, correr `composer install` y `php bin/migrar.php --con-datos`. En `php.ini` tienen que estar activas las extensiones `gd` (achica las fotos que se suben) y `zip` (exportar a Excel): XAMPP las trae, pero con `;` adelante. Después entrar a:
 
 - Panel: http://localhost/piccoloBurgers/backend/public/admin/
 - API: http://localhost/piccoloBurgers/backend/public/api/v1/menu
