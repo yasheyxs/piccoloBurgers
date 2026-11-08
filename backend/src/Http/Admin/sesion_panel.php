@@ -75,7 +75,7 @@ if (!function_exists('piccolo_admin_espera_json')) {
             || strtolower((string) ($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '')) === 'xmlhttprequest'
             || str_starts_with($pagina, 'api/')
             || str_ends_with($pagina, '/api.php')
-            || in_array($pagina, ['actualizar_estado.php', 'obtener_pedidos_delivery.php', 'obtener_pedidos_cliente.php', 'cambiar_rol.php'], true);
+            || in_array($pagina, ['actualizar_estado.php', 'obtener_pedidos_delivery.php', 'cambiar_rol.php'], true);
     }
 }
 
@@ -155,7 +155,8 @@ if (!function_exists('piccolo_admin_sesion_vigente')) {
         if (MODO_DESARROLLO) {
             $_SESSION['admin_usuario'] = USUARIO_DESARROLLO;
             $_SESSION['admin_logueado'] = true;
-            $_SESSION['rol'] = 'admin';
+            $_SESSION['rol_real'] = 'admin';
+            $_SESSION['rol'] = piccolo_admin_rol_efectivo();
         }
 
         if (empty($_SESSION['admin_logueado'])) {
@@ -204,9 +205,24 @@ if (!function_exists('piccolo_admin_actualizar_usuario')) {
 
         $_SESSION['admin_id'] = (int) $usuario['ID'];
         $_SESSION['admin_usuario'] = $usuario['usuario'];
-        $_SESSION['rol'] = $usuario['rol'];
+        $_SESSION['rol_real'] = $usuario['rol'];
+        $_SESSION['rol'] = piccolo_admin_rol_efectivo();
 
         return true;
+    }
+}
+
+if (!function_exists('piccolo_admin_rol_efectivo')) {
+    /**
+     * Rol con el que se usa el panel. Un administrador puede elegir ver el panel como empleado o
+     * delivery ("vista rápida", para probar lo que ven); el resto siempre usa su propio rol.
+     */
+    function piccolo_admin_rol_efectivo(): string
+    {
+        $real = (string) ($_SESSION['rol_real'] ?? '');
+        $vista = (string) ($_SESSION['rol_vista'] ?? '');
+
+        return $real === 'admin' && in_array($vista, ['empleado', 'delivery'], true) ? $vista : $real;
     }
 }
 
@@ -218,8 +234,10 @@ if (!function_exists('piccolo_admin_guardar_sesion')) {
         $_SESSION['admin_id'] = (int) $usuario['ID'];
         $_SESSION['admin_usuario'] = $usuario['usuario'];
         $_SESSION['admin_logueado'] = true;
+        $_SESSION['rol_real'] = $usuario['rol'];
         $_SESSION['rol'] = $usuario['rol'];
         $_SESSION['admin_ultima_actividad'] = time();
+        unset($_SESSION['rol_vista']);
         unset($_SESSION['csrf_token']);
     }
 }
@@ -227,7 +245,7 @@ if (!function_exists('piccolo_admin_guardar_sesion')) {
 if (!function_exists('piccolo_admin_cerrar_sesion')) {
     function piccolo_admin_cerrar_sesion(): void
     {
-        unset($_SESSION['admin_logueado'], $_SESSION['admin_id'], $_SESSION['admin_usuario'], $_SESSION['rol'], $_SESSION['admin_ultima_actividad']);
+        unset($_SESSION['admin_logueado'], $_SESSION['admin_id'], $_SESSION['admin_usuario'], $_SESSION['rol'], $_SESSION['rol_real'], $_SESSION['rol_vista'], $_SESSION['admin_ultima_actividad']);
     }
 }
 
@@ -260,6 +278,17 @@ if (!function_exists('piccolo_admin_pagina')) {
         $url_base = piccolo_admin_base_url();
         include piccolo_path('views/admin/header.php');
         piccolo_render(piccolo_path('views/admin/' . $plantilla . '.php'), $datos + ['url_base' => $url_base]);
+        include piccolo_path('views/admin/footer.php');
+    }
+}
+
+if (!function_exists('piccolo_admin_pagina_publica')) {
+    /** Como piccolo_admin_pagina(), para las pantallas sin sesión (recuperar contraseña). */
+    function piccolo_admin_pagina_publica(string $plantilla, array $datos = []): void
+    {
+        $url_base = piccolo_admin_base_url();
+        include piccolo_path('views/admin/header_public.php');
+        piccolo_render(piccolo_path('views/admin/' . $plantilla . '.php'), $datos + ['url_base' => $url_base, 'csrf' => piccolo_csrf_token()]);
         include piccolo_path('views/admin/footer.php');
     }
 }

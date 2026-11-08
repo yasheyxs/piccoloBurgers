@@ -15,15 +15,14 @@ return [
         'login.php',
         'cerrar.php',
         'password/recuperar_password_usuario.php',
-        'password/procesar_recuperacion_usuario.php',
         'password/reset_password.php',
-        'password/actualizar_password.php',
     ],
 
     'roles' => [
         'index.php' => ['admin', 'empleado', 'delivery'],
+        // La "vista rápida" la cambia solo un administrador, pero tiene que poder volver desde cualquier vista
+        'cambiar_rol.php' => ['admin', 'empleado', 'delivery'],
         'password/cambiar_password.php' => ['admin', 'empleado', 'delivery'],
-        'password/procesar_cambio.php' => ['admin', 'empleado', 'delivery'],
         'actualizar_estado.php' => ['admin', 'empleado', 'delivery'],
 
         'panel_cocina.php' => ['admin', 'empleado'],

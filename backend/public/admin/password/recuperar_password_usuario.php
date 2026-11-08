@@ -1,29 +1,48 @@
 <?php
+/** Pedir un enlace para crear una contraseña nueva. No requiere sesión. */
 require_once __DIR__ . '/../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-// No requiere sesión activa
-?>
+require_once piccolo_path('src/Core/database.php');
 
-<?php include(__DIR__ . "/../../../views/admin/header_public.php"); ?>
+use Piccolo\Http\Admin\ContrasenaPanelController;
+use Piccolo\Http\Api\ApiException;
 
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <h4 class="mb-4 text-center">Recuperar contraseña de usuario</h4>
+$aviso = null;
+$errores = [];
+$correo = '';
 
-      <form action="procesar_recuperacion_usuario.php" method="post">
-        <div class="mb-3">
-          <label for="correo" class="form-label">Correo electrónico</label>
-          <input type="email" class="form-control" name="correo" id="correo" required placeholder="ejemplo@correo.com">
-        </div>
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $correo = (string) ($_POST['correo'] ?? '');
+    if (!piccolo_csrf_valido()) {
+        $aviso = ['tipo' => 'warning', 'mensaje' => 'La página venció. Probá de nuevo.'];
+    } else {
+        try {
+            (new ContrasenaPanelController($conexion))->solicitar($correo, static function (string $correo, string $usuario, string $enlace): bool {
+                try {
+                    require_once piccolo_path('config/mailer.php');
+                    $mailer = crearMailer();
+                    $mailer->addAddress($correo, $usuario);
+                    $mailer->isHTML(true);
+                    $mailer->Subject = 'Recuperación de contraseña - Piccolo Burgers';
+                    $texto = "Hola $usuario,\n\nRecibimos un pedido para crear una contraseña nueva del panel de Piccolo Burgers.\n"
+                        . "Entrá a este enlace en los próximos 30 minutos:\n$enlace\n\nSi no lo pediste, ignorá este mensaje.";
+                    $mailer->Body = nl2br(htmlspecialchars($texto, ENT_QUOTES, 'UTF-8'));
+                    $mailer->AltBody = $texto;
+                    $mailer->send();
 
-        <button type="submit" class="btn btn-primary w-100">Enviar enlace de recuperación</button>
-      </form>
+                    return true;
+                } catch (Throwable $error) {
+                    error_log('Error al enviar el correo de recuperación: ' . $error->getMessage());
 
-      <div class="mt-3 text-center">
-        <a href="../login.php" class="text-primary">Volver al login</a>
-      </div>
-    </div>
-  </div>
-</div>
+                    return false;
+                }
+            }, piccolo_admin_base_url() . 'password/reset_password.php');
+            $aviso = ['tipo' => 'success', 'mensaje' => ContrasenaPanelController::MENSAJE_ENVIADO];
+            $correo = '';
+        } catch (ApiException $error) {
+            $errores = $error->errores();
+            $aviso = ['tipo' => 'danger', 'mensaje' => $errores ? implode(' ', $errores) : $error->getMessage()];
+        }
+    }
+}
 
-<?php include(__DIR__ . "/../../../views/admin/footer.php"); ?>
+piccolo_admin_pagina_publica('contrasena/recuperar', ['correo' => $correo, 'errores' => $errores, 'aviso' => $aviso]);

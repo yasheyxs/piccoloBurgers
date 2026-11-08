@@ -1,50 +1,23 @@
 <?php
 require_once __DIR__ . '/../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-piccolo_admin_iniciar_sesion();
-include(__DIR__ . "/../../../src/Core/database.php");
-require_once __DIR__ . '/../../../src/Services/Security/password_utils.php';
+require_once piccolo_path('src/Core/database.php');
 
-if (!isset($_SESSION["admin_logueado"])) {
-  header("Location: ../login.php");
-  exit();
+use Piccolo\Http\Admin\ContrasenaPanelController;
+use Piccolo\Http\Api\ApiException;
+
+$errores = [];
+$aviso = piccolo_admin_tomar_aviso();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    try {
+        (new ContrasenaPanelController($conexion))->cambiar((int) ($_SESSION['admin_id'] ?? 0), $_POST);
+        piccolo_admin_aviso('success', 'Tu contraseña se cambió. La próxima vez entrá con la nueva.');
+        header('Location: cambiar_password.php');
+        exit;
+    } catch (ApiException $error) {
+        $errores = $error->errores();
+        $aviso = ['tipo' => 'danger', 'mensaje' => $error->getMessage()];
+    }
 }
 
-include(__DIR__ . "/../../../views/admin/header.php");
-?>
-
-<div class="container mt-5">
-  <div class="row justify-content-center">
-    <div class="col-md-6">
-      <h4>Cambiar contraseña</h4>
-      <form action="procesar_cambio.php" method="post">
-        <div class="mb-3">
-          <label for="actual" class="form-label">Contraseña actual</label>
-          <input type="password" class="form-control" name="actual" id="actual" required autocomplete="current-password">
-        </div>
-
-        <div class="mb-3">
-          <label for="nueva" class="form-label">Nueva contraseña</label>
-<input
-            type="password"
-            class="form-control"
-            name="nueva"
-            id="nueva"
-            required
-            autocomplete="new-password"
-            pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[\\W_]).{8,}"
-            title="<?php echo mensajeRequisitosPassword(); ?>"
-          >
-          <div class="form-text"><?php echo mensajeRequisitosPassword(); ?></div>        </div>
-
-        <div class="mb-3">
-          <label for="confirmar" class="form-label">Confirmar nueva contraseña</label>
-          <input type="password" class="form-control" name="confirmar" id="confirmar" required autocomplete="new-password">
-        </div>
-
-        <button type="submit" class="btn btn-success">Actualizar contraseña</button>
-      </form>
-    </div>
-  </div>
-</div>
-
-<?php include(__DIR__ . "/../../../views/admin/footer.php"); ?>
+piccolo_admin_pagina('contrasena/cambiar', ['errores' => $errores, 'aviso' => $aviso]);

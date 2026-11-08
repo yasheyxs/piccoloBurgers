@@ -83,31 +83,6 @@ if (!function_exists('poolFechaDbAFechaApp')) {
     }
 }
 
-if (!function_exists('poolValidarFechaFiltro')) {
-    function poolValidarFechaFiltro(string $fecha): bool
-    {
-        return (bool) preg_match('/^\d{4}-\d{2}-\d{2}$/', $fecha) && strtotime($fecha) !== false;
-    }
-}
-
-if (!function_exists('poolRangoFechasDesdeParametros')) {
-    function poolRangoFechasDesdeParametros(array $parametros): array
-    {
-        $fechaInicio = (string) ($parametros['fecha_inicio'] ?? date('Y-m-01'));
-        $fechaFin = (string) ($parametros['fecha_fin'] ?? date('Y-m-d'));
-
-        if (!poolValidarFechaFiltro($fechaInicio)) {
-            $fechaInicio = date('Y-m-01');
-        }
-
-        if (!poolValidarFechaFiltro($fechaFin)) {
-            $fechaFin = date('Y-m-d');
-        }
-
-        return [$fechaInicio, $fechaFin];
-    }
-}
-
 if (!function_exists('poolFormatearDuracion')) {
     function poolFormatearDuracion(?int $minutos): string
     {
@@ -344,21 +319,6 @@ if (!function_exists('poolObtenerJornadaPorId')) {
         $stmt->execute([':id' => $jornadaId]);
         $jornada = $stmt->fetch(PDO::FETCH_ASSOC);
         return $jornada ?: null;
-    }
-}
-
-if (!function_exists('poolSiguienteOrden')) {
-    function poolSiguienteOrden(PDO $conexion, string $pool, int $jornadaId): int
-    {
-        $stmt = $conexion->prepare(
-            'SELECT COALESCE(MAX(orden), 0) + 1 FROM pool_turnos WHERE pool = :pool AND jornada_id = :jornada_id'
-        );
-        $stmt->execute([
-            ':pool' => poolNormalizar($pool),
-            ':jornada_id' => $jornadaId,
-        ]);
-
-        return (int) $stmt->fetchColumn();
     }
 }
 

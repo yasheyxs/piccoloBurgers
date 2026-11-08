@@ -1,86 +1,37 @@
 <?php
+/**
+ * "Vista rápida" de la portada: un administrador elige ver el panel como empleado o delivery,
+ * para probar lo que ven, y puede volver a su vista cuando quiera. Responde {exito, rol, vista}.
+ */
 require_once __DIR__ . '/../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-if (session_status() === PHP_SESSION_NONE) {
-  piccolo_admin_iniciar_sesion();
-}
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
+
+$etiquetas = ['admin' => 'Administrador', 'empleado' => 'Empleado', 'delivery' => 'Delivery'];
+$responder = static function (int $status, array $cuerpo): never {
+    http_response_code($status);
+    echo json_encode($cuerpo, JSON_UNESCAPED_UNICODE);
+    exit;
+};
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-  http_response_code(405);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'Método no permitido.'
-  ]);
-  exit;
+    $responder(405, ['exito' => false, 'mensaje' => 'Método no permitido.']);
+}
+// Se mira el rol real, no la vista elegida: así un administrador "viendo como empleado" puede volver
+if (($_SESSION['rol_real'] ?? '') !== 'admin') {
+    $responder(403, ['exito' => false, 'mensaje' => 'Solo un administrador puede cambiar la vista.']);
 }
 
-if (empty($_SESSION['admin_usuario'])) {
-  http_response_code(401);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'Sesión no válida.'
-  ]);
-  exit;
+$rol = (string) ($_POST['rol'] ?? '');
+if (!isset($etiquetas[$rol])) {
+    $responder(422, ['exito' => false, 'mensaje' => 'Elegí una vista de la lista.']);
 }
 
-require_once __DIR__ . '/../../src/Core/database.php';
-
-try {
-  $sentencia = $conexion->prepare('SELECT rol FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1');
-  $sentencia->execute([':usuario' => $_SESSION['admin_usuario']]);
-  $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
-} catch (Exception $e) {
-  http_response_code(500);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'No se pudo validar la sesión.'
-  ]);
-  exit;
+if ($rol === 'admin') {
+    unset($_SESSION['rol_vista']);
+} else {
+    $_SESSION['rol_vista'] = $rol;
 }
+$_SESSION['rol'] = piccolo_admin_rol_efectivo();
 
-if (!$usuario || ($usuario['rol'] ?? '') !== 'admin') {
-  http_response_code(403);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'No contás con permisos suficientes.'
-  ]);
-  exit;
-}
-
-$tokenSesion = $_SESSION['csrf_token'] ?? '';
-$tokenRecibido = $_POST['csrf_token'] ?? ($_SERVER['HTTP_X_CSRF_TOKEN'] ?? '');
-if (!$tokenSesion || !$tokenRecibido || !hash_equals($tokenSesion, $tokenRecibido)) {
-  http_response_code(403);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'Token CSRF inválido.'
-  ]);
-  exit;
-}
-
-$rol = $_POST['rol'] ?? '';
-$rolesPermitidos = ['admin', 'empleado', 'delivery'];
-
-if (!in_array($rol, $rolesPermitidos, true)) {
-  http_response_code(400);
-  echo json_encode([
-    'exito' => false,
-    'mensaje' => 'Rol no permitido.'
-  ]);
-  exit;
-}
-
-$_SESSION['rol'] = $rol;
-
-$etiquetas = [
-  'admin' => 'Administrador',
-  'empleado' => 'Empleado',
-  'delivery' => 'Delivery'
-];
-
-echo json_encode([
-  'exito' => true,
-  'rol' => $rol,
-  'vista' => $etiquetas[$rol] ?? ucfirst($rol)
-]);
+$responder(200, ['exito' => true, 'rol' => $rol, 'vista' => $etiquetas[$rol]]);

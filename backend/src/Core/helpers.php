@@ -15,15 +15,6 @@ if (!function_exists('piccolo_path')) {
     }
 }
 
-if (!function_exists('piccolo_start_session')) {
-    function piccolo_start_session(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-    }
-}
-
 if (!function_exists('piccolo_leer_env_file')) {
     /** @return array<string, string> variables definidas en un archivo .env */
     function piccolo_leer_env_file(string $path): array
@@ -72,17 +63,6 @@ if (!function_exists('piccolo_env')) {
         }
 
         return $archivos[$clave] ?? $porDefecto;
-    }
-}
-
-if (!function_exists('requireConnection')) {
-    function requireConnection(PDO $conn = null): PDO
-    {
-        if ($conn === null) {
-            throw new RuntimeException('No se encontro la conexion a la base de datos.');
-        }
-
-        return $conn;
     }
 }
 
@@ -246,26 +226,6 @@ if (!function_exists('public_url')) {
     function public_url(string $path = ''): string
     {
         return piccolo_public_base_path() . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('admin_url')) {
-    function admin_url(string $path = ''): string
-    {
-        return piccolo_admin_base_path() . ltrim($path, '/');
-    }
-}
-
-if (!function_exists('asset_url')) {
-    function asset_url(string $path, string $area = 'customer'): string
-    {
-        $path = ltrim($path, '/');
-
-        if ($area === 'backoffice' || $area === 'admin') {
-            return admin_url($path);
-        }
-
-        return public_url($path);
     }
 }
 
