@@ -1,359 +1,81 @@
 <?php
+/**
+ * Operaciones de la pantalla del pool (assets/js/pages/pool.js). Recibe {accion, ...} en JSON
+ * y responde {exito, estado} o {exito: false, mensaje}. Las reglas están en PoolController.
+ */
 require_once __DIR__ . '/../../../../src/Http/Admin/acceso.php'; // permisos, sesión y CSRF del panel
-require_once __DIR__ . '/../../../../src/Core/database.php';
-require_once __DIR__ . '/../../../../src/Services/pool_schema.php';
-require_once __DIR__ . '/../../../../src/Services/bebidas_schema.php';
-require_once __DIR__ . '/../../../../src/Services/Security/password_utils.php';
+require_once piccolo_path('src/Core/database.php');
 
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    piccolo_admin_iniciar_sesion();
-}
+use Piccolo\Http\Admin\PoolController;
+use Piccolo\Http\Api\ApiException;
+use Piccolo\Repositories\PoolRepositorio;
 
 header('Content-Type: application/json; charset=UTF-8');
 header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
-header('Pragma: no-cache');
 
-function poolResponder(array $payload, int $status = 200): void
-{
+$responder = static function (int $status, array $cuerpo): never {
     http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    echo json_encode($cuerpo, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     exit;
-}
+};
 
-function poolValidarAcceso(): void
-{
-    $rol = $_SESSION['rol'] ?? '';
-    if (!isset($_SESSION['admin_logueado']) || !in_array($rol, ['admin', 'empleado'], true)) {
-        poolResponder(['exito' => false, 'mensaje' => 'No autorizado.'], 403);
-    }
-}
-
-function poolValidarCsrf(): void
-{
-    $tokenSesion = $_SESSION['csrf_token'] ?? '';
-    $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
-    if ($tokenSesion === '' || !hash_equals((string) $tokenSesion, (string) $token)) {
-        poolResponder(['exito' => false, 'mensaje' => 'Token CSRF inválido.'], 403);
-    }
-}
-
-function poolPayload(): array
-{
-    $raw = file_get_contents('php://input');
-    $payload = json_decode($raw ?: '[]', true);
-    return is_array($payload) ? $payload : [];
-}
-
-function poolJornadaActivaObligatoria(PDO $conexion): array
-{
-    $jornada = poolJornadaActiva($conexion);
-    if (!$jornada) {
-        poolResponder(['exito' => false, 'mensaje' => 'Abrí una jornada antes de operar.'], 409);
-    }
-
-    return $jornada;
-}
-
-function poolOcultarInformacionSensible(array $estado): array
-{
-    foreach (['azul', 'rojo'] as $pool) {
-        if (!isset($estado['pools'][$pool]['stats'])) {
-            continue;
-        }
-
-        $estado['pools'][$pool]['stats']['vendidas'] = null;
-        $estado['pools'][$pool]['stats']['consumidas'] = null;
-        $estado['pools'][$pool]['stats']['montoVendido'] = null;
-    }
-
-    return $estado;
-}
-
-function poolEstadoPublico(PDO $conexion): array
-{
-    return poolOcultarInformacionSensible(poolObtenerEstado($conexion));
-}
-
-poolValidarAcceso();
+$pool = new PoolController(new PoolRepositorio($conexion), $conexion);
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
+    $responder(200, ['exito' => true, 'estado' => $pool->estado()]);
 }
-
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    poolResponder(['exito' => false, 'mensaje' => 'Método no permitido.'], 405);
+    $responder(405, ['exito' => false, 'mensaje' => 'Método no permitido.']);
 }
 
-poolValidarCsrf();
-
-$payload = poolPayload();
-$accion = (string) ($payload['accion'] ?? '');
+$datos = json_decode((string) file_get_contents('php://input'), true);
+$datos = is_array($datos) ? $datos : [];
+$id = (int) ($datos['id'] ?? 0);
 
 try {
-    switch ($accion) {
+    switch ($datos['accion'] ?? '') {
         case 'validar_privacidad':
-            $password = (string) ($payload['password'] ?? '');
-            $usuarioSesion = (string) ($_SESSION['admin_usuario'] ?? '');
-
-            if ($password === '' || $usuarioSesion === '') {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa tu contraseña para continuar.'], 422);
-            }
-
-            $usuarioStmt = $conexion->prepare(
-                'SELECT password FROM tbl_usuarios WHERE usuario = :usuario LIMIT 1'
-            );
-            $usuarioStmt->execute([':usuario' => $usuarioSesion]);
-            $hashAlmacenado = (string) ($usuarioStmt->fetchColumn() ?: '');
-
-            if (!passwordCoincideConHash($password, $hashAlmacenado)) {
-                poolResponder(['exito' => false, 'mensaje' => 'La contraseña es incorrecta.'], 401);
-            }
-
-            poolResponder([
-                'exito' => true,
-                'privacidadAutorizada' => true,
-                'estado' => poolObtenerEstado($conexion),
-            ]);
-            break;
-
-        case 'abrir_jornada':
-            poolAbrirJornada($conexion);
-            break;
-
-        case 'cerrar_jornada':
-            $totales = is_array($payload['totales'] ?? null) ? $payload['totales'] : [];
-            poolCerrarJornada($conexion, $totales);
-            break;
-
+            $estado = $pool->mostrarSensibles((int) ($_SESSION['admin_id'] ?? 0), (string) ($datos['password'] ?? ''));
+            $responder(200, ['exito' => true, 'privacidadAutorizada' => true, 'estado' => $estado]);
+            // no break: $responder termina la ejecución
         case 'totales_cierre':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            poolResponder([
-                'exito' => true,
-                'totales' => poolTotalesCierre($conexion, (int) $jornada['id']),
-                'estado' => poolEstadoPublico($conexion),
-            ]);
+            $responder(200, ['exito' => true, 'totales' => $pool->totalesCierre(), 'estado' => $pool->estado()]);
+            // no break
+        case 'abrir_jornada':
+            $pool->abrirJornada();
             break;
-
+        case 'cerrar_jornada':
+            $pool->cerrarJornada(is_array($datos['totales'] ?? null) ? $datos['totales'] : []);
+            break;
         case 'agregar':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $pool = poolNormalizar((string) ($payload['pool'] ?? 'azul'));
-            $nombre = trim((string) ($payload['nombre'] ?? ''));
-            $fichas = (int) ($payload['fichas'] ?? 0);
-            $configuracion = poolObtenerConfiguracion($conexion);
-            $maxFichasPorRegistro = (int) $configuracion['max_fichas_por_registro'];
-            $valorFicha = (float) $configuracion['valor_ficha'];
-
-            if ($nombre === '') {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa un nombre o identificación.'], 422);
-            }
-
-            if ($fichas < 1 || $fichas > 99) {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa una cantidad de fichas válida.'], 422);
-            }
-
-            $conexion->beginTransaction();
-            $orden = poolSiguienteOrden($conexion, $pool, $jornadaId);
-            $insert = $conexion->prepare(
-                'INSERT INTO pool_turnos (jornada_id, pool, nombre, fichas_total, fichas_consumidas, valor_ficha, orden, jornada_fecha)
-                 VALUES (:jornada_id, :pool, :nombre, :fichas_total, 0, :valor_ficha, :orden, :fecha)'
-            );
-
-            while ($fichas > 0) {
-                $lote = min($maxFichasPorRegistro, $fichas);
-                $insert->execute([
-                    ':jornada_id' => $jornadaId,
-                    ':pool' => $pool,
-                    ':nombre' => $nombre,
-                    ':fichas_total' => $lote,
-                    ':valor_ficha' => $valorFicha,
-                    ':orden' => $orden,
-                    ':fecha' => poolFechaJornadaActual(),
-                ]);
-                $orden++;
-                $fichas -= $lote;
-            }
-            $conexion->commit();
+            $pool->agregar($datos);
             break;
-
         case 'renombrar':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $id = (int) ($payload['id'] ?? 0);
-            $nombre = trim((string) ($payload['nombre'] ?? ''));
-            $largoNombre = function_exists('mb_strlen') ? mb_strlen($nombre, 'UTF-8') : strlen($nombre);
-
-            if ($id <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
-            }
-
-            if ($nombre === '') {
-                poolResponder(['exito' => false, 'mensaje' => 'Ingresa un nombre o identificación.'], 422);
-            }
-
-            if ($largoNombre > 120) {
-                poolResponder(['exito' => false, 'mensaje' => 'El nombre no puede superar 120 caracteres.'], 422);
-            }
-
-            $stmt = $conexion->prepare(
-                'UPDATE pool_turnos SET nombre = :nombre WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $stmt->execute([
-                ':nombre' => $nombre,
-                ':id' => $id,
-                ':jornada_id' => $jornadaId,
-            ]);
-
-            if ($stmt->rowCount() === 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'No encontramos ese turno en la jornada activa.'], 404);
-            }
+            $pool->renombrar($id, $datos);
             break;
-
         case 'consumir':
+            $pool->consumir($id);
+            break;
         case 'revertir':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $id = (int) ($payload['id'] ?? 0);
-            if ($id <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
-            }
-
-            $turnoStmt = $conexion->prepare(
-                'SELECT fichas_total, fichas_consumidas FROM pool_turnos WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $turnoStmt->execute([':id' => $id, ':jornada_id' => $jornadaId]);
-            $turno = $turnoStmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$turno) {
-                poolResponder(['exito' => false, 'mensaje' => 'No encontramos ese turno en la jornada activa.'], 404);
-            }
-
-            $fichasTotal = (int) $turno['fichas_total'];
-            $fichasConsumidas = (int) $turno['fichas_consumidas'];
-
-            if ($accion === 'consumir' && $fichasConsumidas >= $fichasTotal) {
-                poolResponder(['exito' => false, 'mensaje' => 'Este turno ya alcanzó la cantidad máxima de fichas permitidas.'], 422);
-            }
-
-            if ($accion === 'revertir' && $fichasConsumidas <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Este turno todavia no tiene fichas consumidas para revertir.'], 422);
-            }
-
-            $operador = $accion === 'consumir'
-                ? 'LEAST(fichas_total, fichas_consumidas + 1)'
-                : 'GREATEST(0, fichas_consumidas - 1)';
-
-            $stmt = $conexion->prepare(
-                "UPDATE pool_turnos SET fichas_consumidas = {$operador} WHERE id = :id AND jornada_id = :jornada_id"
-            );
-            $stmt->execute([':id' => $id, ':jornada_id' => $jornadaId]);
+            $pool->revertir($id);
             break;
-
         case 'transferir':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $id = (int) ($payload['id'] ?? 0);
-            $poolDestino = poolNormalizar((string) ($payload['poolDestino'] ?? 'azul'));
-            if ($id <= 0) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno inválido.'], 422);
-            }
-
-            $ordenDestino = poolSiguienteOrden($conexion, $poolDestino, $jornadaId);
-            $stmt = $conexion->prepare(
-                'UPDATE pool_turnos SET pool = :pool, orden = :orden WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $stmt->execute([
-                ':pool' => $poolDestino,
-                ':orden' => $ordenDestino,
-                ':id' => $id,
-                ':jornada_id' => $jornadaId,
-            ]);
+            $pool->transferir($id, $datos);
             break;
-
         case 'mover':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $id = (int) ($payload['id'] ?? 0);
-            $direccion = (string) ($payload['direccion'] ?? '');
-            if ($id <= 0 || !in_array($direccion, ['arriba', 'abajo'], true)) {
-                poolResponder(['exito' => false, 'mensaje' => 'Movimiento inválido.'], 422);
-            }
-
-            $actualStmt = $conexion->prepare(
-                'SELECT id, pool, orden FROM pool_turnos WHERE id = :id AND jornada_id = :jornada_id'
-            );
-            $actualStmt->execute([':id' => $id, ':jornada_id' => $jornadaId]);
-            $actual = $actualStmt->fetch(PDO::FETCH_ASSOC);
-            if (!$actual) {
-                poolResponder(['exito' => false, 'mensaje' => 'Turno no encontrado.'], 404);
-            }
-
-            $comparador = $direccion === 'arriba' ? '<' : '>';
-            $ordenSql = $direccion === 'arriba' ? 'DESC' : 'ASC';
-            $vecinoStmt = $conexion->prepare(
-                "SELECT id, orden FROM pool_turnos
-                 WHERE pool = :pool AND jornada_id = :jornada_id
-                   AND fichas_consumidas < fichas_total
-                   AND orden {$comparador} :orden
-                 ORDER BY orden {$ordenSql}, id {$ordenSql}
-                 LIMIT 1"
-            );
-            $vecinoStmt->execute([
-                ':pool' => $actual['pool'],
-                ':jornada_id' => $jornadaId,
-                ':orden' => (int) $actual['orden'],
-            ]);
-            $vecino = $vecinoStmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($vecino) {
-                $conexion->beginTransaction();
-                $update = $conexion->prepare('UPDATE pool_turnos SET orden = :orden WHERE id = :id');
-                $update->execute([':orden' => (int) $vecino['orden'], ':id' => $id]);
-                $update->execute([':orden' => (int) $actual['orden'], ':id' => (int) $vecino['id']]);
-                $conexion->commit();
-            }
+            $pool->mover($id, $datos);
             break;
-
         case 'reordenar':
-            $jornada = poolJornadaActivaObligatoria($conexion);
-            $jornadaId = (int) $jornada['id'];
-            $pool = poolNormalizar((string) ($payload['pool'] ?? 'azul'));
-            $ids = $payload['ids'] ?? [];
-            if (!is_array($ids)) {
-                poolResponder(['exito' => false, 'mensaje' => 'Orden inválido.'], 422);
-            }
-
-            $conexion->beginTransaction();
-            $update = $conexion->prepare(
-                'UPDATE pool_turnos SET orden = :orden
-                 WHERE id = :id AND pool = :pool AND jornada_id = :jornada_id'
-            );
-            $orden = 1;
-            foreach ($ids as $id) {
-                $update->execute([
-                    ':orden' => $orden,
-                    ':id' => (int) $id,
-                    ':pool' => $pool,
-                    ':jornada_id' => $jornadaId,
-                ]);
-                $orden++;
-            }
-            $conexion->commit();
+            $pool->reordenar($datos);
             break;
-
         default:
-            poolResponder(['exito' => false, 'mensaje' => 'Acción no reconocida.'], 422);
+            throw new ApiException('Acción no reconocida.', 400);
     }
-
-    poolResponder(['exito' => true, 'estado' => poolEstadoPublico($conexion)]);
+    $responder(200, ['exito' => true, 'estado' => $pool->estado()]);
+} catch (ApiException $error) {
+    $mensaje = $error->errores() ? implode(' ', $error->errores()) : $error->getMessage();
+    $responder($error->status(), ['exito' => false, 'mensaje' => $mensaje]);
 } catch (Throwable $error) {
-    if ($conexion->inTransaction()) {
-        $conexion->rollBack();
-    }
-    error_log('Error en modulo pool: ' . $error->getMessage());
-    if ($error instanceof RuntimeException) {
-        poolResponder(['exito' => false, 'mensaje' => $error->getMessage()], 409);
-    }
-
-    poolResponder(['exito' => false, 'mensaje' => 'No se pudo completar la operación.'], 500);
+    error_log('Error en el pool: ' . $error->getMessage());
+    $responder(500, ['exito' => false, 'mensaje' => 'No se pudo completar la operación. Intentá de nuevo.']);
 }

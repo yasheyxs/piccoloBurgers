@@ -1,0 +1,275 @@
+/* Pantalla del pool: filas de cada mesa, fichas y turnos */
+.pool-shell {
+  --pool-blue: #2563eb;
+  --pool-red: #dc2626;
+  --pool-chip-on: #f59e0b;
+  --pool-chip-off: rgba(100, 116, 139, 0.32);
+}
+
+.pool-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.pool-panel {
+  background: var(--admin-surface);
+  border: 1px solid var(--admin-border);
+  border-radius: 0.9rem;
+  overflow: hidden;
+}
+
+.pool-panel--azul { border-top: 0.35rem solid var(--pool-blue); }
+.pool-panel--rojo { border-top: 0.35rem solid var(--pool-red); }
+
+.pool-panel__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--admin-text);
+  background: var(--admin-surface-alt);
+  border-bottom: 1px solid var(--admin-border);
+  padding: 1rem;
+}
+
+.pool-panel__identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.pool-panel__marker {
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid var(--admin-surface);
+  border-radius: 999px;
+}
+
+.pool-panel--azul .pool-panel__marker { background: var(--pool-blue); }
+.pool-panel--rojo .pool-panel__marker { background: var(--pool-red); }
+
+.pool-jornada-card {
+  border: 1px solid var(--admin-border);
+  border-radius: 0.9rem;
+  background: var(--admin-surface);
+  padding: 1rem;
+}
+
+.pool-jornada-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+}
+
+.pool-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.pool-stat {
+  border: 1px solid var(--admin-border);
+  border-radius: 0.7rem;
+  padding: 0.65rem;
+  background: var(--admin-surface-alt);
+  min-height: 74px;
+}
+
+.pool-stat__label {
+  display: block;
+  color: var(--admin-muted);
+  font-size: 0.72rem;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.pool-stat__value {
+  color: var(--admin-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.pool-privacy-toggle {
+  min-width: 46px;
+}
+
+.pool-stat__value--hidden {
+  color: var(--admin-muted);
+  letter-spacing: 0.08em;
+}
+
+.pool-privacy-feedback {
+  min-height: 1.5rem;
+}
+
+.pool-fast-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px 124px;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-top: 1px solid var(--admin-border);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.pool-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-height: 180px;
+  max-height: 62vh;
+  overflow-y: auto;
+  padding: 0.75rem;
+}
+
+.pool-turn {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  border: 1px solid var(--admin-border);
+  border-radius: 0.8rem;
+  background: var(--admin-surface);
+  padding: 0.75rem;
+}
+
+.pool-turn[draggable="true"] { cursor: grab; }
+.pool-turn.dragging { opacity: 0.45; }
+
+.pool-turn__name {
+  color: var(--admin-text);
+  font-weight: 800;
+  word-break: break-word;
+}
+
+.pool-turn__name[data-inline-name] {
+  border-radius: 0.35rem;
+  cursor: text;
+  margin: -0.08rem -0.15rem;
+  outline: none;
+  padding: 0.08rem 0.15rem;
+}
+
+.pool-turn__name[data-inline-name]:hover,
+.pool-turn__name[data-inline-name]:focus,
+.pool-turn__name--editing {
+  background: var(--admin-surface-alt);
+  box-shadow: inset 0 0 0 1px var(--admin-border);
+}
+
+.pool-turn__meta {
+  color: var(--admin-muted);
+  font-size: 0.82rem;
+}
+
+.pool-chips {
+  display: flex;
+  gap: 0.28rem;
+  margin-top: 0.45rem;
+}
+
+.pool-chip {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 999px;
+  border: 2px solid var(--pool-chip-on);
+  background: var(--pool-chip-on);
+}
+
+.pool-chip--off {
+  background: transparent;
+  border-color: var(--pool-chip-off);
+}
+
+.pool-actions {
+  display: grid;
+  grid-template-areas:
+    "chips order"
+    "secondary order";
+  grid-template-columns: auto 46px;
+  gap: 0.4rem;
+  justify-content: end;
+  align-items: center;
+}
+
+.pool-actions__chips {
+  grid-area: chips;
+  display: flex;
+  gap: 0.4rem;
+  justify-content: end;
+}
+
+.pool-actions__order {
+  grid-area: order;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  justify-self: end;
+}
+
+.pool-actions__secondary {
+  grid-area: secondary;
+  display: flex;
+  gap: 0.4rem;
+  justify-content: end;
+}
+
+.pool-action {
+  width: 48px;
+  height: 42px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.pool-action--decrease,
+.pool-action--increase {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.pool-action--decrease {
+  background: var(--admin-btn-danger-bg);
+  border-color: var(--admin-btn-danger-bg);
+  color: var(--admin-btn-danger-text);
+}
+
+.pool-action--increase {
+  background: var(--admin-btn-success-bg);
+  border-color: var(--admin-btn-success-bg);
+  color: var(--admin-btn-success-text);
+}
+
+.pool-empty {
+  border: 1px dashed var(--admin-border);
+  border-radius: 0.8rem;
+  color: var(--admin-muted);
+  padding: 1.25rem;
+  text-align: center;
+}
+
+@media (max-width: 991.98px) {
+  .pool-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 575.98px) {
+  .pool-fast-form { grid-template-columns: 1fr; }
+  .pool-turn { grid-template-columns: 1fr; }
+  .pool-actions {
+    grid-template-areas:
+      "chips order"
+      "secondary order";
+    grid-template-columns: minmax(0, 1fr) 46px;
+    justify-content: stretch;
+  }
+  .pool-actions__chips,
+  .pool-actions__secondary { justify-content: start; }
+}

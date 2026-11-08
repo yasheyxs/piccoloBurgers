@@ -284,3 +284,26 @@ if (!function_exists('piccolo_e')) {
         return htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
     }
 }
+
+if (!function_exists('piccolo_columna_existe')) {
+    /**
+     * Verifica si una columna existe en la tabla indicada del esquema actual.
+     */
+    function piccolo_columna_existe(PDO $conexion, string $tabla, string $columna): bool
+    {
+        $consulta = $conexion->prepare(
+            'SELECT COUNT(*)
+             FROM INFORMATION_SCHEMA.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = :tabla
+               AND COLUMN_NAME = :columna'
+        );
+
+        $consulta->execute([
+            ':tabla'   => $tabla,
+            ':columna' => $columna,
+        ]);
+
+        return (bool) $consulta->fetchColumn();
+    }
+}

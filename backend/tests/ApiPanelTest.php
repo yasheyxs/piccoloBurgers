@@ -280,6 +280,18 @@ verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 3, 'r
 $r = api('PUT', '/admin/puntos/configuracion', $cookies, ['minimo_puntos' => $config['minimo_puntos'] ?? 50, 'valor_punto' => $config['valor_punto'] ?? 20, 'maximo_porcentaje' => $config['maximo_porcentaje'] ?? 25], $csrf);
 verificar($r['status'] === 200 && ($r['cuerpo']['datos']['maximo_porcentaje'] ?? null) == ($config['maximo_porcentaje'] ?? 25), 'guarda la configuración');
 
+echo "\nPool\n";
+$r = api('GET', '/admin/pool', $cookies);
+verificar($r['status'] === 200 && array_key_exists('montoVendido', $r['cuerpo']['datos']['pools']['azul']['stats'] ?? []) && $r['cuerpo']['datos']['pools']['azul']['stats']['montoVendido'] === null, 'muestra las mesas sin los montos');
+$r = api('POST', '/admin/pool/datos-sensibles', $cookies, ['password' => 'incorrecta'], $csrf);
+verificar($r['status'] === 422, 'con una contraseña incorrecta no muestra los montos (422)');
+$r = api('POST', '/admin/pool/datos-sensibles', $cookies, ['password' => $usuarios['admin'][1]], $csrf);
+verificar($r['status'] === 200 && is_numeric($r['cuerpo']['datos']['pools']['azul']['stats']['montoVendido'] ?? null), 'con tu contraseña muestra los montos');
+$r = api('POST', '/admin/pool/turnos/999999/consumir', $cookies, null, $csrf);
+verificar(in_array($r['status'], [404, 409], true), 'un turno que no existe no se toca');
+$r = api('PUT', '/admin/pool/configuracion', $cookies, ['max_fichas_por_registro' => 0, 'valor_ficha' => 0], $csrf);
+verificar($r['status'] === 422 && count($r['cuerpo']['errores'] ?? []) === 2, 'rechaza parámetros fuera de rango (422)');
+
 if (isset($usuarios['delivery'])) {
     echo "\nOtro rol\n";
     $otra = tempnam(sys_get_temp_dir(), 'pb_api_');
@@ -294,6 +306,8 @@ if (isset($usuarios['delivery'])) {
     verificar($r['status'] === 403, 'ni los usuarios (403)');
     $r = api('GET', '/admin/premios', $otra);
     verificar($r['status'] === 403, 'ni los premios (403)');
+    $r = api('GET', '/admin/pool', $otra);
+    verificar($r['status'] === 403, 'ni el pool (403)');
     @unlink($otra);
 }
 
